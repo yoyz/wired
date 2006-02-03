@@ -19,8 +19,10 @@ AC_LANG([C++])
 
 # Accelerate the compilation.
 if test "$GXX" = yes; then
-  CXXFLAGS="-ggdb"
+  CXXFLAGS="-ggdb -Wall -Wextra"
 fi
+
+LDFLAGS="-lefence"
 
 # for autoheader .. investigate this further :)
 AC_CONFIG_HEADER(src/include/config.h)
