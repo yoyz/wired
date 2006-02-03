@@ -1,9 +1,9 @@
 SUBDIRS =		\
 	porttime
 
-LDFLAGS = 
+LDFLAGS =  -lefence
 
-CPPFLAGS = -DPMALSA -ggdb -Ipm_common -Iporttime
+CPPFLAGS = -DPMALSA -g3 -Ipm_common -Iporttime
 
 noinst_LIBRARIES = libportmidi.a
 

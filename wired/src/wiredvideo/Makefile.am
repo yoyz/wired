@@ -1,6 +1,6 @@
-LDFLAGS = $(shell wx-config --libs) -g3 -O3
+LDFLAGS = $(shell wx-config --libs) -g3 -lefence
 
-CPPFLAGS = $(shell wx-config --cflags) -g3 -O3
+CPPFLAGS = $(shell wx-config --cflags) -g3
 
 noinst_LIBRARIES = libwiredvideo.a
 

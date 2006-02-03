@@ -1,6 +1,6 @@
-LDFLAGS = $(shell wx-config --libs) -g3 -O3
+LDFLAGS = $(shell wx-config --libs) -g3 -ggdb -lefence
 
-CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../plugins -I../fileloader -I/opt/gnome/include -I../sequencer -I../redist -I../audio -I../engine -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../asm -I../undo -I../libs/WiredWidgets/src -g3 -O3
+CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../plugins -I../fileloader -I/opt/gnome/include -I../sequencer -I../redist -I../audio -I../engine -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../asm -I../undo -I../libs/WiredWidgets/src -g3 -ggdb
 
 noinst_LIBRARIES = libeditmidi.a
 

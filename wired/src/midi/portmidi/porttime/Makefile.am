@@ -1,6 +1,6 @@
-LDFLAGS = -lasound
+LDFLAGS = -lasound -lefence
 
-CPPFLAGS = -DPMALSA -ggdb -I../pm_common -I../porttime
+CPPFLAGS = -DPMALSA -g3 -I../pm_common -I../porttime
 
 noinst_LIBRARIES = libporttime.a
 

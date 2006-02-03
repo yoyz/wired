@@ -1,8 +1,8 @@
 SUBDIRS = wiredcodec
 
-CPPFLAGS = $(shell wx-config --cflags) -g3 -O3
+CPPFLAGS = $(shell wx-config --cflags) -g3 -ggdb
 
-LDFLAGS = $(shell wx-config --libs) -ldl
+LDFLAGS = $(shell wx-config --libs) -ldl -lefence
 
 noinst_LIBRARIES = libwiredCodec.a
 
