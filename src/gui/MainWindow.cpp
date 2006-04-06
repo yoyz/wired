@@ -44,21 +44,23 @@
 #include "FileConversion.h"
 #include "config.h"
 #include "Threads.h"
+#include "MediaLibrary.h"
 
 
 Rack					*RackPanel;
 SequencerGui				*SeqPanel;
 Sequencer				*Seq;
-WiredVideo			*WiredVideoObject;
+WiredVideo				*WiredVideoObject;
 AudioEngine				*Audio;
 Mixer					*Mix;
 AudioCenter				WaveCenter;
 Transport				*TransportPanel;
+MediaLibrary				*MediaLibraryPanel;
 PlugStartInfo				StartInfo;
 vector<PluginLoader *>			LoadedPluginsList;
 WiredSession				*CurrentSession;
 WiredSessionXml				*CurrentXmlSession;
-WiredExternalPluginMgr		*LoadedExternalPlugins;
+WiredExternalPluginMgr			*LoadedExternalPlugins;
 FileConversion				*FileConverter;
 
 MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size)
@@ -187,7 +189,8 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   TransportFrame = 0x0;
   OptFrame = 0x0;
   SequencerFrame = 0x0;
-  RackFrame = 0x0; 
+  RackFrame = 0x0;
+  MediaLibraryFrame = 0x0; 
 
   MenuBar = new wxMenuBar;
   FileMenu = new wxMenu;
@@ -201,6 +204,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   CreateEffectMenu = new wxMenu;
   HelpMenu = new wxMenu;
   WindowMenu = new wxMenu;
+  MediaLibraryMenu = new wxMenu;
   
   FileMenu->Append(MainWin_New, _("&New\tCtrl-N"));
   FileMenu->Append(MainWin_Open, _("&Open...\tCtrl-O"));
@@ -213,10 +217,8 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   FileMenu->AppendSeparator();
   FileMenu->Append(MainWin_ExportWave, _("&Export Wave file..."));
   FileMenu->Append(MainWin_ExportMIDI, _("&Export MIDI file..."));
-
   FileMenu->AppendSeparator();
   FileMenu->Append(MainWin_Quit, _("&Quit\tCtrl-Q"));
-
 
   EditMenu->AppendSeparator();
   EditMenu->Append(MainWin_Cut, _("C&ut\tCtrl+X"));
@@ -239,6 +241,11 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   HelpMenu->Append(MainWin_IntHelp, _("&Show Integrated Help"));
   HelpMenu->Append(MainWin_About, _("&About..."));
   
+  MediaLibraryMenu->Append(MainWin_MediaLibraryShow, _("&Show\tCtrl-M"));
+  MediaLibraryMenu->Append(MainWin_MediaLibraryHide, _("&Hide\tCtrl-M"));
+  ItemFloatingMediaLibrary = MediaLibraryMenu->AppendCheckItem(MainWin_FloatMediaLibrary, _("Floating"));
+
+
   WindowMenu->Append(MainWin_SwitchRack, _("Switch &Rack/Optional view\tTAB"));
   WindowMenu->Append(MainWin_SwitchSeq, _("Switch &Sequencer/Optional view\tCtrl+TAB"));
   WindowMenu->AppendSeparator();
@@ -258,46 +265,56 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   MenuBar->Append(CreateInstrMenu, _("&Instruments"));
   MenuBar->Append(CreateEffectMenu, _("Effec&ts"));
   MenuBar->Append(VideoMenu, _("&Video"));
+  MenuBar->Append(MediaLibraryMenu, _("&MediaLibrary"));
   MenuBar->Append(WindowMenu, _("&Window"));
   MenuBar->Append(HelpMenu, _("&Help"));
     
   SetMenuBar(MenuBar);
 
-  split = new wxSplitterWindow(this, -1, wxPoint(0, 0), wxSize(800, 450)); 
+  split = new wxSplitterWindow(this, -1, wxPoint(0, 0), wxSize(400, 450));
+  splitVert = new wxSplitterWindow(split, -1, wxPoint(0, 0), wxSize(0, 450));
+  split->SetMinimumPaneSize(2);
+  splitVert->SetMinimumPaneSize(2);
 
   /* Creation Panel */
-  RackPanel = new Rack(split, -1, wxPoint(0, 0), wxSize(800, 250));
+  RackPanel = new Rack(splitVert, -1, wxPoint(0, 0), wxSize(0, 250));
 
-  //cout << "Known warning ...." << endl;      
-  SeqPanel = new SequencerGui(split, wxPoint(0, 254), wxSize(800, 200), this);
+  //cout << "Known warning ...." << endl;
+  SeqPanel = new SequencerGui(splitVert, wxPoint(0, 254), wxSize(0, 200), this);
   //cout << "done :-)" << endl;  
 
   //  OptPanel = new OptionPanel(this, wxPoint(306, 452), wxSize(470, 150), wxSIMPLE_BORDER);
   TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER);
 
-  split->SplitHorizontally(RackPanel, SeqPanel);
+  MediaLibraryPanel = new MediaLibrary(split, wxPoint(0, 0), wxSize(0, 450), wxSIMPLE_BORDER);
+  MediaLibraryPanel->SetSizeHints(2, 450);
+
+  splitVert->SplitHorizontally(RackPanel, SeqPanel);
+  split->SplitVertically(MediaLibraryPanel, splitVert);
   
   /* Placement Panel */
-    
+
   BottomSizer = new wxBoxSizer(wxHORIZONTAL);
-  BottomSizer->Add(TransportPanel, 0, wxEXPAND | wxALL | wxFIXED_MINSIZE, 2); 
+  BottomSizer->Add(TransportPanel, 0, wxEXPAND | wxALL | wxFIXED_MINSIZE, 2);
   BottomSizer->Add(OptPanel, 1, wxEXPAND | wxALL | wxFIXED_MINSIZE, 2); 
   
+
   TopSizer = new wxBoxSizer(wxVERTICAL);
-    
   TopSizer->Add(split, 1, wxEXPAND | wxALL, 2);
   TopSizer->Add(BottomSizer, 0, wxEXPAND | wxALL, 0);
+
   SetSizer(TopSizer);
-  
+
   RackPanel->SetBackgroundColour(*wxBLACK);
   SeqPanel->SetBackgroundColour(*wxWHITE);
   OptPanel->SetBackgroundColour(*wxLIGHT_GREY);
+  MediaLibraryPanel->SetBackgroundColour(*wxLIGHT_GREY);
   
+  MediaLibraryPanel->Show();
   RackPanel->Show();
   SeqPanel->Show();
   OptPanel->Show();
   TransportPanel->Show();
-
 
   StartInfo.HostCallback = HostCallback;
   StartInfo.Version = WIRED_VERSION;
@@ -1090,14 +1107,14 @@ void					MainWindow::OnFloatSequencer(wxCommandEvent &event)
   if (WindowMenu->IsChecked(MainWin_FloatSequencer))
     {
       SequencerFrame = new FloatingFrame(0x0, -1, _("Sequencer"), SeqPanel->GetPosition(), 
-					 SeqPanel->GetSize(), SeqPanel, this, ItemFloatingSeq);
+					 SeqPanel->GetSize(), SeqPanel, split, ItemFloatingSeq);
       SeqPanel->Reparent(SequencerFrame);
       //SeqPanel->Floating = true;
       SequencerFrame->Show();
     }
   else
     {
-      SeqPanel->Reparent(this);
+      SeqPanel->Reparent(splitVert);
       //SeqPanel->Floating = false;
       delete SequencerFrame;
       SequencerFrame = 0x0;
@@ -1109,15 +1126,41 @@ void					MainWindow::OnFloatRack(wxCommandEvent &event)
   if (WindowMenu->IsChecked(MainWin_FloatRacks))
     {
       RackFrame = new FloatingFrame(0x0, -1, _("Racks"), RackPanel->GetPosition(), 
-				    RackPanel->GetSize(), RackPanel, this, ItemFloatingRacks);
+				    RackPanel->GetSize(), RackPanel, split, ItemFloatingRacks);
       RackPanel->Reparent(RackFrame);
       RackFrame->Show();
     }
   else
     {
-      RackPanel->Reparent(this);
+      RackPanel->Reparent(splitVert);
       delete RackFrame;
       RackFrame = 0x0;
+    }
+}
+
+void					MainWindow::OnFloatMediaLibrary(wxCommandEvent &event)
+{
+  if (MediaLibraryMenu->IsChecked(MainWin_FloatMediaLibrary))
+    {
+      cout << "[MEDIALIBRARY] Float" << endl;
+      MediaLibraryFrame = new FloatingFrame(0x0, -1, _("MediaLibrary"), MediaLibraryPanel->GetPosition(), 
+				    MediaLibraryPanel->GetSize(), MediaLibraryPanel, split, ItemFloatingMediaLibrary);
+      MediaLibraryPanel->Reparent(MediaLibraryFrame);
+      MediaLibraryPanel->SetVisible();
+      MediaLibraryPanel->SetFloating();
+      //      split->SetSashPosition(1);
+      //      MediaLibraryPanel->SetSizeHints(2, 450);
+      MediaLibraryFrame->Show();
+    }
+  else
+    {
+      cout << "[MEDIALIBRARY] UnFloat" << endl;
+      MediaLibraryPanel->Reparent(split);
+      delete MediaLibraryFrame;
+      MediaLibraryFrame = 0x0;
+      MediaLibraryPanel->SetVisible();
+      MediaLibraryPanel->SetDocked();
+      split->SetSashPosition(200);
     }
 }
 
@@ -1231,6 +1274,34 @@ void					MainWindow::SwitchSeqOptView()
       SetSizer(TopSizer);
     }
 }
+
+void					MainWindow::MediaLibraryShow(wxCommandEvent &event)
+{
+
+	cout << "[MAINWIN] Launching MediaLibrary" << endl;
+
+	if (MediaLibraryPanel->IsVisible() == true)
+	  {
+	    return ;
+	  }
+	MediaLibraryPanel->Show();
+	MediaLibraryPanel->SetVisible();
+ 	split->SetSashPosition(200);
+}
+
+void					MainWindow::MediaLibraryHide(wxCommandEvent &event)
+{
+	cout << "[MAINWIN] Hiding MediaLibrary" << endl;
+
+	if (MediaLibraryPanel->IsVisible() == false || MediaLibraryPanel->IsFloating() == true)
+	  {
+	    return ;
+	  }
+	MediaLibraryPanel->Hide();
+	MediaLibraryPanel->SetInvisible();
+ 	split->SetSashPosition(1);
+}
+
 
 void					MainWindow::OnSettings(wxCommandEvent &event)
 {
@@ -1670,6 +1741,7 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
   EVT_MENU(MainWin_FloatTransport, MainWindow::OnFloatTransport) 
   EVT_MENU(MainWin_FloatSequencer, MainWindow::OnFloatSequencer) 
   EVT_MENU(MainWin_FloatRacks, MainWindow::OnFloatRack) 
+  EVT_MENU(MainWin_FloatMediaLibrary, MainWindow::OnFloatMediaLibrary) 
   EVT_MENU(MainWin_Undo, MainWindow::OnUndo) 
   EVT_MENU(MainWin_Redo, MainWindow::OnRedo)
   //EVT_MENU(MainWin_History, MainWindow::OnHistory)
@@ -1689,6 +1761,8 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
   EVT_TIMER(MainWin_KillTimer, MainWindow::OnKillTimer)
   EVT_BUTTON(FileLoader_Start, MainWindow::OnFileLoaderStart)
   EVT_BUTTON(FileLoader_Stop, MainWindow::OnFileLoaderStop)
+  EVT_MENU(MainWin_MediaLibraryShow, MainWindow::MediaLibraryShow)
+  EVT_MENU(MainWin_MediaLibraryHide, MainWindow::MediaLibraryHide)
 //  EVT_MENU(MainWin_OpenVideo, MainWindow::OnOpenVideo)
 //  EVT_MENU(MainWin_CloseVideo, MainWindow::OnCloseVideo)
 //  EVT_MENU(MainWin_SeekVideo, MainWindow::OnSeekVideo)
