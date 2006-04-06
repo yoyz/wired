@@ -24,6 +24,8 @@ libgui_a_SOURCES = 			\
 		MainApp.h		\
 		MainWindow.cpp		\
 		MainWindow.h		\
+		MediaLibrary.cpp	\
+		MediaLibrary.h		\
 		MidiPattern.cpp		\
 		MidiPattern.h		\
 		MixerGui.cpp		\

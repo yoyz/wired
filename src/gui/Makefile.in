@@ -52,9 +52,10 @@ libgui_a_LIBADD =
 am_libgui_a_OBJECTS = AccelCenter.$(OBJEXT) ChannelGui.$(OBJEXT) \
 	ColoredLine.$(OBJEXT) ColoredBox.$(OBJEXT) Cursor.$(OBJEXT) \
 	HelpCtrl.$(OBJEXT) HelpPanel.$(OBJEXT) MainApp.$(OBJEXT) \
-	MainWindow.$(OBJEXT) MidiPattern.$(OBJEXT) MixerGui.$(OBJEXT) \
-	OptionPanel.$(OBJEXT) Pattern.$(OBJEXT) Rack.$(OBJEXT) \
-	Ruler.$(OBJEXT) SeqTrack.$(OBJEXT) SeqTrackPattern.$(OBJEXT) \
+	MainWindow.$(OBJEXT) MediaLibrary.$(OBJEXT) \
+	MidiPattern.$(OBJEXT) MixerGui.$(OBJEXT) OptionPanel.$(OBJEXT) \
+	Pattern.$(OBJEXT) Rack.$(OBJEXT) Ruler.$(OBJEXT) \
+	SeqTrack.$(OBJEXT) SeqTrackPattern.$(OBJEXT) \
 	SequencerGui.$(OBJEXT) SelectionZone.$(OBJEXT) \
 	SettingWindow.$(OBJEXT) StaticLabel.$(OBJEXT) \
 	Transport.$(OBJEXT) WaveEditor.$(OBJEXT) WaveView.$(OBJEXT) \
@@ -236,6 +237,8 @@ libgui_a_SOURCES = \
 		MainApp.h		\
 		MainWindow.cpp		\
 		MainWindow.h		\
+		MediaLibrary.cpp	\
+		MediaLibrary.h		\
 		MidiPattern.cpp		\
 		MidiPattern.h		\
 		MixerGui.cpp		\
@@ -337,6 +340,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HelpPanel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MainApp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MainWindow.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MediaLibrary.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MidiPattern.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MixerGui.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionPanel.Po@am__quote@
