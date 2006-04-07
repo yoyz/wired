@@ -271,8 +271,8 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
     
   SetMenuBar(MenuBar);
 
-  split = new wxSplitterWindow(this, -1, wxPoint(0, 0), wxSize(400, 450));
-  splitVert = new wxSplitterWindow(split, -1, wxPoint(0, 0), wxSize(0, 450));
+  split = new wxSplitterWindow(this, -1, wxPoint(0, 0), wxSize(400, 454));
+  splitVert = new wxSplitterWindow(split, -1, wxPoint(0, 0), wxSize(0, 454));
   split->SetMinimumPaneSize(2);
   splitVert->SetMinimumPaneSize(2);
 
@@ -286,8 +286,8 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   //  OptPanel = new OptionPanel(this, wxPoint(306, 452), wxSize(470, 150), wxSIMPLE_BORDER);
   TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER);
 
-  MediaLibraryPanel = new MediaLibrary(split, wxPoint(0, 0), wxSize(0, 450), wxSIMPLE_BORDER);
-  MediaLibraryPanel->SetSizeHints(2, 450);
+  MediaLibraryPanel = new MediaLibrary(split, wxPoint(0, 0), wxSize(0, 400), wxSIMPLE_BORDER);
+  MediaLibraryPanel->SetSizeHints(2, 0);
 
   splitVert->SplitHorizontally(RackPanel, SeqPanel);
   split->SplitVertically(MediaLibraryPanel, splitVert);
@@ -308,7 +308,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   RackPanel->SetBackgroundColour(*wxBLACK);
   SeqPanel->SetBackgroundColour(*wxWHITE);
   OptPanel->SetBackgroundColour(*wxLIGHT_GREY);
-  MediaLibraryPanel->SetBackgroundColour(*wxLIGHT_GREY);
+  MediaLibraryPanel->SetBackgroundColour(*wxWHITE);
   
   MediaLibraryPanel->Show();
   RackPanel->Show();
@@ -1149,7 +1149,6 @@ void					MainWindow::OnFloatMediaLibrary(wxCommandEvent &event)
       MediaLibraryPanel->SetVisible();
       MediaLibraryPanel->SetFloating();
       //      split->SetSashPosition(1);
-      //      MediaLibraryPanel->SetSizeHints(2, 450);
       MediaLibraryFrame->Show();
     }
   else

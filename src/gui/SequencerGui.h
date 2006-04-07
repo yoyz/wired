@@ -54,7 +54,7 @@ using namespace std;
 #define ERASE_UP			wxT("ihm/toolbar/erase_up.png")
 #define ERASE_DOWN			wxT("ihm/toolbar/erase_down.png")
 #define SPLIT_UP			wxT("ihm/toolbar/split_up.png")
-#define SPLIT_DOWN			wxT("ihm/toolbar/split_up.png")
+#define SPLIT_DOWN			wxT("ihm/toolbar/split_down.png")
 #define MAGN_UP				wxT("ihm/toolbar/magn_up.png")
 #define MAGN_DOWN			wxT("ihm/toolbar/magn_down.png")
 #define COLOR_UP			wxT("ihm/toolbar/color_up.png")

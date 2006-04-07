@@ -12,6 +12,22 @@ class				HoldButton;
 class				StaticLabel;
 class				VUMCtrl;
 
+#define MEDIALIBRARY_ADDUP_IMG		wxT("ihm/toolbar/hand_up.png")
+#define MEDIALIBRARY_ADDDO_IMG		wxT("ihm/toolbar/hand_down.png")
+#define MEDIALIBRARY_REMOVEUP_IMG	wxT("ihm/toolbar/erase_up.png")
+#define MEDIALIBRARY_REMOVEDO_IMG	wxT("ihm/toolbar/erase_down.png")
+#define MEDIALIBRARY_EDITUP_IMG		wxT("ihm/toolbar/draw_up.png")
+#define MEDIALIBRARY_EDITDO_IMG		wxT("ihm/toolbar/draw_down.png")
+#define MEDIALIBRARY_INSERTUP_IMG	wxT("ihm/toolbar/split_up.png")
+#define MEDIALIBRARY_INSERTDO_IMG	wxT("ihm/toolbar/split_down.png")
+
+#define ML_BACKGROUND			wxColour(142, 142, 169)
+#define ML_FOREGROUND			wxColour(142, 142, 155)
+
+#define NB_SORTSELECT_CHOICES		(4)
+#define DEFAULT_SORTSELECT_VALUE	wxT("Sort by...")
+
+
 class				MediaLibrary : public wxPanel
 {
  public:
@@ -21,28 +37,66 @@ class				MediaLibrary : public wxPanel
 
  protected:
   friend class			MainWindow;
-  int				size_x;
-  int				size_y;
   bool				visible;
   bool				floating;
+  bool				collapsed;
+  wxToolBar			*TopToolbar;
+  wxToolBar			*BottomToolbar;
+  wxToolBar			*FiltersToolbar;
+  wxBoxSizer			*TopSizer;
+  // A effacer ?
+  wxBoxSizer			*TreeSizer;
+  wxBoxSizer			*BottomSizer;
+  ///////////
+  wxComboBox			*SortSelect;
+  wxTreeCtrl			*Tree;
+  wxTextCtrl			*mlTextCtrl;
 
   void				OnSize(wxSizeEvent &event);
-  void				SetSize(int x, int y);
-  int				GetXSize();
-  int				GetYSize();
+  void				OnAdd(wxCommandEvent &WXUNUSED(event));
+  void				OnRemove(wxCommandEvent &WXUNUSED(event));
+  void				OnEdit(wxCommandEvent &WXUNUSED(event));
+  void				OnInsert(wxCommandEvent &WXUNUSED(event));
+
+  void				OnPreview(wxCommandEvent &WXUNUSED(event));
+  void				OnCollapse(wxCommandEvent &WXUNUSED(event));
+  void				OnSortToggle(wxCommandEvent &WXUNUSED(event));
+  void				OnFilterAudio(wxCommandEvent &WXUNUSED(event));
+  void				OnFilterMIDI(wxCommandEvent &WXUNUSED(event));
+  void				OnFilterVideo(wxCommandEvent &WXUNUSED(event));
+  void				OnFilterEffects(wxCommandEvent &WXUNUSED(event));
+
+  void				CreateTree();
+
+  bool				IsTreeCollapsed();
+  void				SetTreeCollapsed();
+  void				SetTreeExpanded();
   bool				IsVisible();
   void				SetInvisible();
   void				SetVisible();
   bool			        IsFloating();
   void				SetFloating();
   void				SetDocked();
+
   DECLARE_EVENT_TABLE()
 };
 
-enum    
 
+extern const struct s_combo_choice	SortSelectChoices[NB_SORTSELECT_CHOICES + 1];
+
+enum
 {
-  
+   MediaLibrary_Add = 1, 
+   MediaLibrary_Remove, 
+   MediaLibrary_Edit,
+   MediaLibrary_Insert,
+   MediaLibrary_Preview,
+   MediaLibrary_TreeCollapse,
+   MediaLibrary_SortSelect,
+   MediaLibrary_FilterAudio,
+   MediaLibrary_FilterMIDI,
+   MediaLibrary_FilterVideo,
+   MediaLibrary_FilterEffects,
 };
 
 
