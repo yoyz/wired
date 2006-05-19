@@ -154,13 +154,13 @@ wxString Plugin::OpenFileLoader(wxString title,
 {
   struct
   {
-    wxString *t;
+    wxString t;
     std::vector<wxString> *e;
     bool ak;
     wxString result;
   } w_filel;
  
-  w_filel.t = &title;
+  w_filel.t = title;
   w_filel.e = exts;
   w_filel.ak = akai;
   StartInfo.HostCallback(this, wiredOpenFileLoader, (void *)&w_filel);
@@ -172,12 +172,12 @@ wxString Plugin::SaveFileLoader(wxString title,
 {
   struct
   {
-    wxString *t;
+    wxString t;
     std::vector<wxString> *e;
     wxString result;
   } w_filel;
  
-  w_filel.t = &title;
+  w_filel.t = title;
   w_filel.e = exts;
   StartInfo.HostCallback(this, wiredSaveFileLoader, (void *)&w_filel);
   return (w_filel.result);
@@ -186,29 +186,25 @@ wxString Plugin::SaveFileLoader(wxString title,
 // Host info
 wxString Plugin::GetHostProductName()
 {
-  wxChar str[256];
   wxString s;
 
-  StartInfo.HostCallback(0x0, wiredHostProductName, (void *)str); 
-  s = str;
+  StartInfo.HostCallback(0x0, wiredHostProductName, (void *)&s); 
   return (s);
 }
 
-float  Plugin::GetHostProductVersion()
+wxString Plugin::GetHostProductVersion()
 {
-  float f;
+  wxString s;
 
-  StartInfo.HostCallback(0x0, wiredHostProductVersion, (void *)&f);
-  return (f);
+  StartInfo.HostCallback(0x0, wiredHostProductVersion, (void *)&s);
+  return (s);
 }
 
 wxString Plugin::GetHostVendorName()
 {
-  wxChar str[256];
   wxString s;
 
-  StartInfo.HostCallback(0x0, wiredHostVendorName, (void *)str); 
-  s = str;
+  StartInfo.HostCallback(0x0, wiredHostVendorName, (void *)&s); 
   return (s);
 }
 

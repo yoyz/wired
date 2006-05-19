@@ -278,10 +278,13 @@ void				OptionPanel::OnListToolClick(wxCommandEvent &event)
   menu = new wxMenu();
   for (k = OPT_TOOL_ID_START, i = ToolsList.begin(); i != ToolsList.end(); i++, k++)
     {
-      menu->Append(k, (*i)->Name.c_str());
-      Connect(k, wxEVT_COMMAND_MENU_SELECTED, 
-	      (wxObjectEventFunction)(wxEventFunction)
-	      (wxCommandEventFunction)&OptionPanel::OnSelectTool);
+      if (!(*i)->IsDetached)
+	{
+	  menu->Append(k, (*i)->Name.c_str());
+	  Connect(k, wxEVT_COMMAND_MENU_SELECTED, 
+		  (wxObjectEventFunction)(wxEventFunction)
+		  (wxCommandEventFunction)&OptionPanel::OnSelectTool);
+	}
     }
   wxPoint p(ListToolBtn->GetPosition());
   PopupMenu(menu, p.x, p.y);
@@ -366,8 +369,8 @@ void				OptionPanel::DeleteTools(void *DataPointer)
 	  && ((*i)->Type != ID_TOOL_HELP_OPTIONPANEL)) 
 	    if ((*i)->Data == DataPointer)
   	    {
-          ShowTool(MixerTool);
-          ToolsList.erase(i);
+	      ShowTool(MixerTool);
+	      ToolsList.erase(i);
 	      delete *i;
 	      break;
 	    }
@@ -376,21 +379,7 @@ void				OptionPanel::DeleteTools(void *DataPointer)
 
 void				OptionPanel::ClosePlug(Plugin *p)
 {
-  vector<WiredTool *>::iterator	i;
-  
-  for (i = ToolsList.begin(); i != ToolsList.end(); i++)
-    {
-      if ((*i)->Data == p)
-	{
-	  if (*i == CurrentTool)
-	    {
-	      ShowLastTool();
-  	    }     
-	  ToolsList.erase(i);
-	  delete *i;
-	  break;
-	}
-    }
+  DeleteTools(p);
 }
 
 BEGIN_EVENT_TABLE(WiredFrame, wxFrame)

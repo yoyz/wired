@@ -86,29 +86,29 @@ void				MediaLibrary::CreateTree()
 {
 
   cout << "*** [MEDIALIBRARY] Tree Creation" << this->GetSize().x << endl;
-  Tree = new wxTreeCtrl((wxWindow*)this, -1, wxPoint(10, 50), wxSize(300, this->GetSize().y - 100), wxTR_DEFAULT_STYLE | wxTR_EDIT_LABELS | wxTR_MULTIPLE, wxDefaultValidator, "Tree");
+  Tree = new wxTreeCtrl((wxWindow*)this, -1, wxPoint(10, 50), wxSize(300, this->GetSize().y - 100), wxTR_DEFAULT_STYLE | wxTR_EDIT_LABELS | wxTR_MULTIPLE, wxDefaultValidator, _("Tree"));
   Tree->SetIndent(5);
 
   /* Set the Root node with the project's name in label */
-  wxTreeItemId root = Tree->AppendItem(Tree->GetRootItem(), "Project's name");
+  wxTreeItemId root = Tree->AppendItem(Tree->GetRootItem(), _("Project's name"));
   Tree->SetItemBold(root);
 
   /* Starting the nodes construction */
-  wxTreeItemId Soundchild = Tree->AppendItem(root, "Sound Files");
-  wxTreeItemId child2 = Tree->AppendItem(Soundchild, "child2");
-  wxTreeItemId child3 = Tree->AppendItem(Soundchild, "child3");
+  wxTreeItemId Soundchild = Tree->AppendItem(root, _("Sound Files"));
+  wxTreeItemId child2 = Tree->AppendItem(Soundchild, _("child2"));
+  wxTreeItemId child3 = Tree->AppendItem(Soundchild, _("child3"));
 
-  wxTreeItemId MIDIchild = Tree->AppendItem(root, "MIDI Files");
-  wxTreeItemId child5 = Tree->AppendItem(MIDIchild, "child2");
-  wxTreeItemId child6 = Tree->AppendItem(MIDIchild, "child3");
+  wxTreeItemId MIDIchild = Tree->AppendItem(root, _("MIDI Files"));
+  wxTreeItemId child5 = Tree->AppendItem(MIDIchild, _("child2"));
+  wxTreeItemId child6 = Tree->AppendItem(MIDIchild, _("child3"));
 
-  wxTreeItemId Videochild = Tree->AppendItem(root, "Video Files");
-  wxTreeItemId child7 = Tree->AppendItem(Videochild, "child2");
-  wxTreeItemId child8 = Tree->AppendItem(Videochild, "child3");
+  wxTreeItemId Videochild = Tree->AppendItem(root, _("Video Files"));
+  wxTreeItemId child7 = Tree->AppendItem(Videochild, _("child2"));
+  wxTreeItemId child8 = Tree->AppendItem(Videochild, _("child3"));
 
-  wxTreeItemId Effectschild = Tree->AppendItem(root, "Effects Files");
-  wxTreeItemId child9 = Tree->AppendItem(Effectschild, "child2");
-  wxTreeItemId child10 = Tree->AppendItem(Effectschild, "child2");
+  wxTreeItemId Effectschild = Tree->AppendItem(root, _("Effects Files"));
+  wxTreeItemId child9 = Tree->AppendItem(Effectschild, _("child2"));
+  wxTreeItemId child10 = Tree->AppendItem(Effectschild, _("child2"));
 
   Tree->Expand(root);
 }
@@ -169,7 +169,7 @@ void				MediaLibrary::OnSize(wxSizeEvent &event)
 void				MediaLibrary::OnAdd(wxCommandEvent &WXUNUSED(event))
 {
   cout << "[MEDIALIBRARY] Add File (OnAdd)" << endl;
-  wxString FileToAdd = wxFileSelector("Add a file to the Media Library", "", "", "", "All supported files (*.*)|*.*", wxOPEN);
+  wxString FileToAdd = wxFileSelector(_("Add a file to the Media Library"), _(""), _(""), _(""), _("All supported files (*.*)|*.*"), wxOPEN);
   if (!FileToAdd.empty())
     {
       wxFileName	*File = new wxFileName(FileToAdd);

@@ -100,7 +100,7 @@ void				SettingWindow::AudioPanelView()
 
   int x1, x2;
   t->GetSize(&x1, 0x0);
-  BitsChoice = new wxChoice(AudioPanel, Setting_Bits, wxPoint(12 + x1, 2), wxSize(80, -1), 0, 0x0);  
+  BitsChoice = new wxChoice(AudioPanel, Setting_Bits, wxPoint(12 + x1, 2), wxSize(80, -1), 0, 0x0);    
   t = new wxStaticText(AudioPanel, -1, _("Sample rate:"), 
 				     wxPoint(22 + x1 + BitsChoice->GetSize().x, 10));
   t->GetSize(&x2, 0x0);
@@ -195,6 +195,7 @@ void			SettingWindow::OnSelPrefCategory(wxTreeEvent &e)
     }
 }
 
+/* No longer called */
 void SettingWindow::OnAudioClick(wxCommandEvent &event)
 {
   AudioPanel->Show(true);
@@ -208,7 +209,7 @@ void SettingWindow::OnAudioClick(wxCommandEvent &event)
       int j, val;
       wxString s;
 
-      AudioLoaded = true;
+     
       OutputList->Clear();
       if ((val = OutputChoice->GetSelection()) > 0)
 	for (j = 1, i = Audio->DeviceList.begin(); i != Audio->DeviceList.end(); i++, j++)
@@ -220,7 +221,7 @@ void SettingWindow::OnAudioClick(wxCommandEvent &event)
 		    s.Printf(_("Output %d"), j);
 		    OutputList->Append(s);
 		  }
-		break;
+		//breakOnAudioClick;
 	      }
 	  }
       InputList->Clear();
@@ -256,9 +257,9 @@ void SettingWindow::OnAudioClick(wxCommandEvent &event)
 	  LatencySlider->SetValue(i);
       UpdateLatency();
     }  
-
 }
 
+/* No longer called */
 void SettingWindow::OnMidiClick(wxCommandEvent &event)
 {
   AudioPanel->Show(false);
@@ -287,6 +288,7 @@ void SettingWindow::OnMidiClick(wxCommandEvent &event)
 
 void SettingWindow::OnOkClick(wxCommandEvent &event)
 {
+  AudioLoaded = true;
   Save();
   EndModal(wxID_OK);
 }
@@ -302,6 +304,7 @@ void SettingWindow::OnApplyClick(wxCommandEvent &event)
     Audio->CloseStream();
   
   */
+  AudioLoaded = true;
   Save();
   
   /*
@@ -324,7 +327,12 @@ void SettingWindow::OnApplyClick(wxCommandEvent &event)
 
 void SettingWindow::OnInputDevClick(wxCommandEvent &event)
 {
-  vector<Device*>::iterator i;
+  RefreshInputDev();
+}
+
+void SettingWindow::RefreshInputDev()
+{
+   vector<Device*>::iterator i;
   int j, val;
   wxString s;
 
@@ -340,16 +348,26 @@ void SettingWindow::OnInputDevClick(wxCommandEvent &event)
 	      s.Printf(_("Input %d"), j);
 	      InputList->Append(s);
 	    }
-	  return;
+	  break;
 	}
     }  
+    LoadSampleFormat();
+    LoadSampleRates();
+
 }
 
 void SettingWindow::OnOutputDevClick(wxCommandEvent &event)
 {
+  RefreshOutputDev();
+}
+
+void SettingWindow::RefreshOutputDev()
+{
+
   vector<Device*>::iterator i;
   int j, val;
   wxString s;
+
 
   OutputList->Clear();
   if ((val = OutputChoice->GetSelection()) != 0)
@@ -370,7 +388,9 @@ void SettingWindow::OnOutputDevClick(wxCommandEvent &event)
 	    }
 	}  
     }
-  LoadSampleFormat();
+    LoadSampleFormat();
+    LoadSampleRates();
+
 }
 
 void SettingWindow::OnOutputChanClick(wxCommandEvent &event)
@@ -393,22 +413,41 @@ void SettingWindow::OnOutputChanClick(wxCommandEvent &event)
 
 void SettingWindow::Load()
 {
-	ostringstream	oss;
-	
+  ostringstream	oss;
+  int i;
+
   QuickWaveBox->SetValue(WiredSettings->QuickWaveRender);
   dBWaveBox->SetValue(WiredSettings->dbWaveRender);
   oss << WiredSettings->maxUndoRedoDepth;
   undoRedoMaxDepthTextCtrl->SetValue(wxString(oss.str().c_str(), *wxConvCurrent));
   if (WiredSettings->OutputDev > -1)
-    OutputChoice->SetSelection(WiredSettings->OutputDev + 1);
+    {
+      OutputChoice->SetSelection(WiredSettings->OutputDev + 1);
+      RefreshOutputDev();
+      for(i = 0; i < OutputList->GetCount(); i++)
+	OutputList->Check(i, false);
+      for(i = 0; i < WiredSettings->OutputChannels.size(); i++)
+	OutputList->Check(WiredSettings->OutputChannels[i]);
+    }
   if (WiredSettings->InputDev > -1)
-    InputChoice->SetSelection(WiredSettings->InputDev + 1);
+    {
+      InputChoice->SetSelection(WiredSettings->InputDev + 1);
+      RefreshInputDev();
+      for(i = 0; i < InputList->GetCount(); i++)
+	InputList->Check(i, false);
+      for(i = 0; i < WiredSettings->InputChannels.size(); i++)
+	InputList->Check(WiredSettings->InputChannels[i]);
+    }
+      
   if (WiredSettings->SamplesPerBuffer > 0)
     {
       for (int i = 0; i < 9; i++)
 	if (Latencies[i] == WiredSettings->SamplesPerBuffer)
 	  LatencySlider->SetValue(i);
+      UpdateLatency();
     }
+
+    
 }
 
 void SettingWindow::Save()
@@ -417,6 +456,8 @@ void SettingWindow::Save()
 //	AudioMutex.Lock();
 //	MidiMutex.Lock();
   long i;
+
+
   istringstream	iss((string)undoRedoMaxDepthTextCtrl->GetValue().mb_str(*wxConvCurrent));
 
   WiredSettings->QuickWaveRender = QuickWaveBox->IsChecked();
@@ -424,9 +465,11 @@ void SettingWindow::Save()
   WiredSettings->OutputDev = OutputChoice->GetSelection() - 1;
   WiredSettings->InputDev = InputChoice->GetSelection() - 1;
   iss >> WiredSettings->maxUndoRedoDepth;
-
+  
+   AudioLoaded = true;
   if (AudioLoaded)
     {
+      cout << "Audio loaded for saving" << endl;
       WiredSettings->OutputChannels.clear();
       for (i = 0; i < OutputList->GetCount(); i++)
 	if (OutputList->IsChecked(i))
@@ -442,9 +485,11 @@ void SettingWindow::Save()
       WiredSettings->SampleFormat = BitsChoice->GetSelection();
       
       WiredSettings->SamplesPerBuffer = Latencies[LatencySlider->GetValue()];
+      WiredSettings->Save();
     }
   if (MidiLoaded)
     {
+      cout << "Midi loaded for saving" << endl;
       WiredSettings->MidiIn.clear();
       for (i = 0; i < MidiInList->GetCount(); i++)
 	if (MidiInList->IsChecked(i))
@@ -452,6 +497,7 @@ void SettingWindow::Save()
       
       WiredSettings->Save();
     }    
+
 //	AudioMutex.Unlock();
 //	MidiMutex.Unlock();
 }
@@ -459,7 +505,7 @@ void SettingWindow::Save()
 void SettingWindow::LoadSampleFormat()
 {
   vector<DeviceFormat *>::iterator i;
-  unsigned int k = OutputChoice->GetSelection() - 1;
+  unsigned int k = (OutputChoice->GetSelection() - 1) > 0 ? OutputChoice->GetSelection() - 1 : 0;
   
   BitsChoice->Clear();
   if (k < Audio->DeviceList.size())
@@ -515,7 +561,8 @@ void SettingWindow::LoadSampleRates()
   vector<double>::iterator i;
   wxString s;
   unsigned int k = BitsChoice->GetSelection();
-  unsigned int j = OutputChoice->GetSelection() - 1;
+  unsigned int j = (OutputChoice->GetSelection() - 1) > 0 ? OutputChoice->GetSelection() - 1 : 0 ;
+
   
   RateChoice->Clear();	 
   if (j < Audio->DeviceList.size())
@@ -596,7 +643,7 @@ void SettingWindow::UpdateLatency()
 
 BEGIN_EVENT_TABLE(SettingWindow, wxDialog)
   // EVT_TOGGLEBUTTON(Setting_General, SettingWindow::OnGeneralClick)
-//   EVT_TOGGLEBUTTON(Setting_Audio, SettingWindow::OnAudioClick)
+  // EVT_TOGGLEBUTTON(Setting_Audio, SettingWindow::OnAudioClick)
 //   EVT_TOGGLEBUTTON(Setting_Midi, SettingWindow::OnMidiClick)
   EVT_BUTTON(wxID_OK, SettingWindow::OnOkClick)
   EVT_BUTTON(wxID_CANCEL,SettingWindow:: OnCancelClick)
