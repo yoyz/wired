@@ -34,12 +34,8 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel)
   root = Tree->AppendItem(Tree->GetRootItem(), _("Project's name"));
   Tree->SetItemBold(root);
 
-  //vectorFolder.push_back(10);
-  // folders = new wxArray();
-
-
   /* Starting the nodes construction */
-  wxTreeItemId Soundchild = Tree->AppendItem(root, _("Sound Files"));
+  Soundchild = Tree->AppendItem(root, _("Sound Files"));
   wxTreeItemId child2 = Tree->AppendItem(Soundchild, _("child2"));
   wxTreeItemId child3 = Tree->AppendItem(Soundchild, _("child3"));
 
@@ -56,11 +52,53 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel)
   wxTreeItemId child10 = Tree->AppendItem(Effectschild, _("child2"));
 
   Tree->Expand(root);
+
+  LoadKnownExtentions();
 }
 
 MLTree::~MLTree()
 {
  
+}
+
+bool				MLTree::LoadKnownExtentions()
+{
+  wxTextFile			file(WiredSettings->ConfDir + EXT_FILE);
+  wxString			l;
+  wxString			*itemdata = NULL;
+
+  filters = wxT("");  
+
+   if (file.Open())
+     {
+      for (l = file.GetFirstLine(); ; l = file.GetNextLine())
+	{
+	  l.Trim(false);
+	  l = l.BeforeFirst('#');
+	  if (!l.IsEmpty())
+	    {
+	      itemdata = new wxString(l.BeforeFirst('\t'));
+	      Exts.push_back(*itemdata);
+	      filters += *itemdata + wxT(";");
+	    }
+ 	  if (file.Eof())
+ 	    break;
+	}
+      file.Close();
+     }
+   else
+     {
+       cout << "[MEDIALIBRARY] Could not open ext file" << endl;
+     }
+   //    cout << "[MEDIALIBRARY] known extentions : " << filters << endl;
+  
+    for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
+      {
+
+	cout << "[MEDIALIBRARY] : " << *iter << endl;
+      }
+
+   return (true);
 }
 
 void				MLTree::SetTreeExpanded()
@@ -89,6 +127,15 @@ void				MLTree::OnAdd()
       if (File->FileExists() == true)
 	{
 	  cout << "[MEDIALIBRARY] File added : " << FileToAdd <<  " Extention is : " << File->GetExt() << endl;
+	  
+	  for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
+	    {
+	     
+	      if (iter->Contains(File->GetExt()) == true)
+		{
+		  wxTreeItemId child2 = Tree->AppendItem(Soundchild, _(FileToAdd));
+		}
+	    }
 	}
     }
 }
@@ -111,7 +158,7 @@ void				MLTree::OnRemove()
     }
 }
 
-void				ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel)
+void				MLTree::ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel)
 {
   if (toLevel == 0 || !Tree->ItemHasChildren(id)) 
     return;
@@ -144,3 +191,35 @@ void				MLTree::OnCollapse()
       SetTreeCollapsed();
     }
 }
+
+void				MLTree::OnRightClick(wxTreeEvent &WXUNUSED(event))
+{
+  cout << "[MEDIALIBRARY] RightClick" << endl;
+
+        wxMenu* myMenu = new wxMenu();
+    //     myMenu->Append(idMenuNewDir, wxT("New Directory"), wxT("New Directory"));
+//         myMenu->Append(idMenuNewSnip, wxT("New Snippet"), wxT("New Snippet"));
+        myMenu->AppendSeparator();
+//         myMenu->Append(idMenuDelete, wxT("Delete"), wxT("Delete"));
+        PopupMenu(myMenu);
+        delete myMenu; 
+}
+
+void				MLTree::OnContextMenu(wxMouseEvent &WXUNUSED(event))
+{
+  cout << "[MEDIALIBRARY] ContextMenu" << endl;
+}
+
+void				MLTree::OnSelChange(wxTreeEvent &WXUNUSED(event))
+{
+    cout << "[MEDIALIBRARY] Selection Change" << endl;
+}
+
+BEGIN_EVENT_TABLE(MLTree, wxPanel)
+  //  EVT_CONTEXT_MENU(MLTree::OnContextMenu)
+//   EVT_RIGHT_DOWN(MLTree::OnContextMenu)
+//   EVT_TREE_ITEM_MENU(MLTree_RightClick, MLTree::OnRightClick)
+
+//   EVT_TREE_ITEM_RIGHT_CLICK(MLTree_RightClick, MLTree::OnRightClick)
+//   EVT_TREE_SEL_CHANGED(MLTree_SelChange, MLTree::OnSelChange)
+END_EVENT_TABLE()

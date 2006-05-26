@@ -6,6 +6,12 @@
 
 #include <wx/wx.h>
 #include <vector>
+#include <list>
+
+using std::string;
+using std::vector;
+
+#define EXT_FILE		wxT("wired_exts.conf")
 
 class				MLTree : public wxPanel
 {
@@ -19,31 +25,35 @@ class				MLTree : public wxPanel
   wxTreeCtrl			*Tree;
   bool				collapsed;
   wxTreeItemId			root;
-  //vector<wxTreeItemId>		Folders;
+  wxString			filters;
+  vector<wxString>		Exts;
+
+  // temp
+  wxTreeItemId			Soundchild;
+  //
 
   bool				IsTreeCollapsed();
   void				SetTreeCollapsed();
   void				SetTreeExpanded();
   void				OnAdd();
   void				OnRemove();
+  void				ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel);
   void				OnCollapse();
-  //DECLARE_EVENT_TABLE()
+  bool				LoadKnownExtentions();
+
+  void				OnRightClick(wxTreeEvent &WXUNUSED(event));
+  void				OnContextMenu(wxMouseEvent &WXUNUSED(event));
+  void				OnSelChange(wxTreeEvent &WXUNUSED(event));
+
+  DECLARE_EVENT_TABLE()
 };
 
 
-/* enum */
-/* { */
-/*    MediaLibrary_Add = 1, */
-/*    MediaLibrary_Remove, */
-/*    MediaLibrary_Edit, */
-/*    MediaLibrary_Insert, */
-/*    MediaLibrary_Preview, */
-/*    MediaLibrary_TreeCollapse, */
-/*    MediaLibrary_SortSelect, */
-/*    MediaLibrary_FilterAudio, */
-/*    MediaLibrary_FilterMIDI, */
-/*    MediaLibrary_FilterVideo, */
-/*    MediaLibrary_FilterEffects, */
-/* }; */
+enum
+{
+   MLTree_Add = 53028,
+   MLTree_RightClick = 2913,
+   MLTree_SelChange,
+};
 
 #endif

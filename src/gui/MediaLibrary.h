@@ -20,10 +20,8 @@ class				VUMCtrl;
 #define MEDIALIBRARY_EDITDO_IMG		wxT("ihm/toolbar/draw_down.png")
 #define MEDIALIBRARY_INSERTUP_IMG	wxT("ihm/toolbar/split_up.png")
 #define MEDIALIBRARY_INSERTDO_IMG	wxT("ihm/toolbar/split_down.png")
-
 #define ML_BACKGROUND			wxColour(142, 142, 169)
 #define ML_FOREGROUND			wxColour(142, 142, 155)
-
 #define NB_SORTSELECT_CHOICES		(4)
 #define DEFAULT_SORTSELECT_VALUE	wxT("Sort by...")
 
@@ -57,6 +55,7 @@ class				MediaLibrary : public wxPanel
   wxTextCtrl			*mlTextCtrl;
   wxMenu			*PopMenu;
   MLTree			*MLTreeView;
+
 
   void				OnSize(wxSizeEvent &event);
   void				OnEdit(wxCommandEvent &WXUNUSED(event));

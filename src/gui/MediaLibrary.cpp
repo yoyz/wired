@@ -19,15 +19,13 @@
 
 extern WiredSession				*CurrentSession;
 
-//MLtree		*MLTree = NULL;
-
 const struct s_combo_choice		SortSelectChoices[NB_SORTSELECT_CHOICES + 1] =
 {
-  { wxT("filename")		,	1	},
-  { wxT("filetype")		,	2	},
-  { wxT("filesize")		,	4	},
-  { wxT("Modified")		,	8	},
-  { wxT("")			,	4242	}
+  { wxT("filename")	,	1	},
+  { wxT("filetype")	,	2	},
+  { wxT("filesize")	,	4	},
+  { wxT("Modified")	,	8	},
+  { wxT("")		,	4242	}
 };
 
 MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style)
