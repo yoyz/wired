@@ -3,6 +3,7 @@
 
 #include <wx/filename.h>
 #include <wx/treectrl.h>
+#include "MLTree.h"
 #include "MediaLibrary.h"
 #include "Sequencer.h"
 #include "SequencerGui.h"
@@ -17,6 +18,8 @@
 #include "../engine/AudioEngine.h"
 
 extern WiredSession				*CurrentSession;
+
+//MLtree		*MLTree = NULL;
 
 const struct s_combo_choice		SortSelectChoices[NB_SORTSELECT_CHOICES + 1] =
 {
@@ -38,15 +41,15 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
   SetBackgroundColour(ML_BACKGROUND);
   SetForegroundColour(ML_FOREGROUND);
 
+  MLTreeView = new MLTree(this);
+  MLTreeView->SetTreeCollapsed();
+
   TopToolbar = new wxToolBar(this, -1, wxPoint(-1, -1), wxSize(1000, 46), wxTB_3DBUTTONS);
   TopToolbar->AddTool(MediaLibrary_Add, _("Add"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_ADDUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_ADDDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Add a file"), _("Add a file"), NULL);
   TopToolbar->AddTool(MediaLibrary_Remove, _("Remove"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_REMOVEUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_REMOVEDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Remove file"), _("Remove file"), NULL);
   TopToolbar->AddTool(MediaLibrary_Edit, _("Edit"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_EDITUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_EDITDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Edit file"), _("Edit file"), NULL);
   TopToolbar->AddTool(MediaLibrary_Insert, _("Insert"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_INSERTUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_INSERTDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Insert file"), _("Insert file in a new track"), NULL);
   TopToolbar->Realize();
-
-  CreateTree();
-  SetTreeCollapsed();
 
   BottomToolbar = new wxToolBar(this, -1, wxPoint(-1, this->GetSize().y - 50), wxSize(1000, 46), wxTB_3DBUTTONS);
   BottomToolbar->AddTool(MediaLibrary_Preview, _("Preview"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_ADDUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_ADDDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Preview file"), _("Preview a file"), NULL);
@@ -70,62 +73,15 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
 
   TopSizer = new wxBoxSizer(wxVERTICAL);
   TopSizer->Add(TopToolbar, 0, wxALL | wxEXPAND, 0);
-  TopSizer->Add(Tree, 0, wxALL | wxEXPAND, 0);
+  TopSizer->Add(MLTreeView, 0, wxALL | wxEXPAND, 0);
   TopSizer->Add(BottomToolbar, 0, wxALL | wxEXPAND, 0);
   TopSizer->Add(FiltersToolbar, 0, wxALL | wxEXPAND, 0);
   SetSizer(TopSizer);
-
 }
 
 MediaLibrary::~MediaLibrary()
 {
   
-}
-
-void				MediaLibrary::CreateTree()
-{
-
-  cout << "*** [MEDIALIBRARY] Tree Creation" << this->GetSize().x << endl;
-  Tree = new wxTreeCtrl((wxWindow*)this, -1, wxPoint(10, 50), wxSize(300, this->GetSize().y - 100), wxTR_DEFAULT_STYLE | wxTR_EDIT_LABELS | wxTR_MULTIPLE, wxDefaultValidator, _("Tree"));
-  Tree->SetIndent(5);
-
-  /* Set the Root node with the project's name in label */
-  wxTreeItemId root = Tree->AppendItem(Tree->GetRootItem(), _("Project's name"));
-  Tree->SetItemBold(root);
-
-  /* Starting the nodes construction */
-  wxTreeItemId Soundchild = Tree->AppendItem(root, _("Sound Files"));
-  wxTreeItemId child2 = Tree->AppendItem(Soundchild, _("child2"));
-  wxTreeItemId child3 = Tree->AppendItem(Soundchild, _("child3"));
-
-  wxTreeItemId MIDIchild = Tree->AppendItem(root, _("MIDI Files"));
-  wxTreeItemId child5 = Tree->AppendItem(MIDIchild, _("child2"));
-  wxTreeItemId child6 = Tree->AppendItem(MIDIchild, _("child3"));
-
-  wxTreeItemId Videochild = Tree->AppendItem(root, _("Video Files"));
-  wxTreeItemId child7 = Tree->AppendItem(Videochild, _("child2"));
-  wxTreeItemId child8 = Tree->AppendItem(Videochild, _("child3"));
-
-  wxTreeItemId Effectschild = Tree->AppendItem(root, _("Effects Files"));
-  wxTreeItemId child9 = Tree->AppendItem(Effectschild, _("child2"));
-  wxTreeItemId child10 = Tree->AppendItem(Effectschild, _("child2"));
-
-  Tree->Expand(root);
-}
-
-void				MediaLibrary::SetTreeExpanded()
-{
-  collapsed = false;
-}
-
-void				MediaLibrary::SetTreeCollapsed()
-{
-  collapsed = true;
-}
-
-bool				MediaLibrary::IsTreeCollapsed()
-{
-  return (collapsed);
 }
 
 bool				MediaLibrary::IsVisible()
@@ -158,45 +114,28 @@ void				MediaLibrary::SetDocked()
   floating = false;
 }
 
+
+void				MediaLibrary::OnAdd(wxCommandEvent &WXUNUSED(event))
+{
+  MLTreeView->OnAdd();
+}
+
+void				MediaLibrary::OnRemove(wxCommandEvent &WXUNUSED(event))
+{
+  MLTreeView->OnRemove();
+}
+
+void				MediaLibrary::OnCollapse(wxCommandEvent &WXUNUSED(event))
+{
+  MLTreeView->OnCollapse();
+}
+
 void				MediaLibrary::OnSize(wxSizeEvent &event)
 {
   cout << "[MEDIALIBRARY] Resize (OnSize) : X = " << this->GetSize().x << "; Y = " << this->GetSize().y << endl;
 
   BottomToolbar->Move(0, this->GetSize().y - 100);
   FiltersToolbar->Move(0, this->GetSize().y - 50);
-}
-
-void				MediaLibrary::OnAdd(wxCommandEvent &WXUNUSED(event))
-{
-  cout << "[MEDIALIBRARY] Add File (OnAdd)" << endl;
-  wxString FileToAdd = wxFileSelector(_("Add a file to the Media Library"), _(""), _(""), _(""), _("All supported files (*.*)|*.*"), wxOPEN);
-  if (!FileToAdd.empty())
-    {
-      wxFileName	*File = new wxFileName(FileToAdd);
-      
-      if (File->FileExists() == true)
-	{
-	  cout << "[MEDIALIBRARY] File added : " << FileToAdd <<  " Extention is : " << File->GetExt() << endl;
-	}
-    }
-}
-
-void				MediaLibrary::OnRemove(wxCommandEvent &WXUNUSED(event))
-{
-  //  cout << "[MEDIALIBRARY] Remove File (OnRemove)" << endl;
-  wxArrayTreeItemIds		selection;
-  int				selection_length;
-  int				i;
-
-  selection_length = Tree->GetSelections(selection);  
-  for (i = 0; i < selection_length; i++)
-    {
-      if (Tree->GetItemParent(selection[i]) != Tree->GetRootItem() && selection[i] != Tree->GetRootItem())
-	{
-	  Tree->DeleteChildren(selection[i]);
-	  Tree->Delete(selection[i]);
-	}
-    }
 }
 
 void				MediaLibrary::OnEdit(wxCommandEvent &WXUNUSED(event))
@@ -238,40 +177,6 @@ void				MediaLibrary::OnSortToggle(wxCommandEvent &WXUNUSED(event))
 {
   cout << "[MEDIALIBRARY] Sort Files (OnSortToggle)" << endl;
 
-}
-
-void				ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel)
-{
-  if (toLevel == 0 || !Tree->ItemHasChildren(id)) 
-    return;
-
-  bool isExpanded = Tree->IsExpanded(id);
-
-  if (shouldExpand && !isExpanded)
-    Tree->Expand(id);
-  else if (!shouldExpand && isExpanded)
-    Tree->Collapse(id);
-
-  wxTreeItemIdValue cookie = &Tree;
-  for (wxTreeItemId child = Tree->GetFirstChild(id, cookie); child.IsOk(); child = Tree->GetNextChild(id, cookie))
-    ExpandAll(Tree, child, shouldExpand, toLevel - 1);
-}
-
-void				MediaLibrary::OnCollapse(wxCommandEvent &WXUNUSED(event))
-{
-  cout << "[MEDIALIBRARY] Expand/Collapse Tree (OnCollapse)" << endl;
-  if (IsTreeCollapsed() == true)
-    {
-      ExpandAll(Tree, Tree->GetRootItem(), true, 2);
-      SetTreeExpanded();
-    }
-  else
-    {
-      wxTreeItemIdValue cookie = &Tree;
-      ExpandAll(Tree, Tree->GetRootItem(), false, 2);
-      Tree->EnsureVisible(Tree->GetFirstChild(Tree->GetRootItem(), cookie));
-      SetTreeCollapsed();
-    }
 }
 
 BEGIN_EVENT_TABLE(MediaLibrary, wxPanel)

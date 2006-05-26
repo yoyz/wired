@@ -28,6 +28,10 @@ class				VUMCtrl;
 #define DEFAULT_SORTSELECT_VALUE	wxT("Sort by...")
 
 
+//class				MediaLibrary;
+class				MLTree;
+
+
 class				MediaLibrary : public wxPanel
 {
  public:
@@ -37,9 +41,9 @@ class				MediaLibrary : public wxPanel
 
  protected:
   friend class			MainWindow;
+  friend class			MLTree;
   bool				visible;
   bool				floating;
-  bool				collapsed;
   wxToolBar			*TopToolbar;
   wxToolBar			*BottomToolbar;
   wxToolBar			*FiltersToolbar;
@@ -49,16 +53,18 @@ class				MediaLibrary : public wxPanel
   wxBoxSizer			*BottomSizer;
   ///////////
   wxComboBox			*SortSelect;
-  wxTreeCtrl			*Tree;
+  //wxTreeCtrl			*Tree;
   wxTextCtrl			*mlTextCtrl;
+  wxMenu			*PopMenu;
+  MLTree			*MLTreeView;
 
   void				OnSize(wxSizeEvent &event);
-  void				OnAdd(wxCommandEvent &WXUNUSED(event));
-  void				OnRemove(wxCommandEvent &WXUNUSED(event));
   void				OnEdit(wxCommandEvent &WXUNUSED(event));
   void				OnInsert(wxCommandEvent &WXUNUSED(event));
 
   void				OnPreview(wxCommandEvent &WXUNUSED(event));
+  void				OnAdd(wxCommandEvent &WXUNUSED(event));
+  void				OnRemove(wxCommandEvent &WXUNUSED(event));
   void				OnCollapse(wxCommandEvent &WXUNUSED(event));
   void				OnSortToggle(wxCommandEvent &WXUNUSED(event));
   void				OnFilterAudio(wxCommandEvent &WXUNUSED(event));
@@ -66,11 +72,11 @@ class				MediaLibrary : public wxPanel
   void				OnFilterVideo(wxCommandEvent &WXUNUSED(event));
   void				OnFilterEffects(wxCommandEvent &WXUNUSED(event));
 
-  void				CreateTree();
+  //void				CreateTree();
+  void				OnRightClick(wxMouseEvent &event);
+  void				ShowPopup(wxPoint pos);
 
-  bool				IsTreeCollapsed();
-  void				SetTreeCollapsed();
-  void				SetTreeExpanded();
+ 
   bool				IsVisible();
   void				SetInvisible();
   void				SetVisible();

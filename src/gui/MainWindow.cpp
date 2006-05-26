@@ -45,6 +45,7 @@
 #include "config.h"
 #include "Threads.h"
 #include "MediaLibrary.h"
+#include "MLTree.h"
 
 Rack			*RackPanel = NULL;
 SequencerGui		*SeqPanel = NULL;
@@ -160,7 +161,6 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
       cout << "[MAINWIN] Stdlib failure during AudioEngine init, check your code" << endl;
       AudioMutex.Lock();/* This will lock the sequencer			\
 			   until audio parameters are properly set */
-      
     }
   catch (...)
     {
