@@ -282,7 +282,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
 
   //cout << "Known warning ...." << endl;      
   SeqPanel = new SequencerGui(split, wxPoint(0, 0), wxSize(800, 200), this);
-  //cout << "done :-)" << endl;  
+  //cout << "done :-)" << endl;
 
   //  OptPanel = new OptionPanel(this, wxPoint(306, 452), wxSize(470, 150), wxSIMPLE_BORDER);
   TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER);
@@ -304,8 +304,8 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   TopSizer = new wxBoxSizer(wxVERTICAL);
   TopSizer->Add(splitVert, 1, wxEXPAND | wxALL, 2);
   TopSizer->Add(BottomSizer, 0, wxEXPAND | wxALL, 0);
-
   SetSizer(TopSizer);
+  splitVert->SetSashPosition(200);
 
   RackPanel->SetBackgroundColour(*wxBLACK);
   SeqPanel->SetBackgroundColour(*wxWHITE);
@@ -1207,6 +1207,12 @@ void					MainWindow::OnFloatRack(wxCommandEvent &event)
 
 void					MainWindow::OnFloatMediaLibrary(wxCommandEvent &event)
 {
+  if (MediaLibraryPanel->IsVisible() == false)
+    {
+      splitVert->SetSashPosition(200);
+      MediaLibraryPanel->Show();
+      MediaLibraryPanel->SetVisible();
+    }
   if (MediaLibraryMenu->IsChecked(MainWin_FloatMediaLibrary))
     {
       splitVert->Unsplit(MediaLibraryPanel);
@@ -1357,6 +1363,7 @@ void					MainWindow::MediaLibraryShow(wxCommandEvent &event)
 	  {
 	    return ;
 	  }
+	splitVert->SetSashPosition(200);
 	MediaLibraryPanel->Show();
 	MediaLibraryPanel->SetVisible();
 }
@@ -1369,6 +1376,7 @@ void					MainWindow::MediaLibraryHide(wxCommandEvent &event)
 	  {
 	    return ;
 	  }
+	splitVert->SetSashPosition(1);
 	MediaLibraryPanel->Hide();
 	MediaLibraryPanel->SetInvisible();
 }

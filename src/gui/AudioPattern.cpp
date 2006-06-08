@@ -371,6 +371,12 @@ void					AudioPattern::OnDoubleClick(wxMouseEvent &e)
   /*printf("audio (%d) me (%d)\n", audio, me);*/
 }
 
+void					AudioPattern::OnDirectEdit()
+{
+  //  if (SeqPanel->Tool == ID_TOOL_MOVE_SEQUENCER)
+  OptPanel->ShowWave(this);
+}
+
 void					AudioPattern::OnRightClick(wxMouseEvent &e)
 {
   Pattern::OnRightClick(e);

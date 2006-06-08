@@ -17,9 +17,14 @@
 #include "../engine/Settings.h"
 #include "../engine/AudioEngine.h"
 
-extern WiredSession				*CurrentSession;
+#include "file.xpm"
+#include "audio.xpm"
+#include "icon5.xpm"
+#include "icon3.xpm"
+#include "delete.xpm"
 
-//IMPLEMENT_CLASS(MLTree, wxTreeCtrl)
+
+extern WiredSession				*CurrentSession;
 
 s_nodeInfo		SetStructInfos(s_nodeInfo infos, wxString label, wxString extention, wxString length)
 {
@@ -38,26 +43,44 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel)
 			wxSize(300, MediaLibraryPanel->GetSize().y - 100),
 			wxTR_DEFAULT_STYLE | wxTR_EDIT_LABELS | wxTR_MULTIPLE,
 			wxDefaultValidator, _("Tree"));
-  Tree->SetIndent(10);  
+  Tree->SetIndent(10);
   /* Set the Root node with the project's name in label */
   root = Tree->AppendItem(Tree->GetRootItem(), _("Project's name"));
   Tree->SetItemBold(root);
-  /* Create basic nodes */
-  s_nodeInfo	infos;
-  infos = SetStructInfos(infos, _("Sounds"), _(""), _(""));
-  nodes[Tree->AppendItem(root, _("Sound Files"))] = infos;
 
+  /* Create Image List */
+  wxImageList *images = new wxImageList(16, 16, TRUE);
+  AddIcon(images, wxIcon(icon3_xpm));
+  AddIcon(images, wxIcon(icon5_xpm));
+  AddIcon(images, wxIcon(audio_xpm));
+  AddIcon(images, wxIcon(file_xpm));
+  Tree->AssignImageList(images);
+  /* Create basic nodes */
+  s_nodeInfo		infos;
+  wxTreeItemId		itemTemp;
+
+  infos = SetStructInfos(infos, _("Sounds"), _(""), _(""));
+  itemTemp = Tree->AppendItem(root, _("Sound Files"));
+  Tree->SetItemImage(itemTemp, 0);
+  nodes[itemTemp] = infos;
+  
   s_nodeInfo	infos1;
   infos1 = SetStructInfos(infos1, _("MIDI"), _(""), _(""));
-  nodes[Tree->AppendItem(root, _("MIDI Files"))] = infos1;
+  itemTemp = Tree->AppendItem(root, _("MIDI Files"));
+  Tree->SetItemImage(itemTemp, 0);
+  nodes[itemTemp] = infos1;
 
   s_nodeInfo	infos2;
   infos2 = SetStructInfos(infos2, _("Videos"), _(""), _(""));
-  nodes[Tree->AppendItem(root, _("Videos Files"))] = infos2;
+  itemTemp = Tree->AppendItem(root, _("Videos Files"));
+  Tree->SetItemImage(itemTemp, 0);
+  nodes[itemTemp] = infos2;
 
   s_nodeInfo	infos3;
   infos3 = SetStructInfos(infos3, _("Effects"), _(""), _(""));
-  nodes[Tree->AppendItem(root, _("Effects Files"))] = infos3;
+  itemTemp = Tree->AppendItem(root, _("Effects Files"));
+  Tree->SetItemImage(itemTemp, 0);
+  nodes[itemTemp] = infos3;
 
   Tree->Expand(root);
   LoadKnownExtentions();
@@ -68,13 +91,23 @@ MLTree::~MLTree()
  
 }
 
+void				MLTree::AddIcon(wxImageList *images, wxIcon icon)
+{
+  int sizeInit = icon.GetWidth();
+
+  if (16 == sizeInit)
+    images->Add(icon);
+  else
+    images->Add(wxBitmap(wxBitmap(icon).ConvertToImage().Rescale(16, 16)));
+}
+
 bool				MLTree::LoadKnownExtentions()
 {
   wxTextFile			file(WiredSettings->ConfDir + EXT_FILE);
   wxString			l;
   wxString			*itemdata = NULL;
 
-  filters = wxT("");  
+  filters = wxT("");
   if (file.Open())
     {
       for (l = file.GetFirstLine(); ; l = file.GetNextLine())
@@ -97,11 +130,12 @@ bool				MLTree::LoadKnownExtentions()
       cout << "[MEDIALIBRARY] Could not open ext file" << endl;
     }
   
-  for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
-    {
-      
-      cout << "[MEDIALIBRARY] : " << *iter << endl;
-    }
+  //   Display known extentions
+  //   for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
+  //     {
+  
+  //       cout << "[MEDIALIBRARY] : " << *iter << endl;
+  //     }
   
   return (true);
 }
@@ -122,8 +156,12 @@ bool				MLTree::IsTreeCollapsed()
 }
 
 void				MLTree::AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_nodeInfo infos)
-{  
-  nodes[Tree->AppendItem(ParentNode, FileToAdd)] = infos;
+{ 
+
+  wxTreeItemId			itemToAdd;
+  itemToAdd = Tree->AppendItem(ParentNode, FileToAdd);
+  Tree->SetItemImage(itemToAdd, 3);
+  nodes[itemToAdd] = infos;
 }
 
 wxTreeItemId			MLTree::GetTreeItemIdFromLabel(wxString label)
@@ -150,20 +188,21 @@ void				MLTree::OnAdd()
   if (!FileToAdd.empty())
     {
       wxFileName	*File = new wxFileName(FileToAdd);
-
+      
       if (File->FileExists() == true)
 	{
-	  cout << "[MEDIALIBRARY] File added : " << FileToAdd <<  " Extention is : " << File->GetExt() << endl;
-	  
+	  cout << "[MEDIALIBRARY] File added : " << FileToAdd <<  " Extention is : " << File->GetExt() << endl;	  
 	  for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
 	    {
-	     
+	      
 	      if (iter->Contains(File->GetExt()) == true)
 		{
 		  s_nodeInfo		infos;
-
+		  int			slashPos;
+		  
 		  SetStructInfos(infos, FileToAdd, File->GetExt(), _(""));
-		  this->AddFile(GetTreeItemIdFromLabel(_("Sounds")),FileToAdd, infos);
+		  slashPos = FileToAdd.Find('/', true);		  
+		  this->AddFile(GetTreeItemIdFromLabel(_("Sounds")), FileToAdd.Mid(slashPos + 1), infos);
 		}
 	    }
 	}
@@ -193,7 +232,7 @@ void				MLTree::OnRemove()
   wxArrayTreeItemIds		selection;
   int				selection_length;
   int				i;
-
+  
   selection_length = Tree->GetSelections(selection);
   for (i = 0; i < selection_length; i++)
     {
@@ -246,10 +285,10 @@ void				MLTree::OnRightClick(wxTreeEvent &WXUNUSED(event))
   cout << "[MEDIALIBRARY] RightClick" << endl;
 
         wxMenu* myMenu = new wxMenu();
-    //     myMenu->Append(idMenuNewDir, wxT("New Directory"), wxT("New Directory"));
-//         myMenu->Append(idMenuNewSnip, wxT("New Snippet"), wxT("New Snippet"));
+	//     myMenu->Append(idMenuNewDir, wxT("New Directory"), wxT("New Directory"));
+	//         myMenu->Append(idMenuNewSnip, wxT("New Snippet"), wxT("New Snippet"));
         myMenu->AppendSeparator();
-//         myMenu->Append(idMenuDelete, wxT("Delete"), wxT("Delete"));
+	//         myMenu->Append(idMenuDelete, wxT("Delete"), wxT("Delete"));
         PopupMenu(myMenu);
         delete myMenu; 
 }
@@ -261,29 +300,29 @@ void				MLTree::OnContextMenu(wxMouseEvent &WXUNUSED(event))
 
 void				MLTree::OnSelChange(wxTreeEvent &WXUNUSED(event))
 {
-    cout << "[MEDIALIBRARY] Selection Change" << endl;
+  cout << "[MEDIALIBRARY] Selection Change" << endl;
 }
 
 void				MLTree::OnItemRightClick(wxTreeEvent& event)
 {
   cout << "[MEDIALIBRARY] RightClick" << endl;
-        wxMenu* myMenu = new wxMenu();
-//         myMenu->Append(idMenuNewDir, wxT("New Directory"), wxT("New Directory"));
-//         myMenu->Append(idMenuNewSnip, wxT("New Snippet"), wxT("New Snippet"));
-        myMenu->AppendSeparator();
-//         myMenu->Append(idMenuDelete, wxT("Delete"), wxT("Delete"));
-        PopupMenu(myMenu);
-        delete myMenu;
+  wxMenu* myMenu = new wxMenu();
+  //         myMenu->Append(idMenuNewDir, wxT("New Directory"), wxT("New Directory"));
+  //         myMenu->Append(idMenuNewSnip, wxT("New Snippet"), wxT("New Snippet"));
+  myMenu->AppendSeparator();
+  //         myMenu->Append(idMenuDelete, wxT("Delete"), wxT("Delete"));
+  PopupMenu(myMenu);
+  delete myMenu;
 }
 
 
 void				MLTree::OnTreeRightClick(wxTreeEvent& event)
 {
   cout << "[MEDIALIBRARY] RightClick tarass" << endl;
-        wxMenu* myMenu = new wxMenu();
-//         myMenu->Append(idMenuNewDir, wxT("New Directory"), wxT("New Directory"));
-        PopupMenu(myMenu);
-        delete myMenu;
+  wxMenu* myMenu = new wxMenu();
+  //         myMenu->Append(idMenuNewDir, wxT("New Directory"), wxT("New Directory"));
+  PopupMenu(myMenu);
+  delete myMenu;
 }
 
 BEGIN_EVENT_TABLE(MLTree, wxTreeCtrl)

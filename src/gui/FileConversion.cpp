@@ -288,8 +288,8 @@ void				FileConversion::ImportWavePattern(wxString *FileName)
 //														NULL, wxPD_AUTO_HIDE | wxPD_CAN_ABORT 
 //														| wxPD_REMAINING_TIME);
 //	Progress->Update(1);
-    std::string temp(FileName->mb_str(*wxConvCurrent));
-	cActionManager::Global().AddImportWaveAction(temp, true, true);
+  std::string temp(FileName->mb_str(*wxConvCurrent));
+  cActionManager::Global().AddImportWaveAction(temp, true, true);
 //	Progress->Update(80);
 	//CreateUndoRedoMenus(EditMenu); // ??
 //	Progress->Update(99);

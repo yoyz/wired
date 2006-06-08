@@ -55,6 +55,7 @@ class				MLTree : public wxTreeCtrl//Panel
   void				OnCollapse();
   bool				LoadKnownExtentions();
 
+  void				AddIcon(wxImageList *images, wxIcon icon);
   void				OnRightClick(wxTreeEvent &WXUNUSED(event));
   void				OnContextMenu(wxMouseEvent &WXUNUSED(event));
   void				OnSelChange(wxTreeEvent &WXUNUSED(event));
@@ -69,7 +70,7 @@ class				MLTree : public wxTreeCtrl//Panel
 enum
 {
    MLTree_RightClick,
-   MLTree_Menu,
+   MLTree_Menu
 };
 
 #endif

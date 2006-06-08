@@ -47,7 +47,7 @@
 #include "WiredSession.h"
 #include "HelpPanel.h"
 
-extern WiredSession				*CurrentSession;
+extern WiredSession			*CurrentSession;
 
 const struct s_combo_choice		SortSelectChoices[NB_SORTSELECT_CHOICES + 1] =
 {
@@ -60,7 +60,6 @@ const struct s_combo_choice		SortSelectChoices[NB_SORTSELECT_CHOICES + 1] =
 
 MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style)
   : wxPanel(parent, -1, pos, size, style)
-//MediaLibrary::MediaLibrary()
 {
   wxString	sortselect_choices[NB_SORTSELECT_CHOICES];
   long		c;
@@ -175,6 +174,21 @@ void				MediaLibrary::OnSize(wxSizeEvent &event)
 void				MediaLibrary::OnEdit(wxCommandEvent &WXUNUSED(event))
 {
   cout << "[MEDIALIBRARY] Edit fille (OnEdit)" << endl;
+  wxString			selfile;
+  
+  selfile = MLTreeView->getSelection();
+  // Test the selfile content HERE
+  MidiMutex.Lock();
+  MidiDeviceMutex.Lock();
+  AudioMutex.Lock();
+  SeqMutex.Unlock();
+  FileConverter->ConvertFromCodec(&selfile);
+  FileConverter->ConvertSamplerate(&selfile);
+  std::string temp(selfile);//->mb_str(*wxConvCurrent));
+  cActionManager::Global().AddEditWaveAction(temp, true, true);
+  MidiMutex.Unlock();
+  MidiDeviceMutex.Unlock();
+  AudioMutex.Unlock();
 }
 
 void				MediaLibrary::OnInsert(wxCommandEvent &WXUNUSED(event))
@@ -182,6 +196,7 @@ void				MediaLibrary::OnInsert(wxCommandEvent &WXUNUSED(event))
   wxString			selfile;
   
   selfile = MLTreeView->getSelection();
+  // Test the selfile content HERE
   cout << "[MEDIALIBRARY] Insert File (OnInsert)" << selfile << endl;
   MidiMutex.Lock();
   MidiDeviceMutex.Lock();
@@ -223,7 +238,6 @@ void				MediaLibrary::OnPreview(wxCommandEvent &WXUNUSED(event))
 void				MediaLibrary::OnSortToggle(wxCommandEvent &WXUNUSED(event))
 {
   cout << "[MEDIALIBRARY] Sort Files (OnSortToggle)" << endl;
-
 }
 
 BEGIN_EVENT_TABLE(MediaLibrary, wxPanel)
