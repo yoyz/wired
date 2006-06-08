@@ -5,6 +5,7 @@
 #define __MEDIALIBRARY_H__
 
 #include <wx/wx.h>
+#include "MainWindow.h"
 
 class				MainWindow;
 class				DownButton;
@@ -29,7 +30,6 @@ class				VUMCtrl;
 //class				MediaLibrary;
 class				MLTree;
 
-
 class				MediaLibrary : public wxPanel
 {
  public:
@@ -40,6 +40,9 @@ class				MediaLibrary : public wxPanel
  protected:
   friend class			MainWindow;
   friend class			MLTree;
+
+
+  
   bool				visible;
   bool				floating;
   wxToolBar			*TopToolbar;
@@ -47,20 +50,19 @@ class				MediaLibrary : public wxPanel
   wxToolBar			*FiltersToolbar;
   wxBoxSizer			*TopSizer;
   // A effacer ?
-  wxBoxSizer			*TreeSizer;
-  wxBoxSizer			*BottomSizer;
+  //  wxBoxSizer			*TreeSizer;
+  //  wxBoxSizer			*BottomSizer;
   ///////////
   wxComboBox			*SortSelect;
-  //wxTreeCtrl			*Tree;
   wxTextCtrl			*mlTextCtrl;
   wxMenu			*PopMenu;
   MLTree			*MLTreeView;
+  FileConversion		*FileConverter;
 
-
+  void				SetFileConverter(FileConversion *FileConv);
   void				OnSize(wxSizeEvent &event);
   void				OnEdit(wxCommandEvent &WXUNUSED(event));
   void				OnInsert(wxCommandEvent &WXUNUSED(event));
-
   void				OnPreview(wxCommandEvent &WXUNUSED(event));
   void				OnAdd(wxCommandEvent &WXUNUSED(event));
   void				OnRemove(wxCommandEvent &WXUNUSED(event));
@@ -70,11 +72,8 @@ class				MediaLibrary : public wxPanel
   void				OnFilterMIDI(wxCommandEvent &WXUNUSED(event));
   void				OnFilterVideo(wxCommandEvent &WXUNUSED(event));
   void				OnFilterEffects(wxCommandEvent &WXUNUSED(event));
-
-  //void				CreateTree();
   void				OnRightClick(wxMouseEvent &event);
   void				ShowPopup(wxPoint pos);
-
  
   bool				IsVisible();
   void				SetInvisible();

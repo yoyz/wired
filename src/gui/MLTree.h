@@ -7,13 +7,23 @@
 #include <wx/wx.h>
 #include <vector>
 #include <list>
+#include <map>
 
 using std::string;
 using std::vector;
+using std::map;
 
 #define EXT_FILE		wxT("wired_exts.conf")
 
-class				MLTree : public wxPanel
+struct				s_nodeInfo
+{
+  wxString			label;
+  wxString			extention;
+  wxString			length;
+
+};
+
+class				MLTree : public wxTreeCtrl//Panel
 {
  public:
   MLTree(wxWindow *MediaLibraryPanel);
@@ -27,6 +37,7 @@ class				MLTree : public wxPanel
   wxTreeItemId			root;
   wxString			filters;
   vector<wxString>		Exts;
+  map<wxTreeItemId, s_nodeInfo>	nodes;
 
   // temp
   wxTreeItemId			Soundchild;
@@ -35,6 +46,9 @@ class				MLTree : public wxPanel
   bool				IsTreeCollapsed();
   void				SetTreeCollapsed();
   void				SetTreeExpanded();
+  wxTreeItemId			GetTreeItemIdFromLabel(wxString label);
+  wxString			getSelection();
+  void				AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_nodeInfo infos);
   void				OnAdd();
   void				OnRemove();
   void				ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel);
@@ -44,6 +58,9 @@ class				MLTree : public wxPanel
   void				OnRightClick(wxTreeEvent &WXUNUSED(event));
   void				OnContextMenu(wxMouseEvent &WXUNUSED(event));
   void				OnSelChange(wxTreeEvent &WXUNUSED(event));
+  void				OnTreeRightClick(wxTreeEvent& event);
+  void				OnItemRightClick(wxTreeEvent& event);
+
 
   DECLARE_EVENT_TABLE()
 };
@@ -51,9 +68,8 @@ class				MLTree : public wxPanel
 
 enum
 {
-   MLTree_Add = 53028,
-   MLTree_RightClick = 2913,
-   MLTree_SelChange,
+   MLTree_RightClick,
+   MLTree_Menu,
 };
 
 #endif

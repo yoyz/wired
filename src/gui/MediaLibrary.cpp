@@ -3,19 +3,49 @@
 
 #include <wx/filename.h>
 #include <wx/treectrl.h>
-#include "MLTree.h"
-#include "MediaLibrary.h"
-#include "Sequencer.h"
+
 #include "SequencerGui.h"
+#include "HostCallback.h"
+#include "FileLoader.h"
+#include "WaveFile.h"
+#include "SettingWindow.h"
+#include "AudioPattern.h"
+#include "AudioCenter.h"
+#include "EditMidi.h"
+#include "cAddTrackAction.h"
+#include "cImportMidiAction.h"
+#include "Transport.h"
+#include "OptionPanel.h"
+#include "Rack.h"
+#include "SeqTrack.h"
+#include "MixerGui.h"
+#include "DownButton.h"
+#include "HoldButton.h"
+#include "FaderCtrl.h"
+#include "StaticLabel.h"
+#include "VUMCtrl.h"
+#include "FloatingFrame.h"
+#include "../engine/AudioEngine.h"
+#include "../engine/Settings.h"
+#include "../engine/EngineError.h"
+#include "../sequencer/Sequencer.h"
+#include "../sequencer/Track.h"
+#include "../mixer/Mixer.h"
+#include "../engine/WiredSession.h"
+#include "../midi/MidiThread.h"
+#include "../plugins/PluginLoader.h"
+#include "../xml/WiredSessionXml.h"
+#include "../dssi/WiredExternalPluginMgr.h"
+#include "FileConversion.h"
+#include "config.h"
+#include "Threads.h"
+#include "MediaLibrary.h"
+#include "MLTree.h"
+#include "MainWindow.h"
+#include "Sequencer.h"
 #include "Colour.h"
 #include "WiredSession.h"
 #include "HelpPanel.h"
-#include "DownButton.h"
-#include "HoldButton.h"
-#include "StaticLabel.h"
-#include "VUMCtrl.h"
-#include "../engine/Settings.h"
-#include "../engine/AudioEngine.h"
 
 extern WiredSession				*CurrentSession;
 
@@ -25,11 +55,12 @@ const struct s_combo_choice		SortSelectChoices[NB_SORTSELECT_CHOICES + 1] =
   { wxT("filetype")	,	2	},
   { wxT("filesize")	,	4	},
   { wxT("Modified")	,	8	},
-  { wxT("")		,	4242	}
+  { wxT("")	      	,	4242	}
 };
 
 MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style)
   : wxPanel(parent, -1, pos, size, style)
+//MediaLibrary::MediaLibrary()
 {
   wxString	sortselect_choices[NB_SORTSELECT_CHOICES];
   long		c;
@@ -80,6 +111,11 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
 MediaLibrary::~MediaLibrary()
 {
   
+}
+
+void				MediaLibrary::SetFileConverter(FileConversion *Fileconv)
+{
+  FileConverter = Fileconv;
 }
 
 bool				MediaLibrary::IsVisible()
@@ -143,7 +179,20 @@ void				MediaLibrary::OnEdit(wxCommandEvent &WXUNUSED(event))
 
 void				MediaLibrary::OnInsert(wxCommandEvent &WXUNUSED(event))
 {
-  cout << "[MEDIALIBRARY] Insert File (OnInsert)" << endl;
+  wxString			selfile;
+  
+  selfile = MLTreeView->getSelection();
+  cout << "[MEDIALIBRARY] Insert File (OnInsert)" << selfile << endl;
+  MidiMutex.Lock();
+  MidiDeviceMutex.Lock();
+  AudioMutex.Lock();
+  SeqMutex.Unlock();
+  FileConverter->ConvertFromCodec(&selfile);
+  FileConverter->ConvertSamplerate(&selfile);
+  FileConverter->ImportWaveFile(&selfile);
+  MidiMutex.Unlock();  
+  MidiDeviceMutex.Unlock();
+  AudioMutex.Unlock();
 }
 
 void				MediaLibrary::OnFilterAudio(wxCommandEvent &WXUNUSED(event))

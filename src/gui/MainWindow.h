@@ -26,6 +26,7 @@ using namespace std;
 #include <wx/log.h>
 
 #include "version.h"
+#include "FileConversion.h"
 
 #define PLUG_MENU_INDEX_START		(50000)
 #define INDEX_MENUITEM_UNDO		0
@@ -43,7 +44,6 @@ class					WiredSessionXml;
 class					MainWindow: public wxFrame
 {
  public:
-  
   MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size);
   void					OnClose(wxCloseEvent &event);
   void					OnQuit(wxCommandEvent &event);
@@ -108,6 +108,10 @@ class					MainWindow: public wxFrame
   void					SwitchSeqOptView();  
   void					AddUpdatePlugin(Plugin *p);
 
+ protected:
+  friend class				MediaLibrary;
+  FileConversion			*FileConverter;
+
  private:
   int					PluginMenuIndexCount;			
   bool					RackModeView;
@@ -115,8 +119,8 @@ class					MainWindow: public wxFrame
   void					OnIdle(wxIdleEvent &event);
 
     /* Locale */
-    wxLocale            *mLocale;
-    void                    InitLocale();
+  wxLocale				*mLocale;
+  void					InitLocale();
 
   /* DSSI & LADSPA Plugins Menus */
   void					LoadExternalPlugins();

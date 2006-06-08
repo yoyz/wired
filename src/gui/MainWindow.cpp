@@ -60,7 +60,6 @@ vector<PluginLoader *>	LoadedPluginsList;
 WiredSession		*CurrentSession = NULL;
 WiredSessionXml		*CurrentXmlSession = NULL;
 WiredExternalPluginMgr	*LoadedExternalPlugins = NULL;
-FileConversion		*FileConverter = NULL;
 MediaLibrary		*MediaLibraryPanel = NULL;
 
 MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size)
@@ -185,6 +184,8 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
    	wxGetApp().m_threads.Add(MidiEngine);
   /* Creation Menu */
 
+  this->FileConverter = NULL;
+
   TransportFrame = 0x0;
   OptFrame = 0x0;
   SequencerFrame = 0x0;
@@ -287,6 +288,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER);
 
   MediaLibraryPanel = new MediaLibrary(splitVert, wxPoint(0, 0), wxSize(0, 400), wxSIMPLE_BORDER);
+  //  MediaLibraryPanel = new MediaLibrary();
   MediaLibraryPanel->SetSizeHints(2, 0);
 
   splitVert->SplitVertically(MediaLibraryPanel, split);
@@ -397,6 +399,7 @@ void					MainWindow::InitFileConverter()
 	if (FileConverter->Init(&info, wxString(CurrentXmlSession->GetAudioDir()), (unsigned long) 16889235, this) == false)
 		cout << "[MAINWIN] Create file converter thread failed !" << endl;
 	WiredSettings->Save();
+	MediaLibraryPanel->SetFileConverter(FileConverter);
 }
 
 void					MainWindow::InitUndoRedoMenuItems()
