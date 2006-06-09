@@ -685,7 +685,7 @@ void					MainWindow::OnImportWave(wxCommandEvent &event)
       	AudioMutex.Lock();
       	SeqMutex.Unlock();
       	FileConverter->ConvertFromCodec(&selfile);
-		FileConverter->ConvertSamplerate(&selfile);
+	FileConverter->ConvertSamplerate(&selfile);
       	FileConverter->ImportWaveFile(&selfile);
       	MidiMutex.Unlock();  
       	MidiDeviceMutex.Unlock();

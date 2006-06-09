@@ -48,6 +48,7 @@
 #include "HelpPanel.h"
 
 extern WiredSession			*CurrentSession;
+extern WiredSessionXml			*CurrentXmlSession;
 
 const struct s_combo_choice		SortSelectChoices[NB_SORTSELECT_CHOICES + 1] =
 {
@@ -152,7 +153,29 @@ void				MediaLibrary::SetDocked()
 
 void				MediaLibrary::OnAdd(wxCommandEvent &WXUNUSED(event))
 {
-  MLTreeView->OnAdd();
+
+  FileLoader				dlg(this, MainWin_FileLoader, _("Loading sound file"), false, false, FileConverter->GetCodecsExtensions(), true);
+  int					res;
+
+  if (dlg.ShowModal() == wxID_OK)
+    {
+      wxString 	selfile = dlg.GetSelectedFile();
+      
+      if (CurrentXmlSession->GetAudioDir().empty() == false)
+	res = wxID_OK;
+      else	     
+	{
+	  wxDirDialog dir(this, _("Choose the Audio file directory"), wxFileName::GetCwd());
+	  if (dir.ShowModal() == wxID_OK)
+	    {
+	      CurrentXmlSession->GetAudioDir() = dir.GetPath().c_str(); 
+	      res = wxID_OK;
+	    }
+	  else
+	    res = wxID_CANCEL;
+	}
+      MLTreeView->OnAdd(selfile);
+    }
 }
 
 void				MediaLibrary::OnRemove(wxCommandEvent &WXUNUSED(event))
@@ -236,6 +259,8 @@ void				MediaLibrary::OnFilterEffects(wxCommandEvent &WXUNUSED(event))
 void				MediaLibrary::OnPreview(wxCommandEvent &WXUNUSED(event))
 {
   cout << "[MEDIALIBRARY] Preview File (OnPreview)" << endl;
+
+  
 }
 
 void				MediaLibrary::OnSortToggle(wxCommandEvent &WXUNUSED(event))

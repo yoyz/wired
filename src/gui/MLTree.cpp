@@ -28,7 +28,6 @@ extern WiredSession				*CurrentSession;
 
 s_nodeInfo		SetStructInfos(s_nodeInfo infos, wxString label, wxString extention, wxString length)
 {
-  cout << "j'ajoute ce label : " << label << endl;
   infos.label = label;
   infos.extention = extention;
   infos.length = length;
@@ -59,7 +58,7 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
   itemTemp = AppendItem(root, _("Sound Files"));
   SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos;
-  
+
   s_nodeInfo	infos1;
   infos1 = SetStructInfos(infos1, _("MIDI"), _(""), _(""));
   itemTemp = AppendItem(root, _("MIDI Files"));
@@ -81,6 +80,8 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
   Expand(root);
   LoadKnownExtentions();
 
+  Connect(ML_ID_MENU_DELETE, wxEVT_COMMAND_MENU_SELECTED,
+	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::OnRemove);
 }
 
 MLTree::~MLTree()
@@ -178,10 +179,27 @@ wxTreeItemId			MLTree::GetTreeItemIdFromLabel(wxString label)
   return (ItemToReturn);
 }
 
-void				MLTree::OnAdd()
+s_nodeInfo			MLTree::GetTreeItemStructFromId(wxTreeItemId ItemToFind)
 {
-  cout << "[MEDIALIBRARY] Add File (OnAdd)" << endl;
-  wxString FileToAdd = wxFileSelector(_("Add a file to the Media Library"), _(""), _(""), _(""), _("All supported files (*.*)|*.*"), wxOPEN);
+  s_nodeInfo			structToReturn;
+  map<wxTreeItemId, s_nodeInfo>::iterator theIterator;
+
+  for (theIterator = nodes.begin(); theIterator != nodes.end(); theIterator++)
+    {
+      if ((*theIterator).first == ItemToFind)
+	{
+	  s_nodeInfo		temp;	  
+
+	  temp = (*theIterator).second;
+	  return (temp);
+	}
+    }
+  return (structToReturn);
+}
+
+void				MLTree::OnAdd(wxString FileToAdd)
+{
+
   if (!FileToAdd.empty())
     {
       wxFileName	*File = new wxFileName(FileToAdd);
@@ -196,10 +214,9 @@ void				MLTree::OnAdd()
 		  s_nodeInfo		infos;
 		  int			slashPos;
 
-		  SetStructInfos(infos, FileToAdd, File->GetExt(), _(""));
+		  infos = SetStructInfos(infos, FileToAdd, File->GetExt(), _(""));
 		  slashPos = FileToAdd.Find('/', true);
 		  this->AddFile(GetTreeItemIdFromLabel(_("Sounds")), FileToAdd.Mid(slashPos + 1), infos);
-		  //this->AddFile(GetTreeItemIdFromLabel(_("Sounds")), FileToAdd, infos);
 		}
 	    }
 	}
@@ -216,25 +233,22 @@ wxString			MLTree::getSelection(int flag)
   map<wxTreeItemId, s_nodeInfo>::iterator it;
 
 
-  if (!flag)
-    {
-      selection_length = GetSelections(selection);
-      for (i = 0; i < selection_length; i++)
-	if (GetItemParent(selection[i]) != GetRootItem() && selection[i] != GetRootItem())
-	  return (GetItemText(selection[i]));
-      return (_(""));
-    }
-  else /* display fullname */
-    {
-      for (it = nodes.begin(); it != nodes.end(); it++)
+  selection_length = GetSelections(selection);
+  for (i = 0; i < selection_length; i++)
+    if (GetItemParent(selection[i]) != GetRootItem() && selection[i] != GetRootItem())
+      if (!flag)
 	{
-	  s_nodeInfo temp;
-	  temp = (*it).second;
-	  cout << "LAAA : " << temp.label << endl;
+	  
+	  return (GetItemText(selection[i]));
+	}
+      else
+	{
+	  s_nodeInfo		temp;
+	  
+	  temp = GetTreeItemStructFromId(selection[i]);
 	  return (temp.label);
 	}
-      return (_(""));
-    }
+  return (_(""));
 }
 
 void				MLTree::OnRemove()
@@ -299,10 +313,6 @@ void				MLTree::OnRightClick(wxMouseEvent& event)
   myMenu->AppendSeparator();
   myMenu->Append(ML_ID_MENU_DELETE, wxT("Delete"), wxT("Delete"));
   PopupMenu(myMenu);
-
-  Connect(ML_ID_MENU_DELETE, wxEVT_COMMAND_MENU_SELECTED,
-	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::OnRemove);
-
   delete myMenu;
 }
 

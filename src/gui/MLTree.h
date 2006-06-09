@@ -39,29 +39,24 @@ class				MLTree : public wxTreeCtrl
   vector<wxString>		Exts;
   map<wxTreeItemId, s_nodeInfo>	nodes;
 
-  // temp
-  wxTreeItemId			Soundchild;
-  //
-
   bool				IsTreeCollapsed();
   void				SetTreeCollapsed();
   void				SetTreeExpanded();
   wxTreeItemId			GetTreeItemIdFromLabel(wxString label);
+  s_nodeInfo			MLTree::GetTreeItemStructFromId(wxTreeItemId ItemToFind);
   wxString			getSelection(int flag);
   void				AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_nodeInfo infos);
-  void				OnAdd();
-  void				OnRemove();
   void				ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel);
   void				OnCollapse();
   bool				LoadKnownExtentions();
-
   void				AddIcon(wxImageList *images, wxIcon icon);
+  void				OnAdd(wxString FileToAdd);
+  void				OnRemove();
   void				OnRightClick(wxMouseEvent &WXUNUSED(event));
   void				OnContextMenu(wxMouseEvent &WXUNUSED(event));
   void				OnSelChange(wxTreeEvent &WXUNUSED(event));
   void				OnTreeRightClick(wxTreeEvent& event);
   void				OnItemRightClick(wxTreeEvent& event);
-
 
   DECLARE_EVENT_TABLE()
 };
