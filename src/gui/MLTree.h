@@ -47,7 +47,7 @@ class				MLTree : public wxTreeCtrl
   void				SetTreeCollapsed();
   void				SetTreeExpanded();
   wxTreeItemId			GetTreeItemIdFromLabel(wxString label);
-  wxString			getSelection();
+  wxString			getSelection(int flag);
   void				AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_nodeInfo infos);
   void				OnAdd();
   void				OnRemove();
@@ -66,12 +66,22 @@ class				MLTree : public wxTreeCtrl
   DECLARE_EVENT_TABLE()
 };
 
+enum
+{
+  ML_ID_MENU_ADD = 20600,
+  ML_ID_MENU_CUT,
+  ML_ID_MENU_COPY,
+  ML_ID_MENU_PASTE,
+  ML_ID_MENU_DELETE,
+  ML_ID_INSTR_MENU,
+  ML_ID_EFFECTS_MENU
+};
 
 enum
 {
    MLTree_RightClick = 165238,
    MLTree_Menu,
-   MLTree_Selected,
+   MLTree_Selected
 };
 
 #endif
