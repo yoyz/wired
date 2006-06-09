@@ -157,6 +157,7 @@ void				MediaLibrary::OnAdd(wxCommandEvent &WXUNUSED(event))
 
 void				MediaLibrary::OnRemove(wxCommandEvent &WXUNUSED(event))
 {
+  cout << "Removing" << endl;
   MLTreeView->OnRemove();
 }
 
@@ -178,7 +179,7 @@ void				MediaLibrary::OnEdit(wxCommandEvent &WXUNUSED(event))
   cout << "[MEDIALIBRARY] Edit fille (OnEdit)" << endl;
   wxString			selfile;
   
-  selfile = MLTreeView->getSelection();
+  selfile = MLTreeView->getSelection(1);
   // Test the selfile content HERE
   MidiMutex.Lock();
   MidiDeviceMutex.Lock();
@@ -197,7 +198,7 @@ void				MediaLibrary::OnInsert(wxCommandEvent &WXUNUSED(event))
 {
   wxString			selfile;
   
-  selfile = MLTreeView->getSelection();
+  selfile = MLTreeView->getSelection(1);
   // Test the selfile content HERE
   cout << "[MEDIALIBRARY] Insert File (OnInsert)" << selfile << endl;
   MidiMutex.Lock();
