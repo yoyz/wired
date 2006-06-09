@@ -23,10 +23,10 @@ struct				s_nodeInfo
 
 };
 
-class				MLTree : public wxTreeCtrl//Panel
+class				MLTree : public wxTreeCtrl
 {
  public:
-  MLTree(wxWindow *MediaLibraryPanel);
+  MLTree(wxWindow *dad, wxPoint p, wxSize s, long style);
   ~MLTree();
 
  protected:
@@ -56,7 +56,7 @@ class				MLTree : public wxTreeCtrl//Panel
   bool				LoadKnownExtentions();
 
   void				AddIcon(wxImageList *images, wxIcon icon);
-  void				OnRightClick(wxTreeEvent &WXUNUSED(event));
+  void				OnRightClick(wxMouseEvent &WXUNUSED(event));
   void				OnContextMenu(wxMouseEvent &WXUNUSED(event));
   void				OnSelChange(wxTreeEvent &WXUNUSED(event));
   void				OnTreeRightClick(wxTreeEvent& event);
@@ -69,8 +69,9 @@ class				MLTree : public wxTreeCtrl//Panel
 
 enum
 {
-   MLTree_RightClick,
-   MLTree_Menu
+   MLTree_RightClick = 165238,
+   MLTree_Menu,
+   MLTree_Selected,
 };
 
 #endif

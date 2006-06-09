@@ -36,17 +36,13 @@ s_nodeInfo		SetStructInfos(s_nodeInfo infos, wxString label, wxString extention,
   return(infos);
 }
 
-MLTree::MLTree(wxWindow *MediaLibraryPanel)
+MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
+  : wxTreeCtrl(MediaLibraryPanel, -1, p, s, style)
 {
-
-  Tree = new wxTreeCtrl((wxWindow*)MediaLibraryPanel, -1, wxPoint(10, 50),
-			wxSize(300, MediaLibraryPanel->GetSize().y - 100),
-			wxTR_DEFAULT_STYLE | wxTR_EDIT_LABELS | wxTR_MULTIPLE,
-			wxDefaultValidator, _("Tree"));
-  Tree->SetIndent(10);
+  SetIndent(10);
   /* Set the Root node with the project's name in label */
-  root = Tree->AppendItem(Tree->GetRootItem(), _("Project's name"));
-  Tree->SetItemBold(root);
+  root = AddRoot(_("Project's name"));
+  SetItemBold(root);
 
   /* Create Image List */
   wxImageList *images = new wxImageList(16, 16, TRUE);
@@ -54,36 +50,37 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel)
   AddIcon(images, wxIcon(icon5_xpm));
   AddIcon(images, wxIcon(audio_xpm));
   AddIcon(images, wxIcon(file_xpm));
-  Tree->AssignImageList(images);
+  AssignImageList(images);
   /* Create basic nodes */
   s_nodeInfo		infos;
   wxTreeItemId		itemTemp;
 
   infos = SetStructInfos(infos, _("Sounds"), _(""), _(""));
-  itemTemp = Tree->AppendItem(root, _("Sound Files"));
-  Tree->SetItemImage(itemTemp, 0);
+  itemTemp = AppendItem(root, _("Sound Files"));
+  SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos;
   
   s_nodeInfo	infos1;
   infos1 = SetStructInfos(infos1, _("MIDI"), _(""), _(""));
-  itemTemp = Tree->AppendItem(root, _("MIDI Files"));
-  Tree->SetItemImage(itemTemp, 0);
+  itemTemp = AppendItem(root, _("MIDI Files"));
+  SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos1;
 
   s_nodeInfo	infos2;
   infos2 = SetStructInfos(infos2, _("Videos"), _(""), _(""));
-  itemTemp = Tree->AppendItem(root, _("Videos Files"));
-  Tree->SetItemImage(itemTemp, 0);
+  itemTemp = AppendItem(root, _("Videos Files"));
+  SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos2;
 
   s_nodeInfo	infos3;
   infos3 = SetStructInfos(infos3, _("Effects"), _(""), _(""));
-  itemTemp = Tree->AppendItem(root, _("Effects Files"));
-  Tree->SetItemImage(itemTemp, 0);
+  itemTemp = AppendItem(root, _("Effects Files"));
+  SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos3;
 
-  Tree->Expand(root);
+  Expand(root);
   LoadKnownExtentions();
+
 }
 
 MLTree::~MLTree()
@@ -159,8 +156,8 @@ void				MLTree::AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_nodeInfo 
 { 
 
   wxTreeItemId			itemToAdd;
-  itemToAdd = Tree->AppendItem(ParentNode, FileToAdd);
-  Tree->SetItemImage(itemToAdd, 3);
+  itemToAdd = AppendItem(ParentNode, FileToAdd);
+  SetItemImage(itemToAdd, 3);
   nodes[itemToAdd] = infos;
 }
 
@@ -216,12 +213,12 @@ wxString			MLTree::getSelection()
   int				selection_length;
   int				i;
   
-  selection_length = Tree->GetSelections(selection);
+  selection_length = GetSelections(selection);
   for (i = 0; i < selection_length; i++)
     {
-      if (Tree->GetItemParent(selection[i]) != Tree->GetRootItem() && selection[i] != Tree->GetRootItem())
+      if (GetItemParent(selection[i]) != GetRootItem() && selection[i] != GetRootItem())
 	{
-	  return (Tree->GetItemText(selection[i]));
+	  return (GetItemText(selection[i]));
 	}
     }
   return (_(""));
@@ -233,14 +230,14 @@ void				MLTree::OnRemove()
   int				selection_length;
   int				i;
   
-  selection_length = Tree->GetSelections(selection);
+  selection_length = GetSelections(selection);
   for (i = 0; i < selection_length; i++)
     {
-      if (Tree->GetItemParent(selection[i]) != Tree->GetRootItem() && selection[i] != Tree->GetRootItem())
+      if (GetItemParent(selection[i]) != GetRootItem() && selection[i] != GetRootItem())
 	{
-	  //nodes.erase(Tree->GetItemText(selection[i]));
-	  Tree->DeleteChildren(selection[i]);
-	  Tree->Delete(selection[i]);
+	  //nodes.erase(GetItemText(selection[i]));
+	  DeleteChildren(selection[i]);
+	  Delete(selection[i]);
 	  
 	}
     }
@@ -248,18 +245,18 @@ void				MLTree::OnRemove()
 
 void				MLTree::ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel)
 {
-  if (toLevel == 0 || !Tree->ItemHasChildren(id)) 
+  if (toLevel == 0 || !ItemHasChildren(id)) 
     return;
 
-  bool isExpanded = Tree->IsExpanded(id);
+  bool isExpanded = IsExpanded(id);
 
   if (shouldExpand && !isExpanded)
-    Tree->Expand(id);
+    Expand(id);
   else if (!shouldExpand && isExpanded)
-    Tree->Collapse(id);
+    Collapse(id);
 
   wxTreeItemIdValue cookie = &Tree;
-  for (wxTreeItemId child = Tree->GetFirstChild(id, cookie); child.IsOk(); child = Tree->GetNextChild(id, cookie))
+  for (wxTreeItemId child = GetFirstChild(id, cookie); child.IsOk(); child = GetNextChild(id, cookie))
     ExpandAll(Tree, child, shouldExpand, toLevel - 1);
 }
 
@@ -268,19 +265,19 @@ void				MLTree::OnCollapse()
   cout << "[MEDIALIBRARY] Expand/Collapse Tree (OnCollapse)" << endl;
   if (IsTreeCollapsed() == true)
     {
-      ExpandAll(Tree, Tree->GetRootItem(), true, 2);
+      ExpandAll(Tree, GetRootItem(), true, 2);
       SetTreeExpanded();
     }
   else
     {
       wxTreeItemIdValue cookie = &Tree;
-      ExpandAll(Tree, Tree->GetRootItem(), false, 2);
-      Tree->EnsureVisible(Tree->GetFirstChild(Tree->GetRootItem(), cookie));
+      ExpandAll(Tree, GetRootItem(), false, 2);
+      EnsureVisible(GetFirstChild(GetRootItem(), cookie));
       SetTreeCollapsed();
     }
 }
 
-void				MLTree::OnRightClick(wxTreeEvent &WXUNUSED(event))
+void				MLTree::OnRightClick(wxMouseEvent& event)
 {
   cout << "[MEDIALIBRARY] RightClick" << endl;
 
@@ -293,12 +290,12 @@ void				MLTree::OnRightClick(wxTreeEvent &WXUNUSED(event))
         delete myMenu; 
 }
 
-void				MLTree::OnContextMenu(wxMouseEvent &WXUNUSED(event))
+void				MLTree::OnContextMenu(wxMouseEvent &event)
 {
   cout << "[MEDIALIBRARY] ContextMenu" << endl;
 }
 
-void				MLTree::OnSelChange(wxTreeEvent &WXUNUSED(event))
+void				MLTree::OnSelChange(wxTreeEvent &event)
 {
   cout << "[MEDIALIBRARY] Selection Change" << endl;
 }
@@ -326,6 +323,5 @@ void				MLTree::OnTreeRightClick(wxTreeEvent& event)
 }
 
 BEGIN_EVENT_TABLE(MLTree, wxTreeCtrl)
-        EVT_TREE_ITEM_RIGHT_CLICK(0, MLTree::OnItemRightClick)
-        EVT_TREE_ITEM_MENU(MLTree_Menu, MLTree::OnTreeRightClick)
+  EVT_RIGHT_UP(MLTree::OnRightClick)
 END_EVENT_TABLE()

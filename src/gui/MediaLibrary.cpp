@@ -69,7 +69,9 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
   SetBackgroundColour(ML_BACKGROUND);
   SetForegroundColour(ML_FOREGROUND);
 
-  MLTreeView = new MLTree(this);
+  MLTreeView = new MLTree(this, wxPoint(10, 50),
+			  wxSize(300, GetSize().y - 100),
+			  wxTR_DEFAULT_STYLE | wxTR_EDIT_LABELS | wxTR_MULTIPLE);
   MLTreeView->SetTreeCollapsed();
 
   TopToolbar = new wxToolBar(this, -1, wxPoint(-1, -1), wxSize(1000, 46), wxTB_3DBUTTONS);

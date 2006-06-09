@@ -22,7 +22,7 @@ pkglibdir = $(libdir)/wired
 pkgincludedir = $(includedir)/wired
 top_builddir = ../..
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
-INSTALL = /usr/bin/install -c
+INSTALL = /bin/install -c
 install_sh_DATA = $(install_sh) -c -m 644
 install_sh_PROGRAM = $(install_sh) -c
 install_sh_SCRIPT = $(install_sh) -c
@@ -52,7 +52,7 @@ libgui_a_LIBADD =
 am_libgui_a_OBJECTS = AccelCenter.$(OBJEXT) ChannelGui.$(OBJEXT) \
 	ColoredLine.$(OBJEXT) ColoredBox.$(OBJEXT) Cursor.$(OBJEXT) \
 	HelpCtrl.$(OBJEXT) HelpPanel.$(OBJEXT) MainApp.$(OBJEXT) \
-	MainWindow.$(OBJEXT) MediaLibrary.$(OBJEXT) MLTree.$(OBJEXT)\
+	MainWindow.$(OBJEXT) MediaLibrary.$(OBJEXT) MLTree.$(OBJEXT) \
 	MidiPattern.$(OBJEXT) MixerGui.$(OBJEXT) OptionPanel.$(OBJEXT) \
 	Pattern.$(OBJEXT) Rack.$(OBJEXT) Ruler.$(OBJEXT) \
 	SeqTrack.$(OBJEXT) SeqTrackPattern.$(OBJEXT) \
@@ -87,16 +87,16 @@ DIST_SOURCES = $(libgui_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/scoup/Wired/branches/media-library/missing --run aclocal-1.9
+ACLOCAL = ${SHELL} /home/doomsday/wired/wired-ml/missing --run aclocal-1.9
 ALLOCA = 
 AMDEP_FALSE = #
 AMDEP_TRUE = 
-AMTAR = ${SHELL} /home/scoup/Wired/branches/media-library/missing --run tar
+AMTAR = ${SHELL} /home/doomsday/wired/wired-ml/missing --run tar
 AR = ar
-AUTOCONF = ${SHELL} /home/scoup/Wired/branches/media-library/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/scoup/Wired/branches/media-library/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/scoup/Wired/branches/media-library/missing --run automake-1.9
-AWK = mawk
+AUTOCONF = ${SHELL} /home/doomsday/wired/wired-ml/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/doomsday/wired/wired-ml/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/doomsday/wired/wired-ml/missing --run automake-1.9
+AWK = gawk
 BUILD_INCLUDED_LIBINTL = no
 CATOBJEXT = .gmo
 CC = gcc
@@ -107,7 +107,7 @@ CPPFLAGS = $(shell wx-config --cflags) -I../audio -I../libs/WiredAkai/include -I
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -O3
+CXXFLAGS = -O3 -g
 CYGPATH_W = echo
 DATADIRNAME = share
 DEFS = -DHAVE_CONFIG_H
@@ -118,12 +118,12 @@ ECHO_N = -n
 ECHO_T = 
 EGREP = grep -E
 EXEEXT = 
-F77 = 
-FFLAGS = 
+F77 = g77
+FFLAGS = -g -O2
 GENCAT = gencat
 GLIBC2 = yes
 GLIBC21 = yes
-GMSGFMT = :
+GMSGFMT = /usr/bin/gmsgfmt
 HAVE_ASPRINTF = 1
 HAVE_POSIX_PRINTF = 1
 HAVE_SNPRINTF = 1
@@ -133,7 +133,7 @@ INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
 INSTOBJEXT = .mo
-INTLBISON = :
+INTLBISON = bison
 INTLLIBS = 
 INTLOBJS = 
 INTL_LIBTOOL_SUFFIX_PREFIX = 
@@ -148,10 +148,10 @@ LN_S = ln -s
 LTLIBICONV = 
 LTLIBINTL = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/scoup/Wired/branches/media-library/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/doomsday/wired/wired-ml/missing --run makeinfo
 MKINSTALLDIRS = $(top_builddir)/./mkinstalldirs
-MSGFMT = :
-MSGMERGE = :
+MSGFMT = /usr/bin/msgfmt
+MSGMERGE = /usr/bin/msgmerge
 OBJEXT = o
 PACKAGE = wired
 PACKAGE_BUGREPORT = wired@bloodshed.net
@@ -163,19 +163,19 @@ PATH_SEPARATOR = :
 PKG_CONFIG = /usr/bin/pkg-config
 POSUB = po
 RANLIB = ranlib
-SAMPLERATE_CFLAGS = -I/usr/local/include  
-SAMPLERATE_LIBS = -L/usr/local/lib -lsamplerate  
+SAMPLERATE_CFLAGS = -I/usr//include  
+SAMPLERATE_LIBS = -L/usr//lib -lsamplerate  
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = strip
 USE_INCLUDED_LIBINTL = no
 USE_NLS = yes
 VERSION = 0.2
-XGETTEXT = :
+XGETTEXT = /usr/bin/xgettext
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
-ac_ct_F77 = 
+ac_ct_F77 = g77
 ac_ct_RANLIB = ranlib
 ac_ct_STRIP = strip
 ac_pt_PKG_CONFIG = /usr/bin/pkg-config
@@ -203,14 +203,14 @@ host_os = linux-gnu
 host_vendor = pc
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /home/scoup/Wired/branches/media-library/install-sh
+install_sh = /home/doomsday/wired/wired-ml/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
 mandir = ${prefix}/man
 mkdir_p = mkdir -p --
 oldincludedir = /usr/include
-prefix = /usr/local
+prefix = /home/doomsday/wired/usr-ml/
 program_transform_name = s,x,x,
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
@@ -340,10 +340,10 @@ include ./$(DEPDIR)/FileConversion.Po
 include ./$(DEPDIR)/FloatingFrame.Po
 include ./$(DEPDIR)/HelpCtrl.Po
 include ./$(DEPDIR)/HelpPanel.Po
+include ./$(DEPDIR)/MLTree.Po
 include ./$(DEPDIR)/MainApp.Po
 include ./$(DEPDIR)/MainWindow.Po
 include ./$(DEPDIR)/MediaLibrary.Po
-#include ./$(DEPDIR)/MLTree.Po
 include ./$(DEPDIR)/MidiPattern.Po
 include ./$(DEPDIR)/MixerGui.Po
 include ./$(DEPDIR)/OptionPanel.Po
