@@ -80,6 +80,9 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
   Expand(root);
   LoadKnownExtentions();
 
+  //temp
+  DisplayNodes();
+
   Connect(ML_ID_MENU_DELETE, wxEVT_COMMAND_MENU_SELECTED,
 	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::OnRemove);
 }
@@ -179,6 +182,22 @@ wxTreeItemId			MLTree::GetTreeItemIdFromLabel(wxString label)
   return (ItemToReturn);
 }
 
+void				MLTree::DisplayNodes()
+{
+  map<wxTreeItemId, s_nodeInfo>::iterator it;
+
+  int cnt = 0;
+  for (it = nodes.begin(); it != nodes.end(); it++)
+    {
+      s_nodeInfo temp;
+      temp = (*it).second;
+      cout << "value : [" << temp.label << "]" << endl;
+      cnt++;
+    }
+  cout << "  total : " << cnt << endl;
+}
+
+
 s_nodeInfo			MLTree::GetTreeItemStructFromId(wxTreeItemId ItemToFind)
 {
   s_nodeInfo			structToReturn;
@@ -188,7 +207,7 @@ s_nodeInfo			MLTree::GetTreeItemStructFromId(wxTreeItemId ItemToFind)
     {
       if ((*theIterator).first == ItemToFind)
 	{
-	  s_nodeInfo		temp;	  
+	  s_nodeInfo		temp;
 
 	  temp = (*theIterator).second;
 	  return (temp);
@@ -219,6 +238,7 @@ void				MLTree::OnAdd(wxString FileToAdd)
 		  this->AddFile(GetTreeItemIdFromLabel(_("Sounds")), FileToAdd.Mid(slashPos + 1), infos);
 		}
 	    }
+	  DisplayNodes();
 	}
     }
 }
@@ -238,13 +258,12 @@ wxString			MLTree::getSelection(int flag)
     if (GetItemParent(selection[i]) != GetRootItem() && selection[i] != GetRootItem())
       if (!flag)
 	{
-	  
 	  return (GetItemText(selection[i]));
 	}
       else
 	{
 	  s_nodeInfo		temp;
-	  
+ 
 	  temp = GetTreeItemStructFromId(selection[i]);
 	  return (temp.label);
 	}
@@ -262,11 +281,13 @@ void				MLTree::OnRemove()
     {
       if (GetItemParent(selection[i]) != GetRootItem() && selection[i] != GetRootItem())
 	{
-	  //nodes.erase(GetItemText(selection[i]));
+	  // wxTreeItemId temp = GetItemText(selection[i]);
+	  nodes.erase(selection[i]);
 	  DeleteChildren(selection[i]);
 	  Delete(selection[i]);
 	}
     }
+  DisplayNodes();
 }
 
 void				MLTree::ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel)
@@ -317,5 +338,5 @@ void				MLTree::OnRightClick(wxMouseEvent& event)
 }
 
 BEGIN_EVENT_TABLE(MLTree, wxTreeCtrl)
-  EVT_RIGHT_UP(MLTree::OnRightClick)
+  EVT_RIGHT_UP(MLTree::OnRightClick) 
 END_EVENT_TABLE()

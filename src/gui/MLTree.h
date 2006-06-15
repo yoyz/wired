@@ -57,6 +57,7 @@ class				MLTree : public wxTreeCtrl
   void				OnSelChange(wxTreeEvent &WXUNUSED(event));
   void				OnTreeRightClick(wxTreeEvent& event);
   void				OnItemRightClick(wxTreeEvent& event);
+  void				DisplayNodes();
 
   DECLARE_EVENT_TABLE()
 };
