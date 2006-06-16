@@ -25,8 +25,9 @@
 
 
 extern WiredSession				*CurrentSession;
+extern MediaLibrary				*MediaLibraryPanel;
 
-s_nodeInfo		SetStructInfos(s_nodeInfo infos, wxString label, wxString extention, wxString length)
+s_nodeInfo					SetStructInfos(s_nodeInfo infos, wxString label, wxString extention, wxString length)
 {
   infos.label = label;
   infos.extention = extention;
@@ -85,6 +86,16 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
 
   Connect(ML_ID_MENU_DELETE, wxEVT_COMMAND_MENU_SELECTED,
 	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::OnRemove);
+  Connect(ML_ID_MENU_CREATEDIR, wxEVT_COMMAND_MENU_SELECTED,
+	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::OnCreateDir);
+  Connect(ML_ID_MENU_INSERT, wxEVT_COMMAND_MENU_SELECTED,
+	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::OnInsert);
+  Connect(ML_ID_MENU_EDIT, wxEVT_COMMAND_MENU_SELECTED,
+	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::OnEdit);
+  Connect(ML_ID_MENU_PREVIEW, wxEVT_COMMAND_MENU_SELECTED,
+	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::OnPreview);
+  Connect(ML_ID_MENU_INFOS, wxEVT_COMMAND_MENU_SELECTED,
+	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::DisplayInfos);
 }
 
 MLTree::~MLTree()
@@ -154,6 +165,53 @@ void				MLTree::SetTreeCollapsed()
 bool				MLTree::IsTreeCollapsed()
 {
   return (collapsed);
+}
+
+void				MLTree::OnCreateDir()
+{
+  cout << "[MEDIALIBRARY] OmCreateDir" << endl;
+
+  s_nodeInfo		infos;
+  wxTreeItemId		itemParent;
+  wxTreeItemId		itemAdded;
+
+
+  itemParent = GetSelection();
+  
+  
+
+  infos = SetStructInfos(infos, _("New Directory"), _(""), _(""));
+  itemAdded = AppendItem(itemParent, _("New Directory"));
+  SetItemImage(itemAdded, 0);
+  nodes[itemAdded] = infos;
+  Expand(itemParent);
+  EditLabel(itemAdded);
+}
+
+void				MLTree::OnInsert()
+{
+  wxCommandEvent		event;
+
+  MediaLibraryPanel->OnInsert(event);
+}
+
+void				MLTree::OnEdit()
+{
+  wxCommandEvent		event;
+
+  MediaLibraryPanel->OnEdit(event);
+}
+
+void				MLTree::OnPreview()
+{
+  wxCommandEvent		event;
+
+  MediaLibraryPanel->OnPreview(event);
+}
+
+void				MLTree::DisplayInfos()
+{
+  cout << "[MEDIALIBRARY] DISPLAYINFOS" << endl;
 }
 
 void				MLTree::AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_nodeInfo infos)
@@ -329,10 +387,14 @@ void				MLTree::OnRightClick(wxMouseEvent& event)
   cout << "[MEDIALIBRARY] RightClick" << endl;
 
   wxMenu* myMenu = new wxMenu();
-  myMenu->Append(5111, wxT("New Directory"), wxT("New Directory"));
-  myMenu->Append(5112, wxT("New Snippet"), wxT("New Snippet"));
-  myMenu->AppendSeparator();
+  myMenu->Append(ML_ID_MENU_INFOS, wxT("Infos"), wxT("Infos"));
+  myMenu->Append(ML_ID_MENU_PREVIEW, wxT("Preview"), wxT("Preview"));
+  myMenu->Append(ML_ID_MENU_INSERT, wxT("Insert"), wxT("Insert"));
+  myMenu->Append(ML_ID_MENU_EDIT, wxT("Edit"), wxT("Edit"));
   myMenu->Append(ML_ID_MENU_DELETE, wxT("Delete"), wxT("Delete"));
+  myMenu->AppendSeparator();
+  myMenu->Append(ML_ID_MENU_CREATEDIR, wxT("New Directory"), wxT("New Directory"));
+  //  myMenu->Append(5112, wxT("New Snippet"), wxT("New Snippet"));
   PopupMenu(myMenu);
   delete myMenu;
 }

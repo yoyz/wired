@@ -50,6 +50,7 @@
 extern WiredSession			*CurrentSession;
 extern WiredSessionXml			*CurrentXmlSession;
 
+
 const struct s_combo_choice		SortSelectChoices[NB_SORTSELECT_CHOICES + 1] =
 {
   { wxT("filename")	,	1	},

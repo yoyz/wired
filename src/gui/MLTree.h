@@ -52,6 +52,13 @@ class				MLTree : public wxTreeCtrl
   void				AddIcon(wxImageList *images, wxIcon icon);
   void				OnAdd(wxString FileToAdd);
   void				OnRemove();
+  void				OnCreateDir();
+  /////
+  void				OnInsert();
+  void				OnEdit();
+  void				OnPreview();
+  void				DisplayInfos();
+  /////
   void				OnRightClick(wxMouseEvent &WXUNUSED(event));
   void				OnContextMenu(wxMouseEvent &WXUNUSED(event));
   void				OnSelChange(wxTreeEvent &WXUNUSED(event));
@@ -65,10 +72,15 @@ class				MLTree : public wxTreeCtrl
 enum
 {
   ML_ID_MENU_ADD = 20600,
-  ML_ID_MENU_CUT,
-  ML_ID_MENU_COPY,
-  ML_ID_MENU_PASTE,
+  //  ML_ID_MENU_CUT,
+  //  ML_ID_MENU_COPY,
+  //  ML_ID_MENU_PASTE,
+  ML_ID_MENU_PREVIEW,
+  ML_ID_MENU_INSERT,
+  ML_ID_MENU_EDIT,
   ML_ID_MENU_DELETE,
+  ML_ID_MENU_INFOS,
+  ML_ID_MENU_CREATEDIR,
   ML_ID_INSTR_MENU,
   ML_ID_EFFECTS_MENU
 };
