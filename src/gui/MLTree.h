@@ -38,6 +38,8 @@ class				MLTree : public wxTreeCtrl
   wxString			filters;
   vector<wxString>		Exts;
   map<wxTreeItemId, s_nodeInfo>	nodes;
+  int				m_reverseSort;
+  wxString			selected;
 
   bool				IsTreeCollapsed();
   void				SetTreeCollapsed();
@@ -65,6 +67,8 @@ class				MLTree : public wxTreeCtrl
   void				OnTreeRightClick(wxTreeEvent& event);
   void				OnItemRightClick(wxTreeEvent& event);
   void				DisplayNodes();
+  void				SortNodes(wxString selected);
+  int				OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2);
 
   DECLARE_EVENT_TABLE()
 };

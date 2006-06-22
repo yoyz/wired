@@ -44,6 +44,8 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
   root = AddRoot(_("Project's name"));
   SetItemBold(root);
 
+  m_reverseSort = 1;
+
   /* Create Image List */
   wxImageList *images = new wxImageList(16, 16, TRUE);
   AddIcon(images, wxIcon(icon3_xpm));
@@ -177,8 +179,6 @@ void				MLTree::OnCreateDir()
 
 
   itemParent = GetSelection();
-  
-  
 
   infos = SetStructInfos(infos, _("New Directory"), _(""), _(""));
   itemAdded = AppendItem(itemParent, _("New Directory"));
@@ -253,6 +253,78 @@ void				MLTree::DisplayNodes()
       cnt++;
     }
   cout << "  total : " << cnt << endl;
+}
+
+int				MLTree::OnCompareItems(const wxTreeItemId& item1, const wxTreeItemId& item2)
+{
+  map<wxTreeItemId, s_nodeInfo>::iterator it;
+  wxString	text1;
+  wxString	text2;
+  int		slashPos;
+
+  cout << "selected : " << selected.mb_str() << endl;
+  for (it = nodes.begin(); it != nodes.end(); it++)
+    {
+      if ((*it).first == item1)
+	{
+	  s_nodeInfo temp;
+	  temp = (*it).second;
+	  if (!selected.Cmp(_("filesize")))
+	    text1 = temp.length;
+	  else if (!selected.Cmp(_("filename")))
+	    {
+	      text1 = temp.label;
+	      slashPos = text1.Find('/', true);
+	      text1 = text1.Mid(slashPos + 1);
+	    }
+	  else if (!selected.Cmp(_("filetype")))
+	    text1 = temp.extention;
+	  else
+	    text1 = temp.label;
+	}
+    }
+  for (it = nodes.begin(); it != nodes.end(); it++)
+    {
+      if ((*it).first == item2)
+	{
+	  s_nodeInfo temp;
+	  temp = (*it).second;
+	  if (!selected.Cmp(_("filesize")))
+	    text2 = temp.length;
+	  else if (!selected.Cmp(_("filename")))
+	    {
+	      text2 = temp.label;
+	      slashPos = text2.Find('/', true);
+	      text2 = text2.Mid(slashPos + 1);
+	    }
+	  else if (!selected.Cmp(_("filetype")))
+	    text2 = temp.extention;
+	  else
+	    text2 = temp.label;
+	}
+    }
+  //  cout << "text1: " << text1.mb_str() << " | text2: " << text2.mb_str() << "comp: " << text1.Cmp(text2) << endl;
+  cout << "sort:" << m_reverseSort << endl;
+
+  return text1.Cmp(text2) * m_reverseSort;
+
+}
+
+void				MLTree::SortNodes(wxString MLselected)
+{
+  map<wxTreeItemId, s_nodeInfo>::iterator it;
+  wxTreeItemId temp;
+
+  selected = MLselected;
+  if (m_reverseSort == 1)
+    m_reverseSort = -1;
+  else
+    m_reverseSort = 1;
+  for (it = nodes.begin(); it != nodes.end(); it++)
+    {
+      temp = (*it).first;
+      SortChildren(temp);
+    }
 }
 
 

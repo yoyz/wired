@@ -260,13 +260,13 @@ void				MediaLibrary::OnFilterEffects(wxCommandEvent &WXUNUSED(event))
 void				MediaLibrary::OnPreview(wxCommandEvent &WXUNUSED(event))
 {
   cout << "[MEDIALIBRARY] Preview File (OnPreview)" << endl;
-
-  
 }
 
 void				MediaLibrary::OnSortToggle(wxCommandEvent &WXUNUSED(event))
 {
-  cout << "[MEDIALIBRARY] Sort Files (OnSortToggle)" << endl;
+  wxString selected = SortSelect->GetValue();
+  cout << "[MEDIALIBRARY] Sort Files (OnSortToggle) [" << selected << "]" << endl;
+  MLTreeView->SortNodes(selected);
 }
 
 BEGIN_EVENT_TABLE(MediaLibrary, wxPanel)
@@ -277,7 +277,8 @@ BEGIN_EVENT_TABLE(MediaLibrary, wxPanel)
   EVT_TOOL(MediaLibrary_Insert, MediaLibrary::OnInsert)
   EVT_TOOL(MediaLibrary_Preview, MediaLibrary::OnPreview)
   EVT_TOOL(MediaLibrary_TreeCollapse, MediaLibrary::OnCollapse)
-  EVT_TOOL(MediaLibrary_SortSelect, MediaLibrary::OnSortToggle)
+  EVT_COMBOBOX(MediaLibrary_SortSelect, MediaLibrary::OnSortToggle)
+  EVT_TEXT_ENTER(MediaLibrary_SortSelect, MediaLibrary::OnSortToggle)
   EVT_TOOL(MediaLibrary_FilterAudio, MediaLibrary::OnFilterAudio)
   EVT_TOOL(MediaLibrary_FilterMIDI, MediaLibrary::OnFilterMIDI)
   EVT_TOOL(MediaLibrary_FilterVideo, MediaLibrary::OnFilterVideo)

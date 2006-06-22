@@ -27,7 +27,6 @@ class				VUMCtrl;
 #define DEFAULT_SORTSELECT_VALUE	wxT("Sort by...")
 
 
-//class				MediaLibrary;
 class				MLTree;
 
 class				MediaLibrary : public wxPanel
@@ -41,8 +40,6 @@ class				MediaLibrary : public wxPanel
   friend class			MainWindow;
   friend class			MLTree;
 
-
-  
   bool				visible;
   bool				floating;
   wxToolBar			*TopToolbar;
@@ -58,7 +55,7 @@ class				MediaLibrary : public wxPanel
   wxMenu			*PopMenu;
   MLTree			*MLTreeView;
   FileConversion		*FileConverter;
-
+ 
   void				SetFileConverter(FileConversion *FileConv);
   void				OnSize(wxSizeEvent &event);
   void				OnEdit(wxCommandEvent &WXUNUSED(event));
@@ -90,8 +87,8 @@ extern const struct s_combo_choice	SortSelectChoices[NB_SORTSELECT_CHOICES + 1];
 
 enum
 {
-   MediaLibrary_Add = 1, 
-   MediaLibrary_Remove, 
+   MediaLibrary_Add = 1,
+   MediaLibrary_Remove,
    MediaLibrary_Edit,
    MediaLibrary_Insert,
    MediaLibrary_Preview,
@@ -100,7 +97,7 @@ enum
    MediaLibrary_FilterAudio,
    MediaLibrary_FilterMIDI,
    MediaLibrary_FilterVideo,
-   MediaLibrary_FilterEffects,
+   MediaLibrary_FilterEffects
 };
 
 
