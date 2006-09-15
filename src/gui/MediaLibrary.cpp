@@ -66,7 +66,7 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
   wxString	sortselect_choices[NB_SORTSELECT_CHOICES];
   long		c;
 
-  this->SetVisible();
+  this->SetInvisible();
   this->SetDocked();
   SetBackgroundColour(ML_BACKGROUND);
   SetForegroundColour(ML_FOREGROUND);
@@ -84,8 +84,8 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
   TopToolbar->Realize();
 
   BottomToolbar = new wxToolBar(this, -1, wxPoint(-1, this->GetSize().y - 50), wxSize(1000, 46), wxTB_3DBUTTONS);
-  BottomToolbar->AddTool(MediaLibrary_Preview, _("Preview"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_ADDUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_ADDDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Preview file"), _("Preview a file"), NULL);
-  BottomToolbar->AddTool(MediaLibrary_TreeCollapse, _("Expand/Collapse"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_REMOVEUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_REMOVEDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Expand/Collapse all"), _("Expand or Collapse all tree branches"), NULL);
+  BottomToolbar->AddTool(MediaLibrary_Preview, _("Preview"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_PREVIEWUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_PREVIEWUP_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Preview file"), _("Preview a file"), NULL);
+  BottomToolbar->AddTool(MediaLibrary_TreeCollapse, _("Expand/Collapse"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_COLLAPSEUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_COLLAPSEDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Expand/Collapse all"), _("Expand or Collapse all tree branches"), NULL);
   for (c = 0; c < NB_SORTSELECT_CHOICES; c++)
     sortselect_choices[c] = SortSelectChoices[c].s;
   SortSelect = new wxComboBox(BottomToolbar, MediaLibrary_SortSelect, DEFAULT_SORTSELECT_VALUE, wxPoint(-1, -1), wxSize(100, -1), 4, sortselect_choices, wxCB_READONLY);
@@ -93,10 +93,10 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
   BottomToolbar->Realize();
 
   FiltersToolbar = new wxToolBar(this, -1, wxPoint(-1, this->GetSize().y - 100), wxSize(1000, 46), wxTB_3DBUTTONS);
-  FiltersToolbar->AddCheckTool(MediaLibrary_FilterAudio, _("FAudio"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_ADDUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_ADDDO_IMG)), wxBITMAP_TYPE_PNG), _("Show/Hide Audio files"), _("Show or hide audio files from the Media Library"), NULL);
-  FiltersToolbar->AddCheckTool(MediaLibrary_FilterMIDI, _("FMIDI"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_REMOVEUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_REMOVEDO_IMG)), wxBITMAP_TYPE_PNG), _("Show/Hide MIDI files"), _("Show or hide MIDI files from the Media Library"), NULL);
-  FiltersToolbar->AddCheckTool(MediaLibrary_FilterVideo, _("FVideo"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_EDITUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_EDITDO_IMG)), wxBITMAP_TYPE_PNG), _("Show/Hide Video files"), _("Show or hide video files from the Media Library"), NULL);
-  FiltersToolbar->AddCheckTool(MediaLibrary_FilterEffects, _("FEffects"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_INSERTUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_INSERTDO_IMG)), wxBITMAP_TYPE_PNG), _("Show/Hide Effects Files"), _("Show or hide effects from the Media Library"), NULL);
+  FiltersToolbar->AddCheckTool(MediaLibrary_FilterAudio, _("FAudio"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_FILEAUDIOUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_FILEAUDIODO_IMG)), wxBITMAP_TYPE_PNG), _("Show/Hide Audio files"), _("Show or hide audio files from the Media Library"), NULL);
+  FiltersToolbar->AddCheckTool(MediaLibrary_FilterMIDI, _("FMIDI"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_FILEMIDIUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_FILEMIDIDO_IMG)), wxBITMAP_TYPE_PNG), _("Show/Hide MIDI files"), _("Show or hide MIDI files from the Media Library"), NULL);
+  FiltersToolbar->AddCheckTool(MediaLibrary_FilterVideo, _("FVideo"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_FILEVIDEOUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_FILEVIDEODO_IMG)), wxBITMAP_TYPE_PNG), _("Show/Hide Video files"), _("Show or hide video files from the Media Library"), NULL);
+  FiltersToolbar->AddCheckTool(MediaLibrary_FilterEffects, _("FEffects"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_FILEFXUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_FILEFXDO_IMG)), wxBITMAP_TYPE_PNG), _("Show/Hide Effects Files"), _("Show or hide effects from the Media Library"), NULL);
   FiltersToolbar->ToggleTool(MediaLibrary_FilterAudio, 3);
   FiltersToolbar->ToggleTool(MediaLibrary_FilterMIDI, 3);
   FiltersToolbar->ToggleTool(MediaLibrary_FilterVideo, 3);
@@ -259,7 +259,12 @@ void				MediaLibrary::OnFilterEffects(wxCommandEvent &WXUNUSED(event))
 
 void				MediaLibrary::OnPreview(wxCommandEvent &WXUNUSED(event))
 {
-  cout << "[MEDIALIBRARY] Preview File (OnPreview)" << endl;
+  wxString			selfile;
+  
+  selfile = MLTreeView->getSelection(1);
+  cout << "[MEDIALIBRARY] Preview File (OnPreview)" << selfile << endl;
+
+  Seq->PlayFile(selfile, true);
 }
 
 void				MediaLibrary::OnSortToggle(wxCommandEvent &WXUNUSED(event))

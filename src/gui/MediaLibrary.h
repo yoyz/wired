@@ -13,14 +13,31 @@ class				HoldButton;
 class				StaticLabel;
 class				VUMCtrl;
 
-#define MEDIALIBRARY_ADDUP_IMG		wxT("ihm/toolbar/hand_up.png")
-#define MEDIALIBRARY_ADDDO_IMG		wxT("ihm/toolbar/hand_down.png")
-#define MEDIALIBRARY_REMOVEUP_IMG	wxT("ihm/toolbar/erase_up.png")
-#define MEDIALIBRARY_REMOVEDO_IMG	wxT("ihm/toolbar/erase_down.png")
-#define MEDIALIBRARY_EDITUP_IMG		wxT("ihm/toolbar/draw_up.png")
-#define MEDIALIBRARY_EDITDO_IMG		wxT("ihm/toolbar/draw_down.png")
-#define MEDIALIBRARY_INSERTUP_IMG	wxT("ihm/toolbar/split_up.png")
-#define MEDIALIBRARY_INSERTDO_IMG	wxT("ihm/toolbar/split_down.png")
+#define MEDIALIBRARY_ADDUP_IMG		wxT("ihm/toolbar/add_up.png")
+#define MEDIALIBRARY_ADDDO_IMG		wxT("ihm/toolbar/add_up.png")
+#define MEDIALIBRARY_REMOVEUP_IMG	wxT("ihm/toolbar/del_up.png")
+#define MEDIALIBRARY_REMOVEDO_IMG	wxT("ihm/toolbar/del_up.png")
+#define MEDIALIBRARY_EDITUP_IMG		wxT("ihm/toolbar/edit_up.png")
+#define MEDIALIBRARY_EDITDO_IMG		wxT("ihm/toolbar/edit_up.png")
+#define MEDIALIBRARY_INSERTUP_IMG	wxT("ihm/toolbar/insert_up.png")
+#define MEDIALIBRARY_INSERTDO_IMG	wxT("ihm/toolbar/insert_up.png")
+
+
+#define MEDIALIBRARY_PREVIEWUP_IMG	wxT("ihm/toolbar/play.png")
+#define MEDIALIBRARY_PREVIEWDO_IMG	wxT("ihm/toolbar/play.png")
+#define MEDIALIBRARY_COLLAPSEUP_IMG	wxT("ihm/toolbar/collapse_up.png")
+#define MEDIALIBRARY_COLLAPSEDO_IMG	wxT("ihm/toolbar/collapse_up.png")
+
+#define MEDIALIBRARY_FILEAUDIOUP_IMG	wxT("ihm/toolbar/file_audio_up.png")
+#define MEDIALIBRARY_FILEAUDIODO_IMG	wxT("ihm/toolbar/file_audio_up.png")
+#define MEDIALIBRARY_FILEVIDEOUP_IMG	wxT("ihm/toolbar/file_mov_up.png")
+#define MEDIALIBRARY_FILEVIDEODO_IMG	wxT("ihm/toolbar/file_mov_up.png")
+#define MEDIALIBRARY_FILEMIDIUP_IMG	wxT("ihm/toolbar/file_midi_up.png")
+#define MEDIALIBRARY_FILEMIDIDO_IMG	wxT("ihm/toolbar/file_midi_up.png")
+#define MEDIALIBRARY_FILEFXUP_IMG	wxT("ihm/toolbar/file_fx_up.png")
+#define MEDIALIBRARY_FILEFXDO_IMG	wxT("ihm/toolbar/file_fx_up.png")
+
+
 #define ML_BACKGROUND			wxColour(142, 142, 169)
 #define ML_FOREGROUND			wxColour(142, 142, 155)
 #define NB_SORTSELECT_CHOICES		(4)

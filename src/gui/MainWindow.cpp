@@ -305,7 +305,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   TopSizer->Add(splitVert, 1, wxEXPAND | wxALL, 2);
   TopSizer->Add(BottomSizer, 0, wxEXPAND | wxALL, 0);
   SetSizer(TopSizer);
-  splitVert->SetSashPosition(200);
+  splitVert->SetSashPosition(1);
 
   RackPanel->SetBackgroundColour(*wxBLACK);
   SeqPanel->SetBackgroundColour(*wxWHITE);
@@ -1377,7 +1377,7 @@ void					MainWindow::MediaLibraryHide(wxCommandEvent &event)
 	    return ;
 	  }
 	splitVert->SetSashPosition(1);
-	MediaLibraryPanel->Hide();
+	//MediaLibraryPanel->Hide();
 	MediaLibraryPanel->SetInvisible();
 }
 
