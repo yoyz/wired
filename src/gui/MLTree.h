@@ -45,7 +45,7 @@ class				MLTree : public wxTreeCtrl
   void				SetTreeCollapsed();
   void				SetTreeExpanded();
   wxTreeItemId			GetTreeItemIdFromLabel(wxString label);
-  s_nodeInfo			MLTree::GetTreeItemStructFromId(wxTreeItemId ItemToFind);
+  s_nodeInfo			GetTreeItemStructFromId(wxTreeItemId ItemToFind);
   wxString			getSelection(int flag);
   void				AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_nodeInfo infos);
   void				ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel);
