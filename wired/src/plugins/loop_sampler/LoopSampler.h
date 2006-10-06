@@ -22,7 +22,11 @@ using namespace std;
 
 #include <list>
 
-#define PLUGIN_NAME wxT("Loop Sampler")
+#define LS_PLUGIN_NAME wxT("Loop Sampler")
+#define LS_PLUGIN_TYPE (ePlugTypeInstrument)
+#define LS_PLUGIN_WIDTH (2)
+#define LS_PLUGIN_HEIGHT (2)
+#define LS_PLUGIN_API_VERSION (2)
 
 #define IMG_LS_BMP	wxT("plugins/loopsampler/LoopSampler.bmp")
 #define IMG_LS_PLAY_UP  wxT("plugins/loopsampler/loop_play_up.png")
@@ -334,5 +338,21 @@ enum
     LoopSampler_Sustain,
     LoopSampler_Release
   };
+
+class		LoopSamplerInstaller : public WiredPluginInstaller
+{
+ public:
+  WiredPluginInstaller() {};
+  ~WiredPluginInstaller() {};
+
+  wxString	GetName() { return (LS_PLUGIN_NAME) };
+  ePlugType	GetType() { return (LS_PLUGIN_TYPE) };
+  int		GetWidth() { return (LS_PLUGIN_WIDTH); };
+  int		GetHeight() { return (LS_PLUGIN_HEIGHT); };
+  int		GetVersion() { return (LS_PLUGIN_API_VERSION); };
+
+  WiredPlugin*	Create(WiredPluginStartInfo* start) { return (new LoopSampler(start)); };
+  void		Destroy(WiredPlugin* plug) { delete (LoopSampler*)plug; };
+};
 
 #endif

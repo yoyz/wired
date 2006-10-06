@@ -31,8 +31,8 @@ BEGIN_EVENT_TABLE(LoopSampler, wxWindow)
 END_EVENT_TABLE()
 
 
-LoopSampler::LoopSampler(PlugStartInfo &startinfo, PlugInitInfo *initinfo)
-  : Plugin(startinfo, initinfo)    
+LoopSampler::LoopSampler(WiredPluginStartInfo* start)
+  : WiredPlugin(start)
 {
   HelpMode = false;
   BeatCount = GetSigNumerator();
