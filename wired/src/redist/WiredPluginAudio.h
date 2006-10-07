@@ -8,9 +8,10 @@
 #endif
 
 #include "WiredPluginStartInfo.h"
+#include "WiredPluginEvent.h"
 
 class WiredPluginStartInfo;
-
+class WiredEvent;
 
 ////
 // Current version of API
@@ -23,11 +24,11 @@ class WiredPluginStartInfo;
 class		WiredPluginAudio
 {
  private:
-  WiredPluginStartInfo	*StartInfo;
+  WiredPluginStartInfo*	_StartInfo;
 
  public:
-  WiredPlugin(WiredPluginStartInfo *parent) { StartInfo = parent; } ;
-  ~WiredPlugin();
+  WiredPluginAudio(WiredPluginStartInfo* parent) { StartInfo = parent; } ;
+  ~WiredPluginAudio();
 
   /* Called when the host starts to play */
   virtual void	 Play() {}
@@ -40,7 +41,7 @@ class		WiredPluginAudio
   /**
    * This is were you do your processing. 'input' is the data you have to process (or
    * not if you are making an instrument) and 'output' whre you should place the
-   * processed or generated. 'input' and 'output' contains 'n' buffers (2 for stereo) which 
+   * processed or generated. 'input' and 'output' contains 'n' buffers (2 for stereo) which
    * contains 'sample_length' elements
    */
   typedef float**	WiredBuffer;
@@ -53,7 +54,7 @@ class		WiredPluginAudio
 	  output[1][i] = input[1][i];
 	}
     }
-  
+
   /* Is plugin supporting audio data to be sent to it ? */
   virtual bool	 IsAudio() = 0;
   /* Is plugin supporting MIDI data to be sent to it ? */
@@ -67,13 +68,13 @@ class		WiredPluginAudio
   /* Returns the signature denominator */
   int		GetSigDenominator();
   /* Returns the position in sample in the sequencer */
-  unsigned long	GetSamplePos();
+  unsigned long	GetCurAudioPos();
   /* Returns the number of samples per bar */
-  double	GetSamplesPerBar();
+  double	GetSamplesPerMeasure();
   /* Returns the number of bars per sample */
-  double	GetBarsPerSample();
+  double	GetMeasuresPerSample();
   /* Returns the position in Bars of the sequencer */
-  double	GetBarPos();
+  double	GetCurrentPos();
 
   /* Called when the plugin receives an event such as MIDI */
   virtual void	 ProcessEvent(WiredEvent &event) {}

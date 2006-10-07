@@ -30,7 +30,7 @@ using namespace std;
 #define INDEX_MENUITEM_UNDO		0
 #define INDEX_MENUITEM_REDO		1
 
-#include	"Plugin.h"
+#include	"WiredPlugin.h"
 #include	"../wiredvideo/WiredVideo.h"
 #include        "FloatingFrame.h"
 
@@ -111,8 +111,8 @@ class					MainWindow: public wxFrame
   void					OnKey(wxKeyEvent& event);
   void					OnSpaceKey();
   void					SwitchRackOptView();
-  void					SwitchSeqOptView();  
-  void					AddUpdatePlugin(Plugin *p);
+  void					SwitchSeqOptView();
+  void					AddUpdatePlugin(WiredPlugin *p);
 
   /* init func */
   int					Init();
@@ -123,7 +123,7 @@ class					MainWindow: public wxFrame
   friend class				MediaLibrary;
 
  private:
-  int					PluginMenuIndexCount;			
+  int					PluginMenuIndexCount;
   bool					RackModeView;
   bool					SeqModeView;
   void					OnIdle(wxIdleEvent &event);
@@ -161,15 +161,15 @@ class					MainWindow: public wxFrame
   void					InitUndoRedoMenuItems();
   void					CreateUndoRedoMenus(wxMenu *callingMenu);
   void					removeAllMenuItems(wxMenu *menu);
-  
+
   /* Video Menu */
   void					InitVideoMenuItems();
-  
+
   void					InitFileConverter();
-  
+
   /* Config files */
   wxTextFile				PluginsConfFile;
-  
+
   /* Visible controls */
   wxSplitterWindow			*split;
   wxSplitterWindow			*splitVert;
@@ -186,13 +186,13 @@ class					MainWindow: public wxFrame
   wxMenu				*CreateInstrMenu;
   wxMenu				*CreateDSSIInstrMenu;
   wxMenu				*CreateLADSPAInstrMenu;
-  wxMenu				*CreateEffectMenu;     
-  wxMenu				*CreateDSSIEffectMenu;     
-  wxMenu				*CreateLADSPAEffectMenu;     
+  wxMenu				*CreateEffectMenu;
+  wxMenu				*CreateDSSIEffectMenu;
+  wxMenu				*CreateLADSPAEffectMenu;
   wxMenu				*HelpMenu;
   wxMenu				*WindowMenu;
   wxMenu				*MediaLibraryMenu;
-  
+
   wxMenuItem				*ItemFloatingTrans;
   wxMenuItem				*ItemFloatingSeq;
   wxMenuItem				*ItemFloatingRacks;
@@ -219,8 +219,8 @@ class					MainWindow: public wxFrame
   wxTimer				*SeqTimer;
 
   /* List of plugins that need to be updated for their gui */
-  list<Plugin *>			UpdatePlugins;
-    
+  list<WiredPlugin *>			UpdatePlugins;
+
   wxLogWindow                           *LogWin;
   wxLogStderr                           *LogTarget;
   FILE                                  *LogFile;
@@ -262,7 +262,7 @@ enum
   MainWin_FloatMediaLibrary,
   MainWin_Undo,
   MainWin_Redo,
-  MainWin_History, 
+  MainWin_History,
   MainWin_Delete,
   MainWin_SelectAll,
   MainWin_FullScreen,
@@ -271,8 +271,8 @@ enum
   MainWin_FileLoader,
   MainWin_IntHelp,
   MainWin_SwitchRack,
-  MainWin_SwitchSeq, 
-  MainWin_OpenVideo, 
+  MainWin_SwitchSeq,
+  MainWin_OpenVideo,
   MainWin_CloseVideo,
   MainWin_MediaLibraryBeta,
   MainWin_MediaLibraryShow,

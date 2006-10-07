@@ -24,7 +24,7 @@
 #include <errno.h>
 
 #include "../plugins/PluginLoader.h"
-#include "../redist/Plugin.h"
+#include "../redist/WiredPlugin.h"
 #include "../sequencer/Track.h"
 #include "../sequencer/Sequencer.h"
 #include "../gui/SeqTrack.h"

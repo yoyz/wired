@@ -11,8 +11,12 @@
 #include "config.h"
 
 #include "WiredPluginStartInfo.h"
+#include "WiredPluginGui.h"
+#include "WiredPluginAudio.h"
 
 class WiredPluginStartInfo;
+class WiredPluginGui;
+class WiredPluginAudio;
 
 
 ////
@@ -23,13 +27,13 @@ class WiredPluginStartInfo;
 #define WIRED_CURRENT_VERSION_API (2)
 
 
-class		WiredPlugin : public WiredPluginGui : public WiredPluginAudio
+class		WiredPlugin : public WiredPluginGui, public WiredPluginAudio
 {
  private:
   WiredPluginStartInfo	*StartInfo;
 
  public:
-  WiredPlugin(WiredPluginStartInfo *parent) 
+  WiredPlugin(WiredPluginStartInfo *parent)
     { StartInfo = parent; } : WiredPluginGui(parent) : WiredPluginAudio(parent);
   ~WiredPlugin();
 
@@ -41,13 +45,13 @@ class		WiredPlugin : public WiredPluginGui : public WiredPluginAudio
 
   /* Returns the default name for the plugin */
   virtual wxString DefaultName() { return _("Rack"); }
-  
-  // Host info
 
+
+  // Host info
   /* Returns the host product name */
-  wxString	GetHostProductName();
+  wxString	GetProductName();
   /* Returns the host product version */
-  wxString	GetHostProductVersion();
+  wxString	GetProductVersion();
 };
 
 #endif // __WIREDPLUGIN_H__

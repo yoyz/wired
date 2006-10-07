@@ -3,22 +3,27 @@
 
 #include "WiredCorePlugins.h"
 #include "WiredPlugin.h"
+//#include "WiredPluginMgr.h"
 
 #include <wx/string.h>
 #include <wx/wx.h>
 
 class WiredPlugin;
+//class WiredPluginMgr;
+
 
 /**
    * \dad Window ptr of plugin's parent
-   * \pos Position 
-   * \size 
+   * \pos Position
+   * \size
    */
 
 class	WiredPluginStartInfo
 {
-  friend WiredPluginMgr;
-  friend WiredPlugin;
+  //  friend WiredPluginMgr;
+  friend class WiredPlugin;
+  friend class WiredPluginGui;
+  friend class WiredPluginAudio;
 
  private:
   WiredCorePlugins*	Core;
@@ -27,14 +32,17 @@ class	WiredPluginStartInfo
   wxPoint		Pos;
   wxSize		Size;
 
+
+
+  WiredPluginStartInfo();
+  ~WiredPluginStartInfo();
+
   //  HostInterface GetHostCallback();
   wxString	GetVersion();
   wxWindow*	GetRack();
   wxPoint	GetPos();
   wxSize	GetSize();
 
-  WiredPluginStartInfo();
-  ~WiredPluginStartInfo();
  public:
 };
 

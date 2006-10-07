@@ -23,14 +23,14 @@ class WiredPluginStartInfo;
 class		WiredPluginGui
 {
  private:
-  WiredPluginStartInfo	*StartInfo;
+  WiredPluginStartInfo*	_StartInfo;
 
  public:
-  WiredPlugin(WiredPluginStartInfo *parent) { StartInfo = parent; } ;
-  ~WiredPlugin();
+  WiredPluginGui(WiredPluginStartInfo* parent) { StartInfo = parent; } ;
+  ~WiredPluginGui();
 
   /* Ask the host application to call Update() whenever the main thread can process gui calls  */
-  virtual void	 AskUpdate();
+  void	 UpdatePluginGui();
 
   /* Called by the host that the plugin can update its graphical controls */
   virtual void	 Update() {}
@@ -39,10 +39,10 @@ class		WiredPluginGui
   virtual wxString GetHelpString() { return _("No help provided for this plugin"); }
 
   /* Is the Help window being shown ? */
-  virtual void SetHelpMode(bool On) { }
+  virtual void EnableHelpMode(bool On = true) { }
 
   /* Returns a 32x16 bitmap used for displaying the connected to track plugin */
-  virtual wxBitmap *GetBitmap() = 0;  
+  virtual wxBitmap *GetBitmap() = 0;
 
   /* Used to know if a keyboard event occured. No need to overload */
   virtual void	OnKeyEvent(wxKeyEvent &event);
@@ -50,48 +50,38 @@ class		WiredPluginGui
   virtual void  OnMouseEvent(wxMouseEvent &event);
   /* Used to know if a paint event occured. No need to overload */
   virtual void  OnPaintEvent(wxPaintEvent &event);
-  
-  // User interface events
 
-  /* Send help wxString to the Wired help window */
-  void SendHelp(wxString str);
-  /* Tells the host that a mouse event occured */
-  void SendMouseEvent(wxMouseEvent &event);
-  /* Tells the host that a key event occured */
-  void SendKeyEvent(wxKeyEvent &event);
-  /* Tells the host that the plugin got selected */
-  void SendClickEvent(wxMouseEvent &event);
-  /* Tells the host that the plugin needs to be paint */
-  void SendPaintEvent(wxPaintEvent &event);
-  /* Shows MIDI controller change window, if returns true,
-     MidiData will be filled by the MIDI data received (you need to pass a valid pointer
-     to a int[3] variable */
-  bool ShowMidiController(int *MidiData[3]);
+  // User interface events
+  bool ShowMidiController();
 
   /* Shows plugin's optional view */
   void ShowOptionalView();
   /* Closes plugin's optional view */
   void CloseOptionalView();
 
+  int	WiredCorePlugins::GetLastMidiType();
+  int	WiredCorePlugins::GetLastMidiController();
+  int	WiredCorePlugins::GetLastMidiValue();
+
   /* Opens the Wired file loader with given title, extensions, and if it should read
-     AKAI audio cds/files or not. Returns the selected file name or an empty wstring if 
+     AKAI audio cds/files or not. Returns the selected file name or an empty wstring if
      cancelled. If 'exts' is NULL, default audio extensions are used. */
-  wxString OpenFileLoader(wxString title, 
-			     std::vector<wxString> *exts, 
+  wxString OpenFileLoader(wxString& title,
+			     std::vector<wxString>& exts,
 			     bool akai = false);
   /* Opens the Wired file loader with given title, extensions, for saving a file.
      Returns the file name or an empty wstring if cancelled */
-  wxString SaveFileLoader(wxString title, 
-			     std::vector<wxString> *exts);
+  wxString SaveFileLoader(wxString& title,
+			     std::vector<wxString>& exts);
 
   // Sequencer events
   /* Create a MIDI pattern containing a list of event in the host's sequencer */
-  bool CreateMidiPattern(std::list<SeqCreateEvent *> *l);
+  bool	AddMidiPattern(std::list<SeqCreateEvent *>& midi);
 
   /* Called by the host to know if the plugin has an optional view or not */
   virtual bool	 HasView() { return false; }
   /* Called by the host to create the optional view */
-  virtual wxWindow *CreateView(wxWindow *zone, wxPoint &pos, wxSize &size) { return 0x0; } 
+  virtual wxWindow *CreateView(wxWindow *zone, wxPoint &pos, wxSize &size) { return 0x0; }
   /* Called when the optional view needs to be destroyed */
   virtual void	 DestroyView() {}
 

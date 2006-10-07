@@ -10,22 +10,22 @@ WiredCorePlugins::~WiredCorePlugins()
 
 }
 
-void		WiredCorePlugins::SendMouseEvent(Plugin *plug, wxMouseEvent *event)
+void		WiredCorePlugins::SendMouseEvent(WiredPlugin *plug, wxMouseEvent *event)
 {
   RackPanel->HandleMouseEvent(plug, event);
 }
 
-void		WiredCorePlugins::SendKeyEvent(Plugin *plug, wxKeyEvent *event)
+void		WiredCorePlugins::SendKeyEvent(WiredPlugin *plug, wxKeyEvent *event)
 {
   RackPanel->HandleKeyEvent(plug, event);
 }
 
-void		WiredCorePlugins::SendPaintEvent(Plugin *plug, wxPaintEvent *event)
+void		WiredCorePlugins::SendPaintEvent(WiredPlugin *plug, wxPaintEvent *event)
 {
   RackPanel->HandlePaintEvent(plug, event);
 }
 
-void		WiredCorePlugins::AddUpdatePlugin(Plugin *plug)
+void		WiredCorePlugins::UpdatePluginGui(WiredPlugin *plug)
 {
   MainWin->AddUpdatePlugin(plug);
 }
@@ -134,7 +134,7 @@ void		WiredCorePlugins::CloseOptionalView(WiredPlugin *plug)
 }
 
 void		WiredCorePlugins::AddMidiPattern(WiredPlugin *plug,
-						 list<SeqCreateEvent*> midi)
+						 list<SeqCreateEvent*>& midi)
 {
   Seq->AddMidiPattern(midi, plug);
 }

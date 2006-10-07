@@ -4,8 +4,19 @@ CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../plugins -I../fileloader -I/
 
 noinst_LIBRARIES = libredist.a
 
-libredist_a_SOURCES = 			\
-		Plugin.cpp		\
-		Plugin.h		\
-		Polyphony.cpp		\
+libredist_a_SOURCES = 				\
+		WiredCorePlugins.h		\
+		WiredCorePlugins.cpp		\
+		WiredPluginStartInfo.h		\
+		WiredPluginStartInfo.cpp	\
+		WiredPluginGui.h		\
+		WiredPluginGui.cpp		\
+		WiredPluginAudio.h		\
+		WiredPluginAudio.cpp		\
+		WiredPlugin.h			\
+		WiredPlugin.cpp			\
+		WiredPluginInstaller.h		\
+		WiredPluginInstaller.cpp	\
+		WiredPlugin.h			\
+		Polyphony.cpp			\
 		Polyphony.h

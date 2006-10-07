@@ -16,17 +16,17 @@ class	WiredCorePlugins
 
   /**
    * Event related
-   */ 
-  void		SendMouseEvent(Plugin *plug, wxMouseEvent *event);
+   */
+  void		SendMouseEvent(WiredPlugin *plug, wxMouseEvent *event);
 
 
-  void		SendKeyEvent(Plugin *plug, wxKeyEvent *event);
+  void		SendKeyEvent(WiredPlugin *plug, wxKeyEvent *event);
 
 
-  void		SendPaintEvent(Plugin *plug, wxPaintEvent *event);
+  void		SendPaintEvent(WiredPlugin *plug, wxPaintEvent *event);
 
 
-  void		AddUpdatePlugin(Plugin *plug);
+  void		UpdatePluginGui(WiredPlugin *plug);
 
 
   /**
@@ -40,14 +40,14 @@ class	WiredCorePlugins
 
 
   // long		GetBufferSize();
-  // 
+  //
 
   /**
    * Audio info
    */
 
   // double		GetSamplingRate();
-  // 
+  //
 
   float		GetBPM();
 
@@ -110,7 +110,7 @@ class	WiredCorePlugins
 
   int		GetLastMidiValue();
 
-  
+
 };
 
 #endif // __WIREDCOREPLUGINS_H__

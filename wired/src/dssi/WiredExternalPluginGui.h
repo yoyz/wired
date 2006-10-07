@@ -9,7 +9,7 @@
 #ifndef WX_PRECOMP
    #include <wx/wx.h>
 #endif
-#include "Plugin.h"
+#include "WiredPlugin.h"
 #include "WiredExternalPluginLADSPA.h"
 #include "FaderCtrl.h"
 #include "KnobCtrl.h"
@@ -38,7 +38,7 @@ class		WiredDSSIGui : public WiredLADSPAInstance
   WiredDSSIGui(const WiredDSSIGui& copy) {*this = copy;}
   WiredDSSIGui operator=(const WiredDSSIGui& right);
   ~WiredDSSIGui();
-  
+
   void		DestroyView();
   wxWindow	*CreateView(wxWindow *rack, wxPoint &pos, wxSize &size);
   void		SetInfo(PlugInitInfo *info);
@@ -48,7 +48,7 @@ class		WiredDSSIGui : public WiredLADSPAInstance
   void		OnFaderMove(wxScrollEvent &WXUNUSED(e));
   void		OnBypass(wxCommandEvent &e);
   void		OnBypassController(wxMouseEvent &event);
-  
+
  protected:
   bool		Bypass;
   wxWindow	**Faders;
