@@ -30,21 +30,21 @@ FilterPlugin::FilterPlugin(PlugStartInfo &startinfo, PlugInitInfo *initinfo)
   Init();
 
   wxImage *tr_bg = 
-    new wxImage(GetDataDir() + wxString(IMG_FL_BG), 
+    new wxImage(GetDataPath() + wxString(IMG_FL_BG), 
 		wxBITMAP_TYPE_PNG);
   TpBmp = new wxBitmap(tr_bg);
   delete tr_bg;
-  bmp = new wxBitmap(GetDataDir() + wxString(IMG_FL_BMP), 
+  bmp = new wxBitmap(GetDataPath() + wxString(IMG_FL_BMP), 
 		     wxBITMAP_TYPE_BMP); 
-  liquid_on = new wxImage(GetDataDir() + wxString(IMG_LIQUID_ON),
+  liquid_on = new wxImage(GetDataPath() + wxString(IMG_LIQUID_ON),
 			  wxBITMAP_TYPE_PNG);
-  liquid_off = new wxImage(GetDataDir() + wxString(IMG_LIQUID_OFF), 
+  liquid_off = new wxImage(GetDataPath() + wxString(IMG_LIQUID_OFF), 
 			   wxBITMAP_TYPE_PNG);
   Liquid = new StaticBitmap(this, -1, wxBitmap(liquid_on), wxPoint(22, 25));
 
-  bypass_on = new wxImage(GetDataDir() + wxString(IMG_BYPASS_ON),
+  bypass_on = new wxImage(GetDataPath() + wxString(IMG_BYPASS_ON),
 			  wxBITMAP_TYPE_PNG);
-  bypass_off = new wxImage(GetDataDir() + wxString(IMG_BYPASS_OFF), 
+  bypass_off = new wxImage(GetDataPath() + wxString(IMG_BYPASS_OFF), 
 			   wxBITMAP_TYPE_PNG);
   BypassBtn = new DownButton(this, Filter_Bypass, 
 			     wxPoint(21, 58), 
@@ -52,28 +52,28 @@ FilterPlugin::FilterPlugin(PlugStartInfo &startinfo, PlugInitInfo *initinfo)
 				    bypass_on->GetHeight()), bypass_off, 
 			     bypass_on);
 
-  hp_on = new wxImage(GetDataDir() + wxString(IMG_FL_HP), 
+  hp_on = new wxImage(GetDataPath() + wxString(IMG_FL_HP), 
 		      wxBITMAP_TYPE_PNG);
-  hp_off = new wxImage(GetDataDir() + wxString(IMG_FL_HP_UP), 
+  hp_off = new wxImage(GetDataPath() + wxString(IMG_FL_HP_UP), 
 		       wxBITMAP_TYPE_PNG);
-  lp_on = new wxImage(GetDataDir() + wxString(IMG_FL_LP), 
+  lp_on = new wxImage(GetDataPath() + wxString(IMG_FL_LP), 
 		      wxBITMAP_TYPE_PNG);
-  lp_off = new wxImage(GetDataDir() + wxString(IMG_FL_LP_UP), 
+  lp_off = new wxImage(GetDataPath() + wxString(IMG_FL_LP_UP), 
 		       wxBITMAP_TYPE_PNG);
-  bp_on = new wxImage(GetDataDir() + wxString(IMG_FL_BP),
+  bp_on = new wxImage(GetDataPath() + wxString(IMG_FL_BP),
 		      wxBITMAP_TYPE_PNG);
-  bp_off = new wxImage(GetDataDir() + wxString(IMG_FL_BP_UP),
+  bp_off = new wxImage(GetDataPath() + wxString(IMG_FL_BP_UP),
 		       wxBITMAP_TYPE_PNG);
-  notch_on = new wxImage(GetDataDir() + wxString(IMG_FL_NOTCH), 
+  notch_on = new wxImage(GetDataPath() + wxString(IMG_FL_NOTCH), 
 			 wxBITMAP_TYPE_PNG);
   notch_off = 
-    new wxImage(GetDataDir() + wxString(IMG_FL_NOTCH_UP), 
+    new wxImage(GetDataPath() + wxString(IMG_FL_NOTCH_UP), 
 		wxBITMAP_TYPE_PNG);
   notchbar_on = 
-    new wxImage(GetDataDir() + wxString(IMG_FL_NOTCHBAR), 
+    new wxImage(GetDataPath() + wxString(IMG_FL_NOTCHBAR), 
 		wxBITMAP_TYPE_PNG);
   notchbar_off = 
-    new wxImage(GetDataDir() + wxString(IMG_FL_NOTCHBAR_UP), 
+    new wxImage(GetDataPath() + wxString(IMG_FL_NOTCHBAR_UP), 
 		wxBITMAP_TYPE_PNG);
 
 
@@ -96,9 +96,9 @@ FilterPlugin::FilterPlugin(PlugStartInfo &startinfo, PlugInitInfo *initinfo)
 				   notch_off->GetHeight()),
 			    notch_off, notch_on);
   
-  img_bg = new wxImage(GetDataDir() + wxString(IMG_FL_FADER_BG), 
+  img_bg = new wxImage(GetDataPath() + wxString(IMG_FL_FADER_BG), 
 		       wxBITMAP_TYPE_PNG);
-  img_fg = new wxImage(GetDataDir() + wxString(IMG_FL_FADER_FG), 
+  img_fg = new wxImage(GetDataPath() + wxString(IMG_FL_FADER_FG), 
 		       wxBITMAP_TYPE_PNG);
   
   CutoffFader = new FaderCtrl(this, Filter_Cutoff, img_bg, img_fg, 1, 
@@ -113,13 +113,13 @@ FilterPlugin::FilterPlugin(PlugStartInfo &startinfo, PlugInitInfo *initinfo)
 
   imgs = new wxImage*[4];
   imgs[0] = 
-    new wxImage(GetDataDir() + wxString(IMG_FL_KNOB_LP));
+    new wxImage(GetDataPath() + wxString(IMG_FL_KNOB_LP));
   imgs[1] = 
-    new wxImage(GetDataDir() + wxString(IMG_FL_KNOB_BP));
+    new wxImage(GetDataPath() + wxString(IMG_FL_KNOB_BP));
   imgs[2] = 
-    new wxImage(GetDataDir() + wxString(IMG_FL_KNOB_HP));
+    new wxImage(GetDataPath() + wxString(IMG_FL_KNOB_HP));
   imgs[3] = 
-    new wxImage(GetDataDir() + wxString(IMG_FL_KNOB_NOTCH));
+    new wxImage(GetDataPath() + wxString(IMG_FL_KNOB_NOTCH));
   
   FilterSelect = new StaticPosKnob(this, Filter_Select, 4, imgs, 15, 0, 3, 0, 
 				   wxPoint(68, 7), wxDefaultSize);

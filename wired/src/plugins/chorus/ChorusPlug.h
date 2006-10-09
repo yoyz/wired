@@ -1,9 +1,6 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2005 by Wired Team
-// Under the GNU General Public License
-
 #ifndef _CHORUS_PLUGIN_
 #define  _CHORUS_PLUGIN_
 

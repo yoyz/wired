@@ -48,11 +48,17 @@ class	WiredCorePlugins
    * Basic info
    */
 
+  /**
+   * Get the host name
+   * \return wxString name of Wired (basically "Wired")
+   */
   wxString	GetProductName();
 
-
+  /**
+   * Get the host version
+   * \return wxString version of Wired ("0.3.1", ..)
+   */
   wxString	GetProductVersion();
-
 
   // long		GetBufferSize();
   //

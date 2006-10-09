@@ -52,6 +52,8 @@ class		WiredPlugin : public WiredPluginGui, public WiredPluginAudio
   wxString	GetProductName();
   /* Returns the host product version */
   wxString	GetProductVersion();
+  /* Returns the host product data path */
+  wxString	GetDataPath() { return (wxT(INSTALL_PREFIX)); }
 };
 
 #endif // __WIREDPLUGIN_H__

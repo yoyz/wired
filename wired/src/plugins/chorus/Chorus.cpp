@@ -23,9 +23,9 @@ Chorus :: Chorus(StkFloat baseDelay, string dirpath)
   baseLength_ = baseDelay;
 
   // Concatenate the STK rawwave path to the rawwave file
-  mods_[0] = new WaveLoop( (dirpath + "plugins/chorus/sinewave.raw").c_str(), 
+  mods_[0] = new WaveLoop( (dirpath + "plugins/chorus/sinewave.raw"), 
 			   true );
-  mods_[1] = new WaveLoop( (dirpath + "plugins/chorus/sinewave.raw").c_str(), 
+  mods_[1] = new WaveLoop( (dirpath + "plugins/chorus/sinewave.raw"), 
 			   true );
   mods_[0]->setFrequency(0.2);
   mods_[1]->setFrequency(0.222222);

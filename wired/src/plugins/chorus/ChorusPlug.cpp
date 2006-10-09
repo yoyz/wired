@@ -1,10 +1,6 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2005 by Wired Team
-// Under the GNU General Public License
-
-
 #include <math.h>
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -34,19 +30,19 @@ ChorusPlugin::ChorusPlugin(PlugStartInfo &startinfo, PlugInitInfo *initinfo)
   Init();
 
   wxImage *tr_bg = 
-    new wxImage(GetDataDir() + wxString(IMG_DL_BG), 
+    new wxImage(GetDataPath() + wxString(IMG_DL_BG), 
 		wxBITMAP_TYPE_PNG);
   TpBmp = new wxBitmap(tr_bg);
-  bmp = new wxBitmap(GetDataDir() + wxString(IMG_DL_BMP), 
+  bmp = new wxBitmap(GetDataPath() + wxString(IMG_DL_BMP), 
 		     wxBITMAP_TYPE_BMP); 
-  img_bg = new wxImage(GetDataDir() + wxString(IMG_DL_FADER_BG),
+  img_bg = new wxImage(GetDataPath() + wxString(IMG_DL_FADER_BG),
 		       wxBITMAP_TYPE_PNG );
-  img_fg = new wxImage(GetDataDir() + wxString(IMG_DL_FADER_FG),
+  img_fg = new wxImage(GetDataPath() + wxString(IMG_DL_FADER_FG),
 		       wxBITMAP_TYPE_PNG );
-  bypass_on = new wxImage(GetDataDir() + wxString(IMG_BYPASS_ON),
+  bypass_on = new wxImage(GetDataPath() + wxString(IMG_BYPASS_ON),
 			  wxBITMAP_TYPE_PNG);
   bypass_off = 
-    new wxImage(GetDataDir() + wxString(IMG_BYPASS_OFF), 
+    new wxImage(GetDataPath() + wxString(IMG_BYPASS_OFF), 
 		wxBITMAP_TYPE_PNG);
   BypassBtn = 
     new DownButton(this, Chorus_Bypass, wxPoint(21, 58), 
@@ -55,10 +51,10 @@ ChorusPlugin::ChorusPlugin(PlugStartInfo &startinfo, PlugInitInfo *initinfo)
 
   //bypass button's stuff
 
-  liquid_on = new wxImage(GetDataDir() + wxString(IMG_LIQUID_ON),
+  liquid_on = new wxImage(GetDataPath() + wxString(IMG_LIQUID_ON),
 			  wxBITMAP_TYPE_PNG);
   liquid_off = 
-    new wxImage(GetDataDir() + wxString(IMG_LIQUID_OFF), 
+    new wxImage(GetDataPath() + wxString(IMG_LIQUID_OFF), 
 		wxBITMAP_TYPE_PNG);
   Liquid = new StaticBitmap(this, -1, wxBitmap(liquid_on), wxPoint(22, 25));
   BaseLengthFader = new FaderCtrl(this, Chorus_Feedback, img_bg, img_fg, 0, 
@@ -101,12 +97,12 @@ void ChorusPlugin::Init()
   
   Stk::setSampleRate(44100.0);
 
-  chorus1 = new Chorus(BaseLength, (const char *)GetDataDir().mb_str(*wxConvCurrent));
+  chorus1 = new Chorus(BaseLength, (const char *)GetDataPath().mb_str(*wxConvCurrent));
   chorus1->setModDepth(ModDepth / 100.f);
   chorus1->setModFrequency(Frequency);
   chorus1->setEffectMix(EffectMix / 100.f);
 
-  chorus2 = new Chorus(BaseLength, (const char *)GetDataDir().mb_str(*wxConvCurrent));
+  chorus2 = new Chorus(BaseLength, (const char *)GetDataPath().mb_str(*wxConvCurrent));
   chorus2->setModDepth(ModDepth / 100.f);
   chorus2->setModFrequency(Frequency);
   chorus2->setEffectMix(EffectMix / 100.f);
