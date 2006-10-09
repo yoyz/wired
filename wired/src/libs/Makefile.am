@@ -1,1 +1,1 @@
-SUBDIRS = WiredAkai WiredWidgets
+SUBDIRS = WiredAkai WiredWidgets WiredAudioUtilities
