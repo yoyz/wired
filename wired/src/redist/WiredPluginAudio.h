@@ -27,7 +27,7 @@ class		WiredPluginAudio
   WiredPluginStartInfo*	_StartInfo;
 
  public:
-  WiredPluginAudio(WiredPluginStartInfo* parent) { StartInfo = parent; } ;
+  WiredPluginAudio(WiredPluginStartInfo* parent) { _StartInfo = parent; } ;
   ~WiredPluginAudio();
 
   /* Called when the host starts to play */

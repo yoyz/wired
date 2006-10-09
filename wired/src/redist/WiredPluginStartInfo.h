@@ -3,12 +3,14 @@
 
 #include "WiredCorePlugins.h"
 #include "WiredPlugin.h"
+#include "WiredCorePlugins.h"
 //#include "WiredPluginMgr.h"
 
 #include <wx/string.h>
 #include <wx/wx.h>
 
 class WiredPlugin;
+class WiredCorePlugins;
 //class WiredPluginMgr;
 
 
@@ -37,11 +39,12 @@ class	WiredPluginStartInfo
   WiredPluginStartInfo();
   ~WiredPluginStartInfo();
 
-  //  HostInterface GetHostCallback();
-  wxString	GetVersion();
-  wxWindow*	GetRack();
-  wxPoint	GetPos();
-  wxSize	GetSize();
+
+  WiredCorePlugins*	GetCore();
+  wxString		GetVersion();
+  wxWindow*		GetRack();
+  wxPoint		GetPos();
+  wxSize		GetSize();
 
  public:
 };

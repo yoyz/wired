@@ -17,7 +17,7 @@ using namespace	std;
 #include <wx/thread.h>
 
 
-typedef struct s_SeqCreateEvent		SeqCreateEvent;
+typedef struct WiredPluginSeqCreateEvent		SeqCreateEvent;
 typedef int				MidiType;
 class					Channel;
 class					Track;
@@ -38,8 +38,8 @@ class ChanBuf
   ChanBuf(float **buf) : Buffer(buf), Chan(0x0) {}
   ChanBuf(float **buf, Channel *chan) : Buffer(buf), Chan(chan) {}
 
-  void					DeleteBuffer() 
-    { 
+  void					DeleteBuffer()
+    {
       if (Buffer[0])
 	delete[] Buffer[0];
       if (Buffer[1])
@@ -71,7 +71,7 @@ class Sequencer : public wxThread
   void					AddTrack(Track *t);
   void					RemoveTrack();
   void					AddMidiEvent(int id, MidiType midi_msg[3]);
-  void					AddMidiPattern(list<SeqCreateEvent *> *l, 
+  void					AddMidiPattern(list<SeqCreateEvent *> *l,
 						       Plugin *plug);
   void					AddNote(Track *t, MidiEvent &event);
   void					SetBPM(float bpm);
@@ -125,11 +125,11 @@ class Sequencer : public wxThread
   float					**AllocBuf1;
   float					**AllocBuf2;
   float					**ExportBuf;
-  WriteWaveFile			*ExportWave;  
-  WaveFile				*PlayWave;  
+  WriteWaveFile			*ExportWave;
+  WaveFile				*PlayWave;
   long					PlayWavePos;
   Channel				*PlayWaveChannel;
-  
+
   WiredSampleRate		*SampleRateConverter;
 };
 
