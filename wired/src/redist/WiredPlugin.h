@@ -13,11 +13,12 @@
 #include "WiredPluginStartInfo.h"
 #include "WiredPluginGui.h"
 #include "WiredPluginAudio.h"
+#include "WiredPluginData.h"
 
 class WiredPluginStartInfo;
 class WiredPluginGui;
 class WiredPluginAudio;
-
+class WiredPluginData;
 
 ////
 // Current version of API
@@ -27,7 +28,7 @@ class WiredPluginAudio;
 #define WIRED_CURRENT_VERSION_API (2)
 
 
-class		WiredPlugin : public WiredPluginGui, public WiredPluginAudio
+class		WiredPlugin : public WiredPluginGui, public WiredPluginAudio, public WiredPluginData
 {
  private:
   WiredPluginStartInfo	*StartInfo;
@@ -36,24 +37,6 @@ class		WiredPlugin : public WiredPluginGui, public WiredPluginAudio
   WiredPlugin(WiredPluginStartInfo *parent)
     { StartInfo = parent; } : WiredPluginGui(parent) : WiredPluginAudio(parent);
   ~WiredPlugin();
-
-  virtual void	 Load(WiredPluginData& Datas) {}
-  virtual void	 Save(WiredPluginData& Datas) {}
-
-  /* Called when host needs to show the plugin's help */
-  virtual wxString GetHelpString() { return _("No help provided for this plugin"); }
-
-  /* Returns the default name for the plugin */
-  virtual wxString DefaultName() { return _("Rack"); }
-
-
-  // Host info
-  /* Returns the host product name */
-  wxString	GetProductName();
-  /* Returns the host product version */
-  wxString	GetProductVersion();
-  /* Returns the host product data path */
-  wxString	GetDataPath() { return (wxT(INSTALL_PREFIX)); }
 };
 
 #endif // __WIREDPLUGIN_H__

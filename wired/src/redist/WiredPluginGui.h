@@ -59,9 +59,6 @@ class		WiredPluginGui
   /* Closes plugin's optional view */
   void CloseOptionalView();
 
-  int	WiredCorePlugins::GetLastMidiType();
-  int	WiredCorePlugins::GetLastMidiController();
-  int	WiredCorePlugins::GetLastMidiValue();
 
   /* Opens the Wired file loader with given title, extensions, and if it should read
      AKAI audio cds/files or not. Returns the selected file name or an empty wstring if

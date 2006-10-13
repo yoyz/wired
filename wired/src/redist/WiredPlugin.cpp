@@ -32,15 +32,3 @@ WiredPlugin::~WiredPlugin()
 {
   CloseOptionalView();
 }
-
- /* Returns the host product name */
-wxString	WiredPlugin::GetProductName()
-{
-  return StartInfo->GetCore()->GetProductName();
-}
-
-/* Returns the host product version */
-wxString	WiredPlugin::GetProductVersion()
-{
-  return StartInfo->GetCore()->GetProductVersion();
-}

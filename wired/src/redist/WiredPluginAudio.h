@@ -55,10 +55,11 @@ class		WiredPluginAudio
 	}
     }
 
-  /* Is plugin supporting audio data to be sent to it ? */
-  virtual bool	 IsAudio() = 0;
-  /* Is plugin supporting MIDI data to be sent to it ? */
-  virtual bool   IsMidi() = 0;
+
+  int	GetLastMidiType();
+  int	GetLastMidiController();
+  int	GetLastMidiValue();
+
 
   // Time events
   /* Returns current BPM (tempo) */

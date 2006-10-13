@@ -17,30 +17,105 @@ using namespace std;
 //	    ((*it)->InitInfo.Id[2] == plugin.Id[2]) && ((*it)->InitInfo.Id[3] == plugin.Id[3])
 
 
+/**
+ * Loads/Unloads plugin's.
+ */
 class				PluginLoader
 {
  public:
+
+  /**
+   *
+   */
   PluginLoader(wxString filename);
+
+  /**
+   *
+   */
   PluginLoader(WiredExternalPluginMgr *PlugMgr, int MenuItemId, PlugStartInfo &info);
+
+  /**
+   *
+   */
   PluginLoader(WiredExternalPluginMgr *PlugMgr, unsigned long UniqueId);
+
+  /**
+   *
+   */
   ~PluginLoader();
 
+  /**
+   *
+   */
   Plugin			*CreateRack(PlugStartInfo &info);
+
+  /**
+   *
+   */
   void				Destroy(Plugin *p);
+
+  /**
+   *
+   */
   bool				IsLoaded();
 
+  /**
+   *
+   */
   wxString			FileName;
+
+  /**
+   *
+   */
   int				Id;
+
+  /**
+   *
+   */
   PlugInitInfo			InitInfo;
 
+
  private:
+
+  /**
+   *
+   */
   wxDynamicLibrary		handle;
+
+  /**
+   *
+   */
   init_t			init;
+
+  /**
+   *
+   */
   create_t			create;
+
+  /**
+   *
+   */
   destroy_t			destroy;
+
+  /**
+   *
+   */
   bool				External;
-  WiredDSSIGui		*ExternalPlug;
-  WiredExternalPluginMgr			*PluginMgr;
+
+  /**
+   *
+   */
+  WiredDSSIGui			*ExternalPlug;
+
+  /**
+   *
+   */
+  WiredExternalPluginMgr	*PluginMgr;
+
+
+  /**
+   *
+   */
   int				IdMenuItem;
 };
 

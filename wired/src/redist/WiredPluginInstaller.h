@@ -1,6 +1,11 @@
 #ifndef __WIREDPLUGININSTALLER__
 #define __WIREDPLUGININSTALLER__
 
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+   #include <wx/wx.h>
+#endif
+
 /**
  * Determine type of plugin
  * \ePlugTypeUnknown Unknown type
@@ -59,6 +64,11 @@ class		WiredPluginInstaller
    * For exemple, its called when users remove an instrument.
    */
   virtual void		Destroy(WiredPlugin*);
+
+  /**
+   * Returns the host product data path
+   */
+  wxString	GetDataPath() { return (wxT(INSTALL_PREFIX)); }
 };
 
 #endif // __WIREDPLUGININSTALLER__
