@@ -25,8 +25,8 @@ WiredExternalPluginMgr::~WiredExternalPluginMgr()
 		delete CurrentLoadedPlugin;
 	}
 	cout << "...done" << endl;
-	list<WiredDSSIPlugin*>::iterator	Iter;
-	WiredDSSIPlugin*					CurrentPlugin;
+	list<WiredExternalPlugin*>::iterator	Iter;
+	WiredExternalPlugin*					CurrentPlugin;
 	cout << "[DSSI] Deleting found plugins ...";
 	for (Iter = _Plugins.begin(); Iter != _Plugins.end(); Iter++)
 	{
@@ -74,34 +74,34 @@ void			WiredExternalPluginMgr::LoadPLugins(int Type)
 
 void			WiredExternalPluginMgr::LoadPluginsFromPath(const wxString& Dirs, int Type)
 {
-	list<wxString>::iterator 	Iter;
-	list<wxString>			Paths = SplitPath(Dirs);
+  list<wxString>::iterator 	Iter;
+  list<wxString>			Paths = SplitPath(Dirs);
 	
-	for (Iter = Paths.begin(); Iter != Paths.end(); Iter++)
+  for (Iter = Paths.begin(); Iter != Paths.end(); Iter++)
+    {
+      wxDir 					CurrentDir((*Iter));
+      if (CurrentDir.IsOpened())
 	{
-		wxDir 					CurrentDir((*Iter));
-		if (CurrentDir.IsOpened())
-		{
-			wxString filename;
-		    bool cont = CurrentDir.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
-		    while (cont)
-		    {
-				//TODO bring back LADSPA / DSSI Load.
-				if (Type == TYPE_PLUGINS_DSSI)
-					LoadPlugins(wxString(*Iter) + wxString(wxT("/")) + (wxString)filename);
-				else if (Type == TYPE_PLUGINS_LADSPA)
-					LoadPlugins(wxString(*Iter) + wxString(wxT("/")) + (wxString)filename);
-		        cont = CurrentDir.GetNext(&filename);
-		    }
-		}
+	  wxString filename;
+	  bool cont = CurrentDir.GetFirst(&filename, wxEmptyString, wxDIR_FILES);
+	  while (cont)
+	    {
+	      //TODO bring back LADSPA / DSSI Load.
+
+	      if (Type == TYPE_PLUGINS_DSSI || Type == TYPE_PLUGINS_LADSPA)
+		LoadPlugins(wxString(*Iter) + wxString(wxT("/")) + (wxString)filename);
+
+	      cont = CurrentDir.GetNext(&filename);
+	    }
 	}
-	//_Plugins.sort(SortByName<WiredLADSPAInstance>());
-	//std::sort(_Plugins.begin(), _Plugins.end(), SortPluginsByName());
+    }
+  //_Plugins.sort(SortByName<WiredLADSPAInstance>());
+  //std::sort(_Plugins.begin(), _Plugins.end(), SortPluginsByName());
 }
 
 void			WiredExternalPluginMgr::LoadPlugins(const wxString& FileName)
 {
-	WiredDSSIPlugin		*NewPlugin = new WiredDSSIPlugin();
+	WiredExternalPlugin		*NewPlugin = new WiredExternalPlugin();
 	
 	if (NewPlugin->Load(FileName, _CurrentPluginIndex))
 	{
@@ -145,7 +145,7 @@ list<wxString>	WiredExternalPluginMgr::SplitPath(const wxString& Path)
 map<int, wxString>	WiredExternalPluginMgr::GetPluginsList()
 {
 	map<int, wxString>					Result;
-	list<WiredDSSIPlugin*>::iterator	Iter;
+	list<WiredExternalPlugin*>::iterator	Iter;
 	map<int, wxString>::iterator			IterDescriptor;
 	map<int, wxString>					CurrentPluginList;
 
@@ -161,7 +161,7 @@ map<int, wxString>	WiredExternalPluginMgr::GetPluginsList()
 list<wxString>		WiredExternalPluginMgr::GetSortedPluginsList(const wxString& Separator)
 {
 	list<wxString>						Result;
-	list<WiredDSSIPlugin*>::iterator	Iter;
+	list<WiredExternalPlugin*>::iterator	Iter;
 	map<int, wxString>::iterator			IterDescriptor;
 	map<int, wxString>					CurrentPluginList;
 	wxChar								buf[1024];
@@ -188,7 +188,7 @@ void				WiredExternalPluginMgr::SetMenuItemId(int ModuleId, int MenuItemId)
 
 int					WiredExternalPluginMgr::GetPluginType(int PluginId)
 {
-	list<WiredDSSIPlugin*>::iterator	Iter;
+	list<WiredExternalPlugin*>::iterator	Iter;
 	int									Result = 0;
 
 	for (Iter = _Plugins.begin(); Iter != _Plugins.end(); Iter++)
@@ -201,7 +201,7 @@ int					WiredExternalPluginMgr::GetPluginType(int PluginId)
 
 WiredDSSIGui		*WiredExternalPluginMgr::CreatePlugin(int MenuItemId, PlugStartInfo &info)
 {
-	list<WiredDSSIPlugin*>::iterator	Iter;
+	list<WiredExternalPlugin*>::iterator	Iter;
 	int									IdPlugin = 0;
 	
 	if (_IdTable.find(MenuItemId) == _IdTable.end())
@@ -233,7 +233,7 @@ WiredDSSIGui		*WiredExternalPluginMgr::CreatePlugin(int MenuItemId, PlugStartInf
 
 WiredDSSIGui		*WiredExternalPluginMgr::CreatePlugin(unsigned long UniqueId)
 {
-	list<WiredDSSIPlugin*>::iterator	Iter;
+	list<WiredExternalPlugin*>::iterator	Iter;
 	int									IdPlugin = 0;
 	
 	if (_UniqueIdTable.find(UniqueId) == _UniqueIdTable.end())

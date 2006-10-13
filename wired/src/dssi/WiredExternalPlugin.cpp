@@ -3,24 +3,24 @@
 
 #include "WiredExternalPlugin.h"
 
-WiredDSSIPlugin::WiredDSSIPlugin()
+WiredExternalPlugin::WiredExternalPlugin()
 {
   _DSSIDescriptorFunction = NULL;
   _LADSPADescriptorFunction = NULL;
   _FileName = wxT("");
 }
 
-WiredDSSIPlugin::WiredDSSIPlugin(const WiredDSSIPlugin& copy)
+WiredExternalPlugin::WiredExternalPlugin(const WiredExternalPlugin& copy)
 {
 	*this= copy;
 }
 
-WiredDSSIPlugin::~WiredDSSIPlugin()
+WiredExternalPlugin::~WiredExternalPlugin()
 {
   UnLoad();
 }
 
-WiredDSSIPlugin		WiredDSSIPlugin::operator=(const WiredDSSIPlugin& right)
+WiredExternalPlugin		WiredExternalPlugin::operator=(const WiredExternalPlugin& right)
 {
 	if (this != &right)
 	{
@@ -34,7 +34,7 @@ WiredDSSIPlugin		WiredDSSIPlugin::operator=(const WiredDSSIPlugin& right)
 	return *this;
 }
 
-bool			WiredDSSIPlugin::Load(const wxString& FileName, int& FirstIndex)
+bool			WiredExternalPlugin::Load(const wxString& FileName, int& FirstIndex)
 {
   bool			Found = false;
 	
@@ -110,7 +110,7 @@ bool			WiredDSSIPlugin::Load(const wxString& FileName, int& FirstIndex)
   return Found;
 }
 
-map<int, wxString>	WiredDSSIPlugin::GetPluginsList()
+map<int, wxString>	WiredExternalPlugin::GetPluginsList()
 {
 	map<int, wxString>	Result;
 	
@@ -131,7 +131,7 @@ map<int, wxString>	WiredDSSIPlugin::GetPluginsList()
 	return Result;
 }
 
-map<int, unsigned long>		WiredDSSIPlugin::GetPluginsListUniqueId()
+map<int, unsigned long>		WiredExternalPlugin::GetPluginsListUniqueId()
 {
 	map<int, unsigned long>	Result;
 	
@@ -152,20 +152,20 @@ map<int, unsigned long>		WiredDSSIPlugin::GetPluginsListUniqueId()
 	return Result;
 }
 
-void				WiredDSSIPlugin::UnLoad()
+void				WiredExternalPlugin::UnLoad()
 {
   if (_Handle.IsLoaded())
     _Handle.Unload();
 }
 
-int					WiredDSSIPlugin::GetPluginType(int PluginId)
+int					WiredExternalPlugin::GetPluginType(int PluginId)
 {
 	if (_PluginsInfo.find(PluginId) != _PluginsInfo.end())
 		return _PluginsInfo[PluginId];
 	return 0;
 }
 
-bool				WiredDSSIPlugin::Contains(int PluginId)
+bool				WiredExternalPlugin::Contains(int PluginId)
 {
 	if (_LADSPADescriptorFunction)
 	{
@@ -180,7 +180,7 @@ bool				WiredDSSIPlugin::Contains(int PluginId)
 	return false;	
 }
 
-bool				WiredDSSIPlugin::CreatePlugin(int PluginId, WiredLADSPAInstance* Plugin)
+bool				WiredExternalPlugin::CreatePlugin(int PluginId, WiredLADSPAInstance* Plugin)
 {	
 	if (Contains(PluginId) == false || Plugin == NULL)
 		return false;
@@ -198,7 +198,7 @@ bool				WiredDSSIPlugin::CreatePlugin(int PluginId, WiredLADSPAInstance* Plugin)
 	return false;
 }
 
-bool				WiredDSSIPlugin::Contains(unsigned long PluginUniqueId)
+bool				WiredExternalPlugin::Contains(unsigned long PluginUniqueId)
 {
 	bool			Result = false;
 	
