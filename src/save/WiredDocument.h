@@ -1,19 +1,30 @@
+#ifndef _WIREDDOCUMENT_H_
+#define _WIREDDOCUMENT_H_
+
+#include <wx/dynarray.h>
+
+#include "SaveElement.h"
+
+WX_DEFINE_ARRAY_PTR(WiredDocument *, WiredDocumentArray);
+
 class WiredDocument
 {
  private:
-  WiredDocument(WiredDocument *parent = NULL);
+  WiredDocument(wxString name, WiredDocument *parent = NULL);
 
 
  public:
-  virtual vector<SaveElement>	Save() = 0;
-  virtual void			Load() = 0;
+  virtual WiredSaveElementArray	Save() = 0;
+  virtual void			Load(WiredSaveElementArray) = 0;
 
-  vector<WiredDocument *>	getChildren();
+  WiredDocumentArray		getChildren();
   wxString			getName();
   void				Register(WiredDocument *children);
   
 
  private:
-  vector<WiredDocument *>	_children;
+  WiredDocumentArray		_children;
   wxString			_name;
 };
+
+#endif /*_WIREDDOCUMENT_H */

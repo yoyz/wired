@@ -1,8 +1,10 @@
 #include "SaveCenter.h"
 
-SaveCenter::SaveCenter()
+SaveCenter::SaveCenter(wxString projectName, wxString projectPath = wxT(""))
 {
-  //Nothing to do yet in here...
+  setProjectPath(projectPath);
+  setProjectName(projectName);
+
 }
 
 SaveCenter::~SaveCenter()
@@ -10,30 +12,45 @@ SaveCenter::~SaveCenter()
   //Nothing to do yet in here...
 }
 
-void	SaveCenter::Register(WiredDocument *child)
+//Implemetation of WiredDocument
+WiredSaveElementArray	SaveCenter::Save()
 {
-  _children.push_back(child);
+  WiredSaveElementArray	ret;
+
+  return ret;
+}
+ 
+void			SaveCenter::Load(WiredSaveElementArray)
+{
+
 }
 
-bool	SaveCenter::WriteXml()
+bool	SaveCenter::SaveProject()
 {
-  vector<WiredDocument *>::iterator	it;
-
-  //commencer le document avec des headers standards
+  wxString	fileName;
   
-  for(it = _children.begin(); it != _children.end(); it++)
-    WriteDocument(*it);
+  filename << _projectPath << _projectName << wxT(".xml");
 
-  //finir le document avec des footers standards
-
+  SaveDocument(fileName, this);
 }
 
-bool	SaveCenter::WriteDocument(WiredDocument *currentNode)
+bool	SaveCenter::SaveDocument(wxString fileName, WiredDocument *doc)
 {
-  vector<SaveElement>			toWrite;
-  vector<SaveElement>::iterator		itElem;
-  vector<WiredDocument *>		childrenOfCurrentNode;
-  vector<WiredDocument *>::iterator	itChild;
+  WiredXml	*xmlFile = new WiredXml();
+
+  xmlFile->CreateDocument(fileName);
+  
+  WriteDocument(doc, xmlFile);
+
+  xmlFile->EndDocumentWriter();
+  delete xmlFile;
+}
+
+bool	SaveCenter::WriteDocument(WiredDocument *currentNode, WiredXml *xmlFile)
+{
+  WiredSaveElementArray			toWrite;
+  WiredDocumentArray			childrenOfCurrentNode;
+  int					i;
 
   //get our children
   childrenOfCurrentNode = currentNode->getChildren();
@@ -43,25 +60,65 @@ bool	SaveCenter::WriteDocument(WiredDocument *currentNode)
 
   //write our SaveElements...
   //...start with our name...
-  startTag(currentNode->getName());
+  xmlFile->StartElememt(currentNode->getName());
   
   //...then the elements
-  for (itElem = toWrite.begin();
-       itElem != toWrite.end();
-       itElem++)
-    WriteElement(elem);
+  for (i = 0; i < toWrite.getCount(); i++)
+    WriteElement(toWrite[i]);
   
   //call recursively on our children
-  for (it = childrenOfCurrentNode.begin();
-       it != childrenOfCurrentNode.end();
-       it ++)
-    WriteDocument(*it);      
+  for (i = 0; i < childrenOfCurrentNode.getCount(); i++)
+    WriteDocument(childrenOfCurrentNode[i], xmlFile);      
   
   //...finish by closing things
-  endTag(currentNode->getName());    
+  xmlFile->EndElement();    
 }
 
-bool	SaveCenter::WriteElement(SaveElement elem)
+bool	SaveCenter::WriteElement(SaveElement elem, WiredXml *xmlFile)
 {
+  int i;
+
   //XML bullshit
+  xmlFile->StartElement(elem->getKey());
+
+  for(i = 0; i < 
+}
+
+
+//Accessors
+wxString	SaveCenter::getProjectPath()
+{
+  return _projectPath;
+}
+
+void		SaveCenter::setProjectPath(wxString projectPath)
+{
+
+  _projectPath = projectPath;
+
+  //make some checks : 
+  //the path must end with a /
+  if(!_projectPath.Matches("*/"))
+    _projectPath << wxT("/");
+
+  //Do we have to handle the ~, bash style ? 
+
+}
+
+wxString	SaveCenter::getProjectName()
+{
+  return _projectName;
+}
+
+void		SaveCenter::setProjectname(wxString projectName)
+{
+  _projectName = projectName;
+
+  //make some checks :
+  //empty name is not good. Let's put a default value...
+  //could be greatly enhanced because we won't handle 
+  //2 default project in the same directory
+  if(_projectName.isEmpty())
+    _projectName << wxT("WiredProject");
+
 }

@@ -52,7 +52,7 @@ class ChanBuf
   Channel				*Chan;
 };
 
-class Sequencer : public wxThread
+class Sequencer : public wxThread, WiredDocument
 {
  public:
   Sequencer();

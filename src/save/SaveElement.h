@@ -1,3 +1,8 @@
+#ifndef _SAVEELEMENT_H_
+#define _SAVEELEMENT_H_
+
+WX_DEFINE_ARRAY_PTR(SaveElement *, WiredSaveElementArray);
+
 class SaveElement
 {
  public:
@@ -14,6 +19,7 @@ class SaveElement
   wxString	getKey();
   wxString	getValue();
   wxString	getAttribute(wxString key);
+  
   bool		attributeExists(wxString key);
   void		clearAttributes();
 
@@ -22,3 +28,5 @@ class SaveElement
   wxSring			_value;
   map<wxString, wxString>	_attributes;
 };
+
+#endif /*_SAVEELEMENT_H_ */
