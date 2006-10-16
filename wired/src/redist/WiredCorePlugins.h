@@ -23,6 +23,13 @@ class	WiredCorePlugins
   int		_MidiController;
   int		_MidiValue;
 
+
+  // The number of frames the event will start on next call to Process()
+  long		_DeltaFrames;
+  // The note length (usually 0, look for note off messages to know the end of a note
+  long		_NoteLength;
+
+
  public:
 
   WiredCorePlugins::WiredCorePlugins();
