@@ -20,7 +20,7 @@ SUBDIRS =				\
 	dssi				
 
 
-DEPS_LIBS = libs/WiredWidgets/src/.libs/libWiredWidgets.so libs/WiredAkai/src/.libs/libWiredAkai.so
+DEPS_LIBS = libs/WiredWidgets/src/.libs/libWiredWidgets.so libs/WiredAkai/src/.libs/libWiredAkai.so libs/WiredAkai/src/.libs/libWiredAudioUtilities.so
 
 wired_LDFLAGS = $(shell wx-config --libs) -lsndfile -lasound -Lmidi/portmidi $(DEPS_LIBS) -Lfileloader -lfileloader -L/usr/pkg/lib/ `xml2-config --libs` @SAMPLERATE_LIBS@ -lportaudio
 
