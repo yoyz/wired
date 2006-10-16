@@ -30,9 +30,7 @@ void		SaveElement::setPair(wxString key, wxString value)
 
 void		SaveElement::addAttribute(wxString key, wxString value)
 {
-
-  //comment on fait pour rajouter un element a la map ?
-
+  _attributes[key] = value;
 }
 
 wxString	SaveElement::getKey()
@@ -47,7 +45,7 @@ wxString	SaveElement::getValue()
 
 wxString	SaveElement::getAttribute(wxString key)
 {
-  if (_attributes[key].is_set())
+  if (_attributes.find(key) != _attributes.end())
     return _attributes[key];
   else
     return wxT("");
@@ -55,10 +53,15 @@ wxString	SaveElement::getAttribute(wxString key)
 
 bool		SaveElement::attributeExists(wxString key)
 {
-  return _attributes[key].is_set();
+  return ( _attributes[key] != _attributes.end() );
 }
 
 void		SaveElement::clearAttributes()
 {
   _attributes.clear();
+}
+
+AttributesHashMap	SaveElement::getAttributes();
+{
+  return _attributes;
 }

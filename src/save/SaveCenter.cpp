@@ -13,75 +13,107 @@ SaveCenter::~SaveCenter()
 }
 
 //Implemetation of WiredDocument
-WiredSaveElementArray	SaveCenter::Save()
+void	SaveCenter::Save(WiredSaveElementArray *conf
+			 WiredSaveElementArray *data, 
+			 wxString *filename)
 {
-  WiredSaveElementArray	ret;
-
-  return ret;
+  //return project specific infos ?
 }
  
-void			SaveCenter::Load(WiredSaveElementArray)
+void	SaveCenter::Load(WiredSaveElementArray conf, WiredSaveElementArray data)
 {
-
+  //load project specific infos ?
 }
 
 bool	SaveCenter::SaveProject()
 {
   wxString	fileName;
+  WiredXml	*xmlFile = new WiredXml();
   
+
   filename << _projectPath << _projectName << wxT(".xml");
 
-  SaveDocument(fileName, this);
-}
-
-bool	SaveCenter::SaveDocument(wxString fileName, WiredDocument *doc)
-{
-  WiredXml	*xmlFile = new WiredXml();
-
   xmlFile->CreateDocument(fileName);
-  
-  WriteDocument(doc, xmlFile);
+
+  SaveDocument(this, xmlFile);
 
   xmlFile->EndDocumentWriter();
   delete xmlFile;
+
+  return true;
 }
 
-bool	SaveCenter::WriteDocument(WiredDocument *currentNode, WiredXml *xmlFile)
+bool	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *confFile = NULL)
 {
-  WiredSaveElementArray			toWrite;
+  WiredSaveElementArray			confToWrite;
+  WiredSaveElementArray			dataToWrite;
+  wxString				dataFileName;
   WiredDocumentArray			childrenOfCurrentNode;
   int					i;
+  WiredXml				*dataFile;
 
   //get our children
   childrenOfCurrentNode = currentNode->getChildren();
 
   //get our SaveElements
-  toWrite = currentNode->Save();
+  currentNode->Save(&confToWrite, &dataToWrite, &dataFileName);
 
-  //write our SaveElements...
-  //...start with our name...
-  xmlFile->StartElememt(currentNode->getName());
-  
-  //...then the elements
-  for (i = 0; i < toWrite.getCount(); i++)
-    WriteElement(toWrite[i]);
+  //if we have a project file to write in...
+  if(confFile)
+    {
+      //write our conf SaveElements...
+      //...start with our name...
+      confFile->StartElememt(currentNode->getName());
+      
+      //...then the elements
+      for (i = 0; i < toWrite.getCount(); i++)
+	WriteElement(toWrite[i], confFile);
+    }
+
+  //if we got a filename and data to write, let's write it.
+  if(!dataFileName.isEmpty() && !dataToWrite.isEmpty())
+    {
+      dataFile = new WiredXml();
+      
+      checkFilePath(dataFileName);
+
+      dataFile->CreateDocument(dataFileName);
+
+      for (i = 0; i < toWrite.getCount(); i++)
+	WriteElement(toWrite[i], dataFile);
+
+      dataFile->EndDocumentWriter();
+      delete dataFile;
+    }
   
   //call recursively on our children
   for (i = 0; i < childrenOfCurrentNode.getCount(); i++)
-    WriteDocument(childrenOfCurrentNode[i], xmlFile);      
+    SaveDocument(childrenOfCurrentNode[i], confFile);      
   
+  //...still if we have a project to file to write in...
   //...finish by closing things
-  xmlFile->EndElement();    
+  if(confFile)
+    confFile->EndElement();    
 }
 
 bool	SaveCenter::WriteElement(SaveElement elem, WiredXml *xmlFile)
 {
-  int i;
+  int				i;
+  AttributesHashMap		attributes;
+  AttributesHashMap::iterator	attributesIt;
+
+  attributes = elem->getAttributes();
 
   //XML bullshit
   xmlFile->StartElement(elem->getKey());
+  
 
-  for(i = 0; i < 
+  for(attributesIt = attributes.begin();
+      attributesIt != attributes.end();
+      attributesIt++)
+    xmlFile->WriteAttribute(it->first, it->second, true);
+  
+  xmlFile->EndElement();
 }
 
 
