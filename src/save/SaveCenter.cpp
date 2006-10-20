@@ -13,77 +13,147 @@ SaveCenter::~SaveCenter()
 }
 
 //Implemetation of WiredDocument
-WiredSaveElementArray	SaveCenter::Save()
+void	SaveCenter::Save(WiredSaveElementArray *conf
+			 WiredSaveElementArray *data, 
+			 wxString *filename)
 {
-  WiredSaveElementArray	ret;
-
-  return ret;
+  //return project specific infos ?
 }
  
-void			SaveCenter::Load(WiredSaveElementArray)
+void	SaveCenter::Load(WiredSaveElementArray conf, WiredSaveElementArray data)
 {
-
+  //load project specific infos ?
 }
 
 bool	SaveCenter::SaveProject()
 {
   wxString	fileName;
+  WiredXml	*xmlFile = new WiredXml();
   
   filename << _projectPath << _projectName << wxT(".xml");
 
-  SaveDocument(fileName, this);
-}
-
-bool	SaveCenter::SaveDocument(wxString fileName, WiredDocument *doc)
-{
-  WiredXml	*xmlFile = new WiredXml();
-
   xmlFile->CreateDocument(fileName);
-  
-  WriteDocument(doc, xmlFile);
+
+  SaveDocument(this, xmlFile);
 
   xmlFile->EndDocumentWriter();
   delete xmlFile;
+
+  return true;
 }
 
-bool	SaveCenter::WriteDocument(WiredDocument *currentNode, WiredXml *xmlFile)
+void	SaveCenter::SaveFile(WiredDocument *doc, wxString file)
 {
-  WiredSaveElementArray			toWrite;
+  doc->Save();
+  WriteFile(file, doc->getDocFile(file)); 
+}
+
+bool	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
+{
   WiredDocumentArray			childrenOfCurrentNode;
   int					i;
+  SaveElementsHashMap			saveElements;
+  SaveElementArray			toWrite;
+  SaveElementsHashMap::iterator		saveElementsIt;
 
-  //get our children
+  //Get our children
   childrenOfCurrentNode = currentNode->getChildren();
 
-  //get our SaveElements
-  toWrite = currentNode->Save();
+  //Save Document
+  currentNode->Save();
+  
+  //get my SaveElements
+  saveElements = currentNode->getDocData();
 
   //write our SaveElements...
   //...start with our name...
   xmlFile->StartElememt(currentNode->getName());
   
-  //...then the elements
+  //Write references
+  WriteReferences(saveElements, xmlFile);
+
+  //get elements to write in the conf file
+  toWrite = saveElements[WIRED_PROJECT_FILE]->second();
+
+  //...then write the elements
   for (i = 0; i < toWrite.getCount(); i++)
-    WriteElement(toWrite[i]);
+    WriteElement(toWrite[i], xmlFile);
   
+  //Write the other files
+  for (saveElementsIt = saveElements.begin();
+       saveElementsIt != saveElements.end();
+       saveElementsIt++)
+    if(saveElementsIt->first() != WIRED_PROJECT_FILE)
+      WriteFile(saveElementsIt->first(), saveElementsIt->second());
+
   //call recursively on our children
   for (i = 0; i < childrenOfCurrentNode.getCount(); i++)
-    WriteDocument(childrenOfCurrentNode[i], xmlFile);      
+    SaveDocument(childrenOfCurrentNode[i], xmlFile);
   
   //...finish by closing things
   xmlFile->EndElement();    
 }
 
-bool	SaveCenter::WriteElement(SaveElement elem, WiredXml *xmlFile)
+void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements, 
+				  WiredXml *xmlFile)
 {
-  int i;
+  SaveElementsHashMap::iterator	saveElementsIt;
+  SaveElement			ref;
+
+  //for each entry of the hash map....
+  for (saveElementsIt = saveElements.begin();
+       saveElementsIt != saveElements.end();
+       saveElementsIt++)
+    //if it is not the one to write in the project file
+    if(saveElementsIt->first() != WIRED_PROJECT_FILE)
+      {
+	//fill a SaveElement
+	ref.clear();
+	ref.AddPair(wxT("reference"), SaveElementsIt->first());
+	//and write it.
+	WriteElement(ref, xmlFile);
+      }
+}
+
+void	SaveCenter::WriteElement(SaveElement elem, WiredXml *xmlFile)
+{
+  int				i;
+  AttributesHashMap		attributes;
+  AttributesHashMap::iterator	attributesIt;
+
+  attributes = elem->getAttributes();
 
   //XML bullshit
   xmlFile->StartElement(elem->getKey());
+  
 
-  for(i = 0; i < 
+  for(attributesIt = attributes.begin();
+      attributesIt != attributes.end();
+      attributesIt++)
+    xmlFile->WriteAttribute(it->first, it->second, true);
+  
+  xmlFile->EndElement();
 }
 
+void		SaveCenter::WriteFile(wxString filename, SaveElementArray elements)
+{
+  wxString	rootTag;
+  WiredXml	*xmlFile = new WiredXml();
+  int		i;
+
+  xmlFile->CreateDocument(filename);
+
+  rootTag = filename.afterLast('/');
+  rootTag = rootTag.beforeLast('.');
+
+  xmlFile->StartElement(rootTag);
+
+  for (i = 0; i < elements.getCount(); i++)
+    WriteElement(elements[i], xmlFile);
+  
+  xmlFile->EndElement();
+  delete xmlFile;
+}
 
 //Accessors
 wxString	SaveCenter::getProjectPath()

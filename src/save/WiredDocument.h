@@ -6,6 +6,9 @@
 #include "SaveElement.h"
 
 WX_DEFINE_ARRAY_PTR(WiredDocument *, WiredDocumentArray);
+WX_DEFINE_STRING_HASH_MAP(SaveElementArray, SaveElementsHashMap);
+
+#define WIRED_PROJECT_FILE wxT("WiredProjectFile"); 
 
 class WiredDocument
 {
@@ -14,17 +17,34 @@ class WiredDocument
 
 
  public:
-  virtual WiredSaveElementArray	Save() = 0;
-  virtual void			Load(WiredSaveElementArray) = 0;
+  /** Main save function.
+   * This function will be called by the SaveCenter when a save of the document
+   * is asked.
+   */ 
+  virtual void	Save() = 0;
+
+  /** Main Load function.
+   * It will be called by the SaveCenter when a load is asked.<br>
+   */
+  virtual void	Load() = 0;
 
   WiredDocumentArray		getChildren();
   wxString			getName();
   void				Register(WiredDocument *children);
   
+  SaveElementsHashMap		getDocData();
+  SaveElementArray		getDocFile(wxString file);
+
+ private:
+  void				saveDocData(wxString file, SaveElement *data);
+  void				clearDocData();
+  void				rmDocDataFile(wxString file);
 
  private:
   WiredDocumentArray		_children;
+
   wxString			_name;
+  SaveElementsHashMap		_dataSave;
 };
 
 #endif /*_WIREDDOCUMENT_H */
