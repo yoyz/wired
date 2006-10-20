@@ -1,11 +1,13 @@
-CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../plugins -I../fileloader -I/opt/gnome/include -I../sequencer -I../redist -I../audio -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../editmidi -I../undo -I../libs/WiredWidgets/src -I/usr/pkg/include/libxml2/ -I/usr/pkg/include `xml2-config --cflags`
+CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../plugins/WiredPluginApi/include -I../fileloader -I../sequencer -I../audio -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../editmidi -I../undo -I../libs/WiredWidgets/src `xml2-config --cflags`
+# -I/usr/pkg/include/libxml2/ -I/usr/pkg/include 
 
 if PORTAUDIO
 CPPFLAGS += -I../portaudio/include
 endif
 
 
-LDFLAGS = $(shell wx-config --libs) -L/usr/pkg/lib/ `xml2-config --libs`
+LDFLAGS = $(shell wx-config --libs) `xml2-config --libs`
+#-L/usr/pkg/lib/
 
 noinst_LIBRARIES = libwiredxml.a
 
