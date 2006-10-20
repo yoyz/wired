@@ -1,22 +1,23 @@
+SUBDIRS = WiredPluginApi
+
 if PLUGINS
-SUBDIRS = beatbox compressor crusher delay filter loop_sampler akai_sampler test reverb chorus wahwah
+SUBDIRS += beatbox compressor crusher delay filter loop_sampler akai_sampler test reverb chorus wahwah
 endif
 
-LDFLAGS = $(shell wx-config --libs)
+#LDFLAGS = $(shell wx-config --libs)
 
-CPPFLAGS = $(shell wx-config --cflags) -I../libs/WiredAkai/include -I../gui -I../audio -I../fileloader -I/opt/gnome/include -I../sequencer -I../redist -I../engine -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../editmidi -I../undo -I../libs/WiredWidgets/src
+#CPPFLAGS = $(shell wx-config --cflags) -I../libs/WiredAkai/include -I../gui -I../audio -I../fileloader -I/opt/gnome/include -I../sequencer -I../redist -I../engine -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../editmidi -I../undo -I../libs/WiredWidgets/src
 
-if PORTAUDIO
-CPPFLAGS += -I../portaudio/include
-endif
+#if PORTAUDIO
+#CPPFLAGS += -I../portaudio/include
+#endif
 
 
-#DEPS_LIBS = -L../libs/WiredWidgets/src/ -lWiredWidgets
+#lib_LTLIBRARIES = libWiredPlugin.la
 
-noinst_LIBRARIES = libplugins.a
 
-libplugins_a_SOURCES = 			\
-		HostCallback.cpp	\
-		HostCallback.h		\
-		PluginLoader.cpp	\
-		PluginLoader.h
+#libplugins_a_SOURCES = 			\
+#		WiredCorePlugin.h	\
+#		WiredCorePlugin.cpp	\
+#		PluginLoader.cpp	\
+#		PluginLoader.h

@@ -10,20 +10,18 @@
 
 class WiredDocument;
 
-
+/**
+ * WiredPluginData implements the WiredDocument class
+ */
 class WiredPluginData : public WiredDocument
 {
 public:
   WiredPluginData() {};
   ~WiredPluginData() {};
 
-  /**
-   * Implemented in WiredDocument class
-   */
-
+  //From WiredDocument
   //virtual void	 Load(WiredPluginData& Datas) {}
   //virtual void	 Save(WiredPluginData& Datas) {}
-
 
 };
 

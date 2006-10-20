@@ -4,7 +4,7 @@ CPPFLAGS = $(shell wx-config --cflags) -I../../../gui -I../../../plugins -I../..
 
 lib_LTLIBRARIES = libWiredWidgets.la
 
-libWiredWidgets_la_SOURCES = 			\
+libWiredWidgets_la_SOURCES = 		\
 		ChoiceButton.cpp	\
 		ChoiceButton.h		\
 		DownButton.cpp		\

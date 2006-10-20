@@ -8,10 +8,8 @@
 #endif
 
 #include "WiredPluginStartInfo.h"
-#include "WiredPluginEvent.h"
 
 class WiredPluginStartInfo;
-class WiredEvent;
 
 ////
 // Current version of API
@@ -78,7 +76,7 @@ class		WiredPluginAudio
   double	GetCurrentPos();
 
   /* Called when the plugin receives an event such as MIDI */
-  virtual void	 ProcessEvent(WiredEvent &event) {}
+  virtual void	 ProcessEvent(/*WiredEvent &event*/) {}
 
 };
 

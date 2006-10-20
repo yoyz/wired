@@ -13,10 +13,9 @@ libredist_a_SOURCES = 				\
 		WiredPluginGui.cpp		\
 		WiredPluginAudio.h		\
 		WiredPluginAudio.cpp		\
+		WiredPluginData.h		\
+		WiredPluginData.cpp		\
 		WiredPlugin.h			\
 		WiredPlugin.cpp			\
 		WiredPluginInstaller.h		\
-		WiredPluginInstaller.cpp	\
-		WiredPlugin.h			\
-		Polyphony.cpp			\
-		Polyphony.h
+		WiredPluginInstaller.cpp
