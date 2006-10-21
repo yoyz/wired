@@ -12,7 +12,7 @@
 #include "HoldButton.h"
 #include "FaderCtrl.h"
 #include "LoopSamplerView.h"
-#include "WaveFile.h"
+#include "WiredAudioFile.h"
 #include "Slice.h"
 #include "Polyphony.h"
 #include "KnobCtrl.h"
@@ -125,7 +125,7 @@ class LoopSampler: public Plugin
 
   void   Update();
 
-  void	 SetWaveFile(WaveFile *w); //locks mutex
+  void	 SetAudioFile(WiredAudioFile *w); //locks mutex
   void	 SetBarCoeff();
   
   wxBitmap *GetBitmap();
@@ -209,7 +209,7 @@ protected:
 
   /* Graphic controls */
   LoopSamplerView *View;
-  WaveFile *Wave;
+  WiredAudioFile *AudioFile;
 
   wxBitmap *bmp;  
   wxImage  *ls_bg;

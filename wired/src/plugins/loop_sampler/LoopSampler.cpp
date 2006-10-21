@@ -40,8 +40,8 @@ LoopSampler::LoopSampler(WiredPluginStartInfo* start)
   PolyphonyCount = 7;
   Playing = false;
   AutoPlaying = false;
-  View = 0x0;
-  Wave = 0x0;
+  View = NULL;
+  AudioFile = NULL;
   Octave = 1.f;
   Pitch = 1.f;  
   Invert = false;
@@ -330,8 +330,8 @@ LoopSampler::~LoopSampler()
     delete *k;
 
   //  DestroyView();
-  if (Wave)
-    delete Wave;
+  if (AudioFile)
+    delete AudioFile;
   list<LoopNote *>::iterator i;
   for (i = Notes.begin(); i != Notes.end(); i++)
     delete *i;
@@ -457,7 +457,7 @@ void LoopSampler::SetSamplingRate(double rate)
 void LoopSampler::Process(float **input, float **output, long sample_length)
 {
   Mutex.Lock();
-  if (!Wave)
+  if (!AudioFile)
     {
       Mutex.Unlock();
       return;
@@ -541,8 +541,8 @@ void LoopSampler::Process(float **input, float **output, long sample_length)
 	    n->End = true;
 	    }*/
 	 
-	  Wave->SetPitch((n->SliceNote->Pitch + Pitch) / 2.f);
-	  Wave->SetInvert(n->SliceNote->Invert);
+	  AudioFile->SetPitch((n->SliceNote->Pitch + Pitch) / 2.f);
+	  AudioFile->SetInvert(n->SliceNote->Invert);
 
 	  curL = 0;
 	  curR = 0;
@@ -848,9 +848,9 @@ void	LoopSampler::Update()
 wxWindow *LoopSampler::CreateView(wxWindow *zone, wxPoint &pos, wxSize &size)
 {
   View = new LoopSamplerView(&Mutex, zone, pos, size, GetDataDir(), &LoopInfo);
-  if (Wave)
+  if (AudioFile)
     {
-      View->SetWaveFile(Wave);
+      View->SetAudioFile(AudioFile);
       View->SetSlices(&Slices);
       SetBarCoeff();
     }
@@ -949,7 +949,7 @@ void LoopSampler::Load(int fd, long size)
 
       Mutex.Unlock();
 
-      SetWaveFile(w);
+      SetAudioFile(w);
       ShowOptionalView();  
 
       Mutex.Lock();
@@ -1142,15 +1142,15 @@ void LoopSampler::SetBarCoeff()
     View->SetBarCoeff(coeff);    
 }
 
-void LoopSampler:: SetWaveFile(WaveFile *w)
+void LoopSampler:: SetAudioFile(WiredAudioFile *w)
 {
-  WaveFile *tmpw = Wave;
+  WiredAudioFile *tmpw = AudioFile;
 
   Mutex.Lock();
 
   Slices.clear();
 
-  Wave = w;
+  AudioFile = w;
 
   Mutex.Unlock();
 
@@ -1165,7 +1165,7 @@ void LoopSampler:: SetWaveFile(WaveFile *w)
 
   if (View)
     {
-      View->SetWaveFile(w);
+      View->SetAudioFile(w);
       View->SetSamplingRate((int)SamplingRate);
 
       Mutex.Lock();
@@ -1229,7 +1229,7 @@ void LoopSampler::OnOpenFile(wxCommandEvent &event)
 	      if (View)
 		CloseOptionalView();
 	      Progress->Update(60);
-	      SetWaveFile(w);
+	      SetAudioFile(w);
 	      Progress->Update(99);
 	      ShowOptionalView();
 	    }
@@ -1435,7 +1435,7 @@ void LoopSampler::OnPlay(wxCommandEvent &event)
 
 void LoopSampler::OnToSeqTrack(wxCommandEvent &event)
 {
-  if (Wave)
+  if (AudioFile)
     {
       list<SeqCreateEvent *> l;
       SeqCreateEvent *e, *f;
