@@ -27,6 +27,7 @@ SNDFILE_VERSION=`pkg-config sndfile --modversion`
 
 # for autoheader .. investigate this further :)
 AC_CONFIG_HEADER(src/include/config.h)
+AC_DEFINE([PACKAGE_LOCALE_DIR], [src/include/], [Used for autoheader.])
 
 
 # Checks for programs.
@@ -183,12 +184,13 @@ AC_FUNC_SELECT_ARGTYPES
 AC_CHECK_FUNCS([floor ftime getcwd memmove memset pow select sqrt strdup memset open])
 
 AC_PREFIX_DEFAULT(/usr/local)
-if [[ $prefix = "NONE" ]] ; then
+if [[ $prefix = "NONE" ]]; then
         AC_DEFINE(INSTALL_PREFIX, "/usr/local",
         [define as prefix where Wired is installed])
 else
         AC_DEFINE_UNQUOTED(INSTALL_PREFIX, "$prefix")
 fi
+
 
 ##################
 # Checking Options
@@ -252,7 +254,6 @@ AC_CONFIG_FILES([src/plugins/beatbox/Makefile
 		src/midi/portmidi/porttime/Makefile
 		src/mixer/Makefile
 		src/plugins/Makefile
-		src/redist/Makefile
 		src/sequencer/Makefile
 		src/dssi/Makefile
 		src/undo/Makefile

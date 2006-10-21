@@ -9,7 +9,8 @@ LDFLAGS = $(shell wx-config --libs) -lm @SAMPLERATE_LIBS@
 
 noinst_LIBRARIES = libwiredsamplerate.a
 
+noinst_HEADERS = WiredSampleRate.h
+
 libwiredsamplerate_a_SOURCES =		\
 		WiredSampleRate.cpp	\
-		WiredSampleRate.h	\
 		WiredSampleRateTypes.cpp

@@ -7,7 +7,6 @@ SUBDIRS =				\
 	engine 				\
 	midi 				\
 	mixer 				\
-	redist 				\
 	undo 				\
 	libs				\
 	plugins				\

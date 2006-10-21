@@ -4,8 +4,10 @@ CPPFLAGS = $(shell wx-config --cflags)
 
 noinst_LIBRARIES = libwiredvideo.a
 
+noinst_HEADERS = 			\
+		WiredVideo.h		\
+		WiredMplayer.h
+
 libwiredvideo_a_SOURCES = 		\
 		WiredVideo.cpp		\
-		WiredVideo.h		\
-		WiredMplayer.h		\
 		WiredMplayer.cpp

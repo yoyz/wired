@@ -4,6 +4,25 @@ CPPFLAGS = $(shell wx-config --cflags) -I../../../gui -I../../../plugins/WiredPl
 
 lib_LTLIBRARIES = libWiredWidgets.la
 
+instdir = $(includedir)
+inst_HEADERS = 					\
+		../include/WiredWidgets.h	\
+		../include/ChoiceButton.h	\
+		../include/CycleKnob.h		\
+		../include/DownButton.h		\
+		../include/FaderCtrl.h		\
+		../include/HintedFader.h	\
+		../include/HintedKnob.h		\
+		../include/Hint.h		\
+		../include/HoldButton.h		\
+		../include/IdButton.h		\
+		../include/KnobCtrl.h		\
+		../include/StaticBitmap.h	\
+		../include/StaticPosKnob.h	\
+		../include/VUMCtrl.h
+
+
+
 libWiredWidgets_la_SOURCES = 		\
 		ChoiceButton.cpp	\
 		ChoiceButton.h		\

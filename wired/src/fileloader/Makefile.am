@@ -4,11 +4,13 @@ CPPFLAGS = $(shell wx-config --cflags) -I../libs/WiredAkai/include -I../gui -I..
 
 noinst_LIBRARIES = libfileloader.a
 
-libfileloader_a_SOURCES =		\
-		FileLoader.cpp		\
+noinst_HEADERS =			\
 		FileLoader.h		\
-		TreeItemData.cpp	\
 		TreeItemData.h		\
 		akai.h			\
-		list.h			\
+		list.h
+
+libfileloader_a_SOURCES =		\
+		FileLoader.cpp		\
+		TreeItemData.cpp	\
 		FileStat.cpp

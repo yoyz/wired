@@ -59,7 +59,7 @@ class	WiredExternalPlugin
   std::map<int, wxString>	GetPluginsList();
 
   /**
-   * Return type of plugin 
+   * Return type of plugin
    * \param  PluginId id gave from plugin creation (FirstIndex).
    * \return Xor of TYPE_PLUGINS_DSSI or TYPE_PLUGINS_LADSPA and TYPE_PLUGINS_INSTR or TYPE_PLUGINS_EFFECT
    */
@@ -89,7 +89,7 @@ class	WiredExternalPlugin
   /**
    * Same as GetPluginsList() but return PluginUniqueId instead PluginId.
    * \see GetPluginsList()
-   */ 
+   */
   std::map<int, unsigned long>	GetPluginsListUniqueId();
 
  private:
@@ -103,7 +103,7 @@ class	WiredExternalPlugin
 
   //Key == PluginId; Value == PluginDescriptor
   std::map<int, const LADSPA_Descriptor*>	_LADSPADescriptors;
-  std::map<int, int>						_PluginsInfo;
+  std::map<int, int>				_PluginsInfo;
 };
 
 

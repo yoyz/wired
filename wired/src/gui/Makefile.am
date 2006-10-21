@@ -1,7 +1,7 @@
 LDFLAGS = $(shell wx-config --libs) `xml2-config --libs`
 #-L/usr/pkg/lib/
 
-CPPFLAGS = $(shell wx-config --cflags) -I../audio -I../libs/WiredAkai/include -I../plugins/WiredPluginApi/include -I../fileloader -I../sequencer -I../engine -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../asm -I../editmidi -I../undo -I../libs/WiredWidgets/src `xml2-config --cflags`
+CPPFLAGS = $(shell wx-config --cflags) -I../audio -I../libs/WiredAkai/include -I../plugins/WiredPluginApi/include -I../fileloader -I../sequencer -I../engine -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../asm -I../editmidi -I../undo -I../libs/WiredWidgets/include `xml2-config --cflags`
 #-I/usr/pkg/include/libxml2/ -I/usr/pkg/include `xml2-config --cflags`
 
 if PORTAUDIO
@@ -10,71 +10,73 @@ endif
 
 noinst_LIBRARIES = libgui.a
 
-libgui_a_SOURCES = 			\
+noinst_HEADERS = 			\
 		AccelCenter.h		\
-		AccelCenter.cpp		\
-		ChannelGui.cpp		\
 		ChannelGui.h		\
-		ColoredLine.cpp		\
 		ColoredLine.h		\
-		ColoredBox.cpp		\
 		ColoredBox.h		\
 		Colour.h		\
-		Cursor.cpp		\
 		Cursor.h		\
-		HelpCtrl.cpp		\
 		HelpCtrl.h		\
-		HelpPanel.cpp		\
 		HelpPanel.h		\
-		MainApp.cpp		\
 		MainApp.h		\
-		MainWindow.cpp		\
 		MainWindow.h		\
-		MediaLibrary.cpp	\
 		MediaLibrary.h		\
-		MLTree.cpp		\
 		MLTree.h		\
-		MLTreeInfos.cpp		\
 		MLTreeInfos.h		\
-		MidiPattern.cpp		\
 		MidiPattern.h		\
-		MixerGui.cpp		\
 		MixerGui.h		\
-		OptionPanel.cpp		\
 		OptionPanel.h		\
-		Pattern.cpp		\
 		Pattern.h		\
-		Rack.cpp		\
 		Rack.h			\
-		Ruler.cpp		\
 		Ruler.h			\
-		SeqTrack.cpp		\
 		SeqTrack.h		\
-		SeqTrackPattern.cpp	\
 		SeqTrackPattern.h	\
-		SequencerGui.cpp	\
 		SequencerGui.h		\
 		SelectionZone.h		\
-		SelectionZone.cpp	\
-		SettingWindow.cpp	\
 		SettingWindow.h		\
-		StaticLabel.cpp		\
 		StaticLabel.h		\
-		Transport.cpp		\
 		Transport.h		\
-		WaveEditor.cpp		\
 		WaveEditor.h		\
-		WaveView.cpp		\
 		WaveView.h		\
-		WaveDrawer.cpp		\
 		WaveDrawer.h		\
-		WaveEditorDrawer.cpp	\
 		WaveEditorDrawer.h	\
-		WavePanel.cpp		\
 		WavePanel.h		\
-		PluginEffect.cpp	\
 		PluginEffect.h		\
 		FileConversion.h	\
+		FloatingFrame.h	
+
+libgui_a_SOURCES = 			\
+		AccelCenter.cpp		\
+		ChannelGui.cpp		\
+		ColoredLine.cpp		\
+		ColoredBox.cpp		\
+		Cursor.cpp		\
+		HelpCtrl.cpp		\
+		HelpPanel.cpp		\
+		MainApp.cpp		\
+		MainWindow.cpp		\
+		MediaLibrary.cpp	\
+		MLTree.cpp		\
+		MLTreeInfos.cpp		\
+		MidiPattern.cpp		\
+		MixerGui.cpp		\
+		OptionPanel.cpp		\
+		Pattern.cpp		\
+		Rack.cpp		\
+		Ruler.cpp		\
+		SeqTrack.cpp		\
+		SeqTrackPattern.cpp	\
+		SequencerGui.cpp	\
+		SelectionZone.cpp	\
+		SettingWindow.cpp	\
+		StaticLabel.cpp		\
+		Transport.cpp		\
+		WaveEditor.cpp		\
+		WaveView.cpp		\
+		WaveDrawer.cpp		\
+		WaveEditorDrawer.cpp	\
+		WavePanel.cpp		\
+		PluginEffect.cpp	\
 		FileConversion.cpp	\
-		FloatingFrame.h		\
 		FloatingFrame.cpp

@@ -8,8 +8,10 @@ LDFLAGS = $(shell wx-config --libs) -ldl
 
 noinst_LIBRARIES = libwiredCodec.a
 
-libwiredCodec_a_SOURCES =			\
-		WiredCodec.cpp			\
+noinst_HEADERS = 				\
 		WiredCodec.h			\
 		wiredcodec/WiredApiCodec.h
 
+
+libwiredCodec_a_SOURCES =			\
+		WiredCodec.cpp

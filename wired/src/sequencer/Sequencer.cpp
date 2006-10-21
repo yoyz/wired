@@ -19,13 +19,13 @@
 #include "../mixer/Channel.h"
 #include "../midi/midi.h"
 #include "../audio/WaveFile.h"
-#include "../redist/Plugin.h"
+#include "WiredPlugin.h"
 #include "../audio/WriteWaveFile.h"
 #include "../samplerate/WiredSampleRate.h"
 #include "../gui/Threads.h"
 
-Sequencer::Sequencer() 
-  : wxThread(), BPM(96), SigNumerator(4), SigDenominator(4), Loop(false), 
+Sequencer::Sequencer()
+  : wxThread(), BPM(96), SigNumerator(4), SigDenominator(4), Loop(false),
     Exporting(false), ExportWave(0), PlayWave(0), PlayWavePos(0), Click(false),
     CurrentPos(0), BeginLoopPos(0), EndLoopPos(4), EndPos(16), Playing(false),
     Recording(false), CurAudioPos(0)
@@ -107,12 +107,12 @@ void					*Sequencer::Entry()
 	    {
 	      SeqMutex.Unlock();
 	      Stop();
-	      SeqMutex.Lock();  
+	      SeqMutex.Lock();
 	    }
 	  else
 	    for (T = Tracks.begin(); T != Tracks.end(); T++)
 	      if ((*T)->IsMidiTrack() && ((*T)->TrackOpt->DeviceId == (*MidiMsg)->Id))
-		{		  
+		{
 		  midievent.Type = WIRED_MIDI_EVENT;
 		  midievent.NoteLength = CurAudioPos;
 		  midievent.DeltaFrames = 0; //**TODO ----- A REMPLIR ----
@@ -159,7 +159,7 @@ void					*Sequencer::Entry()
 		{
 		  size = ClickWave->GetNumberOfFrames() - click_pos - click_dec;
 		  if (size > Audio->SamplesPerBuffer)
-		    size = Audio->SamplesPerBuffer - click_dec; 
+		    size = Audio->SamplesPerBuffer - click_dec;
 		  else
 		    {
 		      memset(AllocBuf1[0] + size, 0, (Audio->SamplesPerBuffer - size) * sizeof(float));
@@ -168,14 +168,14 @@ void					*Sequencer::Entry()
 		  if (click_dec > 0)
 		    {
 		      /*
-			cout << "[SEQ] click_dec: " << click_dec << "; CurAudioPos: " << 
+			cout << "[SEQ] click_dec: " << click_dec << "; CurAudioPos: " <<
 			CurAudioPos << "; Sig: " <<
 			(long)((1.0 / SigNumerator) / MeasurePerSample) << endl;
 		      */
 		      memset(AllocBuf1[0], 0, click_dec * sizeof(float));
 		      memset(AllocBuf1[1], 0, click_dec * sizeof(float));
 		      memcpy(AllocBuf1[0] + click_dec, ClickWave->Data[0] + click_pos, size * sizeof(float));
-		      memcpy(AllocBuf1[1] + click_dec, ClickWave->Data[1] + click_pos, size * sizeof(float)); 
+		      memcpy(AllocBuf1[1] + click_dec, ClickWave->Data[1] + click_pos, size * sizeof(float));
 		      click_dec = 0;
 		    }
 		  else
@@ -183,19 +183,19 @@ void					*Sequencer::Entry()
 		      memcpy(AllocBuf1[0], ClickWave->Data[0] + click_pos, size * sizeof(float));
 		      memcpy(AllocBuf1[1], ClickWave->Data[1] + click_pos, size * sizeof(float));
 		    }
-		  ClickChannel->PushBuffer(AllocBuf1); 
-		  
+		  ClickChannel->PushBuffer(AllocBuf1);
+
 		  click_pos += size;
 		}
 	    }
 	  /* R?cup?rations des patterns ? jouer */
 	  for (T = Tracks.begin(); T != Tracks.end(); T++)
-	    {	      
+	    {
 	      if ((*T)->IsAudioTrack())
 		{
 		  /* - Enregistrement Audio */
 		  if (Recording && (*T)->TrackOpt->Record)
-		    {	 
+		    {
 		      //cout << "MixInput()"<< endl;
 		      Mix->MixInput();	// Mutex ou pas ? a prioris non
 
@@ -221,8 +221,8 @@ void					*Sequencer::Entry()
 		    }
 		}
 	      else
-		{	  
-		  /* Envoi des evenements MIDI (par rapport au timer) de chaque piste du 
+		{
+		  /* Envoi des evenements MIDI (par rapport au timer) de chaque piste du
 		     sequenceur aux plugins concernes */
 		  if (Recording && (*T)->Midi)
 		    {
@@ -247,7 +247,7 @@ void					*Sequencer::Entry()
       //SeqMutex.Unlock();
       //SeqMutex.Lock();
       /* - Appel des fonctions Process de chaque Plugin de chaque piste de racks */
-      for (RacksTrack = RackPanel->RackTracks.begin(); RacksTrack != RackPanel->RackTracks.end(); 
+      for (RacksTrack = RackPanel->RackTracks.begin(); RacksTrack != RackPanel->RackTracks.end();
 	   RacksTrack++)
 	{
 	  if (!(buf1 = (*RacksTrack)->CurrentBuffer))
@@ -265,9 +265,9 @@ void					*Sequencer::Entry()
 		{
 		  //  printf("[SEQ] PROCESS 1: %f\n",  Audio->GetTime());
 		  (*Plug)->Process(buf1, buf2, delta);
-		  //printf("[SEQ] PROCESS 2: %f\n",  Audio->GetTime());	    
+		  //printf("[SEQ] PROCESS 2: %f\n",  Audio->GetTime());
 		  buf = buf1;
-		  buf1 = buf2;	      
+		  buf1 = buf2;
 		  buf2 = buf;
 		  memset(buf2[0], 0, Audio->SamplesPerBuffer * sizeof(float));
 		  memset(buf2[1], 0, Audio->SamplesPerBuffer * sizeof(float));
@@ -282,12 +282,12 @@ void					*Sequencer::Entry()
 	    {
     	if ((*RacksTrack)->CurrentBuffer[0])
 	      delete[] (*RacksTrack)->CurrentBuffer[0];
-	    if ((*RacksTrack)->CurrentBuffer[1])	      
+	    if ((*RacksTrack)->CurrentBuffer[1])
 	      delete[] (*RacksTrack)->CurrentBuffer[1];
 	    if ((*RacksTrack)->CurrentBuffer)
 	      delete[] (*RacksTrack)->CurrentBuffer;
-	      (*RacksTrack)->CurrentBuffer = 0x0;  
-	    } 
+	      (*RacksTrack)->CurrentBuffer = 0x0;
+	    }
 	}
 
       delta = Audio->SamplesPerBuffer;
@@ -304,7 +304,7 @@ void					*Sequencer::Entry()
 	    {
 	      memset(fl_buf[0], 0, Audio->SamplesPerBuffer * sizeof(float));
 	      memset(fl_buf[1], 0, Audio->SamplesPerBuffer * sizeof(float));
-	    }	      
+	    }
 	  PlayWave->Read(fl_buf, PlayWavePos, size);
       	  ExtraBufs.push_back(new ChanBuf(fl_buf, PlayWaveChannel));
 	  PlayWavePos += size;
@@ -362,7 +362,7 @@ void					Sequencer::Play()
   list<Plugin *>::iterator		Plug;
 
   SeqMutex.Lock();
-  for (RacksTrack = RackPanel->RackTracks.begin(); 
+  for (RacksTrack = RackPanel->RackTracks.begin();
        RacksTrack != RackPanel->RackTracks.end(); RacksTrack++)
     for (Plug = (*RacksTrack)->Racks.begin(); Plug != (*RacksTrack)->Racks.end();
 	 Plug++)
@@ -385,7 +385,7 @@ void					Sequencer::Stop()
 
   SeqMutex.Lock();
 
-  for (RacksTrack = RackPanel->RackTracks.begin(); 
+  for (RacksTrack = RackPanel->RackTracks.begin();
        RacksTrack != RackPanel->RackTracks.end(); RacksTrack++)
     for (Plug = (*RacksTrack)->Racks.begin(); Plug != (*RacksTrack)->Racks.end();
 	 Plug++)
@@ -393,10 +393,10 @@ void					Sequencer::Stop()
 
   for (T = Tracks.begin(); T != Tracks.end(); T++)
     if ((*T)->IsMidiTrack())
-      {	
+      {
 	(*T)->TrackOpt->VuValue = 0;
 	TracksToRefresh.push_back(*T);
-      }  
+      }
 
   Playing = false;
   //if (WiredVideoObject->asFile == true) WiredVideoObject->StopFile();
@@ -406,9 +406,9 @@ void					Sequencer::Stop()
 
       FinishRecording();
 
-      SeqMutex.Lock(); 
+      SeqMutex.Lock();
     }
-  Recording = false;    
+  Recording = false;
   SeqMutex.Unlock();
 }
 
@@ -440,7 +440,7 @@ void					Sequencer::AddTrack(Track *t)
 
 void					Sequencer::RemoveTrack()
 {
-  SeqMutex.Lock();  
+  SeqMutex.Lock();
   Track* track = Tracks.back();
   Tracks.pop_back();
   if (track)
@@ -450,7 +450,7 @@ void					Sequencer::RemoveTrack()
 
 void					Sequencer::PrepareRecording()
 {
-  vector<Track *>::iterator		T;      
+  vector<Track *>::iterator		T;
 
   for (T = Tracks.begin(); T != Tracks.end(); T++)
     {
@@ -463,7 +463,7 @@ void					Sequencer::PrepareTrackForRecording(Track *T)
 {
   int					type;
 
-  PatternsToResize.clear();  
+  PatternsToResize.clear();
   if (T->TrackOpt->Record && (T->TrackOpt->DeviceId == -1))
     {
       T->TrackOpt->SetRecording(false);
@@ -474,7 +474,7 @@ void					Sequencer::PrepareTrackForRecording(Track *T)
     {
       if (T->Wave)
 	delete T->Wave;
-      T->Wave = new AudioPattern(CurrentPos, CurrentPos + 0.1, T->Index); 
+      T->Wave = new AudioPattern(CurrentPos, CurrentPos + 0.1, T->Index);
       if (!T->Wave->PrepareRecord(type))
 	{
 	  delete T->Wave;
@@ -483,45 +483,45 @@ void					Sequencer::PrepareTrackForRecording(Track *T)
 	  return;
 	}
       else
-	T->TrackPattern->Patterns.push_back(T->Wave);	      
+	T->TrackPattern->Patterns.push_back(T->Wave);
 
     }
   else if (T->IsMidiTrack())
     {
       T->Midi = new MidiPattern(CurrentPos, CurrentPos + 0.1, T->Index);
       T->TrackPattern->Patterns.push_back(T->Midi);
-    }  
+    }
 }
 
 void					Sequencer::FinishRecording()
 {
-  vector<Track *>::iterator		T; 
+  vector<Track *>::iterator		T;
 
   for (T = Tracks.begin(); T != Tracks.end(); T++)
     {
       if ((*T)->TrackOpt->Record)
 	{
 	  if ((*T)->IsAudioTrack())
-	    {	
+	    {
 	      if ((*T)->Wave)
 		(*T)->Wave->StopRecord();
 	      SeqMutex.Lock();
 
 	      (*T)->Wave = 0x0;
-	      
+
 	      SeqMutex.Unlock();
-		
+
 	    }
 	  else if ((*T)->IsMidiTrack())
 	    {
 	      SeqMutex.Lock();
-	      
+
 	      (*T)->Midi = 0x0;
-	      
-	      SeqMutex.Unlock();  
+
+	      SeqMutex.Unlock();
 	    }
 	}
-    }  
+    }
 }
 
 void					Sequencer::AddMidiEvent(int id, MidiType midi_msg[3])
@@ -586,7 +586,7 @@ void					Sequencer::SetCurrentPos()
 {
   CurAudioPos += Audio->SamplesPerBuffer;//(long)((Audio->GetTime() - StartAudioPos) * Audio->SampleRate);// + (Audio->SamplesPerBuffer * 2);
   CurrentPos = (CurAudioPos * MeasurePerSample);// + (Audio->SamplesPerBuffer * MeasurePerSample);
-  //cout << "[SEQ] CurPos: " << CurrentPos << endl;	   
+  //cout << "[SEQ] CurPos: " << CurrentPos << endl;
   //CursorEvent event(101010, wxSetCursorPos);
   //event.Position = CurrentPos;
   wxCommandEvent event(ID_SEQ_SETPOS, TYPE_SEQ_SETPOS);
@@ -619,14 +619,14 @@ void					Sequencer::SetBPM(float bpm)
   // update audio pattern size
   for (i = Tracks.begin(); i != Tracks.end(); i++)
     if ((*i)->IsAudioTrack())
-      for (j = (*i)->TrackPattern->Patterns.begin(); j != (*i)->TrackPattern->Patterns.end(); 
+      for (j = (*i)->TrackPattern->Patterns.begin(); j != (*i)->TrackPattern->Patterns.end();
 	   j++)
 	(*j)->OnBpmChange();
   // notify the plugins
   list<RackTrack *>::iterator		RacksTrack;
   list<Plugin *>::iterator		Plug;
 
-  for (RacksTrack = RackPanel->RackTracks.begin(); 
+  for (RacksTrack = RackPanel->RackTracks.begin();
        RacksTrack != RackPanel->RackTracks.end(); RacksTrack++)
     for (Plug = (*RacksTrack)->Racks.begin(); Plug != (*RacksTrack)->Racks.end(); Plug++)
       (*Plug)->SetBPM(bpm);
@@ -666,11 +666,11 @@ list<MidiPattern *>			Sequencer::GetCurrentMidiPatterns(Track *t)
 
   for (i = t->TrackPattern->Patterns.begin(); i != t->TrackPattern->Patterns.end(); i++)
     {
-      if ((CurrentPos + delta_mes >= (*i)->GetPosition()) && 
+      if ((CurrentPos + delta_mes >= (*i)->GetPosition()) &&
 	  (CurrentPos < (*i)->GetEndPosition()))
 	{
 	  ret = i;
-	  
+
 	  // Check if the next pattern starts when this one finishes
 	  //i++;
 	  /*	  if (i != t->TrackPattern->Patterns.end())
@@ -679,7 +679,7 @@ list<MidiPattern *>			Sequencer::GetCurrentMidiPatterns(Track *t)
 		  ((CurrentPos + delta_mes > (*ret)->GetEndPosition())))
 		l.push_ (*i);
 		}*/
-	  l.push_back((MidiPattern *)*ret);	  
+	  l.push_back((MidiPattern *)*ret);
 	}
     }
   return (l);
@@ -694,11 +694,11 @@ AudioPattern				*Sequencer::GetCurrentAudioPattern(Track *t)
 
   for (i = t->TrackPattern->Patterns.begin(); i != t->TrackPattern->Patterns.end(); i++)
     {
-      if ((CurrentPos + delta_mes >= (*i)->GetPosition()) && 
+      if ((CurrentPos + delta_mes >= (*i)->GetPosition()) &&
 	  (CurrentPos < (*i)->GetEndPosition()))
 	{
 	  ret = i;
-	  
+
 	  // Check if the next pattern starts when this one finishes
 	  i++;
 	  if (i != t->TrackPattern->Patterns.end())
@@ -707,7 +707,7 @@ AudioPattern				*Sequencer::GetCurrentAudioPattern(Track *t)
 		  ((CurrentPos + delta_mes > (*ret)->GetEndPosition())))
 		return ((AudioPattern *)*i);
 	    }
-	  return ((AudioPattern *)*ret);	  
+	  return ((AudioPattern *)*ret);
 	}
     }
   return (0x0);
@@ -717,7 +717,7 @@ float					**Sequencer::GetCurrentAudioBuffer(AudioPattern *p)
 {
   long					CurPatternBlock;
 
-  CurPatternBlock = (long)((double)((CurrentPos - (p->GetPosition()/* + p->BeginPosition*/)) * SamplesPerMeasure) 
+  CurPatternBlock = (long)((double)((CurrentPos - (p->GetPosition()/* + p->BeginPosition*/)) * SamplesPerMeasure)
 			   / (double)Audio->SamplesPerBuffer);
   if (p->LastBlock != CurPatternBlock)
     {
@@ -733,14 +733,14 @@ void					Sequencer::ProcessCurrentMidiEvents(Track *T, MidiPattern *p)
   double				delta_mes;
   WiredEvent				*curevent;
   vector<MidiEvent *>::iterator		i;
-  
+
   //  cout << "POSITION [ " << p->GetPosition() << " ] youpla :D" << endl;
   //  T->TrackOpt->SetVuValue(0);
   delta_mes = MeasurePerSample * Audio->SamplesPerBuffer;
-  
+
   for (i = p->Events.begin(); i != p->Events.end(); i++)
     {
-      if ((p->GetPosition() + (*i)->Position >= CurrentPos) && 
+      if ((p->GetPosition() + (*i)->Position >= CurrentPos) &&
 	  (p->GetPosition() + (*i)->Position < CurrentPos + delta_mes))
 	{
 	  T->TrackOpt->VuValue = (*i)->Msg[2];
@@ -750,9 +750,9 @@ void					Sequencer::ProcessCurrentMidiEvents(Track *T, MidiPattern *p)
 	    {
 	      curevent = new WiredEvent; //** really needed to dyn alloc ?
 	      curevent->Type = WIRED_MIDI_EVENT;
-	      curevent->DeltaFrames = (long)((p->GetPosition() + (*i)->Position - CurrentPos) 
+	      curevent->DeltaFrames = (long)((p->GetPosition() + (*i)->Position - CurrentPos)
 					     * SamplesPerMeasure);
-	      curevent->NoteLength = (long)(((*i)->EndPosition - (*i)->Position) 
+	      curevent->NoteLength = (long)(((*i)->EndPosition - (*i)->Position)
 					    * SamplesPerMeasure);
 	      memcpy(curevent->MidiData, (*i)->Msg, sizeof(int) * 3);
 
@@ -822,7 +822,7 @@ void					Sequencer::AllocBuffer(float** &Buffer, unsigned int NbChannels)
   }
 }
 
-void					Sequencer::AddMidiPattern(list<SeqCreateEvent *> *l, 
+void					Sequencer::AddMidiPattern(list<SeqCreateEvent *> *l,
 								  Plugin *plug)
 {
   vector<Track *>::iterator		i;
@@ -865,7 +865,7 @@ bool					Sequencer::ExportToWave(wxString &filename)
     delete SampleRateConverter;
   SampleRateConverter = new WiredSampleRate;
   t_samplerate_info	Info;
-  
+
   Info.SampleRate = (int) Audio->SampleRate;
   Info.Format = Audio->UserData->SampleFormat;
   Info.SamplesPerBuffer = Audio->SamplesPerBuffer;
@@ -878,7 +878,7 @@ bool					Sequencer::ExportToWave(wxString &filename)
       Exporting = true;
       Loop = false;
       SeqMutex.Unlock();
-      Play();      
+      Play();
       return true;
     }
   else
@@ -889,20 +889,20 @@ bool					Sequencer::ExportToWave(wxString &filename)
 
 //  try
 //    {
-//      ExportWave = new WriteWaveFile(filename, (int)Audio->SampleRate, 2, 
+//      ExportWave = new WriteWaveFile(filename, (int)Audio->SampleRate, 2,
 //				     SF_FORMAT_PCM_16);
 //      SetCurrentPos(BeginLoopPos);
-//      
+//
 //      SeqMutex.Lock();
 //      Exporting = true;
 //      SeqMutex.Unlock();
-//      
+//
 //      Play();
-//    } 
+//    }
 //  catch (...)
 //    {
 //      cout << "[SEQUENCER] Could not create export file" << endl; // FIXME error dialog box
-//    } 
+//    }
 //    return false;
 }
 
@@ -919,7 +919,7 @@ void					Sequencer::StopExport()
     DeleteBuffer(ExportBuf);
   }
   SeqMutex.Unlock();
-  return;  
+  return;
 }
 
 void					Sequencer::WriteExport()
@@ -929,7 +929,7 @@ void					Sequencer::WriteExport()
 //		bcopy(Mix->OutputLeft, ExportBuf[0], Audio->SamplesPerBuffer);
 //		bcopy(Mix->OutputRight, ExportBuf[1], Audio->SamplesPerBuffer);
       long				j;
-		
+
       for (j = 0; j < Audio->SamplesPerBuffer; j++)
 	{
 	  ExportBuf[0][j] = Mix->OutputLeft[j];
@@ -950,7 +950,7 @@ void					Sequencer::PlayFile(wxString filename, bool isakai)
 	{
 	  wxString mDevice, mFilename, mName;
 	  int mPart;
-	  
+
 	  mDevice = filename.substr(0, filename.find(wxT(":"), 0));
 	  filename = filename.substr(filename.find(wxT(":"), 0) + 1, filename.size() - filename.find(wxT(":"), 0));
 	  mFilename = filename.substr(10, filename.size() - 10);
@@ -960,7 +960,7 @@ void					Sequencer::PlayFile(wxString filename, bool isakai)
 	  int opos = 0;
 	  while ((pos = mFilename.find(wxT("/"), opos)) != wxString::npos)
 	    opos = pos + 1;
-	  
+
 	  mName = mFilename.substr(opos, mFilename.size() - opos);
 	  mFilename = mFilename.substr(1, opos - 2);
 	  cout << "device: " << mDevice << "; part: " << mPart << "; name: " << mName << "; filename: " << mFilename << endl;
@@ -982,11 +982,11 @@ void					Sequencer::PlayFile(wxString filename, bool isakai)
     //delete img;
 
 	  SeqMutex.Lock();
-	  
+
 	  PlayWavePos = 0;
 	  PlayWave = w;
-    
-	  SeqMutex.Unlock();	  	  
+
+	  SeqMutex.Unlock();
 	}
       else
 	{

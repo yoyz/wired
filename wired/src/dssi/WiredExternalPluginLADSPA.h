@@ -6,7 +6,7 @@
 
 #include "ladspa.h"
 #include "../engine/AudioEngine.h"
-#include "../redist/WiredPlugin.h"
+#include "WiredPlugin.h"
 //#include <stdlib.h>
 #include <dlfcn.h>
 #include <math.h>
@@ -46,7 +46,7 @@ typedef struct			s_gui_control
 	t_ladspa_port		Descriptor;
 }				t_gui_control;
 
-class				WiredLADSPAInstance : public Plugin
+class				WiredLADSPAInstance : public WiredPlugin
 {
 public:
   WiredLADSPAInstance(){;}

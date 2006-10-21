@@ -4,11 +4,13 @@ CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../plugins/WiredPluginApi/incl
 
 noinst_LIBRARIES = libaudio.a
 
-libaudio_a_SOURCES = 			\
-		ClipBoard.cpp		\
+noinst_HEADERS = 			\
 		ClipBoard.h		\
 		Error.hh		\
-		WaveFile.cpp		\
 		WaveFile.h		\
-		WriteWaveFile.cpp	\
 		WriteWaveFile.h
+
+libaudio_a_SOURCES = 			\
+		ClipBoard.cpp		\
+		WaveFile.cpp		\
+		WriteWaveFile.cpp
