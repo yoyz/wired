@@ -65,18 +65,20 @@ void	 WiredPluginGui::CloseOptionalView()
      AKAI audio cds/files or not. Returns the selected file name or an empty wstring if
      cancelled. If 'exts' is NULL, default audio extensions are used. */
 wxString	WiredPluginGui::OpenFileLoader(wxString& title,
-					  std::vector<wxString>& exts,
-					  bool akai = false)
+					       std::vector<wxString>& exts,
+					       bool addExts,
+					       bool akai)
 {
-  return _StartInfo->GetCore()->OpenFileLoader(title, exts, akai);
+  return _StartInfo->GetCore()->OpenFileLoader(title, exts, addExts, akai);
 }
 
 /* Opens the Wired file loader with given title, extensions, for saving a file.
    Returns the file name or an empty wstring if cancelled */
 wxString	WiredPluginGui::SaveFileLoader(wxString& title,
-					  std::vector<wxString>& exts)
+					       std::vector<wxString>& exts,
+					       bool addExts)
 {
-   return _StartInfo->GetCore()->SaveFileLoader(title, exts);
+  return _StartInfo->GetCore()->SaveFileLoader(title, exts, addExts);
 }
 
 // Sequencer events

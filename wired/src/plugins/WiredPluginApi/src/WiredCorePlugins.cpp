@@ -86,7 +86,8 @@ double		WiredCorePlugins::GetCurrentPos()
 }
 
 wxString	WiredCorePlugins::OpenFileLoader(wxString& title,
-						 std::vector<wxString>& extensions,
+						 std::vector<wxString>* extensions,
+						 bool addExts,
 						 bool akai)
 {
   wxString	selected;
@@ -94,7 +95,8 @@ wxString	WiredCorePlugins::OpenFileLoader(wxString& title,
 				     title,
 				     akai,
 				     false,
-				     extensions);
+				     extensions,
+				     addExts);
 
   if (dlg->ShowModal() == wxID_OK)
     selected = dlg->GetSelectedFile();
@@ -102,14 +104,16 @@ wxString	WiredCorePlugins::OpenFileLoader(wxString& title,
 }
 
 wxString	WiredCorePlugins::SaveFileLoader(wxString& title,
-						 std::vector<wxString>& extensions)
+						 std::vector<wxString>& extensions,
+						 bool addExts)
 {
   wxString	selected;
   FileLoader*	dlg = new FileLoader(MainWin, MainWin_FileLoader,
 				     title,
 				     false,
 				     true,
-				     extensions);
+				     extensions,
+				     addExts);
 
   if (dlg->ShowModal() == wxID_OK)
     selected = dlg->GetSelectedFile();

@@ -103,12 +103,14 @@ class	WiredCorePlugins
    */
 
   wxString	OpenFileLoader(wxString& title,
-			       std::vector<wxString>& extensions,
+			       std::vector<wxString>* extensions,
+			       bool addExts,
 			       bool akai);
 
 
   wxString	SaveFileLoader(wxString& title,
-			       std::vector<wxString>& extensions);
+			       std::vector<wxString>* extensions,
+			       bool addExts);
 
 
   void		SendHelp(wxString& value);
