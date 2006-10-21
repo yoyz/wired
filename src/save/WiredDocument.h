@@ -5,18 +5,17 @@
 
 #include "SaveElement.h"
 
-WX_DEFINE_ARRAY_PTR(WiredDocument *, WiredDocumentArray);
-WX_DEFINE_STRING_HASH_MAP(SaveElementArray, SaveElementsHashMap);
+class WiredDocument;
 
-#define WIRED_PROJECT_FILE wxT("WiredProjectFile"); 
+WX_DEFINE_ARRAY_PTR(WiredDocument *, WiredDocumentArray);
+
+#define WIRED_PROJECT_FILE wxT("WiredProjectFile")
 
 class WiredDocument
 {
- private:
-  WiredDocument(wxString name, WiredDocument *parent = NULL);
-
-
  public:
+  WiredDocument(wxString name, WiredDocument *parent);
+
   /** Main save function.
    * This function will be called by the SaveCenter when a save of the document
    * is asked.
@@ -33,7 +32,7 @@ class WiredDocument
   void				Register(WiredDocument *children);
   
   SaveElementsHashMap		getDocData();
-  SaveElementArray		getDocFile(wxString file);
+  SaveElementArray		*getDocFile(wxString file);
 
  private:
   void				saveDocData(wxString file, SaveElement *data);

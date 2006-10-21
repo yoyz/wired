@@ -291,7 +291,8 @@ AC_CONFIG_FILES([src/plugins/beatbox/Makefile
 		src/codec/wiredcodec/mpeg/Makefile
 		src/codec/wiredcodec/flac/Makefile
 		src/codec/wiredcodec/vorbis/Makefile
-		src/wiredvideo/Makefile])
+		src/wiredvideo/Makefile
+		src/save/Makefile])
 
 AC_OUTPUT
 

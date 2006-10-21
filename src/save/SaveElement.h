@@ -1,7 +1,14 @@
 #ifndef _SAVEELEMENT_H_
 #define _SAVEELEMENT_H_
 
-WX_DEFINE_ARRAY_PTR(SaveElement *, SaveElementArray);
+#include <wx/string.h>
+#include <wx/hashmap.h>
+#include <wx/dynarray.h>
+
+class SaveElement;
+
+WX_DEFINE_ARRAY_PTR(SaveElement*, SaveElementArray);
+WX_DECLARE_HASH_MAP(wxString, SaveElementArray*, wxPointerHash, wxPointerEqual, SaveElementsHashMap);
 WX_DECLARE_STRING_HASH_MAP(wxString, AttributesHashMap);
 
 class SaveElement
@@ -43,19 +50,16 @@ class SaveElement
     }
   
   inline bool		attributeExists(wxString key) 
-    {  return ( _attributes[key] != _attributes.end() ); }
+    {  return ( _attributes.find(key) != _attributes.end() ); }
 
   inline void		clearAttributes() { _attributes.clear(); }
   inline void		clear() { _key.Clear(); _value.Clear(); clearAttributes(); }
 
-  //I don't really know how to do it, but it would be cool if only the SaveCenter
-  //could access this...
- protected:
   inline AttributesHashMap	getAttributes() { return _attributes; }
 
  private:
   wxString			_key;
-  wxSring			_value;
+  wxString			_value;
   AttributesHashMap		_attributes;
 };
 

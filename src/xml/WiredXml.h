@@ -72,7 +72,6 @@ class WiredXml
 	 * \return the name of the document.
 	 */
 	const wxString&	GetDocumentName();
-protected:
 
 	/** Opens a document.
 	 * \param FileName The path to the document.

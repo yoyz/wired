@@ -2,10 +2,12 @@
 
 WiredDocument::WiredDocument(wxString name, WiredDocument *parent = NULL)
 {
-  if (!parent)
-    parent = saveCenter;
+  //uncomment when savecenter is instanciated
+//   if (!parent)
+//     parent = saveCenter;
 
-  parent->Register(this);
+  if(parent)
+    parent->Register(this);
 
   _name = name;
 
@@ -13,11 +15,11 @@ WiredDocument::WiredDocument(wxString name, WiredDocument *parent = NULL)
 
 void		WiredDocument::Register(WiredDocument *child)
 {
-  _children->push_back(child);
+  _children.Add(child);
 }
 
 
-vector<WiredDocument *>	WiredDocument::getChildren()
+WiredDocumentArray	WiredDocument::getChildren()
 {
   return _children;
 }
@@ -27,23 +29,23 @@ wxString	WiredDocument::getName()
   return _name;
 }
 
-void		WiredDocument::saveDocData(wxString file, SaveElement data)
+void		WiredDocument::saveDocData(wxString file, SaveElement *data)
 {
   SaveElement	*toAdd;
 
-  toAdd = new SaveElement(data)
+  toAdd = new SaveElement(*data);
 
-  _dataSave[file].Add(toAdd);
+  _dataSave[file]->Add(toAdd);
 }
 
 void		WiredDocument::clearDocData()
 {
-  SaveElementHashMap::iterator	dataSaveIt;
+  SaveElementsHashMap::iterator	dataSaveIt;
 
   for (dataSaveIt = _dataSave.begin();
        dataSaveIt != _dataSave.end();
        dataSaveIt++)
-    rmDocDataFile(dataSaveIt->first());
+    rmDocDataFile(dataSaveIt->first);
 
   _dataSave.clear();
 }
@@ -52,20 +54,20 @@ void		WiredDocument::rmDocDataFile(wxString file)
 {
   int	i;
 
-  if(_dataSave.find(file) != _saveData.end())
-    for (i = 0; i < _dataSave[file].GetCount(); i++)
-      if(_dataSave[file][i] != NULL)
-	delete(_dataSave[file][i]);
+  if(_dataSave.find(file) != _dataSave.end())
+    for (i = 0; i < _dataSave[file]->GetCount(); i++)
+      if(_dataSave[file]->Item(i) != NULL)
+	delete(_dataSave[file]->Item(i));
 
   _dataSave.erase(file);
 }
 
 SaveElementsHashMap	WiredDocument::getDocData()
 {
-  return _saveData;
+  return _dataSave;
 }
 
-SaveElementArray	WiredDocument::getDocFile(wxString file)
+SaveElementArray	*WiredDocument::getDocFile(wxString file)
 {
   return _dataSave[file];
 }

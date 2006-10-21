@@ -2,11 +2,15 @@
 #define _SAVECENTER_H_
 
 #include "WiredDocument.h"
+#include "WiredXml.h"
 
 class SaveCenter : public WiredDocument
 {
  public:
-  SaveCenter(wxString projectName, wxString projectPath = wxT(""));
+  SaveCenter(wxString docName,
+	     wxString projectName,  
+	     WiredDocument *docParent,
+	     wxString projectPath);
   ~SaveCenter();
 
   /** Main Save function, implementation of WiredDocument.
@@ -16,9 +20,7 @@ class SaveCenter : public WiredDocument
    * \param data Please, refer to the WiredDocument class documentation.
    * \param filename Please, refer to the WiredDocument class documentation.
    */
-  void		Save(WiredSaveElementArray &conf,
-		     WiredSaveElementArray &data,
-		     wxString &filename);
+  void		Save();
   
   /** Main Load function, implementation of WiredDocument.
    * The SaveCenter is a WiredDocument. This function is used to load 
@@ -27,8 +29,7 @@ class SaveCenter : public WiredDocument
    * \param data Please, refer to the WiredDocument class documentation.
    * \param filename Please, refer to the WiredDocument class documentation.
    */
-  void		Load(WiredSaveElementArray conf,
-		     WiredSaveElementArray data);
+  void		Load();
   
   /** Returns the project path. */
   wxString	getProjectPath();
@@ -44,7 +45,7 @@ class SaveCenter : public WiredDocument
   /** Sets the project name
    * \param projectName the new project name.
    */
-  void		setProjectname(wxString projectName);
+  void		setProjectName(wxString projectName);
   
   /** Saves the whole project.
    * This function should only be called when clicking on the save menu...
@@ -62,7 +63,7 @@ class SaveCenter : public WiredDocument
   void		SaveFile(WiredDocument *doc, wxString file);
 
 
- private
+ private:
    /** Writes an element in the xmlfile.
     * \param elem the element to write.
     * \param xmlFile the WiredXml object to write in.
@@ -75,14 +76,17 @@ class SaveCenter : public WiredDocument
    * If the confFile is NULL, no project file will be written (only data...)
    * \param doc the 
    */ 
-  void		SaveDocument(WiredDocument *doc, WiredXml confFile);
+  void		SaveDocument(WiredDocument *doc, WiredXml *xmlFile);
 
   /** Writes a SaveElementArray in a separate file.
    * The filename is relative to the project root path.
    * \param filename the path to the file to write.
    * \param elements the SaveElementArray to write.
    */
-  void		WriteFile(wxString filename, SaveElementArray elements);
+  void		WriteFile(wxString filename, SaveElementArray *elements);
+
+  void		AddReferences(SaveElementsHashMap &saveElements, 
+			      WiredXml *xmlFile);
 
   bool		ReadXml();
 
@@ -94,6 +98,6 @@ class SaveCenter : public WiredDocument
  private:
   wxString		_projectName;
   wxString		_projectPath;
-}
+};
 
 #endif /*_SAVECENTER_H_ */

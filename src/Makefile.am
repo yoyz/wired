@@ -17,7 +17,8 @@ SUBDIRS =				\
 	samplerate			\
 	codec				\
 	wiredvideo			\
-	dssi				
+	dssi				\
+	save
 
 
 DEPS_LIBS = libs/WiredWidgets/src/.libs/libWiredWidgets.so libs/WiredAkai/src/.libs/libWiredAkai.so
@@ -52,4 +53,5 @@ wired_LDADD =					\
 	samplerate/libwiredsamplerate.a		\
 	codec/libwiredCodec.a			\
 	wiredvideo/libwiredvideo.a		\
-	dssi/libwireddssi.a
+	dssi/libwireddssi.a			\
+	save/libsave.a
