@@ -11,7 +11,7 @@
 #include <list>
 #include <map>
 #include <iostream>
-#include "./wiredcodec/WiredApiCodec.h"
+#include "WiredApiCodec.h"
 
 using namespace std;
 
@@ -24,9 +24,9 @@ class			WiredCodec
   WiredCodec (const WiredCodec& copy){*this = copy;};
   WiredCodec	operator=(const WiredCodec& right);
   ~WiredCodec();
-  
+
   void			      		Init();														/* Init and loads codecs */
-  unsigned long				Decode(const wxString &filename, t_Pcm *pcm, 
+  unsigned long				Decode(const wxString &filename, t_Pcm *pcm,
   									unsigned long length);								/* Decode file */
   int			       		Encode(float **pcm, wxString OutExtension);					/* Encode stream */
   int			       		EndDecode();												/* Close file */

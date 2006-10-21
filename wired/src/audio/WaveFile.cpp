@@ -3,7 +3,7 @@
 
 #include "WaveFile.h"
 #include <math.h>
-#include "../error.hh"
+#include "error.hh"
 
 #include <iostream>
 

@@ -5,7 +5,7 @@
 #define _WIREDEXTERNALPLUGINLADSPA_H_
 
 #include "ladspa.h"
-#include "../engine/AudioEngine.h"
+#include "AudioEngine.h"
 #include "WiredPlugin.h"
 //#include <stdlib.h>
 #include <dlfcn.h>

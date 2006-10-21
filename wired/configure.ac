@@ -240,6 +240,8 @@ AC_CONFIG_FILES([src/plugins/beatbox/Makefile
 		src/plugins/chorus/Makefile
 		src/plugins/wahwah/Makefile
 		src/plugins/test/Makefile
+		src/plugins/WiredPluginApi/Makefile
+		src/plugins/WiredPluginApi/src/Makefile
 		Makefile
 		po/Makefile.in
 		intl/Makefile
@@ -262,6 +264,8 @@ AC_CONFIG_FILES([src/plugins/beatbox/Makefile
 	        src/libs/WiredWidgets/src/Makefile
 		src/libs/WiredAkai/Makefile
 		src/libs/WiredAkai/src/Makefile
+		src/libs/WiredAudioUtilities/Makefile
+		src/libs/WiredAudioUtilities/src/Makefile
 		src/data/Makefile
 		src/data/ihm/Makefile
 		src/data/ihm/mixer/Makefile

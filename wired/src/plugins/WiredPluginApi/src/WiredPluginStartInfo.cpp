@@ -14,26 +14,26 @@ WiredPluginStartInfo::~WiredPluginStartInfo()
 
 WiredCorePlugins	WiredPluginStartInfo::GetCore()
 {
-  return core;
+  return _Core;
 }
 
 wxString		WiredPluginStartInfo::GetVersion()
 {
-  return Version;
+  return _Version;
 }
 
 wxWindow*		WiredPluginStartInfo::GetRack()
 {
-  return Rack;
+  return _Parent;
 }
 
 wxPoint			WiredPluginStartInfo::GetPos()
 {
-  return Pos;
+  return _Pos;
 }
 
 wxSize			WiredPluginStartInfo::GetSize()
 {
-  return Size;
+  return _Size;
 }
 

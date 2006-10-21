@@ -22,7 +22,6 @@ inst_HEADERS = 					\
 		../include/VUMCtrl.h
 
 
-
 libWiredWidgets_la_SOURCES = 		\
 		ChoiceButton.cpp	\
 		ChoiceButton.h		\

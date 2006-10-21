@@ -9,4 +9,4 @@ inst_HEADERS =				\
 		WiredAudioUtilities.h
 
 
-libWiredWidgets_la_SOURCES =
+libWiredAudioUtilities_la_SOURCES =

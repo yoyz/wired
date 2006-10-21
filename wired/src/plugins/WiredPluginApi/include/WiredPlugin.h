@@ -31,11 +31,11 @@ class WiredPluginData;
 class		WiredPlugin : public WiredPluginGui, public WiredPluginAudio, public WiredPluginData
 {
  private:
-  WiredPluginStartInfo	*StartInfo;
+  WiredPluginStartInfo*	_StartInfo;
 
  public:
-  WiredPlugin(WiredPluginStartInfo *parent)
-    { StartInfo = parent; } : WiredPluginGui(parent) : WiredPluginAudio(parent);
+  WiredPlugin(WiredPluginStartInfo* parent)
+    { _StartInfo = parent; } : WiredPluginGui(parent) : WiredPluginAudio(parent);
   ~WiredPlugin();
 };
 

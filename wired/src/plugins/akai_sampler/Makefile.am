@@ -10,21 +10,22 @@ endif
 
 lib_LTLIBRARIES = libWiredSampler.la
 
-noinst_HEADERS =					\ 		
-			AkaiSampler.h			\
-			ASClavier.h    			\
-			ASPlugin.h			\
-			ASEnvel.h      			\
-			AkaiSampler.h			\
-			ASKey.h 			\
-		  	Solver.h			\
-			ASList.h			\
-			Splines.h			\
-			ASPlugPanel.h			\
-			ASSampleList.h			\
-			ASWaveView.h			\
-			ASKeygroupList.h		\
+noinst_HEADERS =				\
+			AkaiSampler.h		\
+			ASClavier.h    		\
+			ASPlugin.h		\
+			ASEnvel.h      		\
+			AkaiSampler.h		\
+			ASKey.h 		\
+		  	Solver.h		\
+			ASList.h		\
+			Splines.h		\
+			ASPlugPanel.h		\
+			ASSampleList.h		\
+			ASWaveView.h		\
+			ASKeygroupList.h	\
 			ASLoop.h
+
 
 libWiredSampler_la_SOURCES =				\
 			AkaiSampler.cpp			\

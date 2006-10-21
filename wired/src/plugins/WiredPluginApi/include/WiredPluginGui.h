@@ -1,5 +1,5 @@
-#ifndef __WIREDPLUGIN_H__
-#define __WIREDPLUGIN_H__
+#ifndef __WIREDPLUGINGUI_H__
+#define __WIREDPLUGINGUI_H__
 
 
 #include <wx/wxprec.h>
@@ -8,6 +8,7 @@
 #endif
 
 #include "WiredPluginStartInfo.h"
+#include "Sequencer.h"
 
 class WiredPluginStartInfo;
 
@@ -26,7 +27,7 @@ class		WiredPluginGui
   WiredPluginStartInfo*	_StartInfo;
 
  public:
-  WiredPluginGui(WiredPluginStartInfo* parent) { StartInfo = parent; } ;
+  WiredPluginGui(WiredPluginStartInfo* parent) { _StartInfo = parent; };
   ~WiredPluginGui();
 
   /* Ask the host application to call Update() whenever the main thread can process gui calls  */
@@ -88,4 +89,4 @@ class		WiredPluginGui
 
 };
 
-#endif // __WIREDPLUGIN_H__
+#endif // __WIREDPLUGINGUI_H__

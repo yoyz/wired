@@ -9,6 +9,6 @@ inst_HEADERS =				\
 		../include/WiredAkai.h	\
 		../include/akai.h
 
-libWiredAkai_la_SOURCES = 			\
-				akai.c		\
-				list.c
+libWiredAkai_la_SOURCES = 	\
+			akai.c	\
+			list.c

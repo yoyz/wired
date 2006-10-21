@@ -6,7 +6,6 @@ noinst_LIBRARIES = libaudio.a
 
 noinst_HEADERS = 			\
 		ClipBoard.h		\
-		Error.hh		\
 		WaveFile.h		\
 		WriteWaveFile.h
 

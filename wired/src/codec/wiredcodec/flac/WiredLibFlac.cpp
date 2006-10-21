@@ -1,11 +1,11 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-#include	<unistd.h>
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<fcntl.h>
-#include	"WiredLibFlac.h"
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include "WiredLibFlac.h"
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -61,7 +61,7 @@ void WiredLibFlac::init(list<s_LibInfo> &Info)
     {
       Info.push_back(LibInfo);
       return;
-    }  
+    }
   LibInfo.CodecMask = DECODE;
   Info.push_back(LibInfo);
 }
@@ -70,7 +70,7 @@ bool WiredLibFlac::CanConvert(const wxString& path, int Decode)
 {
   int		fd;
   char		*buf;
-  
+
   if (Decode & ENCODE)
     return false;
   if (wxFile::Exists(path) == false)
@@ -82,7 +82,7 @@ bool WiredLibFlac::CanConvert(const wxString& path, int Decode)
       if (strcmp(buf, FLAC_FCC_LABEL) == 0)
     	{
 	  delete buf;
-	  return true;	
+	  return true;
     	}
     }
   delete buf;
@@ -107,7 +107,7 @@ int WiredLibFlac::encode(float** pcm)
 
 //       if (write(fd, (void*)pcm,  size) <= 0)
 // 	cout << "rien" << endl;
-      
+
 //     }
 //   close(fd);
 //   cout << "--AND WRITE--" << endl;
@@ -115,7 +115,7 @@ int WiredLibFlac::encode(float** pcm)
 
 
 bool test_decoders(t_Pcm *OriginalPcm)
-{ 
+{
 }
 
 bool WiredLibFlac::LoadSymbol()
@@ -245,7 +245,7 @@ bool WiredLibFlac::LoadSymbol()
 
 int	WiredLibFlac::EndDecode()
 {
-  
+
 }
 
 int WiredLibFlac::decode(const char *path, t_Pcm *pcm, unsigned long length)
@@ -254,9 +254,9 @@ int WiredLibFlac::decode(const char *path, t_Pcm *pcm, unsigned long length)
   if (Pass != 1)
     {
       flacfilename_ = path;
-      
+
       decoder = FileDecoderNew();
-      
+
       if (FileDecoderSetMd5Checking(decoder, false) == false)
 	{
 	  cout << "[WIRED_FLAC_CODEC] md5 doesn t match" <<endl;
@@ -271,7 +271,7 @@ int WiredLibFlac::decode(const char *path, t_Pcm *pcm, unsigned long length)
 	{
 	  cout << "[WIRED_FLAC_CODEC] Can t set decoder client data" <<endl;
 	  return 0;
-	}  
+	}
 //       if (FileDecoderSetWriteCallback(decoder, frame, buffer, client_data))
 // 	{
 // 	  cout << "[WIRED_FLAC_CODEC] Can t set decoder write callback" <<endl;

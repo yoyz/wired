@@ -11,8 +11,10 @@
 #include "config.h"
 
 #include <list>
-
+#include <vector>
 #include "WiredPlugin.h"
+#include "Sequencer.h"
+
 
 class WiredPlugin;
 
@@ -32,8 +34,8 @@ class	WiredCorePlugins
 
  public:
 
-  WiredCorePlugins::WiredCorePlugins();
-  WiredCorePlugins::~WiredCorePlugins();
+  WiredCorePlugins();
+  ~WiredCorePlugins();
 
 
   /**
@@ -126,7 +128,7 @@ class	WiredCorePlugins
    */
 
   void		AddMidiPattern(WiredPlugin *plug,
-			       list<SeqCreateEvent*> midi);
+			       std::list<SeqCreateEvent*> midi);
 
 
   void		ShowMidiController(WiredPlugin *plug);

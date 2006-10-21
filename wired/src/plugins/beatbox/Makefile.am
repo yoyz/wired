@@ -11,7 +11,7 @@ endif
 lib_LTLIBRARIES = libWiredBeatBox.la
 
 noinst_HEADERS =			\
-		BeatBox.h		\ 
+		BeatBox.h		\
 		BeatButton.h		\
 		BeatBoxChannel.h	\
 		BeatBoxView.h		\

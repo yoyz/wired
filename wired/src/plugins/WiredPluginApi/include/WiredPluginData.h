@@ -6,22 +6,23 @@
    #include <wx/wx.h>
 #endif
 
-#include "WiredDocument.h"
+//#include "WiredDocument.h"
 
-class WiredDocument;
+
+//class WiredDocument;
 
 /**
  * WiredPluginData implements the WiredDocument class
  */
-class WiredPluginData : public WiredDocument
+class WiredPluginData //: public WiredDocument
 {
 public:
   WiredPluginData() {};
   ~WiredPluginData() {};
 
   //From WiredDocument
-  //virtual void	 Load(WiredPluginData& Datas) {}
-  //virtual void	 Save(WiredPluginData& Datas) {}
+  void	 Load(WiredPluginData& Datas) {}
+  void	 Save(WiredPluginData& Datas) {}
 
 };
 
