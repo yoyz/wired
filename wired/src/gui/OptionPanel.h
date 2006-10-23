@@ -45,7 +45,7 @@ class				EditMidi;
 class				DownButton;
 class				AudioPattern;
 class				MidiPattern;
-class				Plugin;
+class				WiredPlugin;
 
 class				WiredFrame: public wxFrame
 {
@@ -60,7 +60,7 @@ class				WiredFrame: public wxFrame
  public:
   WiredFrame(WiredTool *t, wxString s) :
     wxFrame(0x0, -1, s, wxDefaultPosition, wxSize(400, 200)),
-    Tool(t) 
+    Tool(t)
     {
       em = NULL;
       Connect(GetId(), wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)(wxEventFunction)
@@ -98,16 +98,16 @@ class OptionPanel : public wxPanel
 
   void				AddAudioTool(AudioPattern *p);
   void				AddMidiTool(MidiPattern *p);
-  void				AddPlugTool(Plugin *p);
+  void				AddPlugTool(WiredPlugin *p);
 
   void				ShowTool(WiredTool *t);
   void				ShowWave(AudioPattern *p);
   void				ShowMidi(MidiPattern *p);
-  void				ShowPlug(Plugin *p);
+  void				ShowPlug(WiredPlugin *p);
   void				ShowHelp();
   void				ShowLastTool();
 
-  void				ClosePlug(Plugin *p);
+  void				ClosePlug(WiredPlugin *p);
   void				DeleteTools();
   void				DeleteTools(void *DataPointer);		//Delete tool(s) associated with some data, for example delete editor for a pattern
 

@@ -12,7 +12,7 @@ WiredPluginStartInfo::~WiredPluginStartInfo()
 }
 
 
-WiredCorePlugins	WiredPluginStartInfo::GetCore()
+WiredCorePlugins*	WiredPluginStartInfo::GetCore()
 {
   return _Core;
 }

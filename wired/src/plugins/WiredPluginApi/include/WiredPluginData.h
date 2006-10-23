@@ -21,8 +21,8 @@ public:
   ~WiredPluginData() {};
 
   //From WiredDocument
-  void	 Load(WiredPluginData& Datas) {}
-  void	 Save(WiredPluginData& Datas) {}
+  void	 Load(WiredPluginData& Datas);
+  void	 Save(WiredPluginData& Datas);
 
 };
 

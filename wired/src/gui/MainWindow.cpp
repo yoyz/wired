@@ -66,7 +66,7 @@ SettingWindow		*SettingsWin = NULL;
 wxMutex			AudioMutex;
 wxCondition		*SeqStopped = NULL;
 
-MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size)
+MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& size)
   : wxFrame((wxFrame *) NULL, -1, title, pos, size,
 	    wxDEFAULT_FRAME_STYLE | wxWS_EX_PROCESS_IDLE)
 {
@@ -86,7 +86,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
     {
       Audio = new AudioEngine();
     }
-  catch (Error::InitFailure &f)
+  catch (Error::InitFailure& f)
     {
       cout << "[MAINWIN] Portaudio Failure :" << f.getMsg().mb_str() << endl;
       // FIXME: find a cleaner solution
@@ -380,7 +380,7 @@ int			MainWindow::InitAudio(bool restart)
     {
       cout << "[MAINWIN] oom" << endl;
     }
-  catch (std::exception &e)
+  catch (std::exception& e)
     {
       cout << "[MAINWIN] Stdlib failure (" << e.what() <<
 	")during AudioEngine init, check your code" << endl;
@@ -511,7 +511,7 @@ void					MainWindow::InitVideoMenuItems()
   VideoMenu->Enable(MainWin_CloseVideo, false);
 }
 
-void					MainWindow::OnClose(wxCloseEvent &event)
+void					MainWindow::OnClose(wxCloseEvent& event)
 {
   vector<RackTrack *>::iterator		i;
   vector<WiredPlugin *>::iterator	j;
@@ -616,12 +616,12 @@ void					MainWindow::OnClose(wxCloseEvent &event)
   exit(1);
 }
 
-void					MainWindow::OnQuit(wxCommandEvent &WXUNUSED(event))
+void					MainWindow::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
   Close(false);
 }
 
-void					MainWindow::OnNew(wxCommandEvent &event)
+void					MainWindow::OnNew(wxCommandEvent& event)
 {
   NewSession();
 }
@@ -662,7 +662,7 @@ bool					MainWindow::NewSession()
   return (true);
 }
 
-void					MainWindow::OnOpen(wxCommandEvent &event)
+void					MainWindow::OnOpen(wxCommandEvent& event)
 {
   vector<wxString>			exts;
 
@@ -703,7 +703,7 @@ void					MainWindow::OnOpen(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnSave(wxCommandEvent &event)
+void					MainWindow::OnSave(wxCommandEvent& event)
 {
   if (CurrentXmlSession)
     {
@@ -717,7 +717,7 @@ void					MainWindow::OnSave(wxCommandEvent &event)
     OnSaveAs(event);
 }
 
-void					MainWindow::OnSaveAs(wxCommandEvent &event)
+void					MainWindow::OnSaveAs(wxCommandEvent& event)
 {
   vector<wxString>			exts;
 
@@ -751,7 +751,7 @@ void					MainWindow::OnSaveAs(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnImportWave(wxCommandEvent &event)
+void					MainWindow::OnImportWave(wxCommandEvent& event)
 {
   FileLoader				dlg(this, MainWin_FileLoader, _("Loading sound file"), false, false, FileConverter->GetCodecsExtensions(), true);
   int						res;
@@ -788,7 +788,7 @@ void					MainWindow::OnImportWave(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnImportMIDI(wxCommandEvent &event)
+void					MainWindow::OnImportMIDI(wxCommandEvent& event)
 {
   vector<wxString>			exts;
 
@@ -831,7 +831,7 @@ void					MainWindow::OnImportMIDI(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnImportAKAI(wxCommandEvent &event)
+void					MainWindow::OnImportAKAI(wxCommandEvent& event)
 {
   //TransportPanel->OnStop(event);
   FileLoader				dlg(this, MainWin_FileLoader, _("Import AKAI samples"), true, false, NULL);
@@ -887,7 +887,7 @@ void					MainWindow::OnImportAKAI(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnExportWave(wxCommandEvent &event)
+void					MainWindow::OnExportWave(wxCommandEvent& event)
 {
   //  TransportPanel->OnStop(event);
   double total = Seq->EndLoopPos - Seq->BeginLoopPos;
@@ -935,7 +935,7 @@ void					MainWindow::OnExportWave(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnExportMIDI(wxCommandEvent &event)
+void					MainWindow::OnExportMIDI(wxCommandEvent& event)
 {
   vector<wxString>			exts;
 
@@ -1104,7 +1104,7 @@ void					MainWindow::OnCreateExternalPlugin(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnCreateRackClick(wxCommandEvent &event)
+void					MainWindow::OnCreateRackClick(wxCommandEvent& event)
 {
   int					id = event.GetId();
   vector<PluginLoader *>::iterator	i;
@@ -1124,7 +1124,7 @@ void					MainWindow::OnCreateRackClick(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnCreateEffectClick(wxCommandEvent &event)
+void					MainWindow::OnCreateEffectClick(wxCommandEvent& event)
 {
   int					id = event.GetId();
   vector<PluginLoader *>::iterator	i;
@@ -1144,7 +1144,7 @@ void					MainWindow::OnCreateEffectClick(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnDeleteRack(wxCommandEvent &event)
+void					MainWindow::OnDeleteRack(wxCommandEvent& event)
 {
   vector<PluginLoader *>::iterator	k;
 
@@ -1160,7 +1160,7 @@ void					MainWindow::OnDeleteRack(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnAddTrackAudio(wxCommandEvent &event)
+void					MainWindow::OnAddTrackAudio(wxCommandEvent& event)
 {
   //cAddTrackAction			*action = new cAddTrackAction(true);
 
@@ -1169,7 +1169,7 @@ void					MainWindow::OnAddTrackAudio(wxCommandEvent &event)
   SeqPanel->AddTrack(true);
 }
 
-void					MainWindow::OnAddTrackMidi(wxCommandEvent &event)
+void					MainWindow::OnAddTrackMidi(wxCommandEvent& event)
 {
   //cAddTrackAction			*action = new cAddTrackAction(false);
 
@@ -1178,7 +1178,7 @@ void					MainWindow::OnAddTrackMidi(wxCommandEvent &event)
   SeqPanel->AddTrack(false);
 }
 
-void					MainWindow::OnFloatTransport(wxCommandEvent &event)
+void					MainWindow::OnFloatTransport(wxCommandEvent& event)
 {
   if (WindowMenu->IsChecked(MainWin_FloatTransport))
     {
@@ -1204,7 +1204,7 @@ void					MainWindow::OnFloatTransport(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnFloatSequencer(wxCommandEvent &event)
+void					MainWindow::OnFloatSequencer(wxCommandEvent& event)
 {
   if (WindowMenu->IsChecked(MainWin_FloatSequencer))
     {
@@ -1247,7 +1247,7 @@ void					MainWindow::OnFloatSequencer(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnFloatRack(wxCommandEvent &event)
+void					MainWindow::OnFloatRack(wxCommandEvent& event)
 {
   if (WindowMenu->IsChecked(MainWin_FloatRacks))
     {
@@ -1355,7 +1355,7 @@ void					MainWindow::ShowMediaLibrary(panelState show)
     }
 }
 
-void					MainWindow::OnFloatMediaLibrary(wxCommandEvent &event)
+void					MainWindow::OnFloatMediaLibrary(wxCommandEvent& event)
 {
   if (MediaLibraryMenu->IsChecked(MainWin_FloatMediaLibrary))
     ShowMediaLibrary(panelShowInWindow);
@@ -1364,23 +1364,23 @@ void					MainWindow::OnFloatMediaLibrary(wxCommandEvent &event)
 }
 
 // must be called only when medialibrary is docked
-void					MainWindow::MediaLibraryShow(wxCommandEvent &event)
+void					MainWindow::MediaLibraryShow(wxCommandEvent& event)
 {
   ShowMediaLibrary(panelShow);
 }
 
 // must be called only when medialibrary is docked
-void					MainWindow::MediaLibraryHide(wxCommandEvent &event)
+void					MainWindow::MediaLibraryHide(wxCommandEvent& event)
 {
   ShowMediaLibrary(panelHide);
 }
 
-void					MainWindow::OnSwitchRackOptViewEvent(wxCommandEvent &event)
+void					MainWindow::OnSwitchRackOptViewEvent(wxCommandEvent& event)
 {
   SwitchRackOptView();
 }
 
-void					MainWindow::OnSwitchSeqOptViewEvent(wxCommandEvent &event)
+void					MainWindow::OnSwitchSeqOptViewEvent(wxCommandEvent& event)
 {
   SwitchSeqOptView();
 }
@@ -1489,7 +1489,7 @@ void					MainWindow::SwitchSeqOptView()
   SeqModeView = !SeqModeView;
 }
 
-void					MainWindow::OnSettings(wxCommandEvent &event)
+void					MainWindow::OnSettings(wxCommandEvent& event)
 {
   vector<Track *>::iterator		i;
 
@@ -1520,7 +1520,7 @@ void					MainWindow::AlertDialog(const wxString& from, const wxString& msg)
   mdialog.ShowModal();
 }
 
-void					MainWindow::OnOpenVideo(wxCommandEvent &event)
+void					MainWindow::OnOpenVideo(wxCommandEvent& event)
 {
   WiredVideoObject->OpenFile();
   if (WiredVideoObject->asFile)
@@ -1530,26 +1530,26 @@ void					MainWindow::OnOpenVideo(wxCommandEvent &event)
     }
 }
 
-void					MainWindow::OnCloseVideo(wxCommandEvent &event)
+void					MainWindow::OnCloseVideo(wxCommandEvent& event)
 {
   WiredVideoObject->CloseFile();
   VideoMenu->Enable(MainWin_OpenVideo, true);
   VideoMenu->Enable(MainWin_CloseVideo, false);
 }
 
-void					MainWindow::OnSeekVideo(wxCommandEvent &event)
+void					MainWindow::OnSeekVideo(wxCommandEvent& event)
 {
   //  WiredVideoObject->SetSeek(VideoMenu->IsChecked(MainWin_SeekVideo));
 }
 
-void					MainWindow::OnDeleteTrack(wxCommandEvent &event)
+void					MainWindow::OnDeleteTrack(wxCommandEvent& event)
 {
   SeqPanel->DeleteSelectedTrack();
   /* Needs path in AudioPattern */
   //cActionManager::Global().AddImportWaveAction(selfile, true, false);
 }
 
-void					MainWindow::OnChangeAudioDir(wxCommandEvent &event)
+void					MainWindow::OnChangeAudioDir(wxCommandEvent& event)
 {
   assert(CurrentXmlSession);
 
@@ -1560,7 +1560,7 @@ void					MainWindow::OnChangeAudioDir(wxCommandEvent &event)
     CurrentXmlSession->GetAudioDir() = dir.GetPath().c_str();
 }
 
-void					MainWindow::OnUndo(wxCommandEvent &event)
+void					MainWindow::OnUndo(wxCommandEvent& event)
 {
   wxMenuItemList					listItems;
   wxMenuItemList::const_iterator	iter;
@@ -1576,7 +1576,7 @@ void					MainWindow::OnUndo(wxCommandEvent &event)
   CreateUndoRedoMenus(EditMenu);
 }
 
-void					MainWindow::OnRedo(wxCommandEvent &event)
+void					MainWindow::OnRedo(wxCommandEvent& event)
 {
   wxMenuItemList					listItems;
   wxMenuItemList::const_iterator	iter;
@@ -1643,37 +1643,37 @@ void					MainWindow::CreateUndoRedoMenus(wxMenu *callingMenu)
   callingMenu->Enable(MainWin_Redo, redoMenu->GetMenuItemCount() > 0);
 }
 
-void					MainWindow::OnCut(wxCommandEvent &event)
+void					MainWindow::OnCut(wxCommandEvent& event)
 {
   SeqPanel->OnCut(event);
 }
 
-void					MainWindow::OnCopy(wxCommandEvent &event)
+void					MainWindow::OnCopy(wxCommandEvent& event)
 {
   SeqPanel->OnCopy(event);
 }
 
-void					MainWindow::OnPaste(wxCommandEvent &event)
+void					MainWindow::OnPaste(wxCommandEvent& event)
 {
   SeqPanel->OnPaste(event);
 }
 
-void					MainWindow::OnDelete(wxCommandEvent &event)
+void					MainWindow::OnDelete(wxCommandEvent& event)
 {
   SeqPanel->OnDeleteClick(event);
 }
 
-void					MainWindow::OnSelectAll(wxCommandEvent &event)
+void					MainWindow::OnSelectAll(wxCommandEvent& event)
 {
   SeqPanel->OnSelectAll(event);
 }
 
-void					MainWindow::OnFullScreen(wxCommandEvent &event)
+void					MainWindow::OnFullScreen(wxCommandEvent& event)
 {
   ShowFullScreen(!IsFullScreen(), wxFULLSCREEN_NOBORDER|wxFULLSCREEN_NOCAPTION );
 }
 
-void					MainWindow::OnAbout(wxCommandEvent &event)
+void					MainWindow::OnAbout(wxCommandEvent& event)
 {
   wxBitmap aboutbtm;
   if (aboutbtm.LoadFile(wxString(WiredSettings->DataDir +
@@ -1703,7 +1703,7 @@ void					MainWindow::OnSpaceKey()
     }
 }
 
-void					MainWindow::OnTimer(wxTimerEvent &event)
+void					MainWindow::OnTimer(wxTimerEvent& event)
 {
   wxCommandEvent			commandEvt;
   CursorEvent				cursorEvt;
@@ -1757,24 +1757,24 @@ void					MainWindow::AddUpdatePlugin(Plugin *p)
   UpdatePlugins.push_back(p);
 }
 
-void					MainWindow::OnFileLoaderStart(wxCommandEvent &event)
+void					MainWindow::OnFileLoaderStart(wxCommandEvent& event)
 {
   FileLoader				*f = (FileLoader *)event.GetEventObject();
 
   Seq->PlayFile(f->GetSelectedFile(), f->IsAkai());
 }
 
-void					MainWindow::OnFileLoaderStop(wxCommandEvent &event)
+void					MainWindow::OnFileLoaderStop(wxCommandEvent& event)
 {
   Seq->StopFile();
 }
 
-void					MainWindow::OnIntegratedHelp(wxCommandEvent &event)
+void					MainWindow::OnIntegratedHelp(wxCommandEvent& event)
 {
   OptPanel->ShowHelp();
 }
 
-void                  MainWindow::OnShowDebug(wxCommandEvent &event)
+void                  MainWindow::OnShowDebug(wxCommandEvent& event)
 {
    if(WindowMenu->IsChecked(MainWin_ShowLog))
      {
@@ -1786,13 +1786,13 @@ void                  MainWindow::OnShowDebug(wxCommandEvent &event)
      }
 }
 
-void					MainWindow::OnKillTimer(wxTimerEvent &WXUNUSED(event))
+void					MainWindow::OnKillTimer(wxTimerEvent& WXUNUSED(event))
 {
   cout << "[MAINWIN] Killing Threads" << endl;
   exit (0);
 }
 
-void					MainWindow::OnIdle(wxIdleEvent &WXUNUSED(event))
+void					MainWindow::OnIdle(wxIdleEvent& WXUNUSED(event))
 {
 #if wxUSE_STATUSBAR
   wxLogNull NoLog;

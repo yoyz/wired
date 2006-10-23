@@ -1,4 +1,4 @@
-LDFLAGS = $(shell wx-config --libs) -L../../../libs/WiredWidgets/src/.libs/ -lWiredWidgets -L../../../libs/WiredAkai/src/.libs/ -lWiredAkai -L../../../libs/WiredAkai/src/.libs/ -lWiredAudioUtilities
+LDFLAGS = $(shell wx-config --libs) -L../../../libs/WiredWidgets/src/.libs/ -lWiredWidgets -L../../../libs/WiredAkai/src/.libs/ -lWiredAkai -L../../../libs/WiredAudioUtilities//src/.libs/ -lWiredAudioUtilities
 
 CPPFLAGS = $(shell wx-config --cflags) -I../../../libs/WiredWidgets/include -I../../../libs/WiredAkai/include -I../../../libs/WiredAudioUtilities/include -I../../../gui -I../../../fileloader -I../../../audio -I../../../sequencer -I../../../engine -I../../../mixer -I../../../midi -I../../../midi/portmidi/pm_common -I../../../midi/portmidi/porttime -I../../../asm -I../../../editmidi -I../../../undo -I../include
 

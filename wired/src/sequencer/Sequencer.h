@@ -21,7 +21,7 @@ typedef struct WiredPluginSeqCreateEvent		SeqCreateEvent;
 typedef int				MidiType;
 class					Channel;
 class					Track;
-class					Plugin;
+class					WiredPlugin;
 class					Track;
 class					Pattern;
 class					AudioPattern;
@@ -72,7 +72,7 @@ class Sequencer : public wxThread
   void					RemoveTrack();
   void					AddMidiEvent(int id, MidiType midi_msg[3]);
   void					AddMidiPattern(list<SeqCreateEvent *> *l,
-						       Plugin *plug);
+						       WiredPlugin *plug);
   void					AddNote(Track *t, MidiEvent &event);
   void					SetBPM(float bpm);
   void					SetSigNumerator(int signum);

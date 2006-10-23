@@ -1,9 +1,6 @@
 #ifndef __WIREDPLUGINSTARTINFO_H__
 #define __WIREDPLUGINSTARTINFO_H__
 
-#include "WiredCorePlugins.h"
-#include "WiredPlugin.h"
-//#include "WiredPluginMgr.h"
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -33,6 +30,7 @@ class	WiredPluginStartInfo
   friend class WiredPlugin;
   friend class WiredPluginGui;
   friend class WiredPluginAudio;
+  friend class WiredCorePlugins;
 
  private:
   WiredCorePlugins*	_Core;

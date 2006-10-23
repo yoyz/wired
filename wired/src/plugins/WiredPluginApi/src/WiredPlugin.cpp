@@ -3,13 +3,14 @@
 
 #include "WiredPlugin.h"
 
+#include "WiredCorePlugins.h"
+
 using namespace std;
 
 /* DO NOT MODIFY THIS FILE FOR MAKING A PLUGIN. JUST DERIVE FROM THAT CLASS */
 
-WiredPlugin::WiredPlugin(WiredPluginStartInfo* start)
-  : wxWindow(start.Rack, -1, start.Pos, start.Size)
-{
+//WiredPlugin::WiredPlugin(WiredPluginStartInfo* start) : wxWindow(start->Rack, -1, start->Pos, start->Size)
+//{
 //   if (InitInfo)
 //   	InitInfo->UniqueExternalId = 0;
 //   Connect(wxID_ANY, wxEVT_KEY_DOWN, (wxObjectEventFunction)(wxEventFunction)
@@ -26,9 +27,69 @@ WiredPlugin::WiredPlugin(WiredPluginStartInfo* start)
 // 	 &Plugin::OnMouseEvent);
 //   //  Connect(wxID_ANY, wxEVT_PAINT, (wxObjectEventFunction)(wxEventFunction)
 //   //	 &Plugin::OnPaintEvent);
-}
+//}
 
 WiredPlugin::~WiredPlugin()
 {
   CloseOptionalView();
+}
+
+
+WiredPluginStartInfo*	WiredPlugin::GetStartInfo()
+{
+  return _StartInfo;
+}
+
+
+/* Ask the host application to call Update() whenever the main thread can process gui calls  */
+void	 WiredPlugin::UpdatePluginGui()
+{
+  _StartInfo->GetCore()->UpdatePluginGui(this);
+}
+
+
+
+/* Used to know if a keyboard event occured. No need to overload */
+void	 WiredPlugin::OnKeyEvent(wxKeyEvent* event)
+{
+  _StartInfo->GetCore()->SendKeyEvent(this, event);
+}
+
+/* Used to know if a mouse event occured. No need to overload */
+void	WiredPlugin::OnMouseEvent(wxMouseEvent* event)
+{
+  _StartInfo->GetCore()->SendMouseEvent(this, event);
+}
+
+/* Used to know if a paint event occured. No need to overload */
+void	 WiredPlugin::OnPaintEvent(wxPaintEvent* event)
+{
+  _StartInfo->GetCore()->SendPaintEvent(this, event);
+}
+
+bool	 WiredPlugin::ShowMidiController()
+{
+  _StartInfo->GetCore()->ShowMidiController(this);
+  if (_StartInfo->GetCore()->GetLastMidiType() == -1)
+    return false;
+  return true;
+}
+
+/* Shows plugin's optional view */
+void	 WiredPlugin::ShowOptionalView()
+{
+  _StartInfo->GetCore()->ShowOptionalView(this);
+}
+
+/* Closes plugin's optional view */
+void	 WiredPlugin::CloseOptionalView()
+{
+  _StartInfo->GetCore()->CloseOptionalView(this);
+}
+
+// Sequencer events
+/* Create a MIDI pattern containing a list of event in the host's sequencer */
+void	WiredPlugin::AddMidiPattern(std::list<SeqCreateEvent *>* midi)
+{
+  _StartInfo->GetCore()->AddMidiPattern(this, midi);
 }

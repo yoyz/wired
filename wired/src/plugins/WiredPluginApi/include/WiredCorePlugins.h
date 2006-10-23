@@ -12,11 +12,21 @@
 
 #include <list>
 #include <vector>
-#include "WiredPlugin.h"
 #include "Sequencer.h"
+#include "Rack.h"
+#include "MainWindow.h"
+#include "FileLoader.h"
+#include "HelpPanel.h"
+#include "HelpCtrl.h"
+#include "OptionPanel.h"
+#include "MidiThread.h"
+#include "MidiController.h"
+#include "MidiThread.h"
 
 
 class WiredPlugin;
+
+
 
 class	WiredCorePlugins
 {
@@ -41,16 +51,16 @@ class	WiredCorePlugins
   /**
    * Event related
    */
-  void		SendMouseEvent(WiredPlugin *plug, wxMouseEvent *event);
+  void		SendMouseEvent(WiredPlugin* plugin, wxMouseEvent* event);
 
 
-  void		SendKeyEvent(WiredPlugin *plug, wxKeyEvent *event);
+  void		SendKeyEvent(WiredPlugin* plugin, wxKeyEvent* event);
 
 
-  void		SendPaintEvent(WiredPlugin *plug, wxPaintEvent *event);
+  void		SendPaintEvent(WiredPlugin* plugin, wxPaintEvent* event);
 
 
-  void		UpdatePluginGui(WiredPlugin *plug);
+  void		UpdatePluginGui(WiredPlugin* plugin);
 
 
   /**
@@ -79,7 +89,7 @@ class	WiredCorePlugins
   // double		GetSamplingRate();
   //
 
-  float		GetBPM();
+  float		GetBpm();
 
 
   int		GetSigDenominator();
@@ -118,20 +128,20 @@ class	WiredCorePlugins
   void		SendHelp(wxString& value);
 
 
-  void		ShowOptionalView(WiredPlugin *plug);
+  void		ShowOptionalView(WiredPlugin* plugin);
 
 
-  void		CloseOptionalView(WiredPlugin *plug);
+  void		CloseOptionalView(WiredPlugin* plugin);
 
   /**
    * Midi related
    */
 
-  void		AddMidiPattern(WiredPlugin *plug,
-			       std::list<SeqCreateEvent*> midi);
+  void		AddMidiPattern(WiredPlugin* plugin,
+			       std::list<SeqCreateEvent*>* midi);
 
 
-  void		ShowMidiController(WiredPlugin *plug);
+  void		ShowMidiController(WiredPlugin* plugin);
 
 
   int		GetLastMidiType();

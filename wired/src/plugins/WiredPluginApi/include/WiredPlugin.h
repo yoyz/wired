@@ -28,15 +28,45 @@ class WiredPluginData;
 #define WIRED_CURRENT_VERSION_API (2)
 
 
-class		WiredPlugin : public WiredPluginGui, public WiredPluginAudio, public WiredPluginData
+class		WiredPlugin : public wxWindow, public WiredPluginGui, public WiredPluginAudio, public WiredPluginData
 {
+  friend class WiredCorePlugins;
+
  private:
   WiredPluginStartInfo*	_StartInfo;
 
+  WiredPluginStartInfo*	GetStartInfo();
+
+
  public:
-  WiredPlugin(WiredPluginStartInfo* parent)
-    { _StartInfo = parent; } : WiredPluginGui(parent) : WiredPluginAudio(parent);
+ WiredPlugin(WiredPluginStartInfo* parent) : wxWindow(parent->GetRack(), -1, parent->GetPos(), parent->GetSize()),
+    WiredPluginGui(parent),
+    WiredPluginAudio(parent)
+    { _StartInfo = parent; };
   ~WiredPlugin();
+
+
+  /*Gui part*/
+  /* Ask the host application to call Update() whenever the main thread can process gui calls  */
+  void	 UpdatePluginGui();
+
+  /*Audio part*/
+  /* Used to know if a keyboard event occured. No need to overload */
+  virtual void	OnKeyEvent(wxKeyEvent* event);
+  /* Used to know if a mouse event occured. No need to overload */
+  virtual void  OnMouseEvent(wxMouseEvent* event);
+  /* Used to know if a paint event occured. No need to overload */
+  virtual void  OnPaintEvent(wxPaintEvent* event);
+  // User interface events
+  bool ShowMidiController();
+ /* Shows plugin's optional view */
+  void ShowOptionalView();
+  /* Closes plugin's optional view */
+  void CloseOptionalView();
+  // Sequencer events
+  /* Create a MIDI pattern containing a list of event in the host's sequencer */
+  void	AddMidiPattern(std::list<SeqCreateEvent *>* midi);
+
 };
 
 #endif // __WIREDPLUGIN_H__

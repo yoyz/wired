@@ -5,8 +5,7 @@ CPPFLAGS = $(shell wx-config --cflags) -I../../../gui -I../../../plugins/WiredPl
 lib_LTLIBRARIES = libWiredAudioUtilities.la
 
 instdir = $(includedir)
-inst_HEADERS =				\
-		WiredAudioUtilities.h
+inst_HEADERS =
 
 
 libWiredAudioUtilities_la_SOURCES =

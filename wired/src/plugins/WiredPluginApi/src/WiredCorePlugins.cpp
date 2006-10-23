@@ -11,34 +11,34 @@ WiredCorePlugins::~WiredCorePlugins()
 
 }
 
-void		WiredCorePlugins::SendMouseEvent(WiredPlugin *plug, wxMouseEvent *event)
+void		WiredCorePlugins::SendMouseEvent(WiredPlugin* plugin, wxMouseEvent* event)
 {
-  RackPanel->HandleMouseEvent(plug, event);
+  RackPanel->HandleMouseEvent(plugin, event);
 }
 
-void		WiredCorePlugins::SendKeyEvent(WiredPlugin *plug, wxKeyEvent *event)
+void		WiredCorePlugins::SendKeyEvent(WiredPlugin* plugin, wxKeyEvent* event)
 {
-  RackPanel->HandleKeyEvent(plug, event);
+  RackPanel->HandleKeyEvent(plugin, event);
 }
 
-void		WiredCorePlugins::SendPaintEvent(WiredPlugin *plug, wxPaintEvent *event)
+void		WiredCorePlugins::SendPaintEvent(WiredPlugin* plugin, wxPaintEvent* event)
 {
-  RackPanel->HandlePaintEvent(plug, event);
+  RackPanel->HandlePaintEvent(plugin, event);
 }
 
-void		WiredCorePlugins::UpdatePluginGui(WiredPlugin *plug)
+void		WiredCorePlugins::UpdatePluginGui(WiredPlugin* plugin)
 {
-  MainWin->AddUpdatePlugin(plug);
+  MainWin->AddUpdatePlugin(plugin);
 }
 
 wxString	WiredCorePlugins::GetProductName()
 {
-  return (wxT(WIRED_NAME));
+  return (wxT(PACKAGE));
 }
 
 wxString	WiredCorePlugins::GetProductVersion()
 {
-  return (wxT(WIRED_VERSION));
+  return (wxT(PACKAGE_VERSION));
 }
 
 // long		WiredCorePlugins::GetBufferSize()
@@ -46,12 +46,12 @@ wxString	WiredCorePlugins::GetProductVersion()
 
 // }
 
-// double		WiredCorePlugins::GetSamplingRate()
+// double	WiredCorePlugins::GetSamplingRate()
 // {
 
 // }
 
-float		WiredCorePlugins::GetBPM()
+float		WiredCorePlugins::GetBpm()
 {
   return (Seq->BPM);
 }
@@ -105,7 +105,7 @@ wxString	WiredCorePlugins::OpenFileLoader(wxString& title,
 }
 
 wxString	WiredCorePlugins::SaveFileLoader(wxString& title,
-						 std::vector<wxString>& extensions,
+						 std::vector<wxString>* extensions,
 						 bool addExts)
 {
   wxString	selected;
@@ -127,30 +127,30 @@ void		WiredCorePlugins::SendHelp(wxString& value)
     HelpWin->Help->Load_Text(value);
 }
 
-void		WiredCorePlugins::ShowOptionalView(WiredPlugin *plug)
+void		WiredCorePlugins::ShowOptionalView(WiredPlugin* plugin)
 {
-  OptPanel->ShowPlug(plug);
+  OptPanel->ShowPlug(plugin);
 }
 
-void		WiredCorePlugins::CloseOptionalView(WiredPlugin *plug)
+void		WiredCorePlugins::CloseOptionalView(WiredPlugin* plugin)
 {
-  OptPanel->ClosePlug(plug);
+  OptPanel->ClosePlug(plugin);
 
 }
 
-void		WiredCorePlugins::AddMidiPattern(WiredPlugin *plug,
-						 list<SeqCreateEvent*>& midi)
+void		WiredCorePlugins::AddMidiPattern(WiredPlugin* plugin,
+						 list<SeqCreateEvent*>* midi)
 {
-  Seq->AddMidiPattern(midi, plug);
+  Seq->AddMidiPattern(midi, plugin);
 }
 
-void		WiredCorePlugins::ShowMidiController(WiredPlugin *plug)
+void		WiredCorePlugins::ShowMidiController(WiredPlugin* plugin)
 {
   MidiController*	Controller;
 
   // lock mutex
   MidiMutex.Lock();
-  Controller = new MidiController(plug)
+  Controller = new MidiController(plugin->GetStartInfo()->GetRack());
   MidiMutex.Unlock();
 
   // get information from user and stock them

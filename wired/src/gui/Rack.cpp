@@ -17,10 +17,10 @@
 #include			"Sequencer.h"
 #include			"Mixer.h"
 #include			"WiredPlugin.h"
-#include			"../plugins/PluginLoader.h"
+#include			"PluginLoader.h"
 
 extern wxMutex		SeqMutex;
-int					RackCount = 0;
+int			RackCount = 0;
 
 
 /********************   Class RackTrack   ********************/
@@ -55,11 +55,11 @@ void				RackTrack::RemoveChannel()
   Mix->RemoveChannel(Output);
 }
 
-Plugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, Plugin *connect_to)
+WiredPlugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, WiredPlugin *connect_to)
 {
   int xx, yy, xpos, ypos;
   static int num = 31000;
-  Plugin *plug;
+  WiredPlugin *plug;
 
   xpos = Parent->GetXPos(Index);
   ypos = GetYPos();
@@ -103,7 +103,7 @@ Plugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, Plugin 
 void				RackTrack::RemoveRack()
 {
 	//Dump();
-	Plugin* plugin = Racks.back();
+	WiredPlugin* plugin = Racks.back();
 	Racks.pop_back();
   	//Dump();
 	plugin->Hide();
@@ -115,7 +115,7 @@ void				RackTrack::RemoveRack()
 
 void				RackTrack::DeleteAllRacks()
 {
-  list<Plugin *>::iterator j;
+  list<WiredPlugin *>::iterator j;
 
   for (j = Racks.begin(); j != Racks.end(); j++)
     {
@@ -130,7 +130,7 @@ void				RackTrack::DeleteAllRacks()
 int					RackTrack::GetYPos()
 {
   int u = 0;
-  list<Plugin *>::iterator i;
+  list<WiredPlugin *>::iterator i;
 
   for (i = Racks.begin(); i != Racks.end(); i++)
     u += (*i)->InitInfo->UnitsY;
@@ -167,7 +167,7 @@ void				RackTrack::Dump()
 
 void				RackTrack::DumpPlugins()
 {
-	list<Plugin *>::iterator iterRack;
+	list<WiredPlugin *>::iterator iterRack;
 
 	for (iterRack = Racks.begin(); iterRack != Racks.end(); iterRack++)
 	{
@@ -206,7 +206,7 @@ Rack::~Rack()
   t_ListRackTrack		RackTracks;
 
   RackTrack*			selectedTrack;
-  Plugin*				selectedPlugin;
+  WiredPlugin*				selectedPlugin;
 
   if (tmpFile.IsOpened())
     {
@@ -267,7 +267,7 @@ t_RackTrackPlugin*	Rack::AddRackAndChannel(PlugStartInfo &startinfo, PluginLoade
 {
 	t_RackTrackPlugin	*result;
 	RackTrack			*t;
-	Plugin				*tmp;
+	WiredPlugin				*tmp;
 
 	result = new t_RackTrackPlugin();
 	t = new RackTrack(this, RackTracks.size());
@@ -283,7 +283,7 @@ t_RackTrackPlugin*	Rack::AddRackAndChannel(PlugStartInfo &startinfo, PluginLoade
 	return (result);
 }
 
-Plugin*				Rack::AddSelectedRackAndChannel(PlugStartInfo &startinfo, PluginLoader *p)
+WiredPlugin*				Rack::AddSelectedRackAndChannel(PlugStartInfo &startinfo, PluginLoader *p)
 {
 	t_RackTrackPlugin*	rackTrackPlugin;
 
@@ -372,7 +372,7 @@ int					Rack::GetXPos(int index)
 void				Rack::DeleteAllRacks()
 {
   t_ListRackTrack::iterator i;
-  list<Plugin *>::iterator j;
+  list<WiredPlugin *>::iterator j;
 
   /*  while (!RackTracks.empty())
     {
@@ -408,10 +408,10 @@ void				Rack::DeleteAllRacks()
   selectedPlugin = 0x0;
 }
 
-void				Rack::DeleteRack(Plugin *plug)
+void				Rack::DeleteRack(WiredPlugin *plug)
 {
 	t_ListRackTrack::iterator i;
-	list<Plugin *>::iterator j, k;
+	list<WiredPlugin *>::iterator j, k;
 
 	for (i = RackTracks.begin(); i != RackTracks.end(); i++)
 		for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
@@ -439,10 +439,10 @@ void				Rack::DeleteRack(Plugin *plug)
 			}
 }
 
-void				Rack::SetSelected(Plugin *p)
+void				Rack::SetSelected(WiredPlugin *p)
 {
   t_ListRackTrack::iterator i;
-  list<Plugin *>::iterator j;
+  list<WiredPlugin *>::iterator j;
 
   if (!p)
     {
@@ -462,12 +462,12 @@ void				Rack::SetSelected(Plugin *p)
     }
 }
 
-void				Rack::HandleMouseEvent(Plugin *plug, wxMouseEvent *event)
+void				Rack::HandleMouseEvent(WiredPlugin *plug, wxMouseEvent *event)
 {
 	t_ListRackTrack::iterator i;
 	t_ListRackTrack::iterator k;
-	list<Plugin *>::iterator j;
-	list<Plugin *>::iterator l;
+	list<WiredPlugin *>::iterator j;
+	list<WiredPlugin *>::iterator l;
 	new_x = 0;
 	new_y = 0;
 	int tmp_x = 0;
@@ -508,7 +508,7 @@ void				Rack::HandleMouseEvent(Plugin *plug, wxMouseEvent *event)
     	OldX = event->GetPosition().x;
 	    OldY = event->GetPosition().y;
 
-    	Plugin *oldplug = selectedPlugin;
+    	WiredPlugin *oldplug = selectedPlugin;
 	    SetSelected(plug);
 	    if (oldplug)
 			oldplug->Refresh();

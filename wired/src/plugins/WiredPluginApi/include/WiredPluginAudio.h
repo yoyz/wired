@@ -7,7 +7,7 @@
    #include <wx/wx.h>
 #endif
 
-#include "WiredPluginStartInfo.h"
+//#include "WiredPluginStartInfo.h"
 
 class WiredPluginStartInfo;
 
@@ -76,7 +76,11 @@ class		WiredPluginAudio
   double	GetCurrentPos();
 
   /* Called when the plugin receives an event such as MIDI */
-  virtual void	 ProcessEvent(/*WiredEvent &event*/) {}
+  virtual void	 ProcessEvent(/*WiredEvent &event*/) {};
+
+  /* Returns the number of bars per sample */
+  double	GetBarsPerSample();
+
 
 };
 

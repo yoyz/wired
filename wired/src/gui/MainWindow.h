@@ -30,9 +30,9 @@ using namespace std;
 #define INDEX_MENUITEM_UNDO		0
 #define INDEX_MENUITEM_REDO		1
 
-#include	"WiredPlugin.h"
-#include	"../wiredvideo/WiredVideo.h"
-#include        "FloatingFrame.h"
+#include "WiredPlugin.h"
+#include "../wiredvideo/WiredVideo.h"
+#include "FloatingFrame.h"
 
 typedef	struct s_PlugStartInfo		PlugStartInfo;
 class					PluginLoader;
@@ -40,73 +40,73 @@ class					WiredSession;
 class					WiredSessionXml;
 class					MainWindow;
 
-extern MainWindow		*MainWin;
-extern vector<PluginLoader *>	LoadedPluginsList;
+extern MainWindow*		MainWin;
+extern vector<PluginLoader*>	LoadedPluginsList;
 extern PlugStartInfo		StartInfo;
-extern WiredSession		*CurrentSession;
+extern WiredSession*		CurrentSession;
 extern wxMutex		        AudioMutex;
 extern wxCondition*	        SeqStopped;
 
 class					MainWindow: public wxFrame
 {
  public:
-  MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size);
-  void					OnClose(wxCloseEvent &event);
-  void					OnQuit(wxCommandEvent &event);
-  void					OnOpen(wxCommandEvent &event);
-  void					OnNew(wxCommandEvent &event);
-  void					OnSave(wxCommandEvent &event);
-  void					OnSaveAs(wxCommandEvent &event);
-  void					OnImportWave(wxCommandEvent &event);
-  void					OnImportMIDI(wxCommandEvent &event);
-  void					OnImportAKAI(wxCommandEvent &event);
-  void					OnExportWave(wxCommandEvent &event);
-  void					OnExportMIDI(wxCommandEvent &event);
-  void					OnSettings(wxCommandEvent &event);
-  void					OnDeleteRack(wxCommandEvent &event);
-  void					OnAddTrackAudio(wxCommandEvent &event);
-  void					OnAddTrackMidi(wxCommandEvent &event);
-  void					OnDeleteTrack(wxCommandEvent &event);
-  void					OnChangeAudioDir(wxCommandEvent &event);
-  void					OnCreateRackClick(wxCommandEvent &event);
-  void					OnCreateEffectClick(wxCommandEvent &event);
-  void					OnFloatTransport(wxCommandEvent &event);
-  void					OnFloatSequencer(wxCommandEvent &event);
-  void					OnFloatRack(wxCommandEvent &event);
-  void					OnFloatMediaLibrary(wxCommandEvent &event);
+  MainWindow(const wxString& title, const wxPoint& pos, const wxSize& size);
+  void					OnClose(wxCloseEvent& event);
+  void					OnQuit(wxCommandEvent& event);
+  void					OnOpen(wxCommandEvent& event);
+  void					OnNew(wxCommandEvent& event);
+  void					OnSave(wxCommandEvent& event);
+  void					OnSaveAs(wxCommandEvent& event);
+  void					OnImportWave(wxCommandEvent& event);
+  void					OnImportMIDI(wxCommandEvent& event);
+  void					OnImportAKAI(wxCommandEvent& event);
+  void					OnExportWave(wxCommandEvent& event);
+  void					OnExportMIDI(wxCommandEvent& event);
+  void					OnSettings(wxCommandEvent& event);
+  void					OnDeleteRack(wxCommandEvent& event);
+  void					OnAddTrackAudio(wxCommandEvent& event);
+  void					OnAddTrackMidi(wxCommandEvent& event);
+  void					OnDeleteTrack(wxCommandEvent& event);
+  void					OnChangeAudioDir(wxCommandEvent& event);
+  void					OnCreateRackClick(wxCommandEvent& event);
+  void					OnCreateEffectClick(wxCommandEvent& event);
+  void					OnFloatTransport(wxCommandEvent& event);
+  void					OnFloatSequencer(wxCommandEvent& event);
+  void					OnFloatRack(wxCommandEvent& event);
+  void					OnFloatMediaLibrary(wxCommandEvent& event);
 
-  void					OnSwitchRackOptViewEvent(wxCommandEvent &event);
-  void					OnSwitchSeqOptViewEvent(wxCommandEvent &event);
-  void					OnFullScreen(wxCommandEvent &event);
-  void					OnAbout(wxCommandEvent &event);
-  void					OnIntegratedHelp(wxCommandEvent &event);
-  void					OnTimer(wxTimerEvent &event);
-  void					OnKillTimer(wxTimerEvent &event);
-  void					OnFileLoaderStart(wxCommandEvent &event);
-  void					OnFileLoaderStop(wxCommandEvent &event);
+  void					OnSwitchRackOptViewEvent(wxCommandEvent& event);
+  void					OnSwitchSeqOptViewEvent(wxCommandEvent& event);
+  void					OnFullScreen(wxCommandEvent& event);
+  void					OnAbout(wxCommandEvent& event);
+  void					OnIntegratedHelp(wxCommandEvent& event);
+  void					OnTimer(wxTimerEvent& event);
+  void					OnKillTimer(wxTimerEvent& event);
+  void					OnFileLoaderStart(wxCommandEvent& event);
+  void					OnFileLoaderStop(wxCommandEvent& event);
   bool					NewSession();
   void					LoadPlugins();
   void					AlertDialog(const wxString& from, const wxString& msg);
-  void					StartStream(wxCommandEvent &event);
-  void					StopStream(wxCommandEvent &event);
+  void					StartStream(wxCommandEvent& event);
+  void					StopStream(wxCommandEvent& event);
 
-  void					OnUndo(wxCommandEvent &event);
-  void					OnRedo(wxCommandEvent &event);
-  void					OnHistory(wxCommandEvent &event);
-  void					OnCut(wxCommandEvent &event);
-  void					OnCopy(wxCommandEvent &event);
-  void					OnPaste(wxCommandEvent &event);
-  void					OnDelete(wxCommandEvent &event);
-  void					OnSelectAll(wxCommandEvent &event);
+  void					OnUndo(wxCommandEvent& event);
+  void					OnRedo(wxCommandEvent& event);
+  void					OnHistory(wxCommandEvent& event);
+  void					OnCut(wxCommandEvent& event);
+  void					OnCopy(wxCommandEvent& event);
+  void					OnPaste(wxCommandEvent& event);
+  void					OnDelete(wxCommandEvent& event);
+  void					OnSelectAll(wxCommandEvent& event);
 
-  void					MediaLibraryShow(wxCommandEvent &event);
-  void					MediaLibraryHide(wxCommandEvent &event);
+  void					MediaLibraryShow(wxCommandEvent& event);
+  void					MediaLibraryHide(wxCommandEvent& event);
 
-  void			                OnShowDebug(wxCommandEvent &event);
+  void			                OnShowDebug(wxCommandEvent& event);
 
-  void					OnOpenVideo(wxCommandEvent &event);
-  void					OnCloseVideo(wxCommandEvent &event);
-  void					OnSeekVideo(wxCommandEvent &event);
+  void					OnOpenVideo(wxCommandEvent& event);
+  void					OnCloseVideo(wxCommandEvent& event);
+  void					OnSeekVideo(wxCommandEvent& event);
 
   void					OnKey(wxKeyEvent& event);
   void					OnSpaceKey();
@@ -126,7 +126,7 @@ class					MainWindow: public wxFrame
   int					PluginMenuIndexCount;
   bool					RackModeView;
   bool					SeqModeView;
-  void					OnIdle(wxIdleEvent &event);
+  void					OnIdle(wxIdleEvent& event);
 
   /**
    * Enumerate states of a panel
@@ -155,7 +155,7 @@ class					MainWindow: public wxFrame
   /* DSSI & LADSPA Plugins Menus */
   void					LoadExternalPlugins();
   int					AddPluginMenuItem(int Type, bool IsEffect, const wxString& MenuName);
-  void					OnCreateExternalPlugin(wxCommandEvent &event);
+  void					OnCreateExternalPlugin(wxCommandEvent& event);
 
   /* Undo Redo Menus */
   void					InitUndoRedoMenuItems();
