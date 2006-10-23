@@ -14,7 +14,7 @@ using namespace					std;
 
 #define ID_MIXER_REFRESH			(101020)
 #define TYPE_MIXER_REFRESH			(9876600)
-#define CHANNELGUI_WIDTH			(100)
+#define CHANNELGUI_WIDTH			(50)
 #define CHANNELGUI_HEIGHT			(120)
 #define FADERFG					L"ihm/mixer/mixer_fader.png"
 #define FADERBG					L"ihm/mixer/mixer_fader_bg.png"

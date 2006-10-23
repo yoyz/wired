@@ -9,7 +9,7 @@ Channel::Channel(bool stereo, bool visible)
 {
   Stereo = stereo;
   VolumeLeft = 100.f;
-  VolumeRight = 100.f;
+  //  VolumeRight = 100.f;
 
   InputNum = 0;
 
@@ -21,7 +21,7 @@ Channel::Channel(bool stereo, bool visible)
   Filled = false;
 
   MuteLeft = false;
-  MuteRight = false;
+  //  MuteRight = false;
 
   if (!stereo)
     AddBuffers(PREBUF_NUM);
@@ -51,9 +51,9 @@ Channel		Channel::operator=(const Channel& right)
       Filled = right.Filled;
       Stereo = right.Stereo;
       MuteLeft = right.MuteLeft;
-      MuteRight = right.MuteRight;
+      //      MuteRight = right.MuteRight;
       VolumeLeft = right.VolumeLeft;
-      VolumeRight = right.VolumeRight;
+      //      VolumeRight = right.VolumeRight;
       InputNum = right.InputNum;
     }
   return *this;
@@ -63,7 +63,7 @@ void		Channel::Dump()
 {
   cout << "===Channel " << this << " dump begin===" << endl;
   cout << "VolumeLeft : {" << VolumeLeft << "}" << endl;
-  cout << "VolumeRight : {" << VolumeRight << "}" << endl;
+  //  cout << "VolumeRight : {" << VolumeRight << "}" << endl;
   cout << "Stereo : {" << Stereo << "}" << endl;
   cout << "InputNum : {" << InputNum << "}" << endl;
   cout << "Label : {" << Label.mb_str() << "}" << endl;
@@ -73,7 +73,7 @@ void		Channel::Dump()
   cout << "CurBuf : {" << CurBuf << "}" << endl;
   cout << "Filled : {" << Filled << "}" << endl;
   cout << "MuteLeft : {" << MuteLeft << "}" << endl;
-  cout << "MuteRight : {" << MuteRight << "}" << endl;
+  //  cout << "MuteRight : {" << MuteRight << "}" << endl;
   cout << "===Channel dump end===" << endl;
 }
 
@@ -143,9 +143,9 @@ void Channel::PushBuffer(float **buffer)
 
   MixMutex.Lock();		//used in ChannelGui::OnFader....()
   ml = MuteLeft;
-  mr = MuteRight;
+  //  mr = MuteRight;
   lvol = VolumeLeft / 100.f;
-  rvol = VolumeRight / 100.f;
+  //  rvol = VolumeRight / 100.f;
   MixMutex.Unlock();
 
   if (ml == true)

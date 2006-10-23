@@ -16,12 +16,12 @@ wxMutex				MixMutex;
 Mixer::Mixer()
 {
   VolumeLeft = 1.f;
-  VolumeRight = 1.f;
+  //  VolumeRight = 1.f;
   MuteL = false;
   MuteR = false;
 
   OutputLeft = new float[Audio->SamplesPerBuffer];
-  OutputRight = new float[Audio->SamplesPerBuffer];
+//   OutputRight = new float[Audio->SamplesPerBuffer];
   Input = new float*[PREBUF_NUM];
   for (int i = 0; i < PREBUF_NUM; i++)
     Input[i] = new float[Audio->SamplesPerBuffer];
@@ -46,8 +46,8 @@ Mixer::~Mixer()
 
   if (OutputLeft)
 	  delete[] OutputLeft;
-  if (OutputRight)
-	  delete[] OutputRight;
+//   if (OutputRight)
+// 	  delete[] OutputRight;
 
   if (Input)
     {
@@ -68,10 +68,10 @@ Mixer 	Mixer::operator=(const Mixer& right)
 	if (this != &right)
 	{
 		OutputLeft = right.OutputLeft;
-		OutputRight = right.OutputRight;
+		//		OutputRight = right.OutputRight;
 		Input = right.Input;
 		VolumeLeft = right.VolumeLeft;
-		VolumeRight = right.VolumeLeft;
+		//		VolumeRight = right.VolumeLeft;
 		MuteL = right.MuteL;
 		MuteR = right.MuteR;  
 		OutChannels = right.OutChannels;
@@ -84,13 +84,13 @@ void				Mixer::Dump()
 {
   cout << "===Mixer " << this << "dump begin===" << endl;
   cout << "VolumeLeft : {" << VolumeLeft << "}" << endl;
-  cout << "VolumeRight : {" << VolumeRight << "}" << endl;
+  //  cout << "VolumeRight : {" << VolumeRight << "}" << endl;
   cout << "MuteL : {" << MuteL << "}" << endl;
   cout << "MuteR : {" << MuteR << "}" << endl;
   cout << "OutChannels Size : {" << OutChannels.size() << "}" << endl;
   cout << "InChannels Size : {" << InChannels.size() << "}" << endl;
   cout << "OutputLeft Ptr : {" << OutputLeft << "}" << endl;
-  cout << "OutputRight Ptr : {" << OutputRight << "}" << endl;
+  //  cout << "OutputRight Ptr : {" << OutputRight << "}" << endl;
   cout << "Input Ptr : {" << Input << "}" << endl;
   cout << "===Mixer dump end===" << endl;
 }
@@ -160,14 +160,14 @@ bool				Mixer::InitOutputBuffers(void)
 {
   if (OutputLeft)
     delete[] OutputLeft;
-  if (OutputRight)
-    delete[] OutputRight;
+//   if (OutputRight)
+//     delete[] OutputRight;
   OutputLeft = NULL;
-  OutputRight = NULL;
+  //  OutputRight = NULL;
   try
     {
       OutputLeft = new float[Audio->SamplesPerBuffer];
-      OutputRight = new float[Audio->SamplesPerBuffer];
+      //      OutputRight = new float[Audio->SamplesPerBuffer];
     }
   catch (std::bad_alloc)
     {
@@ -195,7 +195,7 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
   t.tv_sec = 0;
   t.tv_nsec = 100;       
   memset(OutputLeft, 0, Audio->SamplesPerBuffer * sizeof(float));
-  memset(OutputRight, 0, Audio->SamplesPerBuffer * sizeof(float));
+  //  memset(OutputRight, 0, Audio->SamplesPerBuffer * sizeof(float));
   
   //MixMutex.Lock();
   for (list<Channel*>::iterator c = OutChannels.begin(); 
@@ -212,8 +212,8 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 		  // Les Volumes sont appliques lors de PushBuffer
 		  OutputLeft[i]  += 
 		    ((*c)->StereoBuffers[0])[0][i];// * (*c)->VolumeLeft;
-		  OutputRight[i] += 
-		    ((*c)->StereoBuffers[0])[1][i];// * (*c)->VolumeRight;
+// 		  OutputRight[i] += 
+// 		    ((*c)->StereoBuffers[0])[1][i];// * (*c)->VolumeRight;
 		}
 	    }
 	  else
@@ -222,7 +222,7 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 	      for (i = 0; i < Audio->SamplesPerBuffer; i++)
 		{
 		  OutputLeft[i]  += ((*c)->MonoBuffers[0])[i];
-		  OutputRight[i] += ((*c)->MonoBuffers[0])[i];
+// 		  OutputRight[i] += ((*c)->MonoBuffers[0])[i];
 		}
 	    }
 	}
@@ -235,8 +235,8 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 		{
 		  OutputLeft[i]  += 
 		    ((*c)->StereoBuffers[0])[0][i];// * (*c)->VolumeLeft;
-		  OutputRight[i] += 
-		    ((*c)->StereoBuffers[0])[1][i];// * (*c)->VolumeRight;
+// 		  OutputRight[i] += 
+// 		    ((*c)->StereoBuffers[0])[1][i];// * (*c)->VolumeRight;
 		}
 	    }
 	  else
@@ -246,8 +246,8 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 		{
 		  OutputLeft[i]  += 
 		    ((*c)->MonoBuffers[0])[i];// * (*c)->VolumeLeft;
-		  OutputRight[i] +=
-		    ((*c)->MonoBuffers[0])[i];// * (*c)->VolumeRight;
+// 		  OutputRight[i] +=
+// 		    ((*c)->MonoBuffers[0])[i];// * (*c)->VolumeRight;
 		}
 	    }
 	}
@@ -264,32 +264,32 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
     lvol = VolumeLeft;
   if (MuteR == true)
     rvol = 0.f;
-  else
-    rvol = VolumeRight;
+//   else
+//     rvol = VolumeRight;
   MixMutex.Unlock();
   
   for (i = 0; i < Audio->SamplesPerBuffer; i++)
     {
       OutputLeft[i]  *= lvol;
-      OutputRight[i] *= rvol;
+//       OutputRight[i] *= rvol;
       // CLIPPING OUTPUT
       if (OutputLeft[i] > 1.f)
 	OutputLeft[i] = 1.f;
       else if (OutputLeft[i]  < -1.f)
 	OutputLeft[i] = -1.f;
-      if (OutputRight[i] > 1.f)
-	OutputRight[i] = 1.f;
-      else if (OutputRight[i] < -1.f)
-	OutputRight[i] = -1.f;
+//       if (OutputRight[i] > 1.f)
+// 	OutputRight[i] = 1.f;
+//       else if (OutputRight[i] < -1.f)
+// 	OutputRight[i] = -1.f;
       // Calcul du RMS
       Lrms += fabs(OutputLeft[i]);
-      Rrms += fabs(OutputRight[i]);
+//       Rrms += fabs(OutputRight[i]);
     }
   Lrms /=  Audio->SamplesPerBuffer;
   Rrms /=  Audio->SamplesPerBuffer;
   MixMutex.Lock();
   MixerPanel->MasterLeft = Lrms; // used by MixerGui
-  MixerPanel->MasterRight = Rrms;
+//   MixerPanel->MasterRight = Rrms;
   MixMutex.Unlock();
   if (soundcard && Audio->UserData)
     {
@@ -303,7 +303,7 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 	{
 	  bytes_written = 0;
 	  /* Left/Right fourberie */
-	  tmp = ((i % 2) ?  OutputRight : OutputLeft);
+// 	  tmp = ((i % 2) ?  OutputRight : OutputLeft);
 	  /* Blocking write */
 	  //cout << "[MIXER] blocking write BEGIN" << endl;
 	  for (long spb = Audio->SamplesPerBuffer; spb > 0 && (*chan); )

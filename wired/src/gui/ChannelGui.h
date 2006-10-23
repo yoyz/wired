@@ -48,9 +48,9 @@ class					ChannelGui : public wxPanel
   
   SeqTrack				*ConnectedSeqTrack;
   FaderCtrl				*FaderLeft;
-  FaderCtrl				*FaderRight;
+/*   FaderCtrl				*FaderRight; */
   VUMCtrl				*VumLeft;
-  VUMCtrl				*VumRight;
+/*   VUMCtrl				*VumRight; */
   Channel				*Chan;
   bool					Stereo;
   
