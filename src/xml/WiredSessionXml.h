@@ -35,7 +35,7 @@
 #include "../gui/MidiPattern.h"
 #include "../gui/Rack.h"
 #include "../midi/midi.h"
-#include "../gui/Transport.h"
+//#include "../gui/Transport.h"
 #include "../engine/AudioCenter.h"
 
 //For Windows future ...

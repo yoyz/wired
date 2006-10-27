@@ -21,6 +21,4 @@ libengine_a_SOURCES =			\
 		RingBuffer.hxx		\
 		RingError.h		\
 		Settings.cpp		\
-		Settings.h		\
-		WiredSession.cpp	\
-		WiredSession.h
+		Settings.h		

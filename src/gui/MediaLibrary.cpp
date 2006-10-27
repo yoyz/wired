@@ -44,12 +44,10 @@
 #include "MainWindow.h"
 #include "Sequencer.h"
 #include "Colour.h"
-#include "WiredSession.h"
 #include "HelpPanel.h"
+#include "SaveCenter.h"
 
-extern WiredSession			*CurrentSession;
-extern WiredSessionXml			*CurrentXmlSession;
-
+extern SaveCenter *saveCenter;
 
 const struct s_combo_choice		SortSelectChoices[NB_SORTSELECT_CHOICES + 1] =
 {
@@ -162,14 +160,14 @@ void				MediaLibrary::OnAdd(wxCommandEvent &WXUNUSED(event))
     {
       wxString 	selfile = dlg.GetSelectedFile();
 
-      if (CurrentXmlSession->GetAudioDir().empty() == false)
+      if (saveCenter->getAudioDir().empty() == false)
 	res = wxID_OK;
       else
 	{
 	  wxDirDialog dir(this, _("Choose the Audio file directory"), wxFileName::GetCwd());
 	  if (dir.ShowModal() == wxID_OK)
 	    {
-	      CurrentXmlSession->GetAudioDir() = dir.GetPath().c_str(); 
+	      saveCenter->setAudioDir(dir.GetPath());
 	      res = wxID_OK;
 	    }
 	  else

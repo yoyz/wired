@@ -9,7 +9,6 @@
 #include "OptionPanel.h"
 #include "Mixer.h"
 #include "AudioCenter.h"
-#include "../xml/WiredSessionXml.h"
 #include "ColoredBox.h"
 #include "AudioPattern.h"
 #include "HelpPanel.h"
@@ -18,9 +17,10 @@
 #include "../engine/AudioEngine.h"
 #include "../audio/WriteWaveFile.h"
 #include "../mixer/Channel.h"
+#include "SaveCenter.h"
 
 static long				audio_pattern_count = 1;
-extern WiredSessionXml	*CurrentXmlSession;
+extern SaveCenter	*saveCenter;
 
 AudioPattern::AudioPattern(double pos, double endpos, long trackindex)
   : Pattern(pos, endpos, trackindex),
@@ -202,10 +202,10 @@ bool					AudioPattern::PrepareRecord(int type)
   int					i = 1;
 
   cout << "Preparing record for pattern " << this 
-       << " with audio dir : " << CurrentXmlSession->GetAudioDir().mb_str() << endl;
+       << " with audio dir : " << saveCenter->getAudioDir().mb_str() << endl;
   while (!done)
     {
-      s = CurrentXmlSession->GetAudioDir() + wxT("/wired_audio");
+      s = saveCenter->getAudioDir() + wxT("/wired_audio");
       s += wxString::Format(wxT("%d"), i);
       s += wxT(".wav");
 

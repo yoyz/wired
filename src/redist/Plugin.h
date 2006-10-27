@@ -20,6 +20,7 @@
 #include <list> 
 #include <vector>
 #include <map>
+#include "Plugin.h"
 
 // methods are mainly in this class
 class Plugin;

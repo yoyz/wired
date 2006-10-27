@@ -80,6 +80,9 @@ class				Transport : public wxPanel, WiredDocument
   void				OnPaint(wxPaintEvent &event);
   void				OnIdle(wxIdleEvent &WXUNUSED(event));
 
+  void				Save();
+  void				Load();
+
  protected:
   friend class			MainWindow;
 

@@ -2,12 +2,14 @@
 
 SaveCenter::SaveCenter(wxString docName,
 		       wxString projectName,  
-		       WiredDocument *docParent = NULL,
-		       wxString projectPath = wxT(""))
+		       wxString projectPath = wxT(""),
+		       WiredDocument *docParent = NULL)
   : WiredDocument(docName, docParent)
 {
   setProjectPath(projectPath);
   setProjectName(projectName);
+  _audioDir << _projectPath << wxT("/audio/");
+
 }
 
 SaveCenter::~SaveCenter()
@@ -31,9 +33,14 @@ void	SaveCenter::SaveProject()
   wxString	fileName;
   WiredXml	*xmlFile = new WiredXml();
   
+  std::cerr << "[Save] SaveCenter::SaveProject" << std::endl;
+
   fileName << _projectPath << _projectName << wxT(".xml");
+  std::cerr << "[Save] filename = " << fileName.mb_str() << std::endl;
 
   xmlFile->CreateDocument(fileName);
+
+  std::cerr << "[Save] xmlFile created" << std::endl;
 
   SaveDocument((WiredDocument *)this, xmlFile);
 
@@ -55,29 +62,48 @@ void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
   SaveElementArray			*toWrite;
   SaveElementsHashMap::iterator		saveElementsIt;
 
+  std::cerr << "[SaveCenter] SaveCenter::SaveDocument" << std::endl;
+
   //Get our children
   childrenOfCurrentNode = currentNode->getChildren();
+
+  std::cerr << "[SaveCenter] childrenOfCurrentNode" << std::endl;
 
   //Save Document
   currentNode->Save();
   
+  std::cerr << "[SaveCenter] Save" << std::endl;
+
   //get my SaveElements
   saveElements = currentNode->getDocData();
+
+  std::cerr << "[SaveCenter] getNodeData" << std::endl;
 
   //write our SaveElements...
   //...start with our name...
   xmlFile->StartElement(currentNode->getName());
+
+  std::cerr << "[SaveCenter] startelement : node name = " << currentNode->getName().mb_str() << std::endl;
   
   //Write references
   AddReferences(saveElements, xmlFile);
 
-  //get elements to write in the conf file
-  toWrite = saveElements[WIRED_PROJECT_FILE];
+  std::cerr << "[SaveCenter] references added" << std::endl;
 
-  //...then write the elements
-  for (i = 0; i < toWrite->GetCount(); i++)
-    WriteElement((*toWrite->Item(i)), xmlFile);
-  
+  std::cerr << "[SaveCenter] saveElements.count(WIRED_PROJECT_FILE) = " << saveElements.count(WIRED_PROJECT_FILE) << std::endl;
+
+  //get elements to write in the conf file
+  if(saveElements.count(WIRED_PROJECT_FILE))
+    {      
+      toWrite = saveElements[WIRED_PROJECT_FILE];
+      std::cerr << "[SaveCenter] toWrite" << std::endl;
+      
+      //...then write the elements
+      for (i = 0; i < toWrite->GetCount(); i++)
+	WriteElement(toWrite->Item(i), xmlFile);
+
+      std::cerr << "[SaveCenter] Elements written" << std::endl;
+    }
   //Write the other files
   for (saveElementsIt = saveElements.begin();
        saveElementsIt != saveElements.end();
@@ -85,19 +111,21 @@ void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
     if(saveElementsIt->first != WIRED_PROJECT_FILE)
       WriteFile(saveElementsIt->first, saveElementsIt->second);
 
+  std::cerr << "[SaveCenter] other files written" << std::endl;
+
   //call recursively on our children
   for (i = 0; i < childrenOfCurrentNode.GetCount(); i++)
     SaveDocument(childrenOfCurrentNode[i], xmlFile);
   
   //...finish by closing things
-  xmlFile->EndElement();    
+  xmlFile->EndElement();
 }
 
 void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements, 
 				  WiredXml *xmlFile)
 {
   SaveElementsHashMap::iterator	saveElementsIt;
-  SaveElement			ref;
+  SaveElement			*ref;
 
   //for each entry of the hash map....
   for (saveElementsIt = saveElements.begin();
@@ -107,23 +135,23 @@ void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements,
     if(saveElementsIt->first != WIRED_PROJECT_FILE)
       {
 	//fill a SaveElement
-	ref.clear();
-	ref.setPair(wxT("reference"), saveElementsIt->first);
+	ref->clear();
+	ref->setPair(wxT("reference"), saveElementsIt->first);
 	//and write it.
 	WriteElement(ref, xmlFile);
       }
 }
 
-void	SaveCenter::WriteElement(SaveElement elem, WiredXml *xmlFile)
+void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
 {
   int				i;
   AttributesHashMap		attributes;
   AttributesHashMap::iterator	attributesIt;
 
-  attributes = elem.getAttributes();
+  attributes = elem->getAttributes();
 
   //XML bullshit
-  xmlFile->StartElement(elem.getKey());
+  xmlFile->StartElement(elem->getKey());
   
 
   for(attributesIt = attributes.begin();
@@ -148,7 +176,7 @@ void		SaveCenter::WriteFile(wxString filename, SaveElementArray *elements)
   xmlFile->StartElement(rootTag);
 
   for (i = 0; i < elements->GetCount(); i++)
-    WriteElement((*elements->Item(i)), xmlFile);
+    WriteElement(elements->Item(i), xmlFile);
   
   xmlFile->EndElement();
   delete xmlFile;
@@ -158,6 +186,16 @@ void		SaveCenter::WriteFile(wxString filename, SaveElementArray *elements)
 wxString	SaveCenter::getProjectPath()
 {
   return _projectPath;
+}
+
+wxString	SaveCenter::getAudioDir()
+{
+  return _audioDir;
+}
+
+void		SaveCenter::setAudioDir(wxString audioDir)
+{
+  _audioDir = audioDir;
 }
 
 void		SaveCenter::setProjectPath(wxString projectPath)
@@ -189,5 +227,10 @@ void		SaveCenter::setProjectName(wxString projectName)
   //2 default project in the same directory
   if(_projectName.IsEmpty())
     _projectName << wxT("WiredProject");
+
+}
+
+void	SaveCenter::LoadProject(wxString filename)
+{
 
 }

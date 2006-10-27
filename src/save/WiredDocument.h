@@ -34,7 +34,7 @@ class WiredDocument
   SaveElementsHashMap		getDocData();
   SaveElementArray		*getDocFile(wxString file);
 
- private:
+ protected:
   void				saveDocData(wxString file, SaveElement *data);
   void				clearDocData();
   void				rmDocDataFile(wxString file);

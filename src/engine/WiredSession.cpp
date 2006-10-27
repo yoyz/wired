@@ -6,7 +6,7 @@
 #include "WiredSession.h"
 #include "Sequencer.h"
 #include "SequencerGui.h"
-#include "Transport.h"
+//#include "Transport.h"
 #include "Rack.h"
 #include "AudioCenter.h"
 #include "../plugins/PluginLoader.h"

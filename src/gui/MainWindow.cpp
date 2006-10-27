@@ -45,6 +45,8 @@
 #include "Threads.h"
 #include "MediaLibrary.h"
 #include "MLTree.h"
+#include "SaveCenter.h"
+//Isn't it bullshit to declare things here ?
 
 Rack			*RackPanel = NULL;
 SequencerGui		*SeqPanel = NULL;
@@ -63,6 +65,8 @@ MediaLibrary		*MediaLibraryPanel = NULL;
 FileConversion		*FileConverter = NULL;
 SettingWindow		*SettingsWin = NULL;
 
+SaveCenter		*saveCenter = NULL;
+
 wxMutex			AudioMutex;
 wxCondition		*SeqStopped = NULL;
 
@@ -77,8 +81,11 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   CreateStatusBar(2);
 #endif
   WiredSettings = new Settings();
-  CurrentSession = new WiredSession(wxString(wxT(""), *wxConvCurrent));
-  CurrentXmlSession = new WiredSessionXml(wxString(wxT(""), *wxConvCurrent));
+  saveCenter = new SaveCenter(wxString(wxT("wired_save")), 
+			      wxString(wxT("Session_1")), 
+			      wxString(wxT("/home/kiketloule/wired_projects")),
+			      NULL);
+
   LoadedExternalPlugins = new WiredExternalPluginMgr();
   LogWin = new wxLogWindow(this, wxT("Wired log"), false);
   
@@ -178,7 +185,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   WindowMenu->AppendSeparator();
   ItemFloatingSeq = WindowMenu->AppendCheckItem(MainWin_FloatSequencer,_("Floating Sequencer"));
   ItemFloatingRacks = WindowMenu->AppendCheckItem(MainWin_FloatRacks, _("Floating Racks"));
-//   ItemFloatingOptView = WindowMenu->AppendCheckItem(MainWin_FloatView, _("Floating Optional View"));
+  //   ItemFloatingOptView = WindowMenu->AppendCheckItem(MainWin_FloatView, _("Floating Optional View"));
   WindowMenu->AppendSeparator();
   ItemFullscreenToggle = WindowMenu->AppendCheckItem(MainWin_FullScreen,
 						     _("&Fullscreen"));
@@ -208,7 +215,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   RackPanel = new Rack(split, -1, wxPoint(0, 0), wxSize(800, 250));
   SeqPanel = new SequencerGui(split, wxPoint(0, 0), wxSize(800, 200), this);
   OptPanel = new OptionPanel(this, wxPoint(306, 452), wxSize(470, 120), wxSIMPLE_BORDER);
-  TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER);
+  TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER, (WiredDocument *)saveCenter);
 
   MediaLibraryPanel = new MediaLibrary(splitVert);
 
@@ -250,7 +257,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   RackModeView = true;
   SeqModeView = true;
 
-  // Taille minimum de la fenetre
+  // Minimum size of the window
   SetSizeHints(400, 300);
 
   Connect(MainWin_ImportWave, wxEVT_COMMAND_MENU_SELECTED, 
@@ -465,31 +472,34 @@ void                MainWindow::InitLocale()
 
 void					MainWindow::InitFileConverter()
 {
-	FileConverter = new FileConversion();
-	t_samplerate_info info;
-	int i; 
-	if (Audio->UserData->Sets->WorkingDir.empty())
-	  {
-	    wxDirDialog dir(this, _("Choose the audio working directory"), wxFileName::GetCwd(), wxDD_NEW_DIR_BUTTON | wxCAPTION | wxSUNKEN_BORDER);
-	    if (dir.ShowModal() == wxID_OK)
-	      CurrentXmlSession->GetAudioDir() = dir.GetPath();
-	    else
-	      CurrentXmlSession->GetAudioDir() = wxFileName::GetCwd();
+  //USES WIRESESSION
+  FileConverter = new FileConversion();
+  t_samplerate_info info;
+  // 	int i; 
+  // 	if (Audio->UserData->Sets->WorkingDir.empty())
+  // 	  {
+  // 	    wxDirDialog dir(this, _("Choose the audio working directory"), wxFileName::GetCwd(), wxDD_NEW_DIR_BUTTON | wxCAPTION | wxSUNKEN_BORDER);
+  // 	    if (dir.ShowModal() == wxID_OK)
+  // 	      CurrentXmlSession->GetAudioDir() = dir.GetPath();
+  // 	    else
+  // 	      CurrentXmlSession->GetAudioDir() = wxFileName::GetCwd();
 	    
-	    Audio->UserData->Sets->WorkingDir = CurrentXmlSession->GetAudioDir();
-	  }
-	else
-	  {
-	    CurrentXmlSession->GetAudioDir() = Audio->UserData->Sets->WorkingDir;
+  // 	    Audio->UserData->Sets->WorkingDir = CurrentXmlSession->GetAudioDir();
+  // 	  }
+  // 	else
+  // 	  {
+  // 	    CurrentXmlSession->GetAudioDir() = Audio->UserData->Sets->WorkingDir;
 	    
-	  }
-	info.WorkingDirectory = CurrentXmlSession->GetAudioDir();
-	info.SampleRate = (unsigned long) Audio->SampleRate;
-	info.SamplesPerBuffer = (unsigned long) Audio->SamplesPerBuffer;
-	// init FileConverter with 4Mo of cache
-	if (FileConverter->Init(&info, CurrentXmlSession->GetAudioDir(), (unsigned long)1024 * 1024 * 4, this) == false)
-	  cout << "[MAINWIN] Create file converter thread failed !" << endl;
-	MediaLibraryPanel->SetFileConverter(FileConverter);
+  // 	  }
+  // 	info.WorkingDirectory = CurrentXmlSession->GetAudioDir();
+
+  info.WorkingDirectory = saveCenter->getAudioDir();
+  info.SampleRate = (unsigned long) Audio->SampleRate;
+  info.SamplesPerBuffer = (unsigned long) Audio->SamplesPerBuffer;
+  // init FileConverter with 4Mo of cache
+  if (FileConverter->Init(&info, info.WorkingDirectory, (unsigned long)1024 * 1024 * 4, this) == false)
+    cout << "[MAINWIN] Create file converter thread failed !" << endl;
+  MediaLibraryPanel->SetFileConverter(FileConverter);
 }
 
 void					MainWindow::InitUndoRedoMenuItems()
@@ -603,9 +613,8 @@ void					MainWindow::OnClose(wxCloseEvent &event)
     delete LoadedExternalPlugins;
 
   cout << "[MAINWIN] Unloading session manager..." << endl;
-  delete CurrentSession;
-  delete CurrentXmlSession;
-
+  delete saveCenter;
+  
   cout << "[MAINWIN] Unloading user settings manager..." << endl;
   if (WiredSettings)
     delete WiredSettings;
@@ -642,8 +651,11 @@ bool					MainWindow::NewSession()
     }
   else if (res == wxID_CANCEL)
     return (false);
-  delete CurrentXmlSession;
-  CurrentXmlSession = new WiredSessionXml(wxT(""));
+  delete saveCenter;
+  saveCenter = new SaveCenter(wxString(wxT("wired_save")), 
+			      wxString(wxT("Session_1")), 
+			      wxString(wxT("/home/kiketloule/wired_project")),
+			      NULL);
 
   Seq->Stop();
   
@@ -684,17 +696,18 @@ void					MainWindow::OnOpen(wxCommandEvent &event)
 	  transform(selfile.begin(), selfile.end(), selfile.begin(), (int(*)(int))tolower);
 	  if (!selfile.substr(selfile.find_last_of('.')).compare(XML_EXTENSION))
 	    {
-	      if (CurrentXmlSession)				
-		delete CurrentXmlSession;
-	      CurrentXmlSession = new WiredSessionXml(selfile);
-	      CurrentXmlSession->Load(selfile);
+	      delete saveCenter;
+	      saveCenter = new SaveCenter(wxString(wxT("wired_save")), 
+					  wxString(wxT("Session_1")), 
+					  wxString(wxT("/home/kiketloule/wired_project")),
+					  NULL);
+	      saveCenter->LoadProject(selfile);
+
 	      cout << "[MAINWIN] New session loaded" << endl;
 	    }
 	  else
 	    {
-	      cout << "[MAINWIN] Warning! Opening old format" << endl;
-	      CurrentSession = new WiredSession(selfile);
-	      CurrentSession->Load();
+	      cout << "[MAINWIN] Warning! Trying to open old format... nothing done" << endl;
 	    }
 	}
       else
@@ -705,86 +718,74 @@ void					MainWindow::OnOpen(wxCommandEvent &event)
 
 void					MainWindow::OnSave(wxCommandEvent &event)
 {
-  if (CurrentXmlSession)
-    {
-      wxString			DocumentName(CurrentXmlSession->GetDocumentName());
-      if (!DocumentName.empty())
-	CurrentXmlSession->Save();
-      else
-	OnSaveAs(event);
-    }
-  else
-    OnSaveAs(event);
+  saveCenter->SaveProject();
+  
+  //   if (CurrentXmlSession)
+  //     {
+  //       wxString			DocumentName(CurrentXmlSession->GetDocumentName());
+  //       if (!DocumentName.empty())
+  // 	CurrentXmlSession->Save();
+  //       else
+  // 	OnSaveAs(event);
+  //     }
+  //   else
+  //     OnSaveAs(event);
 }
 
 void					MainWindow::OnSaveAs(wxCommandEvent &event)
 {
-  vector<wxString>			exts;
+  //USES WIREDSESSION
+//   vector<wxString>			exts;
   
-  exts.insert(exts.begin(), _("xml\tWired session file (*.xml)"));
-  FileLoader				dlg(this, MainWin_FileLoader, _("Save session"), false, true, &exts);
-  if (dlg.ShowModal() == wxID_OK)
-    {
-      wxString selfile = dlg.GetSelectedFile();    
+//   exts.insert(exts.begin(), _("xml\tWired session file (*.xml)"));
+//   FileLoader				dlg(this, MainWin_FileLoader, _("Save session"), false, true, &exts);
+//   if (dlg.ShowModal() == wxID_OK)
+//     {
+//       wxString selfile = dlg.GetSelectedFile();    
       
-      wxFileName f(selfile);
-      if (!f.HasExt())
-	selfile = selfile + XML_EXTENSION;
-      cout << "[MAINWIN] User saves to " << selfile.mb_str() << endl;
+//       wxFileName f(selfile);
+//       if (!f.HasExt())
+// 	selfile = selfile + XML_EXTENSION;
+//       cout << "[MAINWIN] User saves to " << selfile.mb_str() << endl;
 
-      wxString audiodir;
+//       wxString audiodir;
       
-      if (CurrentXmlSession)
-	{
-	  audiodir = wxString(CurrentXmlSession->GetAudioDir());
-	  if (audiodir.size() == 0)
-	    {
-	      char	buffer[2048];
+//       if (CurrentXmlSession)
+// 	{
+// 	  audiodir = wxString(CurrentXmlSession->GetAudioDir());
+// 	  if (audiodir.size() == 0)
+// 	    {
+// 	      char	buffer[2048];
 	      
-	      getcwd(buffer, 2048);
-	      audiodir = wxString(buffer, *wxConvCurrent);
-	    }  	
-	  delete CurrentXmlSession;
-	}
-      CurrentXmlSession = new WiredSessionXml(selfile, audiodir);
-      CurrentXmlSession->Save();
-    }
+// 	      getcwd(buffer, 2048);
+// 	      audiodir = wxString(buffer, *wxConvCurrent);
+// 	    }  	
+// 	  delete CurrentXmlSession;
+// 	}
+//       CurrentXmlSession = new WiredSessionXml(selfile, audiodir);
+//       CurrentXmlSession->Save();
+//     }
 }
 
 void					MainWindow::OnImportWave(wxCommandEvent &event)
 {
-  FileLoader				dlg(this, MainWin_FileLoader, _("Loading sound file"), false, false, FileConverter->GetCodecsExtensions(), true);
-  int						res;
+  FileLoader	dlg(this, MainWin_FileLoader, _("Loading sound file"), 
+		    false, false, FileConverter->GetCodecsExtensions(), true);
+  int		res;
   
   if (dlg.ShowModal() == wxID_OK)
     {
       wxString 	selfile = dlg.GetSelectedFile();
       
-      if (CurrentXmlSession->GetAudioDir().empty() == false)
-	res = wxID_OK;
-      else	     
-	{
-	  wxDirDialog dir(this, _("Choose the Audio file directory"), wxFileName::GetCwd());
-	  if (dir.ShowModal() == wxID_OK)
-	    {
-	      CurrentXmlSession->GetAudioDir() = dir.GetPath();
-	      res = wxID_OK;
-	    }
-	  else
-	    res = wxID_CANCEL;
-	}
-      if (res != wxID_CANCEL)
-	{
-	  MidiMutex.Lock();
-	  MidiDeviceMutex.Lock();
-	  SeqMutex.Unlock();
-	  
-	  // convert and import file 
-	  FileConverter->ImportFile(selfile);
-	  
-	  MidiMutex.Unlock();  
-	  MidiDeviceMutex.Unlock();
-	}
+      MidiMutex.Lock();
+      MidiDeviceMutex.Lock();
+      SeqMutex.Unlock();
+      
+      // convert and import file 
+      FileConverter->ImportFile(selfile);
+      
+      MidiMutex.Unlock();  
+      MidiDeviceMutex.Unlock();
     }
 }
 
@@ -813,20 +814,20 @@ void					MainWindow::OnImportMIDI(wxCommandEvent &event)
 	
 	if (m)
 	{
-	  Progress->Update(90);
-	  for (int i = 0; i < m->GetNumberOfTracks(); i++)
-	  {
-	  if (m->GetTrack(i)->GetMaxPos() > 0)
-	  {
-	  Track *t = SeqPanel->AddTrack(false);
-	  t->AddPattern(m->GetTrack(i));
-	  }
-	  }
-	  Progress->Update(99);
-	  }
-	  else
-	  cout << "[MAINWIN] Cannot import midi file !" << endl;
-	  delete Progress;
+	Progress->Update(90);
+	for (int i = 0; i < m->GetNumberOfTracks(); i++)
+	{
+	if (m->GetTrack(i)->GetMaxPos() > 0)
+	{
+	Track *t = SeqPanel->AddTrack(false);
+	t->AddPattern(m->GetTrack(i));
+	}
+	}
+	Progress->Update(99);
+	}
+	else
+	cout << "[MAINWIN] Cannot import midi file !" << endl;
+	delete Progress;
       */
     }
 }
@@ -870,19 +871,19 @@ void					MainWindow::OnImportAKAI(wxCommandEvent &event)
 	{
 	Progress->Update(1);
 	cout << "[MAINWIN] sample channel : " << sample->channels << endl;
-	  WaveFile *w = new WaveFile(sample->buffer, sample->size, 2, sample->rate);
+	WaveFile *w = new WaveFile(sample->buffer, sample->size, 2, sample->rate);
 	  
-	  if (!w->Error)
-	  {
-		Track *t = SeqPanel->AddTrack(true);
-		Progress->Update(90);
-		t->AddPattern(w);
-		Progress->Update(99);
-	  }
-	  else
-		cout << "[MAINWIN] Cannot import AKAI wave file !" << endl;
-	  delete Progress;
-	  }
+	if (!w->Error)
+	{
+	Track *t = SeqPanel->AddTrack(true);
+	Progress->Update(90);
+	t->AddPattern(w);
+	Progress->Update(99);
+	}
+	else
+	cout << "[MAINWIN] Cannot import AKAI wave file !" << endl;
+	delete Progress;
+	}
       */
     }
 }
@@ -913,10 +914,10 @@ void					MainWindow::OnExportWave(wxCommandEvent &event)
 	}      
       cout << "[MAINWIN] User exports " << selfile.mb_str() << endl;
       if (Seq->ExportToWave(selfile) == false)
-      {
-      	cout << "[MAINWIN] Export canceled by user " << endl;
-      	return;
-      }
+	{
+	  cout << "[MAINWIN] Export canceled by user " << endl;
+	  return;
+	}
 
       wxProgressDialog Progress(_("Exporting mix"), _("Please wait..."), 
 				(int)Seq->EndLoopPos * 1000, this, 
@@ -1001,7 +1002,7 @@ void					MainWindow::LoadPlugins()
 
 void					MainWindow::LoadExternalPlugins()
 { 
-//  map<int, wstring>				PluginsList;
+  //  map<int, wstring>				PluginsList;
   list<wxString>					PluginsList;
   //  map<int, wstring>::iterator	IterPluginsList;
   list<wxString>::iterator		IterPluginsList;
@@ -1554,10 +1555,10 @@ void					MainWindow::OnChangeAudioDir(wxCommandEvent &event)
   assert(CurrentXmlSession);
   
   wxDirDialog dir(this, _("Choose the Audio file directory"), 
-		  CurrentXmlSession->GetAudioDir().empty() == true ? 
-		  wxFileName::GetCwd() : CurrentXmlSession->GetAudioDir());
+		  saveCenter->getAudioDir().empty() == true ? 
+		  wxFileName::GetCwd() : saveCenter->getAudioDir());
   if (dir.ShowModal() == wxID_OK)
-    CurrentXmlSession->GetAudioDir() = dir.GetPath().c_str();    
+    saveCenter->setAudioDir(dir.GetPath());    
 }
 
 void					MainWindow::OnUndo(wxCommandEvent &event)
@@ -1677,8 +1678,8 @@ void					MainWindow::OnAbout(wxCommandEvent &event)
 {
   wxBitmap aboutbtm;
   if (aboutbtm.LoadFile(wxString(WiredSettings->DataDir +
-				  wxString(wxT("ihm/splash/about.png"))), 
-			 wxBITMAP_TYPE_PNG))
+				 wxString(wxT("ihm/splash/about.png"))), 
+			wxBITMAP_TYPE_PNG))
     {
       wxSplashScreen* splash = new wxSplashScreen(aboutbtm,
 						  wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_NO_TIMEOUT,
@@ -1776,14 +1777,14 @@ void					MainWindow::OnIntegratedHelp(wxCommandEvent &event)
 
 void                  MainWindow::OnShowDebug(wxCommandEvent &event)
 {
-   if(WindowMenu->IsChecked(MainWin_ShowLog))
-     {
-       LogWin->Show(true);
-     }
-   else
-     {
-       LogWin->Show(false);    
-     }
+  if(WindowMenu->IsChecked(MainWin_ShowLog))
+    {
+      LogWin->Show(true);
+    }
+  else
+    {
+      LogWin->Show(false);    
+    }
 }
 
 void					MainWindow::OnKillTimer(wxTimerEvent &WXUNUSED(event))
@@ -1806,10 +1807,9 @@ void					MainWindow::OnIdle(wxIdleEvent &WXUNUSED(event))
 	LeftMemory += Size.ToString();
       else
 	LeftMemory += _("Unknown");
-      if (CurrentXmlSession)
-	wxGetDiskSpace(CurrentXmlSession->GetAudioDir(), &Total, &Free);
-      else
-	wxGetDiskSpace(wxFileName::GetCwd(), &Total, &Free);
+
+      wxGetDiskSpace(saveCenter->getAudioDir(), &Total, &Free);
+
       LeftSpace += FileLoader::FormatSize((off_t) Free.GetValue()) + wxT("/") + FileLoader::FormatSize((off_t)Total.GetValue());
       SetStatusText(LeftSpace, 0);
       SetStatusText(LeftMemory, 1);
@@ -1833,14 +1833,14 @@ void		MainWindow::OnKey(wxKeyEvent& event)
 }
 
 BEGIN_DECLARE_EVENT_TYPES()
-    DECLARE_EVENT_TYPE(wxSetCursorPos, 313131)
-END_DECLARE_EVENT_TYPES()
+  DECLARE_EVENT_TYPE(wxSetCursorPos, 313131)
+  END_DECLARE_EVENT_TYPES()
 
-BEGIN_EVENT_TABLE(MainWindow, wxFrame)
-// key binding
+  BEGIN_EVENT_TABLE(MainWindow, wxFrame)
+  // key binding
   EVT_KEY_UP(MainWindow::OnKey) // DOWN is bugged
 
-// menu 
+  // menu 
   EVT_MENU(MainWin_Quit, MainWindow::OnQuit)
   EVT_MENU(MainWin_New, MainWindow::OnNew)
   EVT_MENU(MainWin_Save, MainWindow::OnSave)
@@ -1877,18 +1877,19 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
   EVT_MENU(MainWin_IntHelp, MainWindow::OnIntegratedHelp)
   EVT_MENU(MainWin_ShowLog, MainWindow::OnShowDebug)
 
-// event
+  // event
   EVT_CLOSE(MainWindow::OnClose) 
   EVT_TIMER(MainWin_SeqTimer, MainWindow::OnTimer)
   EVT_TIMER(MainWin_KillTimer, MainWindow::OnKillTimer)
 
-// button
+  // button
   EVT_BUTTON(FileLoader_Start, MainWindow::OnFileLoaderStart)
   EVT_BUTTON(FileLoader_Stop, MainWindow::OnFileLoaderStop)
-//  EVT_MENU(MainWin_OpenVideo, MainWindow::OnOpenVideo)
-//  EVT_MENU(MainWin_CloseVideo, MainWindow::OnCloseVideo)
-//  EVT_MENU(MainWin_SeekVideo, MainWindow::OnSeekVideo)
+  //  EVT_MENU(MainWin_OpenVideo, MainWindow::OnOpenVideo)
+  //  EVT_MENU(MainWin_CloseVideo, MainWindow::OnCloseVideo)
+  //  EVT_MENU(MainWin_SeekVideo, MainWindow::OnSeekVideo)
   //EVT_TEXT_MAXLEN(101010, MainWindow::OnSetPosition)
   //EVT_PLAYPOSITION(313131, MainWindow::OnSetPosition)
-END_EVENT_TABLE()
+  END_EVENT_TABLE()
 
+  

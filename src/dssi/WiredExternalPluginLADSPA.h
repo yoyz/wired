@@ -6,7 +6,7 @@
 
 #include "ladspa.h"
 #include "../engine/AudioEngine.h"
-#include "../redist/Plugin.h"
+#include "Plugin.h"
 //#include <stdlib.h>
 #include <dlfcn.h>
 #include <math.h>

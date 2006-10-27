@@ -7,27 +7,26 @@
 class SaveCenter : public WiredDocument
 {
  public:
+  /** Constructor.
+   * \param projectName
+   * \param docParent
+   * \param projectPath
+   */
   SaveCenter(wxString docName,
-	     wxString projectName,  
-	     WiredDocument *docParent,
-	     wxString projectPath);
+	     wxString projectName,
+	     wxString projectPath,
+	     WiredDocument *docParent);
   ~SaveCenter();
 
   /** Main Save function, implementation of WiredDocument.
    * The SaveCenter is a WiredDocument. This function is used to save 
    * projectwide infos
-   * \param conf Please, refer to the WiredDocument class documentation.
-   * \param data Please, refer to the WiredDocument class documentation.
-   * \param filename Please, refer to the WiredDocument class documentation.
    */
   void		Save();
   
   /** Main Load function, implementation of WiredDocument.
    * The SaveCenter is a WiredDocument. This function is used to load 
    * projectwide infos
-   * \param conf Please, refer to the WiredDocument class documentation.
-   * \param data Please, refer to the WiredDocument class documentation.
-   * \param filename Please, refer to the WiredDocument class documentation.
    */
   void		Load();
   
@@ -41,6 +40,9 @@ class SaveCenter : public WiredDocument
 
   /** Returns the project name. */
   wxString	getProjectName();
+
+  wxString	getAudioDir();
+  void		setAudioDir(wxString audioDir);
 
   /** Sets the project name
    * \param projectName the new project name.
@@ -62,13 +64,14 @@ class SaveCenter : public WiredDocument
    */
   void		SaveFile(WiredDocument *doc, wxString file);
 
+  void		LoadProject(wxString filename);
 
  private:
    /** Writes an element in the xmlfile.
     * \param elem the element to write.
     * \param xmlFile the WiredXml object to write in.
     */
-  void		WriteElement(SaveElement elem, WiredXml *xmlFile);
+  void		WriteElement(SaveElement *elem, WiredXml *xmlFile);
 
   /** Saves a WiredDocument.
    * This function calls itself recursively, so the whole WiredDocument tree is
@@ -98,6 +101,7 @@ class SaveCenter : public WiredDocument
  private:
   wxString		_projectName;
   wxString		_projectPath;
+  wxString		_audioDir;
 };
 
 #endif /*_SAVECENTER_H_ */

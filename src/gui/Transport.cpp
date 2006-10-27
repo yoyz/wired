@@ -9,7 +9,7 @@
 #include "Sequencer.h"
 #include "SequencerGui.h"
 #include "Colour.h"
-#include "WiredSession.h"
+//#include "WiredSession.h"
 #include "HelpPanel.h"
 #include "DownButton.h"
 #include "HoldButton.h"
@@ -18,10 +18,10 @@
 #include "../engine/Settings.h"
 #include "../engine/AudioEngine.h"
 
-extern WiredSession				*CurrentSession;
+//extern WiredSession				*CurrentSession;
 
 Transport::Transport(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style, WiredDocument *docParent)
-  : wxPanel(parent, -1, pos, size, style) WiredDocument(wxT("transport"), docParent)
+  : wxPanel(parent, -1, pos, size, style), WiredDocument(wxT("transport"), docParent)
 {
   SetBackgroundColour(CL_RULER_BACKGROUND);
   //wxColour(204, 199, 219));//*wxLIGHT_GREY);
@@ -204,27 +204,28 @@ void				Transport::OnStop(wxCommandEvent &WXUNUSED(event))
 
 void				Transport::OnRecord(wxCommandEvent &WXUNUSED(event))
 {
-  if (RecordBtn->GetOn())
-    {
-      wxFileName f(CurrentSession->AudioDir.c_str());
-      if (CurrentSession->AudioDir.empty() || (!f.DirExists()))
-	{
-	  wxDirDialog dir(this, _("Choose the Audio file directory"), 
-			  wxFileName::GetCwd());
-	  if (dir.ShowModal() == wxID_OK)
-	    {
-	      CurrentSession->AudioDir = dir.GetPath().c_str();
-	    }
-	  else
-	    {
-	      RecordBtn->SetOff();
-	      return;
-	    }
-	}
-      Seq->Record();
-    }
-  else
-    Seq->StopRecord();
+  //USES WIREDSESSION
+//   if (RecordBtn->GetOn())
+//     {
+//       wxFileName f(CurrentSession->AudioDir.c_str());
+//       if (CurrentSession->AudioDir.empty() || (!f.DirExists()))
+// 	{
+// 	  wxDirDialog dir(this, _("Choose the Audio file directory"), 
+// 			  wxFileName::GetCwd());
+// 	  if (dir.ShowModal() == wxID_OK)
+// 	    {
+// 	      CurrentSession->AudioDir = dir.GetPath().c_str();
+// 	    }
+// 	  else
+// 	    {
+// 	      RecordBtn->SetOff();
+// 	      return;
+// 	    }
+// 	}
+//       Seq->Record();
+//     }
+//   else
+//     Seq->StopRecord();
 }
 
 void				Transport::OnLoop(wxCommandEvent &WXUNUSED(event))
@@ -462,24 +463,49 @@ void				Transport::OnIdle(wxIdleEvent &WXUNUSED(event))
 
 void				Transport::Save()
 {
-  SaveElement toBeSaved;
+  wxString	s;
 
-  toBeSaved.setKey(wxT("BPM"));
-  toBeSaved.setValue(Seq->BPM);
-
-  toBeSaved.setKey(wxT("SigNumerator"));
-  toBeSaved.setValue(Seq->SigNumerator);
-
-  toBeSaved.setKey(wxT("SigDenominator"));
-  toBeSaved.setValue(Seq->SigDenominator);
-
-  toBeSaved.SetKey(wxT("Click"));
-  toBeSaved.SetValue(Seq->Click);
-  toBeSaved.SetKey(wxT("Loop"));
-  toBeSaved.SetValue(Seq->Loop);
-  saveDocData(WIRED_PROJECT_FILE, &toBeSaved);
-
+  std::cerr << "[Save] Transport::Save()" << std::endl;
   
+  SaveElement	*BPM = new SaveElement();
+  s.clear();
+  s << Seq->BPM;
+  BPM->setKey(wxT("BPM"));
+  BPM->setValue(s);
+  saveDocData(WIRED_PROJECT_FILE, BPM);
+
+  SaveElement	*SigNum = new SaveElement();
+  s.clear();
+  s << Seq->SigNumerator;
+  SigNum->setKey(wxT("SigNumerator"));
+  SigNum->setValue(s);
+  this->saveDocData(WIRED_PROJECT_FILE, SigNum);
+
+  SaveElement	*SigDen = new SaveElement();
+  s.clear();
+  s << Seq->SigDenominator;
+  SigDen->setKey(wxT("SigDenominator"));
+  SigDen->setValue(s);
+  this->saveDocData(WIRED_PROJECT_FILE, SigDen);
+
+  SaveElement	*Click = new SaveElement();
+  s.clear();
+  s << Seq->Click;
+  Click->setKey(wxT("Click"));
+  Click->setValue(s);
+  this->saveDocData(WIRED_PROJECT_FILE, Click);
+
+  SaveElement	*Loop = new SaveElement();
+  s.clear();
+  s << Seq->Loop;
+  Loop->setKey(wxT("Loop"));
+  Loop->setValue(s);
+  this->saveDocData(WIRED_PROJECT_FILE, Loop);
+}
+
+void				Transport::Load()
+{
+
 }
 
 BEGIN_EVENT_TABLE(Transport, wxPanel)
