@@ -1,7 +1,11 @@
 if PORTAUDIO
-SUBDIRS = intl po src/portaudio src
-else
-SUBDIRS = intl po src
+SUBDIRS = src/portaudio
+endif
+
+SUBDIRS += intl po src
+
+if PLUGINS
+SUBDIRS += plugins
 endif
 
 ACLOCAL_AMFLAGS = -I config/m4
