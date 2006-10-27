@@ -20,8 +20,8 @@
 
 extern WiredSession				*CurrentSession;
 
-Transport::Transport(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style)
-  : wxPanel(parent, -1, pos, size, style)
+Transport::Transport(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style, WiredDocument *docParent)
+  : wxPanel(parent, -1, pos, size, style) WiredDocument(wxT("transport"), docParent)
 {
   SetBackgroundColour(CL_RULER_BACKGROUND);
   //wxColour(204, 199, 219));//*wxLIGHT_GREY);
@@ -458,6 +458,28 @@ void				Transport::OnIdle(wxIdleEvent &WXUNUSED(event))
 {
   if (Audio)
     vum->SetValue((int)(Audio->GetCpuLoad() * 100));
+}
+
+void				Transport::Save()
+{
+  SaveElement toBeSaved;
+
+  toBeSaved.setKey(wxT("BPM"));
+  toBeSaved.setValue(Seq->BPM);
+
+  toBeSaved.setKey(wxT("SigNumerator"));
+  toBeSaved.setValue(Seq->SigNumerator);
+
+  toBeSaved.setKey(wxT("SigDenominator"));
+  toBeSaved.setValue(Seq->SigDenominator);
+
+  toBeSaved.SetKey(wxT("Click"));
+  toBeSaved.SetValue(Seq->Click);
+  toBeSaved.SetKey(wxT("Loop"));
+  toBeSaved.SetValue(Seq->Loop);
+  saveDocData(WIRED_PROJECT_FILE, &toBeSaved);
+
+  
 }
 
 BEGIN_EVENT_TABLE(Transport, wxPanel)

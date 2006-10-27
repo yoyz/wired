@@ -9,6 +9,7 @@
 
 #include <wx/wx.h>
 #include <wx/gauge.h>
+#include "WiredDocument.h"
 
 #define TRANSPORT_BACKGR_IMG	L"ihm/player/tr_window_bg.png"
 #define TRANSPORT_BACKGR_LOOP_IMG	L"ihm/player/tr_window_bg_loop.png"
@@ -44,10 +45,10 @@ class				FaderCtrl;
 class				StaticLabel;
 class				VUMCtrl;
 
-class				Transport : public wxPanel
+class				Transport : public wxPanel, WiredDocument
 {
  public:
-  Transport(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style);
+  Transport(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style, WiredDocument *docParent);
   ~Transport();
 
   void				SetPlayPosition(double pos);
