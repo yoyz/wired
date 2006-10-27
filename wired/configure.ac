@@ -228,24 +228,25 @@ else
  AC_DEFINE(PACKAGE_LOCALE_DIR, "${prefix}/share/wired/locale")
 fi
 
-AC_CONFIG_FILES([src/plugins/beatbox/Makefile
-		src/plugins/compressor/Makefile
-		src/plugins/crusher/Makefile
-		src/plugins/delay/Makefile
-		src/plugins/filter/Makefile
-		src/plugins/loop_sampler/Makefile
-		src/plugins/akai_sampler/Makefile
-		src/plugins/reverb/Makefile
-		src/plugins/synth/Makefile
-		src/plugins/chorus/Makefile
-		src/plugins/wahwah/Makefile
-		src/plugins/test/Makefile
-		src/plugins/WiredPluginApi/Makefile
-		src/plugins/WiredPluginApi/src/Makefile
+AC_CONFIG_FILES([plugins/beatbox/Makefile
+		plugins/compressor/Makefile
+		plugins/crusher/Makefile
+		plugins/delay/Makefile
+		plugins/filter/Makefile
+		plugins/loop_sampler/Makefile
+		plugins/akai_sampler/Makefile
+		plugins/reverb/Makefile
+		plugins/synth/Makefile
+		plugins/chorus/Makefile
+		plugins/wahwah/Makefile
+		plugins/test/Makefile
 		Makefile
 		po/Makefile.in
 		intl/Makefile
 		src/Makefile
+		src/plugins/WiredPluginApi/Makefile
+		src/plugins/WiredPluginApi/src/Makefile
+		src/plugins/dssi/Makefile
 		src/audio/Makefile
 		src/editmidi/Makefile
 		src/engine/Makefile
@@ -257,7 +258,6 @@ AC_CONFIG_FILES([src/plugins/beatbox/Makefile
 		src/mixer/Makefile
 		src/plugins/Makefile
 		src/sequencer/Makefile
-		src/dssi/Makefile
 		src/undo/Makefile
 		src/libs/Makefile
 	        src/libs/WiredWidgets/Makefile
