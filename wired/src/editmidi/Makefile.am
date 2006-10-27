@@ -1,4 +1,4 @@
-LDFLAGS = $(shell wx-config --libs)
+LDFLAGS = $(shell wx-config --libs)  -L../WiredPluginApi/src/.libs/ -lWiredPluginApi
 
 CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../plugins -I../fileloader -I../sequencer -I../audio -I../engine -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../asm -I../undo -I../libs/WiredWidgets/include
 

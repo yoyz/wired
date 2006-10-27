@@ -30,8 +30,8 @@ mkdir intl
 autopoint -f				&& \
 aclocal --force	-I config/m4		&& \
 libtoolize --force -c			&& \
-autoconf				&& \
-autoheader				&& \
+autoconf --force			&& \
+autoheader --force			&& \
 automake -a -f -c
 
 

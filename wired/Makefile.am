@@ -1,5 +1,7 @@
 if PORTAUDIO
 SUBDIRS = src/portaudio
+else
+SUBDIRS =
 endif
 
 SUBDIRS += intl po src

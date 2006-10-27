@@ -11,7 +11,7 @@
 #include "MainWindow.h"
 #include "Settings.h"
 
-#include "../include/config.h"
+#include "config.h"
 
 void	AllocationErrorHandler(void)
 {
@@ -64,11 +64,11 @@ bool				MainApp::OnInit()
   Checker = new wxSingleInstanceChecker(name);
   if (Checker->IsAnotherRunning())
     {
-      cout << "Another instance of Wired is already running, aborting." << endl;      
+      cout << "Another instance of Wired is already running, aborting." << endl;
       return (false);
     }
   delete Checker;
-#endif  
+#endif
   SetUseBestVisual(true);
   SetVendorName(L"Wired Team");
   Frame = new MainWindow(WIRED_TITLE, wxDefaultPosition, wxGetDisplaySize());
@@ -76,7 +76,7 @@ bool				MainApp::OnInit()
   SetTopWindow(Frame);
   splash->Hide();
 
-  // now error dialog are based on mainframe 
+  // now error dialog are based on mainframe
   MainWin = Frame;
 
   // its obvious that user can't have deprecated conf with a fresh install

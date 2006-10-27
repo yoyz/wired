@@ -31,7 +31,7 @@ using namespace std;
 #define INDEX_MENUITEM_REDO		1
 
 #include "WiredPlugin.h"
-#include "../wiredvideo/WiredVideo.h"
+#include "WiredVideo.h"
 #include "FloatingFrame.h"
 
 typedef	struct s_PlugStartInfo		PlugStartInfo;

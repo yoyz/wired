@@ -15,17 +15,14 @@ SUBDIRS =				\
 	xml				\
 	samplerate			\
 	codec				\
-	wiredvideo			\
-	dssi				
+	wiredvideo
 
 
 DEPS_LIBS = plugins/WiredPluginApi/src/.libs/libWiredPluginApi.so libs/WiredWidgets/src/.libs/libWiredWidgets.so libs/WiredAkai/src/.libs/libWiredAkai.so libs/WiredAkai/src/.libs/libWiredAudioUtilities.so
 
 wired_LDFLAGS = $(shell wx-config --libs) -lsndfile -lasound -Lmidi/portmidi $(DEPS_LIBS) -Lfileloader -lfileloader `xml2-config --libs` @SAMPLERATE_LIBS@ -lportaudio
-#-L/usr/pkg/lib/ `xml2-config --libs`
 
 wired_CPPFLAGS = $(shell wx-config --cflags) -Igui -Iplugins -Ifileloader -Isequencer -Iaudio -Iengine -Imixer -Imidi -Imidi/portmidi/pm_common -Imidi/portmidi/porttime -I. -Iasm -Ieditmidi -Iundo `xml2-config --cflags` @SAMPLERATE_CFLAGS@
-#-I/opt/gnome/include -I/usr/pkg/include/libxml2/ -I/usr/pkg/include `xml2-config --cflags`
 
 if PORTAUDIO
 wired_LDFLAGS += -Lportaudio/lib/.libs/

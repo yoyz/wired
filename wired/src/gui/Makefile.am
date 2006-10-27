@@ -1,8 +1,6 @@
 LDFLAGS = $(shell wx-config --libs) `xml2-config --libs`
-#-L/usr/pkg/lib/
 
-CPPFLAGS = $(shell wx-config --cflags) -I../audio -I../libs/WiredAkai/include -I../plugins/WiredPluginApi/include -I../fileloader -I../sequencer -I../engine -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../asm -I../editmidi -I../undo -I../libs/WiredWidgets/include `xml2-config --cflags`
-#-I/usr/pkg/include/libxml2/ -I/usr/pkg/include `xml2-config --cflags`
+CPPFLAGS = $(shell wx-config --cflags) -I../audio -I../libs/WiredAkai/include -I../plugins/WiredPluginApi/include -I../fileloader -I../sequencer -I../engine -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../asm -I../editmidi -I../undo -I../libs/WiredWidgets/include `xml2-config --cflags` -I../wiredvideo -I../include/ -I../plugins/dssi/
 
 if PORTAUDIO
 CPPFLAGS += -I../portaudio/include
