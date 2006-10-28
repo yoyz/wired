@@ -1,15 +1,13 @@
 #include "SaveCenter.h"
 
 SaveCenter::SaveCenter(wxString docName,
-		       wxString projectName,  
-		       wxString projectPath = wxT(""),
-		       WiredDocument *docParent = NULL)
+		       wxFileName  projectPath,
+		       WiredDocument *docParent)
   : WiredDocument(docName, docParent)
 {
   setProjectPath(projectPath);
-  setProjectName(projectName);
-  _audioDir << _projectPath << wxT("/audio/");
-
+  _audioDir = _projectPath;
+  _audioDir.AppendDir(wxT("audio"));
 }
 
 SaveCenter::~SaveCenter()
@@ -34,9 +32,8 @@ void	SaveCenter::SaveProject()
   WiredXml	*xmlFile = new WiredXml();
   
   std::cerr << "[Save] SaveCenter::SaveProject" << std::endl;
-
-  fileName << _projectPath << _projectName << wxT(".xml");
-  std::cerr << "[Save] filename = " << fileName.mb_str() << std::endl;
+  
+  fileName << _projectPath.GetLongPath() << wxT("wired.xml");
 
   xmlFile->CreateDocument(fileName);
 
@@ -185,14 +182,14 @@ void		SaveCenter::WriteFile(wxString filename, SaveElementArray *elements)
 }
 
 //Accessors
-wxString	SaveCenter::getProjectPath()
+wxFileName	SaveCenter::getProjectPath()
 {
   return _projectPath;
 }
 
 wxString	SaveCenter::getAudioDir()
 {
-  return _audioDir;
+  return _audioDir.GetLongPath();
 }
 
 void		SaveCenter::setAudioDir(wxString audioDir)
@@ -200,17 +197,22 @@ void		SaveCenter::setAudioDir(wxString audioDir)
   _audioDir = audioDir;
 }
 
-void		SaveCenter::setProjectPath(wxString projectPath)
+void		SaveCenter::setProjectPath(wxFileName projectPath)
 {
-
-  _projectPath = projectPath;
-
-  //make some checks : 
-  //the path must end with a /
-  if(!_projectPath.Matches(wxT("*/")))
-    _projectPath << wxT("/");
-
-  //Do we have to handle the ~, bash style ? 
+  if(!projectPath.IsOk())
+    {
+      _projectPath.AssignDir(wxGetCwd());
+      _projectName = GetDefaultProjectName(projectPath);
+      _projectPath.AppendDir(_projectName);
+      if(!_projectPath.DirExists())
+	_projectPath.Mkdir();
+    }
+  else
+    {
+      _projectPath = projectPath;
+      
+      _projectName = GetProjectNameFromProjectPath(_projectPath);
+    }
 
 }
 
@@ -223,16 +225,43 @@ void		SaveCenter::setProjectName(wxString projectName)
 {
   _projectName = projectName;
 
-  //make some checks :
-  //empty name is not good. Let's put a default value...
-  //could be greatly enhanced because we won't handle 
-  //2 default project in the same directory
-  if(_projectName.IsEmpty())
-    _projectName << wxT("WiredProject");
+  _projectPath.RemoveLastDir();
+  _projectPath.AppendDir(_projectName);
 
 }
 
 void	SaveCenter::LoadProject(wxString filename)
 {
 
+}
+
+wxString	SaveCenter::GetDefaultProjectName(wxFileName cwd)
+{
+  wxString ret(wxT("WiredProject"));
+  wxString fullPath;
+  int i = 0;
+
+  do
+    {
+      fullPath.Clear();
+      i++;
+      fullPath << cwd.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) << ret << i;
+    }
+  while(wxDirExists(fullPath));
+
+  ret << i;
+
+  return ret;
+}
+
+wxString	SaveCenter::GetProjectNameFromProjectPath(wxFileName path)
+{
+  wxString		ret;
+  wxArrayString		dirs;
+  
+  dirs = path.GetDirs();
+
+  ret = dirs[dirs.GetCount() - 1];
+
+  return ret;
 }

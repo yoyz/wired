@@ -13,9 +13,8 @@ class SaveCenter : public WiredDocument
    * \param projectPath
    */
   SaveCenter(wxString docName,
-	     wxString projectName,
-	     wxString projectPath,
-	     WiredDocument *docParent);
+	     wxFileName projectPath = wxT(""),
+	     WiredDocument *docParent = NULL);
   ~SaveCenter();
 
   /** Main Save function, implementation of WiredDocument.
@@ -31,12 +30,12 @@ class SaveCenter : public WiredDocument
   void		Load();
   
   /** Returns the project path. */
-  wxString	getProjectPath();
+  wxFileName	getProjectPath();
 
   /** Sets the project path
    * \param projectPath the new project path.
    */
-  void		setProjectPath(wxString projectPath);
+  void		setProjectPath(wxFileName projectPath);
 
   /** Returns the project name. */
   wxString	getProjectName();
@@ -93,15 +92,14 @@ class SaveCenter : public WiredDocument
 
   bool		ReadXml();
 
-
-  //TODO
-  bool		checkFilePath(wxString filePath);
+  wxString	GetDefaultProjectName(wxFileName cwd);
+  wxString	GetProjectNameFromProjectPath(wxFileName path);
 
 
  private:
+  wxFileName		_projectPath;
   wxString		_projectName;
-  wxString		_projectPath;
-  wxString		_audioDir;
+  wxFileName		_audioDir;
 };
 
 #endif /*_SAVECENTER_H_ */

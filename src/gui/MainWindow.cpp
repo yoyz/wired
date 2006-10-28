@@ -81,11 +81,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   CreateStatusBar(2);
 #endif
   WiredSettings = new Settings();
-  saveCenter = new SaveCenter(wxString(wxT("wired_save")), 
-			      wxString(wxT("Session_1")), 
-			      wxString(wxT("/home/kiketloule/wired_projects")),
-			      NULL);
-
+  saveCenter = new SaveCenter(wxString(wxT("wired_save")));
   LoadedExternalPlugins = new WiredExternalPluginMgr();
   LogWin = new wxLogWindow(this, wxT("Wired log"), false);
   
@@ -652,10 +648,7 @@ bool					MainWindow::NewSession()
   else if (res == wxID_CANCEL)
     return (false);
   delete saveCenter;
-  saveCenter = new SaveCenter(wxString(wxT("wired_save")), 
-			      wxString(wxT("Session_1")), 
-			      wxString(wxT("/home/kiketloule/wired_project")),
-			      NULL);
+  saveCenter = new SaveCenter(wxString(wxT("wired_save")));
 
   Seq->Stop();
   
@@ -697,10 +690,7 @@ void					MainWindow::OnOpen(wxCommandEvent &event)
 	  if (!selfile.substr(selfile.find_last_of('.')).compare(XML_EXTENSION))
 	    {
 	      delete saveCenter;
-	      saveCenter = new SaveCenter(wxString(wxT("wired_save")), 
-					  wxString(wxT("Session_1")), 
-					  wxString(wxT("/home/kiketloule/wired_project")),
-					  NULL);
+	      saveCenter = new SaveCenter(wxString(wxT("wired_save")));
 	      saveCenter->LoadProject(selfile);
 
 	      cout << "[MAINWIN] New session loaded" << endl;
