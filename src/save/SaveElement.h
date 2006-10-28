@@ -8,7 +8,7 @@
 class SaveElement;
 
 WX_DEFINE_ARRAY_PTR(SaveElement*, SaveElementArray);
-WX_DECLARE_HASH_MAP(wxString, SaveElementArray*, wxPointerHash, wxPointerEqual, SaveElementsHashMap);
+WX_DECLARE_STRING_HASH_MAP(SaveElementArray*, SaveElementsHashMap);
 WX_DECLARE_STRING_HASH_MAP(wxString, AttributesHashMap);
 
 class SaveElement

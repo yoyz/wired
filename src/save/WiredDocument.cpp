@@ -35,18 +35,10 @@ void		WiredDocument::saveDocData(wxString file, SaveElement *data)
   SaveElementsHashMap::iterator	it;
 
   if(!_dataSave.count(file))
-    {
       _dataSave[file] = new SaveElementArray();
-      std::cerr << "Added key to _dataSave : " << file.mb_str() << std::endl;
-    }
+
   //Should check if key already exists and delete it before overwriting it.
   _dataSave[file]->Add(data);
-
-  std::cerr << "dumping _DataSave" << std::endl;
-  for(it = _dataSave.begin(); it != _dataSave.end(); it++)
-    {
-      std::cerr << it->first.mb_str() << std::endl;
-    }
 
 }
 

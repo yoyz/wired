@@ -158,6 +158,8 @@ void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
       attributesIt != attributes.end();
       attributesIt++)
     xmlFile->WriteAttribute(attributesIt->first, attributesIt->second, true);
+
+  xmlFile->WriteString(elem->getValue());
   
   xmlFile->EndElement();
 }
