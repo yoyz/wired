@@ -45,6 +45,7 @@
 #include "Threads.h"
 #include "MediaLibrary.h"
 #include "MLTree.h"
+#include "WiredVideo.h"
 
 Rack			*RackPanel = NULL;
 SequencerGui		*SeqPanel = NULL;
@@ -1539,7 +1540,7 @@ void					MainWindow::OnCloseVideo(wxCommandEvent& event)
 
 void					MainWindow::OnSeekVideo(wxCommandEvent& event)
 {
-  //  WiredVideoObject->SetSeek(VideoMenu->IsChecked(MainWin_SeekVideo));
+   WiredVideoObject->SetSeek(VideoMenu->IsChecked(MainWin_SeekVideo));
 }
 
 void					MainWindow::OnDeleteTrack(wxCommandEvent& event)
@@ -1885,9 +1886,9 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
 // button
   EVT_BUTTON(FileLoader_Start, MainWindow::OnFileLoaderStart)
   EVT_BUTTON(FileLoader_Stop, MainWindow::OnFileLoaderStop)
-//  EVT_MENU(MainWin_OpenVideo, MainWindow::OnOpenVideo)
-//  EVT_MENU(MainWin_CloseVideo, MainWindow::OnCloseVideo)
-//  EVT_MENU(MainWin_SeekVideo, MainWindow::OnSeekVideo)
+  EVT_MENU(MainWin_OpenVideo, MainWindow::OnOpenVideo)
+  EVT_MENU(MainWin_CloseVideo, MainWindow::OnCloseVideo)
+  EVT_MENU(MainWin_SeekVideo, MainWindow::OnSeekVideo)
   //EVT_TEXT_MAXLEN(101010, MainWindow::OnSetPosition)
   //EVT_PLAYPOSITION(313131, MainWindow::OnSetPosition)
 END_EVENT_TABLE()
