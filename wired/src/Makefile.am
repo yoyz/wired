@@ -17,7 +17,6 @@ SUBDIRS =				\
 	codec				\
 	wiredvideo
 
-
 DEPS_LIBS = plugins/WiredPluginApi/src/.libs/libWiredPluginApi.so libs/WiredWidgets/src/.libs/libWiredWidgets.so libs/WiredAkai/src/.libs/libWiredAkai.so libs/WiredAkai/src/.libs/libWiredAudioUtilities.so
 
 wired_LDFLAGS = $(shell wx-config --libs) -lsndfile -lasound -Lmidi/portmidi $(DEPS_LIBS) -Lfileloader -lfileloader `xml2-config --libs` @SAMPLERATE_LIBS@ -lportaudio
@@ -48,4 +47,4 @@ wired_LDADD =					\
 	samplerate/libwiredsamplerate.a		\
 	codec/libwiredCodec.a			\
 	wiredvideo/libwiredvideo.a		\
-	dssi/libwireddssi.a
+	plugins/dssi/libwireddssi.a

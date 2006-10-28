@@ -1,4 +1,4 @@
-SUBDIRS = WiredPluginApi
+SUBDIRS = WiredPluginApi dssi
 
 #LDFLAGS = $(shell wx-config --libs)
 
