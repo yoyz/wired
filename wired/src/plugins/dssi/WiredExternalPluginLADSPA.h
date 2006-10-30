@@ -27,38 +27,39 @@ using namespace std;
 
 typedef struct			s_gui_port
 {
-	LADSPA_Data		LowerBound;
-	LADSPA_Data		UpperBound;
-	LADSPA_Data		*Data;
+  LADSPA_Data		LowerBound;
+  LADSPA_Data		UpperBound;
+  LADSPA_Data		*Data;
 }				t_gui_port;
 
 typedef struct			s_ladspa_port
 {
-	LADSPA_PortDescriptor	Descriptor;
-	LADSPA_PortRangeHint	RangeHint;
-	unsigned long		Id;
-	wxString			Name;
+  LADSPA_PortDescriptor	Descriptor;
+  LADSPA_PortRangeHint	RangeHint;
+  unsigned long		Id;
+  wxString		Name;
 }				t_ladspa_port;
 
 typedef struct			s_gui_control
 {
-	t_gui_port		Data;
-	t_ladspa_port		Descriptor;
+  t_gui_port		Data;
+  t_ladspa_port		Descriptor;
 }				t_gui_control;
+
 
 class				WiredLADSPAInstance : public WiredPlugin
 {
 public:
   WiredLADSPAInstance(){;}
-  WiredLADSPAInstance(PlugStartInfo &info);
+  WiredLADSPAInstance(WiredPluginStartInfo& info);
   ~WiredLADSPAInstance();
   WiredLADSPAInstance(const WiredLADSPAInstance& copy){*this = copy;}
   WiredLADSPAInstance		operator=(const WiredLADSPAInstance& right);
   bool				operator<(const WiredLADSPAInstance& right);
-  bool				Init(const LADSPA_Descriptor* Descriptor);
+  //  bool				Init(const LADSPA_Descriptor* Descriptor);
   bool				Load();
-  void				SetInfo(PlugInitInfo *Info);
-  void				SetInfo(PlugStartInfo *Info);
+  //void				SetInfo(PlugInitInfo* Info);
+  void				SetInfo(WiredPluginStartInfo* Info);
   bool				ChangeActivateState(bool Activate = true);
   void				Bypass();
   unsigned long			GetUniqueId();
@@ -66,7 +67,7 @@ public:
   //<Wired Plugin Implementation>
   void	 			Process(float **input, float **output,
 					long sample_length);
-  void				Init();
+  // void				Init();
   void				Play();
   void				Stop();
   void				Load(WiredPluginData& Datas);
@@ -75,17 +76,18 @@ public:
   void				SetSamplingRate(double rate);
   void			  	SetBPM(float bpm);
   void				SetSignature(int numerator, int denominator);
-  void				ProcessEvent(WiredEvent &event);
+  void				ProcessEvent(WiredMidiEvent& event);
   bool				HasView();
   bool				IsAudio();
   bool				IsMidi();
-  void				AskUpdate(){}
-  void				Update() {}
+  void				AskUpdate(){};
+  void				Update() {};
   wxString			GetHelpString();
   void				SetHelpMode(bool On);
-  wxString			DefaultName();
+  //  wxString			DefaultName();
   wxBitmap* 			GetBitmap(){return NULL;}
   //</Wired Plugin Implementation>
+
 
  private:
   void				UnLoad();
@@ -110,16 +112,18 @@ public:
   void				AddGuiControl(t_ladspa_port *PortData);
   void				UnloadGUIPorts();
 
-  int								_Type;
-  LADSPA_Handle					_Handle;
-  LADSPA_Descriptor				*_Descriptor;
-  LADSPA_Properties				_Properties;
-  list<t_ladspa_port>				_InputAudioPluginsPorts;
-  list<t_ladspa_port>				_OutputAudioPluginsPorts;
-  list<t_ladspa_port>				_InputDataPluginsPorts;
-  list<t_ladspa_port>				_OutputDataPluginsPorts;
-  bool							_IsPlaying;
-  bool							_Bypass;
+
+  int				_Type;
+  LADSPA_Handle			_Handle;
+  LADSPA_Descriptor		*_Descriptor;
+  LADSPA_Properties		_Properties;
+  list<t_ladspa_port>		_InputAudioPluginsPorts;
+  list<t_ladspa_port>		_OutputAudioPluginsPorts;
+  list<t_ladspa_port>		_InputDataPluginsPorts;
+  list<t_ladspa_port>		_OutputDataPluginsPorts;
+  bool				_IsPlaying;
+  bool				_Bypass;
+
  protected:
   map<unsigned long, t_gui_control>	_GuiControls;								//Key == PortId; Value == PortData
 };

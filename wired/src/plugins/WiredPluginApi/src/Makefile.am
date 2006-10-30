@@ -18,6 +18,7 @@ inst_HEADERS = 						\
 		../include/WiredPluginAudio.h		\
 		../include/WiredPluginData.h		\
 		../include/WiredPluginInstaller.h	\
+		../include/WiredMidiEvent.h		\
 		../include/Polyphony.h
 
 libWiredPluginApi_la_SOURCES =			\
@@ -27,6 +28,7 @@ libWiredPluginApi_la_SOURCES =			\
 		WiredPluginAudio.cpp		\
 		WiredPluginData.cpp		\
 		WiredPlugin.cpp			\
+		WiredMidiEvent.cpp		\
 		Polyphony.cpp
 
 

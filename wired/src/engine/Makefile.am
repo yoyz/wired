@@ -1,4 +1,4 @@
-CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../plugins/WiredPluginApi/include -I../libs/WiredWidgets/include -I../fileloader -I../sequencer -I../audio -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../editmidi -I../undo
+CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../plugins/ -I../plugins/WiredPluginApi/include -I../libs/WiredWidgets/include -I../fileloader -I../sequencer -I../audio -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../editmidi -I../undo
 
 if PORTAUDIO
 CPPFLAGS += -I../portaudio/include

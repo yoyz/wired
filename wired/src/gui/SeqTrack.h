@@ -23,7 +23,7 @@ using namespace std;
 #define MUTE_DOWN			L"ihm/seqtrack/mute_down.png"
 
 class					ChannelGui;
-class					Plugin;
+class					WiredPlugin;
 class					RackTrack;
 class					ChoiceButton;
 class					DownButton;
@@ -32,14 +32,14 @@ class					VUMCtrl;
 class					SeqTrack: public wxControl
 {
  public:
-  SeqTrack(long index, wxWindow *parent, const wxPoint& pos, 
+  SeqTrack(long index, wxWindow *parent, const wxPoint& pos,
 	   const wxSize& size, bool audio = true);
   ~SeqTrack();
 
   void					PropagateEvent(wxEvent &event);
   void					OnConnectTo(wxCommandEvent &event);
   void					OnConnectSelected(wxCommandEvent &event);
-  void					ConnectTo(Plugin *plug);
+  void					ConnectTo(WiredPlugin* plug);
   void					OnPaint(wxPaintEvent &event);
   void					OnMouseClick(wxMouseEvent &e);
   void					OnDeviceChoice(wxCommandEvent &event);
@@ -65,13 +65,13 @@ class					SeqTrack: public wxControl
   bool					Mute;
   wxTextCtrl				*Text;
   ChannelGui*				ChanGui;
-  Plugin				*Connected;
+  WiredPlugin				*Connected;
   RackTrack				*ConnectedRackTrack;
   int					VuValue;
 
  protected:
   void					OnMotion(wxMouseEvent &e);
-  
+
   ChoiceButton				*Image;
   wxMenu				*menu;
   DownButton				*RecBtn;

@@ -15,10 +15,16 @@
 #include "WiredPluginAudio.h"
 #include "WiredPluginData.h"
 
+//Needed by plugins
+#include "WiredMidiEvent.h"
+#include "WiredPluginInstaller.h"
+
+
 class WiredPluginStartInfo;
 class WiredPluginGui;
 class WiredPluginAudio;
 class WiredPluginData;
+
 
 ////
 // Current version of API
@@ -65,7 +71,7 @@ class		WiredPlugin : public wxWindow, public WiredPluginGui, public WiredPluginA
   void CloseOptionalView();
   // Sequencer events
   /* Create a MIDI pattern containing a list of event in the host's sequencer */
-  void	AddMidiPattern(std::list<SeqCreateEvent *>* midi);
+  void AddMidiPattern(std::list<SeqCreateEvent *>* midi);
 
 };
 

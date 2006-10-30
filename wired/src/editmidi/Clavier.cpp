@@ -8,7 +8,9 @@
 #include "MidiPattern.h"
 #include "Track.h"
 #include "SeqTrack.h"
-#include "WiredCorePlugin.h"
+//#include "WiredCorePlugins.h"
+#include "WiredMidiEvent.h"
+#include "WiredPlugin.h"
 
 
 Clavier::Clavier(wxWindow *parent, wxWindowID id, const wxPoint& pos,
@@ -233,30 +235,30 @@ void				Clavier::OnPaint(wxPaintEvent &event)
 
 void				Clavier::OnKeyDown(wxMouseEvent &event)
 {
-  Key				*k = (Key *)event.GetEventObject();
+  Key*			k = (Key *)event.GetEventObject();
+  WiredMidiEvent	midievent = WiredMidiEvent();
 
-  WiredEvent	midievent;
-  midievent.Type = WIRED_MIDI_EVENT;
-  midievent.NoteLength = 0;
-  midievent.DeltaFrames = 0;
-  midievent.MidiData[0] = 0x90;
-  midievent.MidiData[1] = k->code;
-  midievent.MidiData[2] = 100;
+  midievent.SetNoteLength(0);
+  midievent.SetDeltaFrames(0);
+  midievent.SetMidiType(0x90);
+  midievent.SetMidiController(k->code);
+  midievent.SetMidiValue(0);
+
   if (Seq->Tracks[em->midi_pattern->GetTrackIndex()]->TrackOpt->Connected)
     Seq->Tracks[em->midi_pattern->GetTrackIndex()]->TrackOpt->Connected->ProcessEvent(midievent);
 }
 
 void				Clavier::OnKeyUp(wxMouseEvent &event)
 {
-  Key				*k = (Key *)event.GetEventObject();
-  WiredEvent			midievent;
+  Key*				k = (Key *)event.GetEventObject();
+  WiredMidiEvent		midievent = WiredMidiEvent();
 
-  midievent.Type = WIRED_MIDI_EVENT;
-  midievent.NoteLength = 0;
-  midievent.DeltaFrames = 0;
-  midievent.MidiData[0] = 0x90;
-  midievent.MidiData[1] = k->code;
-  midievent.MidiData[2] = 0;
+  midievent.SetNoteLength(0);
+  midievent.SetDeltaFrames(0);
+  midievent.SetMidiType(0x90);
+  midievent.SetMidiController(k->code);
+  midievent.SetMidiValue(0);
+
   if (Seq->Tracks[em->midi_pattern->GetTrackIndex()]->TrackOpt->Connected)
     Seq->Tracks[em->midi_pattern->GetTrackIndex()]->TrackOpt->Connected->ProcessEvent(midievent);
 }

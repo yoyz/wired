@@ -6,6 +6,7 @@
 #include "PluginLoader.h"
 #include "config.h"
 
+
 PluginLoader::PluginLoader()
 {
   FileName = wxT("");
@@ -47,12 +48,12 @@ void	PluginLoader::Load(WiredExternalPluginMgr *PlugMgr, unsigned long UniqueId)
 
 void	PluginLoader::Load(WiredExternalPluginMgr *PlugMgr, int MenuItemId, PlugStartInfo &info)
 {
-	External = true;
-	PluginMgr = PlugMgr;
-	IdMenuItem = MenuItemId;
-	ExternalPlug = PluginMgr->CreatePlugin(IdMenuItem, info);
-	ExternalPlug->SetInfo(&InitInfo);
-	//ExternalPlug->SetVirtualSize(400, 100);
+  External = true;
+  PluginMgr = PlugMgr;
+  IdMenuItem = MenuItemId;
+  ExternalPlug = PluginMgr->CreatePlugin(IdMenuItem, info);
+  ExternalPlug->SetInfo(&InitInfo);
+  //ExternalPlug->SetVirtualSize(400, 100);
 }
 
 void	PluginLoader::Load(wxString& filename)
@@ -82,13 +83,14 @@ void	PluginLoader::Load(wxString& filename)
 	  Unload();
 	  return ;
 	}
+
       destroy_installer = (f_destroyer) handle.GetSymbol(PLUGIN_SYMBOL_DESTROYER);
-      if (!destroy_installer) 
+      if (!destroy_installer)
 	{
 	  cerr << "[PLUGLOADER] Error: Cannot load symbol : " << PLUGIN_SYMBOL_DESTROYER << endl;
 	  Unload();
 	  return ;
-	}  
+	}
 
       // get installer from plugin (id, name, version, size, instance creator..)
       installer = create_installer();
@@ -96,7 +98,7 @@ void	PluginLoader::Load(wxString& filename)
       // check version of API
       if (!installer || installer->GetVersion() != WIRED_CURRENT_VERSION_API)
 	{
-	  cerr << "[PLUGLOADER] Error: Cannot load plugin " << filename.mb_str() 
+	  cerr << "[PLUGLOADER] Error: Cannot load plugin " << filename.mb_str()
 	       << ", it has deprecated version of API " << endl;
 	  Unload();
 	  return ;

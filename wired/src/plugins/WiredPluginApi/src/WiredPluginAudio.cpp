@@ -2,8 +2,6 @@
 
 #include "WiredCorePlugins.h"
 
-
-
 WiredPluginAudio::~WiredPluginAudio()
 {
 

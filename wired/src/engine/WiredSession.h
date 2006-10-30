@@ -37,7 +37,7 @@ typedef struct  s_Header
 {
   char		Magic[4]; // 'W','I','R','E'
   long		AudioDirLen;
-  long		NumberOfRackTracks;  
+  long		NumberOfRackTracks;
 } t_Header;
 
 typedef struct  s_RackTrack
@@ -50,7 +50,7 @@ typedef struct  s_Plugin
 {
   char		Id[4];
   long		NameLen;
-  wxChar		*Name;
+  wxChar*	Name;
   long		DataLen;
 } t_Plugin;
 

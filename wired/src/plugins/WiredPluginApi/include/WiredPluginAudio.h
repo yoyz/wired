@@ -9,7 +9,9 @@
 
 //#include "WiredPluginStartInfo.h"
 
+
 class WiredPluginStartInfo;
+class WiredMidiEvent;
 
 ////
 // Current version of API
@@ -29,12 +31,12 @@ class		WiredPluginAudio
   ~WiredPluginAudio();
 
   /* Called when the host starts to play */
-  virtual void	 Play() {}
+  virtual void	 Play() {};
   /* Called when the host stopped the sequencer */
-  virtual void	 Stop() {}
+  virtual void	 Stop() {};
 
   /* Called by the host when the signature changes */
-  virtual void   SetSignature(int numerator, int denominator) {}
+  virtual void   SetSignature(int numerator, int denominator) {};
 
   /**
    * This is were you do your processing. 'input' is the data you have to process (or
@@ -51,7 +53,7 @@ class		WiredPluginAudio
 	  output[0][i] = input[0][i];
 	  output[1][i] = input[1][i];
 	}
-    }
+    };
 
 
   int	GetLastMidiType();
@@ -76,7 +78,7 @@ class		WiredPluginAudio
   double	GetCurrentPos();
 
   /* Called when the plugin receives an event such as MIDI */
-  virtual void	 ProcessEvent(/*WiredEvent &event*/) {};
+  virtual void	 ProcessEvent(WiredMidiEvent& event) {};
 
   /* Returns the number of bars per sample */
   double	GetBarsPerSample();

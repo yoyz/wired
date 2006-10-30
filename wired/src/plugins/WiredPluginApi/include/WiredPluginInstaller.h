@@ -19,8 +19,8 @@ enum ePlugType {
 class		WiredPluginInstaller
 {
  public:
-  virtual	WiredPluginInstaller();
-  virtual	~WiredPluginInstaller();
+  //  virtual	WiredPluginInstaller();
+  //  virtual	~WiredPluginInstaller();
 
   /**
    * Get Name of plugin
@@ -61,7 +61,7 @@ class		WiredPluginInstaller
    * Destroy an instance of the plugin.
    * For exemple, its called when users remove an instrument.
    */
-  virtual void		Destroy(WiredPlugin*);
+  virtual void		Destroy(WiredPlugin* plugin);
 
   /**
    * Returns the host product data path

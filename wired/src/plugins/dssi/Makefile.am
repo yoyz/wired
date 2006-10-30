@@ -1,9 +1,9 @@
 LDFLAGS = $(shell wx-config --libs) -lm
 
-CPPFLAGS = $(shell wx-config --cflags) -I../gui -I../engine -I../plugins/WiredPluginApi/include -I../libs/WiredWidgets/include -I../fileloader -I../sequencer -I../audio -I../mixer -I../midi -I../midi/portmidi/pm_common -I../midi/portmidi/porttime -I../editmidi -I../undo -Wall -Wunused
+CPPFLAGS = $(shell wx-config --cflags) -I../../gui -I../../engine -I../../plugins/WiredPluginApi/include -I../../libs/WiredWidgets/include -I../../fileloader -I../../sequencer -I../../audio -I../../mixer -I../../midi -I../../midi/portmidi/pm_common -I../../midi/portmidi/porttime -I../../editmidi -I../../undo -Wall -Wunused
 
 if PORTAUDIO
-CPPFLAGS += -I../portaudio/include
+CPPFLAGS += -I../../portaudio/include
 endif
 
 noinst_LIBRARIES = libwireddssi.a

@@ -30,7 +30,9 @@ class		WiredPluginGui
   WiredPluginGui(WiredPluginStartInfo* parent) { _StartInfo = parent; };
   ~WiredPluginGui();
 
-
+  /*
+   * VIRTUAL METHODS
+   */
   /* Called by the host that the plugin can update its graphical controls */
   virtual void	 Update() {};
 
@@ -42,6 +44,14 @@ class		WiredPluginGui
 
   /* Returns a 32x16 bitmap used for displaying the connected to track plugin */
   virtual wxBitmap* GetBitmap() { return NULL; };
+
+  /* Called by the host to know if the plugin has an optional view or not */
+  virtual bool	 HasView() { return false; };
+  /* Called by the host to create the optional view */
+  virtual wxWindow* CreateView(wxWindow *zone, wxPoint& pos, wxSize& size) { return 0x0; };
+  /* Called when the optional view needs to be destroyed */
+  virtual void	 DestroyView() {};
+
 
 
   /* Opens the Wired file loader with given title, extensions, and if it should read
@@ -57,14 +67,6 @@ class		WiredPluginGui
   wxString SaveFileLoader(wxString& title,
 			  std::vector<wxString>* exts = NULL,
 			  bool addExts = true);
-
-  /* Called by the host to know if the plugin has an optional view or not */
-  virtual bool	 HasView() { return false; };
-  /* Called by the host to create the optional view */
-  virtual wxWindow* CreateView(wxWindow *zone, wxPoint& pos, wxSize& size) { return 0x0; };
-  /* Called when the optional view needs to be destroyed */
-  virtual void	 DestroyView() {};
-
   void	SendHelp(wxString str);
 
 };

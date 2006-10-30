@@ -9,20 +9,21 @@
 #include "Transport.h"
 #include "Rack.h"
 #include "AudioCenter.h"
-#include "../plugins/PluginLoader.h"
-#include "../sequencer/Track.h"
-#include "../gui/SeqTrack.h"
-#include "../gui/SeqTrackPattern.h"
-#include "../gui/Pattern.h"
-#include "../gui/AudioPattern.h"
-#include "../gui/MidiPattern.h"
-#include "../midi/midi.h"
+#include "PluginLoader.h"
+#include "Track.h"
+#include "SeqTrack.h"
+#include "SeqTrackPattern.h"
+#include "Pattern.h"
+#include "AudioPattern.h"
+#include "MidiPattern.h"
+#include "midi.h"
+
 
 extern vector<PluginLoader *>	LoadedPluginsList;
 extern PlugStartInfo		StartInfo;
 
 WiredSession::WiredSession(wxString filename, wxString audiodir)
-{ 
+{
   FileName = filename;
   AudioDir = audiodir;
 }
@@ -46,12 +47,12 @@ bool WiredSession::Load()
       t_AudioPattern	audio_pattern;
       t_MidiPattern	midi_pattern;
       t_MidiEvent	midi_event;
-      
+
 
       // Header
       confFile.Read(&header, sizeof (header));
       if ((header.Magic[0] != 'W') || (header.Magic[1] != 'I') ||
-	  (header.Magic[2] != 'R') || (header.Magic[3] != 'E')) 
+	  (header.Magic[2] != 'R') || (header.Magic[3] != 'E'))
 	{
 	  cout << "[WIREDSESSION] Bad magic !" << endl;
 	  return (false);
@@ -95,7 +96,7 @@ bool WiredSession::Load()
   		  plug = r->AddRack(StartInfo, p);
 		}
 	      else
-		cout << "[WIREDSESSION] Plugin with Id  " << plugin.Id << " is not loaded" << endl;     
+		cout << "[WIREDSESSION] Plugin with Id  " << plugin.Id << " is not loaded" << endl;
 	      confFile.Read(&plugin.NameLen, sizeof (plugin.NameLen));
 	      plugin.Name = new wxChar[plugin.NameLen + 1];
 	      confFile.Read(plugin.Name, plugin.NameLen);
@@ -104,7 +105,7 @@ bool WiredSession::Load()
 	      if (plug)
 		{
 		  plug->Name = plugin.Name;
-		  if (plugin.DataLen > 0)		    
+		  if (plugin.DataLen > 0)
 		    plug->Load(confFile.fd(), plugin.DataLen);
 		}
 	      delete plugin.Name;
@@ -135,7 +136,7 @@ bool WiredSession::Load()
       TransportPanel->SetSigDenominator(Seq->SigDenominator);
       TransportPanel->SetLoop(Seq->Loop);
       TransportPanel->SetClick(Seq->Click);
-      
+
       // Track / Pattern
       Track *t;
       for (i = 0; i < sequencer.NumberOfTracks; i++)
@@ -161,7 +162,7 @@ bool WiredSession::Load()
 	  int					id = 0;
 	  bool					done = false;
 
-	  for (it = RackPanel->RackTracks.begin(); 
+	  for (it = RackPanel->RackTracks.begin();
 	       (it != RackPanel->RackTracks.end()) && !done; it++)
 	    for (it2 = (*it)->Racks.begin(); it2 != (*it)->Racks.end(); it2++)
 	      {
@@ -176,7 +177,7 @@ bool WiredSession::Load()
 
 	  //t->TrackOpt->Text->SetValue(track.Name);
 	  t->TrackOpt->SetName(track.Name);
-	  
+
 	  delete track.Name;
 	  // Pattern
 	  for (j = 0; j < track.NumberOfPatterns; j++)
@@ -187,7 +188,7 @@ bool WiredSession::Load()
 	      pattern.Name = new wxChar[pattern.NameLen + 1];
 	      confFile.Read(pattern.Name, pattern.NameLen);
 	      pattern.Name[pattern.NameLen] = 0;
-	      
+
 	      // AudioPattern / MidiPattern
 	      if (t->IsAudioTrack())
 		{
@@ -195,13 +196,13 @@ bool WiredSession::Load()
 		  confFile.Read(&audio_pattern.EndWavePos, sizeof (audio_pattern.EndWavePos));
 		  confFile.Read(&audio_pattern.FilenameLen, sizeof (audio_pattern.FilenameLen));
 		  audio_pattern.Filename = new wxChar[audio_pattern.FilenameLen + 1];
-		  confFile.Read(audio_pattern.Filename, audio_pattern.FilenameLen);	  
+		  confFile.Read(audio_pattern.Filename, audio_pattern.FilenameLen);
 		  audio_pattern.Filename[audio_pattern.FilenameLen] = 0;
-		  AudioPattern	*p = new AudioPattern(pattern.Position, 
+		  AudioPattern	*p = new AudioPattern(pattern.Position,
 						      pattern.EndPosition, i);
 		  WaveFile	*w = WaveCenter.AddWaveFile(audio_pattern.Filename);
 		  if (w)
-		    {		      
+		    {
 		      p->SetStartWavePos(audio_pattern.StartWavePos);
 		      p->SetEndWavePos(audio_pattern.EndWavePos);
 		      p->SetWave(w);
@@ -209,17 +210,17 @@ bool WiredSession::Load()
 		      t->AddPattern(p);
 		    }
 		  else
-		    cout << "[WIREDSESSION] Could not open file: " 
+		    cout << "[WIREDSESSION] Could not open file: "
 			 << audio_pattern.Filename << endl;
 		  delete audio_pattern.Filename;
 		}
 	      else
 		{
-		  confFile.Read(&midi_pattern, sizeof (midi_pattern));	
-		  MidiPattern *p = new MidiPattern(pattern.Position, 
+		  confFile.Read(&midi_pattern, sizeof (midi_pattern));
+		  MidiPattern *p = new MidiPattern(pattern.Position,
 						   pattern.EndPosition, i);
 		  MidiEvent			*midi_e;
-		  
+
 		  p->SetPPQN(midi_pattern.PPQN);
 		  for (int count = 0; count < midi_pattern.NumberOfEvents; count++)
 		    {
@@ -229,8 +230,8 @@ bool WiredSession::Load()
 		      p->AddEvent(midi_e);
 		    }
 		  t->AddPattern(p);
-		} 
-	      delete pattern.Name;	     
+		}
+	      delete pattern.Name;
 	    }
 	}
       confFile.Close();
@@ -253,7 +254,7 @@ bool WiredSession::Save()
       t_AudioPattern	audio_pattern;
       t_MidiPattern	midi_pattern;
       t_MidiEvent	midi_event;
-      
+
       wxFileName session_dir(FileName);
 
       // Header
@@ -290,7 +291,7 @@ bool WiredSession::Save()
 	      confFile.Write(plugin.Id, sizeof (plugin.Id));
 	      confFile.Write(&(plugin.NameLen), sizeof (plugin.NameLen));
 	      confFile.Write(plugin.Name, plugin.NameLen);
-	      
+
 	      pos = confFile.Seek(sizeof (long), wxFromCurrent) - sizeof (long);
 	      plugin.DataLen = (*j)->Save(confFile.fd());
 	      confFile.Seek(pos);
@@ -298,7 +299,7 @@ bool WiredSession::Save()
 	      confFile.Seek(plugin.DataLen, wxFromCurrent);
 	    }
 	}
-      
+
       // Sequencer
       sequencer.BPM = Seq->BPM;
       sequencer.SigNumerator = Seq->SigNumerator;
@@ -325,8 +326,8 @@ bool WiredSession::Save()
 	  track.Record = (*k)->TrackOpt->Record;
 	  track.DeviceId = (*k)->TrackOpt->DeviceId;
 
-	  track.PluginId = 0; 	  
-	  for (found = false, i = RackPanel->RackTracks.begin(); 
+	  track.PluginId = 0;
+	  for (found = false, i = RackPanel->RackTracks.begin();
 	       (i != RackPanel->RackTracks.end()) && !found; i++)
 	    for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
 	      {
@@ -335,9 +336,9 @@ bool WiredSession::Save()
 		    found = true;
 		    break;
 		  }
-		(track.PluginId)++; 	  
+		(track.PluginId)++;
 	      }
-	  
+
 
 	  track.NameLen = (*k)->TrackOpt->Text->GetLineLength(0);
 	  s = (*k)->TrackOpt->Text->GetValue();
@@ -362,7 +363,7 @@ bool WiredSession::Save()
 	      confFile.Write(&pattern.EndPosition, sizeof (pattern.EndPosition));
 	      confFile.Write(&pattern.NameLen, sizeof (pattern.NameLen));
 	      confFile.Write(pattern.Name, pattern.NameLen);
-	      
+
 	      // AudioPattern / MidiPattern
 	      if ((*k)->IsAudioTrack())
 		{
@@ -374,7 +375,7 @@ bool WiredSession::Save()
 		  confFile.Write(&audio_pattern.StartWavePos, sizeof (audio_pattern.StartWavePos));
 		  confFile.Write(&audio_pattern.EndWavePos, sizeof (audio_pattern.EndWavePos));
 		  confFile.Write(&audio_pattern.FilenameLen, sizeof (audio_pattern.FilenameLen));
-//		  confFile.Write((const char *)audio_pattern.Filename.mb_str(*wxConvCurrent), audio_pattern.FilenameLen);	  
+//		  confFile.Write((const char *)audio_pattern.Filename.mb_str(*wxConvCurrent), audio_pattern.FilenameLen);
 		}
 	      else
 		{
@@ -383,7 +384,7 @@ bool WiredSession::Save()
 		  MidiPattern *p = (MidiPattern *)*l;
 		  midi_pattern.PPQN = p->GetPPQN();
 		  midi_pattern.NumberOfEvents = p->Events.size();
-		  confFile.Write(&midi_pattern, sizeof (midi_pattern));	
+		  confFile.Write(&midi_pattern, sizeof (midi_pattern));
 		  for (m = p->Events.begin(); m != p->Events.end(); m++)
 		    {
 		      midi_event.Position = (*m)->Position;
@@ -394,7 +395,7 @@ bool WiredSession::Save()
 		}
 	    }
 	}
-      confFile.Close();      
+      confFile.Close();
       return (true);
     }
   cout << "[WIREDSESSION] Writing failed for file: " << FileName << endl;
