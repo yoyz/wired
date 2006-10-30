@@ -724,6 +724,8 @@ void					MainWindow::OnSave(wxCommandEvent &event)
 
 void					MainWindow::OnSaveAs(wxCommandEvent &event)
 {
+  saveCenter->SaveProject(true);
+
   //USES WIREDSESSION
 //   vector<wxString>			exts;
   

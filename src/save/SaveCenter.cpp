@@ -26,14 +26,35 @@ void	SaveCenter::Load()
   //load project specific infos ?
 }
 
-void	SaveCenter::SaveProject()
+void	SaveCenter::SaveProject(bool saveAs)
 {
   wxString	fileName;
   WiredXml	*xmlFile = new WiredXml();
-  
+  wxDirDialog	dirDialog(NULL, _("Select a project folder"),
+			  _projectPath.GetPath());
+
   std::cerr << "[Save] SaveCenter::SaveProject" << std::endl;
-  
-  fileName << _projectPath.GetLongPath() << wxT("wired.xml");
+
+  if(!_saved || saveAs)
+    {
+      //call fileloader to select the location
+      if(dirDialog.ShowModal() == wxID_OK)
+	{
+	  _projectPath.Clear();
+	  _projectPath.AssignDir(dirDialog.GetPath());
+	  std::cerr << "dirDialog.GetPath() = " << dirDialog.GetPath().mb_str() << std::endl;
+	  _saved = true;
+	}
+      else
+	return ;
+    }
+
+  if(!_projectPath.DirExists())
+    _projectPath.Mkdir();
+    
+  fileName << _projectPath.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) << wxT("wired.xml");
+
+  std::cerr << "fileName = " << fileName.mb_str() << std::endl;
 
   xmlFile->CreateDocument(fileName);
 
@@ -47,7 +68,7 @@ void	SaveCenter::SaveProject()
 
 void	SaveCenter::SaveFile(WiredDocument *doc, wxString file)
 {
-  doc->Save();
+  doc->SaveMe();
   WriteFile(file, doc->getDocFile(file)); 
 }
 
@@ -67,7 +88,7 @@ void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
   std::cerr << "[SaveCenter] childrenOfCurrentNode" << std::endl;
 
   //Save Document
-  currentNode->Save();
+  currentNode->SaveMe();
   
   std::cerr << "[SaveCenter] Save" << std::endl;
 
@@ -201,14 +222,14 @@ void		SaveCenter::setProjectPath(wxFileName projectPath)
 {
   if(!projectPath.IsOk())
     {
+      _saved = false;
       _projectPath.AssignDir(wxGetCwd());
       _projectName = GetDefaultProjectName(projectPath);
       _projectPath.AppendDir(_projectName);
-      if(!_projectPath.DirExists())
-	_projectPath.Mkdir();
     }
   else
     {
+      _saved = true;
       _projectPath = projectPath;
       
       _projectName = GetProjectNameFromProjectPath(_projectPath);
@@ -237,7 +258,7 @@ void	SaveCenter::LoadProject(wxString filename)
 
 wxString	SaveCenter::GetDefaultProjectName(wxFileName cwd)
 {
-  wxString ret(wxT("WiredProject"));
+  wxString ret(WIRED_DEFAULT_PROJECT_NAME);
   wxString fullPath;
   int i = 0;
 

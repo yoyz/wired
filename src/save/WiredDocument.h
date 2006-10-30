@@ -27,6 +27,8 @@ class WiredDocument
    */
   virtual void	Load() = 0;
 
+  void		SaveMe();
+
   WiredDocumentArray		getChildren();
   wxString			getName();
   void				Register(WiredDocument *children);

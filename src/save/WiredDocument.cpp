@@ -30,6 +30,13 @@ wxString	WiredDocument::getName()
   return _name;
 }
 
+void		WiredDocument::SaveMe()
+{
+  clearDocData();
+
+  Save();
+}
+
 void		WiredDocument::saveDocData(wxString file, SaveElement *data)
 {
   SaveElementsHashMap::iterator	it;

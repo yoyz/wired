@@ -4,6 +4,12 @@
 #include "WiredDocument.h"
 #include "WiredXml.h"
 
+//For the DirDialog
+#include <wx/dirdlg.h>
+#include <wx/generic/dirdlgg.h>
+
+#define WIRED_DEFAULT_PROJECT_NAME wxT("WiredProject")
+
 class SaveCenter : public WiredDocument
 {
  public:
@@ -53,7 +59,7 @@ class SaveCenter : public WiredDocument
    * Initialize some elements and calls SaveDocument on the SaveCenter.
    * Make sure the project path and name are set.
    */
-  void		SaveProject();
+  void		SaveProject(bool saveAs = false);
   
   /** Only saves the file designated by file of the WiredDocument designated by doc.
    * This method should be used, for example, to save a plugin patch.<br>
@@ -100,6 +106,7 @@ class SaveCenter : public WiredDocument
   wxFileName		_projectPath;
   wxString		_projectName;
   wxFileName		_audioDir;
+  bool			_saved;
 };
 
 #endif /*_SAVECENTER_H_ */
