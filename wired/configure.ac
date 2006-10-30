@@ -55,6 +55,13 @@ AC_ARG_ENABLE(plugins,
 	[enable_plugins="yes"])
 AM_CONDITIONAL(PLUGINS, test x$enable_plugins = xyes)
 
+# can enable or disable dssi support
+AC_ARG_ENABLE(dssi,
+	[  --enable-dssi Enable or disable DSSI support (default enabled)],
+	[enable_plugins="$enableval"],
+	[enable_plugins="yes"])
+AM_CONDITIONAL(DSSI, test x$enable_plugins = xyes)
+
 # can enable or disable Wired codecs
 AC_ARG_ENABLE(codecs,
 	[  --enable-codecs Enable or disable Wired codecs (default enabled)],

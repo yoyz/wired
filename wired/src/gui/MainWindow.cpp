@@ -55,11 +55,8 @@ AudioEngine		*Audio = NULL;
 Mixer			*Mix = NULL;
 AudioCenter		WaveCenter;
 Transport		*TransportPanel = NULL;
-PlugStartInfo		StartInfo;
-vector<PluginLoader *>	LoadedPluginsList;
 WiredSession		*CurrentSession = NULL;
 WiredSessionXml		*CurrentXmlSession = NULL;
-WiredExternalPluginMgr	*LoadedExternalPlugins = NULL;
 MediaLibrary		*MediaLibraryPanel = NULL;
 FileConversion		*FileConverter = NULL;
 SettingWindow		*SettingsWin = NULL;
@@ -80,8 +77,12 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
   WiredSettings = new Settings();
   CurrentSession = new WiredSession(wxString(wxT(""), *wxConvCurrent));
   CurrentXmlSession = new WiredSessionXml(wxString(wxT(""), *wxConvCurrent));
-  LoadedExternalPlugins = new WiredExternalPluginMgr();
   LogWin = new wxLogWindow(this, wxT("Wired log"), false);
+
+  // load all plugins 
+  PluginCenter = new PluginCenter();
+  PluginCenter->LoadPlugins();
+  PluginCenter->LoadExternalPlugins();
 
   try
     {
@@ -125,9 +126,6 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
   UndoMenu = new wxMenu;
   RedoMenu = new wxMenu;
   SequencerMenu = new wxMenu;
-  RacksMenu = new wxMenu;
-  CreateInstrMenu = new wxMenu;
-  CreateEffectMenu = new wxMenu;
   HelpMenu = new wxMenu;
   WindowMenu = new wxMenu;
   MediaLibraryMenu = new wxMenu;
@@ -162,8 +160,6 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
   SequencerMenu->AppendSeparator();
   SequencerMenu->Append(MainWin_ChangeAudioDir, _("&Change Audio directory..."));
 
-  RacksMenu->Append(MainWin_DeleteRack, _("D&elete Rack"));
-
   HelpMenu->Append(MainWin_IntHelp, _("&Show Integrated Help"));
   HelpMenu->Append(MainWin_About, _("&About..."));
 
@@ -179,26 +175,37 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
   WindowMenu->AppendSeparator();
   ItemFloatingSeq = WindowMenu->AppendCheckItem(MainWin_FloatSequencer,_("Floating Sequencer"));
   ItemFloatingRacks = WindowMenu->AppendCheckItem(MainWin_FloatRacks, _("Floating Racks"));
-//   ItemFloatingOptView = WindowMenu->AppendCheckItem(MainWin_FloatView, _("Floating Optional View"));
   WindowMenu->AppendSeparator();
   ItemFullscreenToggle = WindowMenu->AppendCheckItem(MainWin_FullScreen,
 						     _("&Fullscreen"));
   WindowMenu->AppendSeparator();
   WindowMenu->AppendCheckItem(MainWin_ShowLog, _("&Log window"));
 
+  ////////////
+  // Menu Bar:
+
   MenuBar->Append(FileMenu, _("&File"));
   MenuBar->Append(EditMenu, _("&Edit"));
   MenuBar->Append(SequencerMenu, _("&Sequencer"));
-  MenuBar->Append(RacksMenu, _("&Racks"));
-  MenuBar->Append(CreateInstrMenu, _("&Instruments"));
-  MenuBar->Append(CreateEffectMenu, _("Effec&ts"));
+
+  // plugins menus :
+  map<wxMenu,wxString>&			menus = PluginCenter->GetMenus();
+  map<wxMenu,wxString>::iterator	menuIt;
+
+  for (menuIt = menus.begin(); menuIt != menus.end(); menuIt++)
+    MenuBar->Append((*menuIt).first(), (*menuIt).first());
+
   // Video menu is empty... and not finished
   //  MenuBar->Append(VideoMenu, _("&Video"));
+
   MenuBar->Append(MediaLibraryMenu, _("&MediaLibrary"));
   MenuBar->Append(WindowMenu, _("&Window"));
   MenuBar->Append(HelpMenu, _("&Help"));
 
   SetMenuBar(MenuBar);
+
+  ////////////
+  // Splitter, and global panel:
 
   splitVert = new wxSplitterWindow(this);
   split = new wxSplitterWindow(splitVert);
@@ -238,15 +245,7 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
   OptPanel->Show();
   TransportPanel->Show();
 
-  StartInfo.HostCallback = HostCallback;
-  StartInfo.Version = WIRED_VERSION;
-  StartInfo.Rack = RackPanel;
-
-  LoadPlugins();
-
   RackPanel->AddPlugToMenu();
-
-  LoadExternalPlugins();
 
   RackModeView = true;
   SeqModeView = true;
@@ -954,213 +953,6 @@ void					MainWindow::OnExportMIDI(wxCommandEvent& event)
   //dlg->Destroy();
 }
 
-void					MainWindow::LoadPlugins()
-{
-  wxString				str;
-  PluginLoader				*p;
-
-  if (!PluginsConfFile.Open(WiredSettings->PlugConfFile))
-    {
-      cerr << "Could not load " << WiredSettings->PlugConfFile.mb_str() << endl;
-      return;
-    }
-  PluginMenuIndexCount = PLUG_MENU_INDEX_START;
-  for (str = PluginsConfFile.GetFirstLine(); !PluginsConfFile.Eof();
-       str = PluginsConfFile.GetNextLine())
-    {
-      if ((str.length() > 0) && (str.at(0) != '#'))
-	{
-	  p = new PluginLoader(str);
-	  if (p->IsLoaded())
-	    {
-	      LoadedPluginsList.push_back(p);
-
-	      p->Id = PluginMenuIndexCount++;
-	      if (p->InitInfo.Type == ePlugTypeInstrument)
-		{
-		  CreateInstrMenu->Append(p->Id, p->InitInfo.Name);
-		  Connect(p->Id, wxEVT_COMMAND_MENU_SELECTED,
-			  (wxObjectEventFunction)(wxEventFunction)
-			  (wxCommandEventFunction)&MainWindow::OnCreateRackClick);
-		}
-	      else if (p->InitInfo.Type == ePlugTypeEffect)
-		{
-		  CreateEffectMenu->Append(p->Id, p->InitInfo.Name);
-		  Connect(p->Id, wxEVT_COMMAND_MENU_SELECTED,
-			  (wxObjectEventFunction)(wxEventFunction)
-			  (wxCommandEventFunction)&MainWindow::OnCreateEffectClick);
-		}
-	      else
-		cout << "[MAINWIN] Plugin type unknown" << endl;
-	      cout << "[MAINWIN] Plugin " << p->InitInfo.Name.mb_str() << " is working" << endl;
-	    }
-	  else
-	    delete p;
-	}
-    }
-}
-
-void					MainWindow::LoadExternalPlugins()
-{
-//  map<int, wstring>				PluginsList;
-  list<wxString>					PluginsList;
-  //  map<int, wstring>::iterator	IterPluginsList;
-  list<wxString>::iterator		IterPluginsList;
-  int							PluginInfo;
-  int							PluginId;
-  wxString						PluginName, Sep(wxT("#"));
-
-  CreateDSSIInstrMenu = NULL;
-  CreateLADSPAInstrMenu = NULL;
-  CreateDSSIEffectMenu = NULL;
-  CreateLADSPAEffectMenu = NULL;
-  LoadedExternalPlugins->LoadPLugins(TYPE_PLUGINS_DSSI | TYPE_PLUGINS_LADSPA);
-  LoadedExternalPlugins->SetStartInfo(StartInfo);
-  PluginsList = LoadedExternalPlugins->GetSortedPluginsList(Sep);
-
-  for (IterPluginsList = PluginsList.begin(); IterPluginsList != PluginsList.end(); IterPluginsList++)
-    {
-      if ((*IterPluginsList).find_last_of(Sep.c_str()) > 0)
-  	{
-	  PluginName = (*IterPluginsList).substr(0, (*IterPluginsList).find_last_of(Sep));
-	  PluginId = atoi(wxString((*IterPluginsList).substr((*IterPluginsList).find_last_of(Sep) + 1).c_str(), *wxConvCurrent).mb_str(*wxConvCurrent));
-  	}
-      //  	PluginInfo = LoadedExternalPlugins->GetPluginType(IterPluginsList->first);
-      PluginInfo = LoadedExternalPlugins->GetPluginType(PluginId);
-
-      //  	LoadedExternalPlugins->SetMenuItemId(IterPluginsList->first,
-      //  		AddPluginMenuItem(PluginInfo, PluginInfo & TYPE_PLUGINS_EFFECT, IterPluginsList->second));
-      LoadedExternalPlugins->SetMenuItemId(PluginId,
-					   AddPluginMenuItem(PluginInfo, PluginInfo & TYPE_PLUGINS_EFFECT, PluginName));
-    }
-}
-
-int						MainWindow::AddPluginMenuItem(int Type, bool IsEffect, const wxString& MenuName)
-{
-  int					Id = PluginMenuIndexCount++;
-  wxMenuItem			*NewItem;
-
-  if (IsEffect == true)
-    {
-      if (Type & TYPE_PLUGINS_DSSI)
-	{
-	  if (!CreateDSSIEffectMenu)
-	    {
-	      CreateDSSIEffectMenu = new wxMenu();
-	      CreateEffectMenu->Append(Id, wxT("DSSI"), CreateDSSIEffectMenu);
-	      Id = PluginMenuIndexCount++;
-	    }
-	  NewItem = CreateDSSIEffectMenu->Append(Id, MenuName.c_str());
-	}
-      else if (Type & TYPE_PLUGINS_LADSPA)
-	{
-	  if (!CreateLADSPAEffectMenu)
-	    {
-	      CreateLADSPAEffectMenu = new wxMenu();
-	      CreateEffectMenu->Append(Id, wxT("LADSPA"), CreateLADSPAEffectMenu);
-	      Id = PluginMenuIndexCount++;
-	    }
-	  NewItem = CreateLADSPAEffectMenu->Append(Id, MenuName.c_str());
-	}
-    }
-  else
-    {
-      if (Type & TYPE_PLUGINS_DSSI)
-	{
-	  if (!CreateDSSIInstrMenu)
-	    {
-	      CreateDSSIInstrMenu = new wxMenu();
-	      CreateInstrMenu->Append(Id, wxT("DSSI"), CreateDSSIInstrMenu);
-	      Id = PluginMenuIndexCount++;
-	    }
-	  NewItem = CreateDSSIInstrMenu->Append(Id, MenuName.c_str());
-	}
-      else if (Type & TYPE_PLUGINS_LADSPA)
-	{
-	  if (!CreateLADSPAInstrMenu)
-	    {
-	      CreateLADSPAInstrMenu = new wxMenu();
-	      CreateInstrMenu->Append(Id, wxT("LADSPA"), CreateLADSPAInstrMenu);
-	      Id = PluginMenuIndexCount++;
-	    }
-	  NewItem = CreateLADSPAInstrMenu->Append(Id, MenuName.c_str());
-	}
-    }
-  if (NewItem)
-    Connect(Id, wxEVT_COMMAND_MENU_SELECTED,
-	    (wxObjectEventFunction)(wxEventFunction)
-	    (wxCommandEventFunction)&MainWindow::OnCreateExternalPlugin);
-  return Id;
-}
-
-void					MainWindow::OnCreateExternalPlugin(wxCommandEvent &event)
-{
-  if (LoadedExternalPlugins)
-    {
-      PluginLoader 	*NewPlugin = new PluginLoader(LoadedExternalPlugins, event.GetId(), StartInfo);
-
-      LoadedPluginsList.push_back(NewPlugin);
-      cout << "[MAINWIN] Creating rack for plugin: " << NewPlugin->InitInfo.Name.mb_str() << endl;
-      cActionManager::Global().AddEffectAction(&StartInfo, NewPlugin, true);
-    }
-}
-
-void					MainWindow::OnCreateRackClick(wxCommandEvent& event)
-{
-  int					id = event.GetId();
-  vector<PluginLoader *>::iterator	i;
-  PluginLoader				*p = 0x0;
-
-  for (i = LoadedPluginsList.begin(); i != LoadedPluginsList.end(); i++)
-    if ((*i)->Id == id)
-      {
-	p = *i;
-	break;
-      }
-  if (p)
-    {
-      cout << "[MAINWIN] Creating rack for plugin: " << p->InitInfo.Name.mb_str() << endl;
-      cCreateRackAction* action = new cCreateRackAction(&StartInfo,  p);
-      action->Do();
-    }
-}
-
-void					MainWindow::OnCreateEffectClick(wxCommandEvent& event)
-{
-  int					id = event.GetId();
-  vector<PluginLoader *>::iterator	i;
-  PluginLoader				*p = 0x0;
-
-  for (i = LoadedPluginsList.begin(); i != LoadedPluginsList.end(); i++)
-    if ((*i)->Id == id)
-      {
-	p = *i;
-	break;
-      }
-  if (p)
-    {
-      cout << "[MAINWIN] Creating rack for plugin: " << p->InitInfo.Name.mb_str() << endl;
-      cActionManager::Global().AddEffectAction(&StartInfo, p, true);
-      CreateUndoRedoMenus(EditMenu);
-    }
-}
-
-void					MainWindow::OnDeleteRack(wxCommandEvent& event)
-{
-  vector<PluginLoader *>::iterator	k;
-
-  if (RackPanel->selectedPlugin)
-    {
-      for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
-	if (COMPARE_IDS((*k)->InitInfo.UniqueId, RackPanel->selectedPlugin->InitInfo->UniqueId))
-	  {
-	    cActionManager::Global().AddEffectAction(&StartInfo, *k, false);
-	    CreateUndoRedoMenus(EditMenu);
-	    return;
-	  }
-    }
-}
-
 void					MainWindow::OnAddTrackAudio(wxCommandEvent& event)
 {
   //cAddTrackAction			*action = new cAddTrackAction(true);
@@ -1852,7 +1644,6 @@ BEGIN_EVENT_TABLE(MainWindow, wxFrame)
   EVT_MENU(MainWin_ExportWave, MainWindow::OnExportWave)
   EVT_MENU(MainWin_Settings, MainWindow::OnSettings)
   EVT_MENU(MainWin_Open, MainWindow::OnOpen)
-  EVT_MENU(MainWin_DeleteRack, MainWindow::OnDeleteRack)
   EVT_MENU(MainWin_AddTrackAudio, MainWindow::OnAddTrackAudio)
   EVT_MENU(MainWin_AddTrackMidi, MainWindow::OnAddTrackMidi)
   EVT_MENU(MainWin_DeleteTrack, MainWindow::OnDeleteTrack)
