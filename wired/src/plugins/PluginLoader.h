@@ -11,17 +11,56 @@
 
 using namespace std;
 
-#define COMPARE_IDS(x, y) ((x[0] == y[0]) && (x[1] == y[1]) && (x[2] == y[2]) && (x[3] == y[3]))
+// MANDATORY C FUNCTIONS
 
-//((*it)->InitInfo.Id[0] == plugin.Id[0]) && ((*it)->InitInfo.Id[1] == plugin.Id[1]) &&
-//	    ((*it)->InitInfo.Id[2] == plugin.Id[2]) && ((*it)->InitInfo.Id[3] == plugin.Id[3])
+// Called when the host initializes the plugin's shared library (usually at startup)
+typedef WiredPluginInstaller*	(*f_installer)();
+// Called when the host needs to unload the plugin's shared library
+typedef void			(*f_destroyer)(WiredPluginInstaller *);
 
+// name of mandatory functions
+#define PLUGIN_SYMBOL_INSTALLER (createInstaller)
+#define PLUGIN_SYMBOL_DESTROYER (destroyInstaller)
 
 /**
- * Loads/Unloads plugin's.
+ * Loads/Unloads Wired plugin library.
  */
-class				PluginLoader
+class				WiredPluginLoader
 {
+ private:
+
+  /**
+   * used to load and get symbol from dynamic library
+   */
+  wxDynamicLibrary		handle;
+
+  /**
+   * function ptr from the plugin
+   */
+  f_installer			create_installer;
+  f_destroyer			destroy_installer;
+
+  /**
+   * Class who handle installation of plugin
+   */
+  WiredPluginInstaller*		installer;
+
+  /**
+   *
+   */
+  WiredDSSIGui			*ExternalPlug;
+
+  /**
+   *
+   */
+  WiredExternalPluginMgr	*PluginMgr;
+
+
+  /**
+   *
+   */
+  int				IdMenuItem;
+
  public:
 
   /**
@@ -32,12 +71,7 @@ class				PluginLoader
   /**
    *
    */
-  PluginLoader(WiredExternalPluginMgr *PlugMgr, int MenuItemId, PlugStartInfo &info);
-
-  /**
-   *
-   */
-  PluginLoader(WiredExternalPluginMgr *PlugMgr, unsigned long UniqueId);
+  PluginLoader(WiredExternalPluginMgr *PlugMgr, int MenuItemId, WiredPluginStartInfo &info);
 
   /**
    *
@@ -68,55 +102,6 @@ class				PluginLoader
    *
    */
   int				Id;
-
-  /**
-   *
-   */
-  PlugInitInfo			InitInfo;
-
-
- private:
-
-  /**
-   *
-   */
-  wxDynamicLibrary		handle;
-
-  /**
-   *
-   */
-  init_t			init;
-
-  /**
-   *
-   */
-  create_t			create;
-
-  /**
-   *
-   */
-  destroy_t			destroy;
-
-  /**
-   *
-   */
-  bool				External;
-
-  /**
-   *
-   */
-  WiredDSSIGui			*ExternalPlug;
-
-  /**
-   *
-   */
-  WiredExternalPluginMgr	*PluginMgr;
-
-
-  /**
-   *
-   */
-  int				IdMenuItem;
 };
 
 #endif

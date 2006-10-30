@@ -1,10 +1,8 @@
 #ifndef __WIREDPLUGININSTALLER__
 #define __WIREDPLUGININSTALLER__
 
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-   #include <wx/wx.h>
-#endif
+#include "WiredPlugin.h"
+#include "WiredPluginStartInfo.h"
 
 /**
  * Determine type of plugin
@@ -68,7 +66,17 @@ class		WiredPluginInstaller
   /**
    * Returns the host product data path
    */
-  wxString	GetDataPath() { return (wxT(INSTALL_PREFIX)); }
+  //wxString	GetDataPath() { return (wxT(INSTALL_PREFIX)); }
 };
+
+/**
+ * Create a WiredPluginInstaller class
+ */
+WiredPluginInstaller*	createInstaller();
+
+/**
+ * Delete a WiredPluginInstaller class
+ */
+void			destroyInstaller(WiredPluginInstaller* installer);
 
 #endif // __WIREDPLUGININSTALLER__
