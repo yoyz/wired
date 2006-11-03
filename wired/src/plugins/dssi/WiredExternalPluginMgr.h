@@ -13,7 +13,6 @@
 
 #include <list>
 #include <map>
-using namespace std;
 
 #define	TYPE_PLUGINS_DSSI 1
 #define	TYPE_PLUGINS_LADSPA 2
@@ -32,35 +31,33 @@ class 	WiredExternalPluginMgr
 public:
 	WiredExternalPluginMgr();
 	~WiredExternalPluginMgr();
-	WiredExternalPluginMgr(const WiredExternalPluginMgr& copy);
-	WiredExternalPluginMgr		operator=(const WiredExternalPluginMgr& right);
 	
 	void			LoadPLugins(int Type);
-	map<int, wxString>	GetPluginsList();
-	list<wxString>		GetSortedPluginsList(const wxString& Separator = wxT("#"));
+	std::map<int, wxString>	GetPluginsList();
+	std::list<wxString>	GetSortedPluginsList(const wxString& Separator = wxT("#"));
 	void			SetMenuItemId(int ModuleId, int MenuItemId);
 	int			GetPluginType(int PluginId);
-	WiredDSSIGui		*CreatePlugin(int MenuItemId, PlugStartInfo &info);
+	WiredDSSIGui		*CreatePlugin(int MenuItemId, WiredPluginStartInfo &info);
 	WiredDSSIGui		*CreatePlugin(unsigned long UniqueId);
 	void			DestroyPlugin(WiredDSSIGui *Plug);
-	void			SetStartInfo(PlugStartInfo &Info);
+	void			SetStartInfo(WiredPluginStartInfo &Info);
 	
 private:
 	void			LoadPlugins(const wxString& FileName);
-	list<wxString>		SplitPath(const wxString& Path);
+	std::list<wxString>	SplitPath(const wxString& Path);
 	void			LoadPluginsFromPath(const wxString& Dirs, int Type);
 
-	list<WiredExternalPlugin*>	_Plugins;
-	list<WiredDSSIGui*>	_LoadedPlugins;
+	std::list<WiredExternalPlugin*>	_Plugins;
+	std::list<WiredDSSIGui*>	_LoadedPlugins;
 
 	int			_CurrentPluginIndex;	
-	PlugStartInfo		_StartInfo;
+	WiredPluginStartInfo	_StartInfo;
 
 	//Key == MenuItemId; Value == PluginId (auto-increment)
-	map<int, int>		_IdTable;
+	std::map<int, int>	_IdTable;
 
 	//Key == Plugin unique ID; Value == PluginId
-	map<unsigned long, int>	_UniqueIdTable;
+	std::map<unsigned long, int>	_UniqueIdTable;
 };
 
 

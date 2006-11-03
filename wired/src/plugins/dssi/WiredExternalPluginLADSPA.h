@@ -7,14 +7,13 @@
 #include "ladspa.h"
 #include "AudioEngine.h"
 #include "WiredPlugin.h"
-//#include <stdlib.h>
-#include <dlfcn.h>
+
 #include <math.h>
 
 #include <list>
+#include <map>
 #include <iostream>
 #include <sstream>
-using namespace std;
 
 #define	TYPE_PLUGINS_DSSI 1
 #define	TYPE_PLUGINS_LADSPA 2
@@ -46,20 +45,15 @@ typedef struct			s_gui_control
   t_ladspa_port		Descriptor;
 }				t_gui_control;
 
+class WiredPlugin;
 
 class				WiredLADSPAInstance : public WiredPlugin
 {
 public:
-  WiredLADSPAInstance(){;}
-  WiredLADSPAInstance(WiredPluginStartInfo& info);
+  WiredLADSPAInstance(WiredPluginStartInfo* info);
   ~WiredLADSPAInstance();
-  WiredLADSPAInstance(const WiredLADSPAInstance& copy){*this = copy;}
-  WiredLADSPAInstance		operator=(const WiredLADSPAInstance& right);
-  bool				operator<(const WiredLADSPAInstance& right);
-  //  bool				Init(const LADSPA_Descriptor* Descriptor);
+
   bool				Load();
-  //void				SetInfo(PlugInitInfo* Info);
-  void				SetInfo(WiredPluginStartInfo* Info);
   bool				ChangeActivateState(bool Activate = true);
   void				Bypass();
   unsigned long			GetUniqueId();
@@ -67,7 +61,6 @@ public:
   //<Wired Plugin Implementation>
   void	 			Process(float **input, float **output,
 					long sample_length);
-  // void				Init();
   void				Play();
   void				Stop();
   void				Load(WiredPluginData& Datas);
@@ -117,15 +110,15 @@ public:
   LADSPA_Handle			_Handle;
   LADSPA_Descriptor		*_Descriptor;
   LADSPA_Properties		_Properties;
-  list<t_ladspa_port>		_InputAudioPluginsPorts;
-  list<t_ladspa_port>		_OutputAudioPluginsPorts;
-  list<t_ladspa_port>		_InputDataPluginsPorts;
-  list<t_ladspa_port>		_OutputDataPluginsPorts;
+  std::list<t_ladspa_port>	_InputAudioPluginsPorts;
+  std::list<t_ladspa_port>	_OutputAudioPluginsPorts;
+  std::list<t_ladspa_port>	_InputDataPluginsPorts;
+  std::list<t_ladspa_port>	_OutputDataPluginsPorts;
   bool				_IsPlaying;
   bool				_Bypass;
 
  protected:
-  map<unsigned long, t_gui_control>	_GuiControls;								//Key == PortId; Value == PortData
+  std::map<unsigned long, t_gui_control>	_GuiControls;								//Key == PortId; Value == PortData
 };
 
 //template <typename T>

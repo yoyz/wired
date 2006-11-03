@@ -34,15 +34,11 @@
 class		WiredDSSIGui : public WiredLADSPAInstance
 {
  public:
-  WiredDSSIGui(PlugStartInfo &startinfo);
-  WiredDSSIGui(const WiredDSSIGui& copy) {*this = copy;}
-  WiredDSSIGui operator=(const WiredDSSIGui& right);
+  WiredDSSIGui(WiredPluginStartInfo &startinfo);
   ~WiredDSSIGui();
 
   void		DestroyView();
   wxWindow	*CreateView(wxWindow *rack, wxPoint &pos, wxSize &size);
-  void		SetInfo(PlugInitInfo *info);
-  void		SetInfo(PlugStartInfo *info);
   bool		Load();
   void		OnPaint(wxPaintEvent &event);
   void		OnFaderMove(wxScrollEvent &WXUNUSED(e));
@@ -65,8 +61,7 @@ class		WiredDSSIGui : public WiredLADSPAInstance
   wxImage	*bypass_off;
   StaticBitmap	*Liquid;
   DownButton	*BypassBtn;
-  PlugStartInfo *StartInfo;
-  PlugInitInfo	*InitInfo;
+  WiredPluginStartInfo *StartInfo;
 
   map <int, unsigned long> FaderIndex;
 

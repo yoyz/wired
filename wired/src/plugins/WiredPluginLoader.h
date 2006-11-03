@@ -66,27 +66,27 @@ class				WiredPluginLoader
   /**
    *
    */
-  PluginLoader(wxString filename);
+  WiredPluginLoader(wxString filename);
 
   /**
    *
    */
-  PluginLoader(WiredExternalPluginMgr *PlugMgr, int MenuItemId, WiredPluginStartInfo &info);
+  WiredPluginLoader(WiredExternalPluginMgr *PlugMgr, int MenuItemId, WiredPluginStartInfo &info);
 
   /**
    *
    */
-  ~PluginLoader();
+  ~WiredPluginLoader();
 
   /**
    *
    */
-  Plugin			*CreateRack(PlugStartInfo &info);
+  WiredPlugin			*CreateRack(WiredPluginStartInfo &info);
 
   /**
    *
    */
-  void				Destroy(Plugin *p);
+  void				Destroy(WiredPlugin *p);
 
   /**
    *

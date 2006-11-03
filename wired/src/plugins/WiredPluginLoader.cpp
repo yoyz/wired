@@ -1,11 +1,8 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-#include <iostream>
-#include <dlfcn.h>
-#include "PluginLoader.h"
+#include "WiredPluginLoader.h"
 #include "config.h"
-
 
 PluginLoader::PluginLoader()
 {
