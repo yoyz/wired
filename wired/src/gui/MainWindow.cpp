@@ -37,7 +37,7 @@
 #include "Mixer.h"
 #include "WiredSession.h"
 #include "MidiThread.h"
-#include "PluginLoader.h"
+#include "WiredPluginLoader.h"
 #include "WiredSessionXml.h"
 #include "WiredExternalPluginMgr.h"
 #include "FileConversion.h"
@@ -46,6 +46,7 @@
 #include "MediaLibrary.h"
 #include "MLTree.h"
 #include "WiredVideo.h"
+#include "PluginCenter.h"
 
 Rack			*RackPanel = NULL;
 SequencerGui		*SeqPanel = NULL;
@@ -60,6 +61,8 @@ WiredSessionXml		*CurrentXmlSession = NULL;
 MediaLibrary		*MediaLibraryPanel = NULL;
 FileConversion		*FileConverter = NULL;
 SettingWindow		*SettingsWin = NULL;
+
+PluginCenter		*glPluginCenter = NULL;
 
 wxMutex			AudioMutex;
 wxCondition		*SeqStopped = NULL;
@@ -80,9 +83,9 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
   LogWin = new wxLogWindow(this, wxT("Wired log"), false);
 
   // load all plugins 
-  PluginCenter = new PluginCenter();
-  PluginCenter->LoadPlugins();
-  PluginCenter->LoadExternalPlugins();
+  glPluginCenter = new PluginCenter();
+  glPluginCenter->LoadPlugins();
+  glPluginCenter->LoadExternalPlugins();
 
   try
     {
@@ -189,11 +192,11 @@ MainWindow::MainWindow(const wxString& title, const wxPoint& pos, const wxSize& 
   MenuBar->Append(SequencerMenu, _("&Sequencer"));
 
   // plugins menus :
-  map<wxMenu,wxString>&			menus = PluginCenter->GetMenus();
-  map<wxMenu,wxString>::iterator	menuIt;
+  map<wxMenu*,wxString>&		menus = glPluginCenter->GetMenus();
+  map<wxMenu*,wxString>::iterator	menuIt;
 
   for (menuIt = menus.begin(); menuIt != menus.end(); menuIt++)
-    MenuBar->Append((*menuIt).first(), (*menuIt).first());
+    MenuBar->Append((*menuIt).first, (*menuIt).second);
 
   // Video menu is empty... and not finished
   //  MenuBar->Append(VideoMenu, _("&Video"));
@@ -580,9 +583,8 @@ void					MainWindow::OnClose(wxCloseEvent& event)
   delete SeqTimer;
   SeqTimer = NULL;
 
-  cout << "[MAINWIN] Unloading shared libraries..."<< endl;
-  for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
-    delete *k;
+  cout << "[MAINWIN] Unloading plugins..."<< endl;
+  delete glPluginCenter;
 
   if (FileConverter)
     delete FileConverter;
@@ -597,10 +599,6 @@ void					MainWindow::OnClose(wxCloseEvent& event)
 
   cout << "[MAINWIN] Unloading logging manager..." << endl;
   delete LogWin;
-
-  cout << "[MAINWIN] Unloading external plugins..." << endl;
-  if (LoadedExternalPlugins)
-    delete LoadedExternalPlugins;
 
   cout << "[MAINWIN] Unloading session manager..." << endl;
   delete CurrentSession;
@@ -651,7 +649,6 @@ bool					MainWindow::NewSession()
 
   WaveCenter.Clear();
 
-  UpdatePlugins.clear();
   Seq->PatternsToRefresh.clear();
   Seq->PatternsToResize.clear();
   Seq->TracksToRefresh.clear();
@@ -1529,25 +1526,11 @@ void					MainWindow::OnTimer(wxTimerEvent& event)
 	}
     }
 
-  for (pluginIt = UpdatePlugins.begin(); pluginIt != UpdatePlugins.end(); pluginIt++)
-    (*pluginIt)->Update();
-  UpdatePlugins.clear();
-
   for (trackIt = Seq->TracksToRefresh.begin(); trackIt != Seq->TracksToRefresh.end(); trackIt++)
     (*trackIt)->TrackOpt->SetVuValue();
   Seq->TracksToRefresh.clear();
 
   SeqMutex.Unlock();
-}
-
-void					MainWindow::AddUpdatePlugin(Plugin *p)
-{
-  list<Plugin *>::iterator		i;
-
-  for (i = UpdatePlugins.begin(); i != UpdatePlugins.end(); i++)
-    if (*i == p)
-      return;
-  UpdatePlugins.push_back(p);
 }
 
 void					MainWindow::OnFileLoaderStart(wxCommandEvent& event)

@@ -40,7 +40,6 @@ class					WiredSessionXml;
 class					MainWindow;
 
 extern MainWindow*		MainWin;
-extern vector<PluginLoader*>	LoadedPluginsList;
 extern PlugStartInfo		StartInfo;
 extern WiredSession*		CurrentSession;
 extern wxMutex		        AudioMutex;
@@ -216,9 +215,6 @@ class					MainWindow: public wxFrame
   wxFrame				*MediaLibraryFrame;
 
   wxTimer				*SeqTimer;
-
-  /* List of plugins that need to be updated for their gui */
-  list<WiredPlugin *>			UpdatePlugins;
 
   wxLogWindow                           *LogWin;
   wxLogStderr                           *LogTarget;
