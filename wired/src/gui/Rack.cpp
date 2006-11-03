@@ -1,9 +1,6 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
-
 #include			"SeqTrack.h"
 #include			"Track.h"
 #include			"Rack.h"
@@ -281,16 +278,6 @@ t_RackTrackPlugin*	Rack::AddRackAndChannel(PlugStartInfo &startinfo, PluginLoade
   	ResizeTracks();
 	SetScrolling();
 	return (result);
-}
-
-WiredPlugin*				Rack::AddSelectedRackAndChannel(PlugStartInfo &startinfo, PluginLoader *p)
-{
-	t_RackTrackPlugin*	rackTrackPlugin;
-
-	rackTrackPlugin = AddRackAndChannel(startinfo, p);
-	selectedTrack = rackTrackPlugin->rackTrack;
-	selectedPlugin = rackTrackPlugin->plugin;
-	delete rackTrackPlugin;
 }
 
 bool				Rack::RemoveTrack(int index)
