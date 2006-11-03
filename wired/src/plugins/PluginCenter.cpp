@@ -1,9 +1,12 @@
+// Copyright (C) 2004-2006 by Wired Team
+// Under the GNU General Public License Version 2, June 1991
+
 #include <wx/menu.h>
 #include <wx/string.h>
 
 #include "Settings.h"
 
-#include "PluginLoader.h"
+#include "WiredPluginLoader.h"
 #include "PluginCenter.h"
 
 #include "WiredCorePlugins.h"
@@ -31,6 +34,13 @@ PluginCenter::PluginCenter()
 
 PluginCenter::~PluginCenter()
 {
+  cout << "[PLUGINCENTER] Unloading shared libraries..."<< endl;
+  for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
+    delete *k;
+
+  cout << "[PLUGINCENTER] Unloading external plugins..." << endl;
+  if (LoadedExternalPlugins)
+    delete LoadedExternalPlugins;
 
 }
 

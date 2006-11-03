@@ -8,6 +8,12 @@
 #include "../dssi/WiredExternalPluginMgr.h"
 
 #include <map>
+#include <vector>
+
+#include <wx/wx.h>
+#include <wx/filename.h>
+#include <wx/string.h>
+#include <wx/menu.h>
 
 /**
  * Manage all plugins in Wired
@@ -15,22 +21,31 @@
 class				PluginCenter
 {
  private:
-  vector<PluginLoader *>	LoadedPluginsList;
+  std::vector<PluginLoader *>	LoadedPluginsList;
   WiredExternalPluginMgr*	LoadedExternalPlugins;
 
-  std::map<wxMenu,wxString>	menus;
-  wxMenu			menuInstruments;
-  wxMenu			menuEffects;
+  std::map<wxMenu*,wxString>	menus;
+  wxMenu*			menuInstruments;
+  wxMenu*			menuEffects;
 
 
  public:
   PluginCenter();
   ~PluginCenter();
 
-  int				LoadPluginFile(wxString& filename);
-  int				LoadPluginDirectory(wxFilename& path);
+  int				LoadPlugin(wxString& filename);
+  void				LoadPlugins();
+  void				LoadExternalPlugins();
+  int				AddPluginMenuItem(int Type, bool IsEffect, const wxString& MenuName);
+  void				OnCreateExternalPlugin(wxCommandEvent &event);
+  void				OnCreateRackClick(wxCommandEvent& event);
+  void				OnCreateEffectClick(wxCommandEvent& event);
 
-  std::map<wxMenu,wxString>&	GetMenus() { return (menus); };
+
+  int				LoadPluginFile(wxString& filename);
+  int				LoadPluginDirectory(wxFileName& path);
+
+  std::map<wxMenu*,wxString>&	GetMenus() { return (menus); };
 };
 
 #endif
