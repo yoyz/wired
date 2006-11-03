@@ -2,7 +2,7 @@
 
 SaveCenter::SaveCenter(wxFileName  projectPath,
 		       WiredDocument *docParent)
-  : WiredDocument(wxT("savecenter"), docParent)
+  : WiredDocument(wxT("savecenter"), docParent, true)
 {
   setProjectPath(projectPath);
   _audioDir = _projectPath;
@@ -127,9 +127,7 @@ void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
 
   attributes = elem->getAttributes();
 
-  //XML bullshit
-  xmlFile->StartElement(elem->getKey());
-  
+  xmlFile->StartElement(elem->getKey());  
 
   for(attributesIt = attributes.begin();
       attributesIt != attributes.end();
@@ -141,19 +139,30 @@ void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
   xmlFile->EndElement();
 }
 
-void		SaveCenter::WriteFile(wxString filename, SaveElementArray *elements)
+void		SaveCenter::WriteFile(wxString rootTag, SaveElementArray *elements)
 {
-  wxString	rootTag;
+  wxFileName	filename;
+  wxString	path;
   WiredXml	*xmlFile = new WiredXml();
   int		i;
+  
+  filename = getProjectPath();
 
-  xmlFile->CreateDocument(filename);
+  //there is certainly a much nicer way to do this...
+  while(rootTag.Find('/') != -1)
+    {
+      filename.AppendDir(rootTag.BeforeFirst('/'));
+      rootTag = rootTag.AfterFirst('/');
+    }
+  filename.SetName(rootTag);
+  filename.SetExt(wxT(".xml"));
+  
+  filename.MakeAbsolute();
 
-  rootTag = filename.AfterLast('/');
-  rootTag = rootTag.BeforeLast('.');
-
+  xmlFile->CreateDocument(filename.GetFullPath());
+  
   xmlFile->StartElement(rootTag);
-
+  
   for (i = 0; i < elements->GetCount(); i++)
     WriteElement(elements->Item(i), xmlFile);
   
@@ -211,6 +220,46 @@ void		SaveCenter::setProjectName(wxString projectName)
   _projectPath.AppendDir(_projectName);
 
 }
+
+//This method really looks like LoadProject... maybe we could do something...
+SaveElementArray	SaveCenter::LoadFile(wxString filename)
+{
+  WiredXml		*xmlFile = new WiredXml();
+  wxString		rootTag;
+  SaveElementArray	ret;
+  SaveElement		*currSaveElem;
+
+  rootTag = filename.AfterLast('/');
+  rootTag = filename.BeforeLast('.');
+
+  xmlFile->OpenDocument(filename);
+
+  while(xmlFile->Read())
+    {
+      nodeType = xmlFile->GetNodeType();
+      if(nodeType == XML_READER_TYPE_ELEMENT)
+	{
+	  nodeName = xmlFile->GetNodeName();
+	  if(nodeName != rootTag)
+	    {
+	      ret->Add(new SaveElement());
+	      currSaveElem = ret->Last();
+	      currSaveElem->SetKey(nodeName);
+	      
+	      //attributes handling
+	      for(int i = 0; i < xmlFile->GetAttributeCount(); i++)
+		currentSaveElem->addAttribute(xmlFile->GetAttributeName(i),
+					      xmlFile->GetAttributeValue(i));
+	    }
+	}
+      else if(nodeType == XML_READER_TYPE_TEXT)
+	{
+	  currentSaveElem->setValue(xmlFile->GetNodeValue());
+	}
+    }
+  return ret;
+}
+
 
 void	SaveCenter::LoadProject()
 {

@@ -80,7 +80,9 @@ class SaveCenter : public WiredDocument
    */
   void		SaveFile(WiredDocument *doc, wxString file);
 
-  void		LoadProject();
+  void			LoadProject();
+
+  SaveElementArray	LoadFile(wxString filename);
 
  private:
    /** Writes an element in the xmlfile.

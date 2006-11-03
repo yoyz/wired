@@ -1,11 +1,10 @@
 #include "WiredDocument.h"
 
 #include <iostream>
-WiredDocument::WiredDocument(wxString name, WiredDocument *parent = NULL)
+WiredDocument::WiredDocument(wxString name, WiredDocument *parent, bool noParent)
 {
-  //uncomment when savecenter is instanciated
-//   if (!parent)
-//     parent = saveCenter;
+   if (!parent && !noParent)
+     parent = saveCenter;
 
   if(parent)
     parent->Register(this);

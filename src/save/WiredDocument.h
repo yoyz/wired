@@ -14,7 +14,8 @@ WX_DEFINE_ARRAY_PTR(WiredDocument *, WiredDocumentArray);
 class WiredDocument
 {
  public:
-  WiredDocument(wxString docName, WiredDocument *parent);
+  WiredDocument(wxString docName, WiredDocument *parent = NULL, 
+		bool noParent = false);
 
   /** Main save function.
    * This function will be called by the SaveCenter when a save of the document
