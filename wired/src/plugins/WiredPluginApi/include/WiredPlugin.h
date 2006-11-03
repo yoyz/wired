@@ -43,52 +43,59 @@ class		WiredPlugin : public wxWindow, public WiredPluginGui, public WiredPluginA
   WiredPluginStartInfo*	_StartInfo;
   WiredPluginInstaller*	_CreatorInfo;
 
+
   WiredPluginStartInfo*	GetStartInfo();
 
 
  public:
-  WiredPlugin(WiredPluginInstaller* creator, WiredPluginStartInfo* parent);
+  WiredPlugin(WiredPluginInstaller* creator, WiredPluginStartInfo* start);
   ~WiredPlugin();
 
 
  public:
-  /* info part */
-  /*
-  ** Return unique name of plugin instance ("loop sampler 4")
-  */
+
   wxString&	GetName();
 
-  /*
-  ** Return name of plugin ("loop sampler")
-  */
-  wxString&	GetDefaultName();
 
-  /*
-  ** Set unique name of plugin instance ("loop sampler 4")
-  */  
-  void		SetName(wxString name);
+  /**
+   * Gui: Ask the host application to call Update() whenever the main thread can process gui calls
+   */
+  void	 UpdatePluginGui();
 
+  /**
+   * Audio: Used to know if a keyboard event occured. No need to overload
+   */
+  void	 OnKeyEvent(wxKeyEvent* event);
 
-  /*Gui part*/
-  /* Ask the host application to call Update() whenever the main thread can process gui calls  */
-  void		UpdatePluginGui();
+  /**
+   * Audio: Used to know if a mouse event occured. No need to overload
+   */
+  void	OnMouseEvent(wxMouseEvent* event);
 
-  /*Audio part*/
-  /* Used to know if a keyboard event occured. No need to overload */
-  virtual void	OnKeyEvent(wxKeyEvent* event);
-  /* Used to know if a mouse event occured. No need to overload */
-  virtual void  OnMouseEvent(wxMouseEvent* event);
-  /* Used to know if a paint event occured. No need to overload */
-  virtual void  OnPaintEvent(wxPaintEvent* event);
-  // User interface events
-  bool		ShowMidiController();
- /* Shows plugin's optional view */
-  void		ShowOptionalView();
-  /* Closes plugin's optional view */
-  void		CloseOptionalView();
-  // Sequencer events
-  /* Create a MIDI pattern containing a list of event in the host's sequencer */
-  void		AddMidiPattern(std::list<SeqCreateEvent *>* midi);
+  /**
+   *Audio: Used to know if a paint event occured. No need to overload
+   */
+  void	 OnPaintEvent(wxPaintEvent* event);
+
+  /**
+   * Gui
+   */
+  bool	 ShowMidiController();
+
+  /**
+   * Audio: Shows plugin's optional view
+   */
+  void	 ShowOptionalView();
+
+  /**
+   * Audio: Closes plugin's optional view
+   */
+  void	 CloseOptionalView();
+
+  /**
+   * Audio: Create a MIDI pattern containing a list of event in the host's sequencer
+   */
+  void	AddMidiPattern(std::list<SeqCreateEvent *>* midi);
 
 };
 

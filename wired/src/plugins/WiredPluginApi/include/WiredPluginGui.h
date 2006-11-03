@@ -7,7 +7,6 @@
    #include <wx/wx.h>
 #endif
 
-//#include "WiredPluginStartInfo.h"
 #include "Sequencer.h"
 
 class WiredPluginStartInfo;
@@ -27,7 +26,7 @@ class		WiredPluginGui
   WiredPluginStartInfo*	_StartInfo;
 
  public:
-  WiredPluginGui(WiredPluginStartInfo* parent) { _StartInfo = parent; };
+  WiredPluginGui(WiredPluginStartInfo* start) { _StartInfo = start; };
   ~WiredPluginGui();
 
   /*

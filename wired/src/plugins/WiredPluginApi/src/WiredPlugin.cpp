@@ -4,6 +4,7 @@
 #include "WiredPlugin.h"
 
 #include "WiredCorePlugins.h"
+#include "WiredPluginStartInfo.h"
 
 using namespace std;
 
@@ -11,9 +12,9 @@ using namespace std;
 
 WiredPlugin::WiredPlugin(WiredPluginInstaller* creator,
 			 WiredPluginStartInfo* start) :
-  wxWindow(parent->GetRack(), -1, parent->GetPos(), parent->GetSize()),
-  WiredPluginGui(parent),
-  WiredPluginAudio(parent)
+  wxWindow(start->GetRack(), -1, start->GetPos(), start->GetSize()),
+  WiredPluginGui(start),
+  WiredPluginAudio(start)
 {
   _StartInfo = start;
   _CreatorInfo = creator;
@@ -46,52 +47,58 @@ WiredPlugin::~WiredPlugin()
 }
 
 
+/**
+ * Private
+ */
 WiredPluginStartInfo*	WiredPlugin::GetStartInfo()
 {
   return _StartInfo;
 }
 
-wxString&	WiredPlugin::GetDefaultName()
-{
-  return (CreatorInfo->GetName());
-}
 
+/**
+ * Public
+ */
 wxString&	WiredPlugin::GetName()
 {
-  return (_Name);
+  return (_CreatorInfo->GetName());
 }
 
-void		WiredPlugin::SetName(wxString name)
-{
-  _Name = name;
-}
-
-/* Ask the host application to call Update() whenever the main thread can process gui calls  */
+/**
+ * Gui: Ask the host application to call Update() whenever the main thread can process gui calls
+ */
 void	 WiredPlugin::UpdatePluginGui()
 {
   _StartInfo->GetCore()->UpdatePluginGui(this);
 }
 
-
-
-/* Used to know if a keyboard event occured. No need to overload */
+/**
+ * Audio: Used to know if a keyboard event occured. No need to overload
+*/
 void	 WiredPlugin::OnKeyEvent(wxKeyEvent* event)
 {
   _StartInfo->GetCore()->SendKeyEvent(this, event);
 }
 
-/* Used to know if a mouse event occured. No need to overload */
+/**
+ * Audio: Used to know if a mouse event occured. No need to overload
+*/
 void	WiredPlugin::OnMouseEvent(wxMouseEvent* event)
 {
   _StartInfo->GetCore()->SendMouseEvent(this, event);
 }
 
-/* Used to know if a paint event occured. No need to overload */
+/**
+ *Audio: Used to know if a paint event occured. No need to overload
+*/
 void	 WiredPlugin::OnPaintEvent(wxPaintEvent* event)
 {
   _StartInfo->GetCore()->SendPaintEvent(this, event);
 }
 
+/**
+ * Gui
+ */
 bool	 WiredPlugin::ShowMidiController()
 {
   _StartInfo->GetCore()->ShowMidiController(this);
@@ -100,20 +107,25 @@ bool	 WiredPlugin::ShowMidiController()
   return true;
 }
 
-/* Shows plugin's optional view */
+/**
+ * Audio: Shows plugin's optional view
+*/
 void	 WiredPlugin::ShowOptionalView()
 {
   _StartInfo->GetCore()->ShowOptionalView(this);
 }
 
-/* Closes plugin's optional view */
+/**
+ * Audio: Closes plugin's optional view
+*/
 void	 WiredPlugin::CloseOptionalView()
 {
   _StartInfo->GetCore()->CloseOptionalView(this);
 }
 
-// Sequencer events
-/* Create a MIDI pattern containing a list of event in the host's sequencer */
+/**
+ * Audio: Create a MIDI pattern containing a list of event in the host's sequencer
+*/
 void	WiredPlugin::AddMidiPattern(std::list<SeqCreateEvent *>* midi)
 {
   _StartInfo->GetCore()->AddMidiPattern(this, midi);

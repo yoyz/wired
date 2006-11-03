@@ -69,14 +69,19 @@ class		WiredPluginInstaller
   //wxString	GetDataPath() { return (wxT(INSTALL_PREFIX)); }
 };
 
-/**
- * Create a WiredPluginInstaller class
- */
-WiredPluginInstaller*	createInstaller();
 
-/**
- * Delete a WiredPluginInstaller class
- */
-void			destroyInstaller(WiredPluginInstaller* installer);
+extern "C"
+{
+  /**
+   * Create a WiredPluginInstaller class
+   */
+  WiredPluginInstaller*	createInstaller();
+
+  /**
+   * Delete a WiredPluginInstaller class
+   */
+  void			destroyInstaller(WiredPluginInstaller* installer);
+}
+
 
 #endif // __WIREDPLUGININSTALLER__
