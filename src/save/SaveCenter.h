@@ -7,6 +7,7 @@
 //For the DirDialog
 #include <wx/dirdlg.h>
 #include <wx/generic/dirdlgg.h>
+#include <wx/filename.h>
 
 //wxArrayString
 #include <wx/arrstr.h>
@@ -28,8 +29,7 @@ class SaveCenter : public WiredDocument
    * \param docParent
    * \param projectPath
    */
-  SaveCenter(wxFileName projectPath = wxT(""),
-	     WiredDocument *docParent = NULL);
+  SaveCenter(wxFileName projectPath = wxString(wxT("")), WiredDocument *docParent = NULL);
   ~SaveCenter();
 
   /** Main Save function, implementation of WiredDocument.
