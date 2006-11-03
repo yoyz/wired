@@ -17,7 +17,7 @@
 #include			"Sequencer.h"
 #include			"Mixer.h"
 #include			"WiredPlugin.h"
-#include			"PluginLoader.h"
+#include			"WiredPluginLoader.h"
 
 extern wxMutex		SeqMutex;
 int			RackCount = 0;
@@ -55,11 +55,11 @@ void				RackTrack::RemoveChannel()
   Mix->RemoveChannel(Output);
 }
 
-WiredPlugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, WiredPlugin *connect_to)
+WiredPlugin*				RackTrack::AddRack(WiredPluginStartInfo &startinfo, PluginLoader *loader, WiredPlugin *connect_to)
 {
   int xx, yy, xpos, ypos;
   static int num = 31000;
-  WiredPlugin *plug;
+  WiredPlugin *plugin;
 
   xpos = Parent->GetXPos(Index);
   ypos = GetYPos();
@@ -74,30 +74,30 @@ WiredPlugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, Wi
 	}*/
   Parent->CalcScrolledPosition(xpos, ypos, &xx, &yy);
   startinfo.Pos = wxPoint(xx, yy);
-  startinfo.Size = wxSize(p->InitInfo.UnitsX * UNIT_W, p->InitInfo.UnitsY * UNIT_H);
-  plug = p->CreateRack(startinfo);
-  if (p->InitInfo.UnitsX > Units)
-    Units = p->InitInfo.UnitsX;
+  startinfo.Size = wxSize(loader->InitInfo.UnitsX * UNIT_W, loader->InitInfo.UnitsY * UNIT_H);
+  plugin = loader->CreateRack(startinfo);
+  if (loader->InitInfo.UnitsX > Units)
+    Units = loader->InitInfo.UnitsX;
 
   // Plug initialization
-  plug->SetId(num++);
-  plug->SetBufferSize(Audio->SamplesPerBuffer);
-  plug->SetSamplingRate(Audio->SampleRate);
-  plug->Init();
-  plug->SetHelpMode(HelpWin->IsShown());
+  plugin->SetId(num++);
+  plugin->SetBufferSize(Audio->SamplesPerBuffer);
+  plugin->SetSamplingRate(Audio->SampleRate);
+  plugin->Init();
+  plugin->SetHelpMode(HelpWin->IsShown());
 
   if (Seq->Playing)
-    plug->Play();
+    plugin->Play();
 
   wxChar str[128];
   wxSnprintf(str, 128, wxT("%d"), ++RackCount);
-  plug->Name = plug->DefaultName() + wxT(" ") + str;
+  plugin->SetName() = plugin->DefaultName() + wxT(" ") + str;
   SeqMutex.Lock();
-  Racks.push_back(plug);
+  Racks.push_back(plugin);
   SeqMutex.Unlock();
   Parent->ResizeTracks();
   Parent->SetScrolling();
-  return (plug);
+  return (plugin);
 }
 
 void				RackTrack::RemoveRack()

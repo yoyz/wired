@@ -35,6 +35,12 @@ class		WiredPluginAudio
   /* Called when the host stopped the sequencer */
   virtual void	 Stop() {};
 
+  /* Called by the host when the buffersize changes */
+  virtual void   SetBufferSize(long size) {};
+
+  /* Called by the host when the samplingrate changes */
+  virtual void   SetSamplingRate(double rate) {};
+
   /* Called by the host when the signature changes */
   virtual void   SetSignature(int numerator, int denominator) {};
 

@@ -16,11 +16,12 @@
 #include "WiredPluginData.h"
 
 //Needed by plugins
-#include "WiredMidiEvent.h"
+//#include "WiredMidiEvent.h"
 #include "WiredPluginInstaller.h"
 
 
 class WiredPluginStartInfo;
+class WiredPluginInstaller;
 class WiredPluginGui;
 class WiredPluginAudio;
 class WiredPluginData;
@@ -40,21 +41,37 @@ class		WiredPlugin : public wxWindow, public WiredPluginGui, public WiredPluginA
 
  private:
   WiredPluginStartInfo*	_StartInfo;
+  WiredPluginInstaller*	_CreatorInfo;
 
   WiredPluginStartInfo*	GetStartInfo();
 
 
  public:
- WiredPlugin(WiredPluginStartInfo* parent) : wxWindow(parent->GetRack(), -1, parent->GetPos(), parent->GetSize()),
-    WiredPluginGui(parent),
-    WiredPluginAudio(parent)
-    { _StartInfo = parent; };
+  WiredPlugin(WiredPluginInstaller* creator, WiredPluginStartInfo* parent);
   ~WiredPlugin();
+
+
+ public:
+  /* info part */
+  /*
+  ** Return unique name of plugin instance ("loop sampler 4")
+  */
+  wxString&	GetName();
+
+  /*
+  ** Return name of plugin ("loop sampler")
+  */
+  wxString&	GetDefaultName();
+
+  /*
+  ** Set unique name of plugin instance ("loop sampler 4")
+  */  
+  void		SetName(wxString name);
 
 
   /*Gui part*/
   /* Ask the host application to call Update() whenever the main thread can process gui calls  */
-  void	 UpdatePluginGui();
+  void		UpdatePluginGui();
 
   /*Audio part*/
   /* Used to know if a keyboard event occured. No need to overload */
@@ -64,14 +81,14 @@ class		WiredPlugin : public wxWindow, public WiredPluginGui, public WiredPluginA
   /* Used to know if a paint event occured. No need to overload */
   virtual void  OnPaintEvent(wxPaintEvent* event);
   // User interface events
-  bool ShowMidiController();
+  bool		ShowMidiController();
  /* Shows plugin's optional view */
-  void ShowOptionalView();
+  void		ShowOptionalView();
   /* Closes plugin's optional view */
-  void CloseOptionalView();
+  void		CloseOptionalView();
   // Sequencer events
   /* Create a MIDI pattern containing a list of event in the host's sequencer */
-  void AddMidiPattern(std::list<SeqCreateEvent *>* midi);
+  void		AddMidiPattern(std::list<SeqCreateEvent *>* midi);
 
 };
 

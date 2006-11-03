@@ -9,8 +9,19 @@ using namespace std;
 
 /* DO NOT MODIFY THIS FILE FOR MAKING A PLUGIN. JUST DERIVE FROM THAT CLASS */
 
-//WiredPlugin::WiredPlugin(WiredPluginStartInfo* start) : wxWindow(start->Rack, -1, start->Pos, start->Size)
-//{
+WiredPlugin::WiredPlugin(WiredPluginInstaller* creator,
+			 WiredPluginStartInfo* start) :
+  wxWindow(parent->GetRack(), -1, parent->GetPos(), parent->GetSize()),
+  WiredPluginGui(parent),
+  WiredPluginAudio(parent)
+{
+  _StartInfo = start;
+  _CreatorInfo = creator;
+
+
+  if (!start || !creator)
+    throw ;
+
 //   if (InitInfo)
 //   	InitInfo->UniqueExternalId = 0;
 //   Connect(wxID_ANY, wxEVT_KEY_DOWN, (wxObjectEventFunction)(wxEventFunction)
@@ -25,9 +36,9 @@ using namespace std;
 // 	 &Plugin::OnMouseEvent);
 //   Connect(wxID_ANY, wxEVT_RIGHT_DOWN, (wxObjectEventFunction)(wxEventFunction)
 // 	 &Plugin::OnMouseEvent);
-//   //  Connect(wxID_ANY, wxEVT_PAINT, (wxObjectEventFunction)(wxEventFunction)
-//   //	 &Plugin::OnPaintEvent);
-//}
+  //  Connect(wxID_ANY, wxEVT_PAINT, (wxObjectEventFunction)(wxEventFunction)
+  //	 &Plugin::OnPaintEvent);
+}
 
 WiredPlugin::~WiredPlugin()
 {
@@ -40,6 +51,20 @@ WiredPluginStartInfo*	WiredPlugin::GetStartInfo()
   return _StartInfo;
 }
 
+wxString&	WiredPlugin::GetDefaultName()
+{
+  return (CreatorInfo->GetName());
+}
+
+wxString&	WiredPlugin::GetName()
+{
+  return (_Name);
+}
+
+void		WiredPlugin::SetName(wxString name)
+{
+  _Name = name;
+}
 
 /* Ask the host application to call Update() whenever the main thread can process gui calls  */
 void	 WiredPlugin::UpdatePluginGui()

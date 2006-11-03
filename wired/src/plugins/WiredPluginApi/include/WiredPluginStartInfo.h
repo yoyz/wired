@@ -29,6 +29,9 @@ class	WiredPluginStartInfo
   friend class WiredPluginAudio;
   friend class WiredCorePlugins;
 
+  // well... it's bad, but it should be substitued with a method of PluginCenter
+  friend class RackTrack;
+
  private:
   WiredCorePlugins*	_Core;
   wxString		_Version;
@@ -47,6 +50,9 @@ class	WiredPluginStartInfo
   wxWindow*		GetRack();
   wxPoint		GetPos();
   wxSize		GetSize();
+
+  void			SetPos(wxPoint& pos);
+  void			SetSize(wxSize& size);
 
  public:
 };

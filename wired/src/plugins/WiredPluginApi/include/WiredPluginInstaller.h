@@ -25,7 +25,7 @@ class		WiredPluginInstaller
   /**
    * Get Name of plugin
    */
-  virtual wxString	GetName();
+  virtual wxString&	GetName();
 
   /**
    * Get Type of plugin
