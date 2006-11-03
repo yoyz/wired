@@ -7,8 +7,6 @@
 #ifndef __OPTIONPANEL_H__
 #define __OPTIONPANEL_H__
 
-using namespace			std;
-
 #include <vector>
 #include <wx/wx.h>
 #include <wx/string.h>
@@ -121,7 +119,7 @@ class OptionPanel : public wxPanel
   DownButton			*DetachToolBtn;
   DownButton			*CloseToolBtn;
 
-  vector<WiredTool *>		ToolsList;
+  std::vector<WiredTool *>		ToolsList;
   WiredTool			*CurrentTool;
   WiredTool			*MixerTool;
   WiredTool			*HelpTool;

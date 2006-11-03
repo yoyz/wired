@@ -13,10 +13,12 @@
 #include "MidiPattern.h"
 #include "WavePanel.h"
 #include "../editmidi/MidiPart.h"
-#include "../redist/Plugin.h"
+#include "WiredPlugin.h"
 #include "../engine/Settings.h"
 
 OptionPanel			*OptPanel;
+
+using namespace			std;
 
 WiredTool::WiredTool(wxString name, int type, wxWindow *win)
 {
@@ -31,7 +33,7 @@ WiredTool::WiredTool(wxString name, int type, wxWindow *win)
 WiredTool::~WiredTool()
 {
   if (Type == ID_TOOL_OTHER_OPTIONPANEL)
-    ((Plugin *)Data)->DestroyView();
+    ((WiredPlugin *)Data)->DestroyView();
   else if (Panel)
     Panel->Destroy();
   if (IsDetached && Frame)
@@ -175,7 +177,7 @@ void				OptionPanel::AddMidiTool(MidiPattern *p)
   ShowTool(tool);
 }
 
-void				OptionPanel::AddPlugTool(Plugin *p)
+void				OptionPanel::AddPlugTool(WiredPlugin *p)
 {
   wxWindow			*m;
   WiredTool			*tool;
@@ -183,7 +185,7 @@ void				OptionPanel::AddPlugTool(Plugin *p)
   wxSize			sz(GetSize().GetWidth(), GetSize().GetHeight() - OPT_TOOLBAR_HEIGHT);
   
   m = p->CreateView(this, pt, sz);
-  tool = new WiredTool(wxString(p->Name.c_str()), ID_TOOL_OTHER_OPTIONPANEL, m);  
+  tool = new WiredTool(p->GetName(), ID_TOOL_OTHER_OPTIONPANEL, m);  
   tool->Data = p;
   ToolsList.push_back(tool);
   ShowTool(tool);
@@ -242,7 +244,7 @@ void				OptionPanel::ShowMidi(MidiPattern *p)
   AddMidiTool(p);  
 }
 
-void				OptionPanel::ShowPlug(Plugin *p)
+void				OptionPanel::ShowPlug(WiredPlugin *p)
 {
   vector<WiredTool *>::iterator	i;
   
@@ -379,7 +381,7 @@ void				OptionPanel::DeleteTools(void *DataPointer)
     }
 }
 
-void				OptionPanel::ClosePlug(Plugin *p)
+void				OptionPanel::ClosePlug(WiredPlugin *p)
 {
   DeleteTools(p);
 }

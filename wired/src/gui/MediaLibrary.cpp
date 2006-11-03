@@ -33,7 +33,7 @@
 #include "../mixer/Mixer.h"
 #include "../engine/WiredSession.h"
 #include "../midi/MidiThread.h"
-#include "../plugins/PluginLoader.h"
+#include "WiredPluginLoader.h"
 #include "../xml/WiredSessionXml.h"
 #include "../dssi/WiredExternalPluginMgr.h"
 #include "FileConversion.h"
