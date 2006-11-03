@@ -4,7 +4,7 @@ LDFLAGS = $(shell wx-config --libs)
 
 CPPFLAGS = $(shell wx-config --cflags) -IWiredPluginApi/ -I../engine/
 
-if DSSI
+if USE_DSSI
 CPPFLAGS += -Idssi/
 endif
 

@@ -60,7 +60,8 @@ AC_ARG_ENABLE(dssi,
 	[  --enable-dssi Enable or disable DSSI support (default enabled)],
 	[enable_plugins="$enableval"],
 	[enable_plugins="yes"])
-AM_CONDITIONAL(DSSI, test x$enable_plugins = xyes)
+AM_CONDITIONAL(USE_DSSI, test x$enable_dssi = xyes)
+AC_DEFINE_UNQUOTED(USE_DSSI, "$USE_DSSI", [build or not DSSI support])
 
 # can enable or disable Wired codecs
 AC_ARG_ENABLE(codecs,
@@ -253,7 +254,6 @@ AC_CONFIG_FILES([plugins/beatbox/Makefile
 		src/Makefile
 		src/plugins/WiredPluginApi/Makefile
 		src/plugins/WiredPluginApi/src/Makefile
-		src/plugins/dssi/Makefile
 		src/audio/Makefile
 		src/editmidi/Makefile
 		src/engine/Makefile
@@ -294,7 +294,6 @@ AC_CONFIG_FILES([plugins/beatbox/Makefile
 		src/data/plugins/reverb/Makefile
 		src/data/plugins/wahwah/Makefile
 		src/data/plugins/chorus/Makefile
-		src/data/dssi/Makefile
 		src/conf/Makefile
 		src/xml/Makefile
 		src/samplerate/Makefile
@@ -304,6 +303,12 @@ AC_CONFIG_FILES([plugins/beatbox/Makefile
 		src/codec/wiredcodec/flac/Makefile
 		src/codec/wiredcodec/vorbis/Makefile
 		src/wiredvideo/Makefile])
+
+# build makefile only if dssi is enabled
+if test x$enable_dssi = xyes ; then
+AC_CONFIG_FILES([src/plugins/dssi/Makefile
+		src/data/dssi/Makefile])
+fi
 
 AC_OUTPUT
 

@@ -4,7 +4,7 @@
 #include "WiredPluginLoader.h"
 #include "config.h"
 
-PluginLoader::PluginLoader()
+WiredPluginLoader::WiredPluginLoader()
 {
   FileName = wxT("");
   installer = NULL;
@@ -14,17 +14,17 @@ PluginLoader::PluginLoader()
   // TODO: init to NULL all used vars.
 }
 
-PluginLoader::~PluginLoader()
+WiredPluginLoader::~WiredPluginLoader()
 {
   Unload();
 }
 
-bool	PluginLoader::IsLoaded()
+bool	WiredPluginLoader::IsLoaded()
 {
   return (handle.IsLoaded());
 }
 
-void	PluginLoader::Unload()
+void	WiredPluginLoader::Unload()
 {
   // freeing class plugin
   if (installer && destroy_installer)
@@ -35,15 +35,17 @@ void	PluginLoader::Unload()
     handle.Unload();
 }
 
-void	PluginLoader::Load(WiredExternalPluginMgr *PlugMgr, unsigned long UniqueId)
+#if USE_DSSI
+void	WiredPluginLoader::Load(WiredExternalPluginMgr *PlugMgr, unsigned long UniqueId)
 {
 	PluginMgr = PlugMgr;
 	//IdMenuItem = MenuItemId;
 	ExternalPlug = PluginMgr->CreatePlugin(UniqueId);
 	ExternalPlug->SetInfo(&InitInfo);
 }
-
-void	PluginLoader::Load(WiredExternalPluginMgr *PlugMgr, int MenuItemId, PlugStartInfo &info)
+#endif
+#if USE_DSSI
+void	WiredPluginLoader::Load(WiredExternalPluginMgr *PlugMgr, int MenuItemId, PlugStartInfo &info)
 {
   External = true;
   PluginMgr = PlugMgr;
@@ -52,8 +54,9 @@ void	PluginLoader::Load(WiredExternalPluginMgr *PlugMgr, int MenuItemId, PlugSta
   ExternalPlug->SetInfo(&InitInfo);
   //ExternalPlug->SetVirtualSize(400, 100);
 }
+#endif
 
-void	PluginLoader::Load(wxString& filename)
+void	WiredPluginLoader::Load(wxString& filename)
 {
   handle.Load(filename);
 
@@ -105,23 +108,28 @@ void	PluginLoader::Load(wxString& filename)
     cerr << "[PLUGLOADER] Error: Cannot open library : " << filename.mb_str() << endl;
 }
 
-WiredPlugin	*PluginLoader::CreateRack(WiredPluginStartInfo &info)
+WiredPlugin	*WiredPluginLoader::CreateRack(WiredPluginStartInfo &info)
 {
   if (installer)
     return (installer->Create(&info));
-
+#if USE_DSSI
   ExternalPlug->SetStartInfo(&info);
   return (WiredPlugin*) ExternalPlug;
+#else
+  return (NULL);
+#endif
 }
 
-void		PluginLoader::Destroy(WiredPlugin *todel)
+void		WiredPluginLoader::Destroy(WiredPlugin *todel)
 {
   if (installer)
     installer->Destroy(todel);
   else
     {
       // it's delete only one instance, and not plugin library itself.
+#if USE_DSSI
       PluginMgr->DestroyPlugin(ExternalPlug);
       ExternalPlug = NULL;
+#endif
     }
 }

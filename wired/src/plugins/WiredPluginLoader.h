@@ -4,10 +4,14 @@
 #ifndef __PLUGINLOADER_H__
 #define __PLUGINLOADER_H__
 
-#include "WiredPlugin.h"
-#include "WiredExternalPluginMgr.h"
 #include <wx/wx.h>
 #include <wx/dynlib.h>
+
+#include "WiredPlugin.h"
+
+#if USE_DSSI
+# include "WiredExternalPluginMgr.h"
+#endif
 
 using namespace std;
 
@@ -48,12 +52,16 @@ class				WiredPluginLoader
   /**
    *
    */
+#if USE_DSSI
   WiredDSSIGui			*ExternalPlug;
+#endif
 
   /**
    *
    */
+#if USE_DSSI
   WiredExternalPluginMgr	*PluginMgr;
+#endif
 
 
   /**
@@ -71,7 +79,9 @@ class				WiredPluginLoader
   /**
    *
    */
+#if USE_DSSI
   WiredPluginLoader(WiredExternalPluginMgr *PlugMgr, int MenuItemId, WiredPluginStartInfo &info);
+#endif
 
   /**
    *
