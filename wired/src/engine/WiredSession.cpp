@@ -9,7 +9,7 @@
 #include "Transport.h"
 #include "Rack.h"
 #include "AudioCenter.h"
-#include "PluginLoader.h"
+#include "WiredPluginLoader.h"
 #include "Track.h"
 #include "SeqTrack.h"
 #include "SeqTrackPattern.h"

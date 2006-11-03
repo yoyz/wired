@@ -23,7 +23,7 @@
 
 #include <errno.h>
 
-#include "../plugins/PluginLoader.h"
+#include "WiredPluginLoader.h"
 #include "WiredPlugin.h"
 #include "../sequencer/Track.h"
 #include "../sequencer/Sequencer.h"

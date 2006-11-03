@@ -8,7 +8,7 @@
 #include "cAction.h"
 #include "cActionManager.h"
 #include "Visitor.h"
-#include "PluginLoader.h"
+#include "WiredPluginLoader.h"
 
 #define	INVALID_VALUE								-42
 #define	HISTORY_LABEL_CREATE_EFFECT_ACTION			_("creating rack effect")
@@ -106,11 +106,11 @@ class					cChangeParamsEffectAction : public cAction
 {
 private:
 //	WiredPluginData 		mDatas;					// Contexte datas
-	Plugin*					mPlugin;				// Contexte instance
+	WiredPlugin*				mPlugin;				// Contexte instance
 	bool					mShouldSave;				// Saves or load action
   
 public:
-	cChangeParamsEffectAction (Plugin* plugin, bool shouldSave);
+	cChangeParamsEffectAction (WiredPlugin* plugin, bool shouldSave);
 	cChangeParamsEffectAction (const cChangeParamsEffectAction& copy){*this = copy;};
 	~cChangeParamsEffectAction () {};
 	virtual void			Do ();					// Does action
@@ -133,14 +133,14 @@ public:
 class						cCreateEffectAction : public cAction 
 {
 private:
-	PluginLoader			*mPluginLoader;			// Contexte
-	PlugStartInfo			*mStartInfo;			// Contexte
+	WiredPluginLoader		*mPluginLoader;			// Contexte
+	WiredPluginStartInfo			*mStartInfo;			// Contexte
 	bool					mShouldAdd;				// True if should add in Do()
 	int						mRackIndex;				// Index du rack dans le RackPanel - Abandonne car remove casse les index dsna RackTracks
 	//RackTrack				*mRackTrack;			// Effect instance
   
 public:
-	cCreateEffectAction (PlugStartInfo* startInfo, PluginLoader * plugin, bool shouldAdd);
+	cCreateEffectAction (WiredPluginStartInfo* startInfo, WiredPluginLoader * plugin, bool shouldAdd);
 	cCreateEffectAction (const cCreateEffectAction& copy){*this = copy;};
 	~cCreateEffectAction () {};
 	virtual void			Do ();					// Does action
@@ -162,11 +162,11 @@ public:
 class					cCreateRackAction : public cAction 
 {
 private:
-  PluginLoader				*mPluginLoader;
-  PlugStartInfo				*mStartInfo;
+  WiredPluginLoader			*mPluginLoader;
+  WiredPluginStartInfo			*mStartInfo;
   
 public:
-  cCreateRackAction (PlugStartInfo* startInfo, PluginLoader* plugLoader);
+  cCreateRackAction (WiredPluginStartInfo* startInfo, WiredPluginLoader* plugLoader);
   cCreateRackAction (const cCreateRackAction& copy){*this = copy;};
   ~cCreateRackAction () {};
   virtual void				Do ();

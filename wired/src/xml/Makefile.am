@@ -11,8 +11,7 @@ LDFLAGS = $(shell wx-config --libs) `xml2-config --libs`
 
 noinst_LIBRARIES = libwiredxml.a
 
-libwiredxml_a_SOURCES =			\
-		../redist/Plugin.cpp	\
+libwiredxml_a_SOURCES =
 		WiredXml.cpp		\
 		WiredXml.h		\
 		WiredSessionXml.cpp	\
