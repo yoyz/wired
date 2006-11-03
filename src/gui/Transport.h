@@ -81,7 +81,7 @@ class				Transport : public wxPanel, WiredDocument
   void				OnIdle(wxIdleEvent &WXUNUSED(event));
 
   void				Save();
-  void				Load();
+  void				Load(SaveElementArray data);
 
  protected:
   friend class			MainWindow;

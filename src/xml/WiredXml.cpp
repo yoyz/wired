@@ -370,3 +370,33 @@ const wxString&		WiredXml::GetDocumentName()
 {
 	return _DocumentFileName;
 }
+
+
+int			WiredXml::GetAttributeCount()
+{
+  if(_DocumentFile != NULL)
+    return xmlTextReaderAttributeCount(_DocumentFile);
+  return 0;
+}
+
+wxString		WiredXml::GetAttributeValue(int no)
+{
+  if(_DocumentFile != NULL && no <= GetAttributeCount())
+    return (wxString((const char*)xmlTextReaderGetAttributeNo(_DocumentFile, no),
+		     wxConvUTF8));
+  return wxT("");
+}
+
+wxString		WiredXml::GetAttributeName(int no)
+{
+  wxString	ret = wxT("");
+  if(_DocumentFile != NULL && no <= GetAttributeCount())
+    {
+      xmlTextReaderMoveToAttributeNo(_DocumentFile, no);
+      ret = wxString((const char*)xmlTextReaderConstName(_DocumentFile), 
+		     wxConvUTF8);
+      xmlTextReaderMoveToElement(_DocumentFile);
+    }
+
+  return ret;
+}

@@ -503,7 +503,7 @@ void				Transport::Save()
   this->saveDocData(WIRED_PROJECT_FILE, Loop);
 }
 
-void				Transport::Load()
+void				Transport::Load(SaveElementArray data)
 {
 
 }

@@ -9,9 +9,8 @@ WiredDocument::WiredDocument(wxString name, WiredDocument *parent = NULL)
 
   if(parent)
     parent->Register(this);
-  
-  _name = name;
 
+  _name = name;
 }
 
 void		WiredDocument::Register(WiredDocument *child)
@@ -23,11 +22,6 @@ void		WiredDocument::Register(WiredDocument *child)
 WiredDocumentArray	WiredDocument::getChildren()
 {
   return _children;
-}
-
-wxString	WiredDocument::getName()
-{
-  return _name;
 }
 
 void		WiredDocument::SaveMe()

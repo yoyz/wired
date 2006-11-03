@@ -81,7 +81,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   CreateStatusBar(2);
 #endif
   WiredSettings = new Settings();
-  saveCenter = new SaveCenter(wxString(wxT("wired_save")));
+  saveCenter = new SaveCenter();
   LoadedExternalPlugins = new WiredExternalPluginMgr();
   LogWin = new wxLogWindow(this, wxT("Wired log"), false);
   

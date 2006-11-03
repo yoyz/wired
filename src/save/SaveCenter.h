@@ -8,7 +8,17 @@
 #include <wx/dirdlg.h>
 #include <wx/generic/dirdlgg.h>
 
+//wxArrayString
+#include <wx/arrstr.h>
+
 #define WIRED_DEFAULT_PROJECT_NAME wxT("WiredProject")
+
+//define standard XML tags for the project file
+#define WIRED_TAG_WIREDDOC wxT("wiredDoc")
+
+WX_DEFINE_ARRAY_PTR(SaveElementArray*, SaveElementArrayArray);
+WX_DECLARE_STRING_HASH_MAP(SaveElementArrayArray*, SaveElementArrayHashMap);
+WX_DECLARE_STRING_HASH_MAP(WiredDocumentArray*, WiredDocumentArrayHashMap);
 
 class SaveCenter : public WiredDocument
 {
@@ -18,8 +28,7 @@ class SaveCenter : public WiredDocument
    * \param docParent
    * \param projectPath
    */
-  SaveCenter(wxString docName,
-	     wxFileName projectPath = wxT(""),
+  SaveCenter(wxFileName projectPath = wxT(""),
 	     WiredDocument *docParent = NULL);
   ~SaveCenter();
 
@@ -33,7 +42,7 @@ class SaveCenter : public WiredDocument
    * The SaveCenter is a WiredDocument. This function is used to load 
    * projectwide infos
    */
-  void		Load();
+  void		Load(SaveElementArray data);
   
   /** Returns the project path. */
   wxFileName	getProjectPath();
@@ -103,6 +112,9 @@ class SaveCenter : public WiredDocument
 
 
  private:
+  
+  void			RedistributeHash(SaveElementArrayHashMap dataLoaded);
+
   wxFileName		_projectPath;
   wxString		_projectName;
   wxFileName		_audioDir;
