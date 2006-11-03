@@ -505,7 +505,51 @@ void				Transport::Save()
 
 void				Transport::Load(SaveElementArray data)
 {
+  int		i;
+  wxString	s;
+  double	bpm;
+  long		sig;
 
+  std::cerr << "[Transport] Load()" << std::endl; 
+  for(i = 0; i < data.GetCount(); i++)
+    {
+      std::cerr << "[Transport] key = " << data[i]->getKey() << std::endl;
+      std::cerr << "[Transport] value = " << data[i]->getValue() << std::endl;
+      if(data[i]->getKey() == wxT("BPM"))
+	{
+	  s = data[i]->getValue();
+	  s.ToDouble(&bpm);
+	  SetBpm((float)bpm);	  
+	}
+      else if(data[i]->getKey() == wxT("SigNumerator"))
+	{
+	  s = data[i]->getValue();
+	  s.ToLong(&sig);
+	  SetSigNumerator((int)sig);
+	} 
+      else if(data[i]->getKey() == wxT("SigDenominator"))
+	{
+	  s = data[i]->getValue();
+	  s.ToLong(&sig);
+	  SetSigDenominator((int)sig);
+	} 
+      else if(data[i]->getKey() == wxT("Click"))
+	{
+	  s = data[i]->getValue();
+	  if(s == wxT("1"))
+	    SetClick(true);
+	  else
+	    SetClick(false);
+	} 
+      else if(data[i]->getKey() == wxT("Loop"))
+	{
+	  s = data[i]->getValue();
+	  if(s == wxT("1"))
+	    SetLoop(true);
+	  else
+	    SetLoop(false);
+	}
+    }
 }
 
 BEGIN_EVENT_TABLE(Transport, wxPanel)

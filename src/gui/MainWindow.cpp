@@ -669,94 +669,51 @@ bool					MainWindow::NewSession()
 
 void					MainWindow::OnOpen(wxCommandEvent &event)
 {
-  vector<wxString>			exts;
-  
-  exts.insert(exts.begin(), _("wrd\tWired session file (*.wrd)"));
-  exts.insert(exts.begin(), _("xml\tWired session file (*.xml)"));
-  FileLoader				dlg(this, MainWin_FileLoader, _("Open session"), false, false, &exts);
-  if (dlg.ShowModal() == wxID_OK)
+  wxDirDialog	dirDialog(NULL, _("Select a project folder"),
+			  saveCenter->getProjectPath().GetPath());
+
+  if (dirDialog.ShowModal() == wxID_OK)
     {
-      wxString selfile = dlg.GetSelectedFile();    
+      wxString selfile = dirDialog.GetPath();    
       
       cout << "[MAINWIN] User opens " << selfile.mb_str() << endl;
-      if (!NewSession())
-	{
-	  //dlg->Destroy();
-	  return;
-	}
-      if (selfile.size() > 4)
-	{
-	  transform(selfile.begin(), selfile.end(), selfile.begin(), (int(*)(int))tolower);
-	  if (!selfile.substr(selfile.find_last_of('.')).compare(XML_EXTENSION))
-	    {
-	      delete saveCenter;
-	      saveCenter = new SaveCenter(wxString(wxT("wired_save")));
-	      saveCenter->LoadProject(selfile);
 
-	      cout << "[MAINWIN] New session loaded" << endl;
-	    }
-	  else
-	    {
-	      cout << "[MAINWIN] Warning! Trying to open old format... nothing done" << endl;
-	    }
-	}
-      else
-	cout << "[MAINWIN] Invalid Filename" << endl;
-      
+      saveCenter->setProjectPath(selfile);
+      saveCenter->LoadProject();      
     }
 }
 
 void					MainWindow::OnSave(wxCommandEvent &event)
 {
-  saveCenter->SaveProject();
+  wxDirDialog	dirDialog(NULL, _("Select a project folder"),
+			  saveCenter->getProjectPath().GetPath());
+
   
-  //   if (CurrentXmlSession)
-  //     {
-  //       wxString			DocumentName(CurrentXmlSession->GetDocumentName());
-  //       if (!DocumentName.empty())
-  // 	CurrentXmlSession->Save();
-  //       else
-  // 	OnSaveAs(event);
-  //     }
-  //   else
-  //     OnSaveAs(event);
+  if(!saveCenter->getSaved())
+    {
+      if(dirDialog.ShowModal() == wxID_OK)
+	{
+	  saveCenter->setProjectPath(dirDialog.GetPath());
+	  std::cout << "[MainWindow] Save in :" << dirDialog.GetPath() << std::endl;
+	}
+      else
+	return ;
+    }
+  saveCenter->SaveProject(); 
 }
 
 void					MainWindow::OnSaveAs(wxCommandEvent &event)
 {
-  saveCenter->SaveProject(true);
-
-  //USES WIREDSESSION
-//   vector<wxString>			exts;
+  wxDirDialog	dirDialog(NULL, _("Select a project folder"),
+			  saveCenter->getProjectPath().GetPath());
   
-//   exts.insert(exts.begin(), _("xml\tWired session file (*.xml)"));
-//   FileLoader				dlg(this, MainWin_FileLoader, _("Save session"), false, true, &exts);
-//   if (dlg.ShowModal() == wxID_OK)
-//     {
-//       wxString selfile = dlg.GetSelectedFile();    
-      
-//       wxFileName f(selfile);
-//       if (!f.HasExt())
-// 	selfile = selfile + XML_EXTENSION;
-//       cout << "[MAINWIN] User saves to " << selfile.mb_str() << endl;
+  if(dirDialog.ShowModal() == wxID_OK)
+    saveCenter->setProjectPath(dirDialog.GetPath());
+  else
+    return ;
+  
+  saveCenter->SaveProject();
 
-//       wxString audiodir;
-      
-//       if (CurrentXmlSession)
-// 	{
-// 	  audiodir = wxString(CurrentXmlSession->GetAudioDir());
-// 	  if (audiodir.size() == 0)
-// 	    {
-// 	      char	buffer[2048];
-	      
-// 	      getcwd(buffer, 2048);
-// 	      audiodir = wxString(buffer, *wxConvCurrent);
-// 	    }  	
-// 	  delete CurrentXmlSession;
-// 	}
-//       CurrentXmlSession = new WiredSessionXml(selfile, audiodir);
-//       CurrentXmlSession->Save();
-//     }
 }
 
 void					MainWindow::OnImportWave(wxCommandEvent &event)

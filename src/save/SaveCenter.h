@@ -58,6 +58,8 @@ class SaveCenter : public WiredDocument
   wxString	getAudioDir();
   void		setAudioDir(wxString audioDir);
 
+  bool		getSaved();
+
   /** Sets the project name
    * \param projectName the new project name.
    */
@@ -68,7 +70,7 @@ class SaveCenter : public WiredDocument
    * Initialize some elements and calls SaveDocument on the SaveCenter.
    * Make sure the project path and name are set.
    */
-  void		SaveProject(bool saveAs = false);
+  void		SaveProject();
   
   /** Only saves the file designated by file of the WiredDocument designated by doc.
    * This method should be used, for example, to save a plugin patch.<br>
@@ -78,7 +80,7 @@ class SaveCenter : public WiredDocument
    */
   void		SaveFile(WiredDocument *doc, wxString file);
 
-  void		LoadProject(wxString filename);
+  void		LoadProject();
 
  private:
    /** Writes an element in the xmlfile.
@@ -113,11 +115,15 @@ class SaveCenter : public WiredDocument
 
  private:
   
+  void			DumpSaveElementArrayHashMap(SaveElementArrayHashMap dataLoaded);
+  void			DumpWiredDocumentArrayHashMap(WiredDocumentArrayHashMap toProcess);
+
   void			RedistributeHash(SaveElementArrayHashMap dataLoaded);
 
   wxFileName		_projectPath;
   wxString		_projectName;
   wxFileName		_audioDir;
+  //store if the project has already been saved once (else, we'll act like a saveAs) 
   bool			_saved;
 };
 

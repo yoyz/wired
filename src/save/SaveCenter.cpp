@@ -25,39 +25,17 @@ void	SaveCenter::Load(SaveElementArray)
   //load project specific infos ?
 }
 
-void	SaveCenter::SaveProject(bool saveAs)
+void	SaveCenter::SaveProject()
 {
   wxString	fileName;
   WiredXml	*xmlFile = new WiredXml();
-  wxDirDialog	dirDialog(NULL, _("Select a project folder"),
-			  _projectPath.GetPath());
-
-  std::cerr << "[Save] SaveCenter::SaveProject" << std::endl;
-
-  if(!_saved || saveAs)
-    {
-      //call fileloader to select the location
-      if(dirDialog.ShowModal() == wxID_OK)
-	{
-	  _projectPath.Clear();
-	  _projectPath.AssignDir(dirDialog.GetPath());
-	  std::cerr << "dirDialog.GetPath() = " << dirDialog.GetPath().mb_str() << std::endl;
-	  _saved = true;
-	}
-      else
-	return ;
-    }
 
   if(!_projectPath.DirExists())
     _projectPath.Mkdir();
     
   fileName << _projectPath.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) << wxT("wired.xml");
 
-  std::cerr << "fileName = " << fileName.mb_str() << std::endl;
-
   xmlFile->CreateDocument(fileName);
-
-  std::cerr << "[Save] xmlFile created" << std::endl;
 
   SaveDocument((WiredDocument *)this, xmlFile);
 
@@ -79,48 +57,31 @@ void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
   SaveElementArray			*toWrite;
   SaveElementsHashMap::iterator		saveElementsIt;
 
-  std::cerr << "[SaveCenter] SaveCenter::SaveDocument" << std::endl;
-
   //Get our children
   childrenOfCurrentNode = currentNode->getChildren();
-
-  std::cerr << "[SaveCenter] childrenOfCurrentNode" << std::endl;
 
   //Save Document
   currentNode->SaveMe();
   
-  std::cerr << "[SaveCenter] Save" << std::endl;
-
   //get my SaveElements
   saveElements = currentNode->getDocData();
-
-  std::cerr << "[SaveCenter] getNodeData" << std::endl;
 
   //write our SaveElements...
   //...start with our name...
   xmlFile->StartElement(WIRED_TAG_WIREDDOC);
   xmlFile->WriteAttribute(wxT("id"), currentNode->getName());
 
-  std::cerr << "[SaveCenter] startelement : node name = " << currentNode->getName().mb_str() << std::endl;
-  
   //Write references
   AddReferences(saveElements, xmlFile);
-
-  std::cerr << "[SaveCenter] references added" << std::endl;
-
-  std::cerr << "[SaveCenter] saveElements.count(WIRED_PROJECT_FILE) = " << saveElements.count(WIRED_PROJECT_FILE) << std::endl;
 
   //get elements to write in the conf file
   if(saveElements.count(WIRED_PROJECT_FILE))
     {      
       toWrite = saveElements[WIRED_PROJECT_FILE];
-      std::cerr << "[SaveCenter] toWrite" << std::endl;
-      
+
       //...then write the elements
       for (i = 0; i < toWrite->GetCount(); i++)
 	WriteElement(toWrite->Item(i), xmlFile);
-
-      std::cerr << "[SaveCenter] Elements written" << std::endl;
     }
   //Write the other files
   for (saveElementsIt = saveElements.begin();
@@ -128,8 +89,6 @@ void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
        saveElementsIt++)
     if(saveElementsIt->first != WIRED_PROJECT_FILE)
       WriteFile(saveElementsIt->first, saveElementsIt->second);
-
-  std::cerr << "[SaveCenter] other files written" << std::endl;
 
   //call recursively on our children
   for (i = 0; i < childrenOfCurrentNode.GetCount(); i++)
@@ -230,7 +189,7 @@ void		SaveCenter::setProjectPath(wxFileName projectPath)
   else
     {
       _saved = true;
-      _projectPath = projectPath;
+      _projectPath.AssignDir(projectPath.GetFullPath());
       
       _projectName = GetProjectNameFromProjectPath(_projectPath);
     }
@@ -244,6 +203,8 @@ wxString	SaveCenter::getProjectName()
 
 void		SaveCenter::setProjectName(wxString projectName)
 {
+  std::cerr << "[SaveCenter] setProjectName : " << projectName << std::endl;
+
   _projectName = projectName;
 
   _projectPath.RemoveLastDir();
@@ -251,16 +212,17 @@ void		SaveCenter::setProjectName(wxString projectName)
 
 }
 
-void	SaveCenter::LoadProject(wxString filename)
+void	SaveCenter::LoadProject()
 {
   //infos about the node we are reading
   WiredXml	*xmlFile = new WiredXml();
+  wxString	filename;
   wxString	nodeName;
   int		nodeType;
 
   //the things we are storing (code readability)
   //It's just used as a reference. No new, no delete on this pointer.
-  SaveElement		*saveElem = NULL;
+  SaveElement		*currentSaveElem = NULL;
 
   //we store the whole path to the current document.
   //Please refer to the technical documentation for more infos.
@@ -273,6 +235,10 @@ void	SaveCenter::LoadProject(wxString filename)
 
   wxArrayString			pathToCurrentDoc;
 
+  filename.Clear();
+  filename << getProjectPath().GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+  filename << wxT("wired.xml");
+
   std::cerr << "[SaveCenter] Load file : " << filename.mb_str() << std::endl;
 
   //read the xml file and fill in a big hash map
@@ -284,101 +250,149 @@ void	SaveCenter::LoadProject(wxString filename)
 
       if(nodeType == XML_READER_TYPE_ELEMENT)
 	{
-	  std::cerr << "[SaveCenter] start tag : " << std::endl;
- 
 	  nodeName = xmlFile->GetNodeName();
-	  std::cerr << "[SaveCenter] Node Name : " << nodeName.mb_str() << std::endl;
-	  std::cerr << "[SaveCenter] Node Value : " << xmlFile->GetNodeValue().mb_str() << std::endl;
 
 	  if(nodeName == WIRED_TAG_WIREDDOC)
 	    {
 	      currentDoc = xmlFile->GetAttribute(wxT("id"));
-	      std::cerr << "[SaveCenter] currentDoc = " << currentDoc.mb_str();
 	      pathToCurrentDoc.Add(currentDoc);
+
+	      //if it is the first doc of this type
 	      if(dataLoaded.find(currentDoc) == dataLoaded.end())
-		dataLoaded[currentDoc]->Add(new SaveElementArray());
+		{
+		  //we add create the key and its array
+		  dataLoaded[currentDoc] = new SaveElementArrayArray();
+		}
+	      //we add a new array to it
+	      dataLoaded[currentDoc]->Add(new SaveElementArray());
 	      //may look hazardous, but last() returns the last item we added...
 	      currentArray = dataLoaded[currentDoc]->Last();
 	    }
 	  else
 	    {
 	      currentArray->Add(new SaveElement);
-	      saveElem = currentArray->Last();
+	      currentSaveElem = currentArray->Last();
 
-	      saveElem->setKey(nodeName);
-	      saveElem->setValue(xmlFile->GetNodeValue());
+	      currentSaveElem->setKey(nodeName);
 
 	      //attributes handling
 	      for(int i = 0; i < xmlFile->GetAttributeCount(); i++)
-		saveElem->addAttribute(xmlFile->GetAttributeName(i),
-				       xmlFile->GetAttributeValue(i));
+		currentSaveElem->addAttribute(xmlFile->GetAttributeName(i),
+					      xmlFile->GetAttributeValue(i));
 
 	    }
 	}
+      else if(nodeType == XML_READER_TYPE_TEXT)
+	{
+	  currentSaveElem->setValue(xmlFile->GetNodeValue());
+	}
       else if(nodeType == XML_READER_TYPE_END_ELEMENT)
 	{
-	  std::cerr << "[SaveCenter] end tag : " << xmlFile->GetNodeName().mb_str() << std::endl;
-	  
 	  pathToCurrentDoc.Remove(nodeName);
 	  currentDoc = pathToCurrentDoc.Last();
 	}
     }
-
-  //un petit dump de la table de hash pour le debug ?
+  
+ 
+  //DumpSaveElementArrayHashMap(dataLoaded);
 
   //redistribute the elements of the hash
   //In a separated method for readability and for logic
   //check technical documentation for more informations.
+  
   RedistributeHash(dataLoaded);
 
  
+}
+
+void		SaveCenter::DumpSaveElementArrayHashMap(SaveElementArrayHashMap dataLoaded)
+{
+  //un petit dump de la table de hash pour le debug
+  std::cerr << "[SaveCenter] dataLoaded Big Dump" << std::endl;
+  //iterate on the keys of the hash map
+  for(SaveElementArrayHashMap::iterator myIt = dataLoaded.begin();
+      myIt != dataLoaded.end();
+      myIt++)
+    //iterate on the elements of the ArrayArray
+    for(int z = 0; z < myIt->second->GetCount(); z++)
+      //iterate on the elements of the Array
+      for(int y = 0; y < myIt->second->Item(z)->GetCount(); y++)
+	{
+	  std::cerr << "SaveElementArrayHashMap[" << myIt->first << "]";
+	  std::cerr << "[" << z << "][" << y << "]->getKey() = ";
+	  std::cerr << dataLoaded[myIt->first]->Item(z)->Item(y)->getKey().mb_str() << std::endl;
+	}
+}
+
+void		SaveCenter::DumpWiredDocumentArrayHashMap(WiredDocumentArrayHashMap toProcess)
+{
+  for(WiredDocumentArrayHashMap::iterator it = toProcess.begin();
+      it != toProcess.end();
+      it ++)
+    for(int i = 0; i < it->second->GetCount(); i++)
+      {
+	std::cerr << "WiredDocumentArrayHashMap[" << it->first << "]";
+	std::cerr << "[" << i << "]->getName() = ";
+	std::cerr << toProcess[it->first]->Item(i)->getName().mb_str() << std::endl;
+      }
 }
 
 
 void		SaveCenter::RedistributeHash(SaveElementArrayHashMap dataLoaded)
 {
   WiredDocumentArray				children;
+  wxString					childName;
   wxString					currentName;
   WiredDocumentArrayHashMap::iterator		it;
   WiredDocumentArrayHashMap			toProcess;
   WiredDocument					*currentDoc;
 
-  int						i, j;
+  int						i;
 
   //init the whole process with the SaveCenter on top
   currentName = getName();
   toProcess[currentName] = new WiredDocumentArray();
   toProcess[currentName]->Add(this);
   
-
-  while(!toProcess.empty())
+  while(!toProcess.empty() && !dataLoaded.empty())
     {
       it = toProcess.begin();
-      if(it->second->empty())
+      currentName = it->first;
+
+      //load the document
+      currentDoc = it->second->Item(0); 
+      currentDoc->Load(* (dataLoaded[currentName]->Item(0)) );
+      //get infos before removing it
+      children = currentDoc->getChildren();
+      //add his children to the list
+      for(i = 0; i < children.GetCount(); i++)
+	{
+	  childName = children[i]->getName();
+	  if(toProcess.find(childName) == toProcess.end())
+	    toProcess[childName] = new WiredDocumentArray();
+	  toProcess[childName]->Add(children[i]);
+	}
+
+      //remove the doc from the doc HashMap
+      it->second->RemoveAt(0);
+
+      //remove the data from dataLoaded
+      delete dataLoaded[currentName]->Item(0);
+      dataLoaded[currentName]->RemoveAt(0);
+
+      
+      //make things clean... remove unused entries of both hash maps.
+      if(it->second->IsEmpty())
 	{
 	  delete it->second;
-	  toProcess.erase(it->first);
+	  toProcess.erase(currentName);
 	}
-      else
+      if(dataLoaded[currentName]->IsEmpty())
 	{
-	  //load the document
-	  currentDoc = it->second->Item(0);
-	  currentDoc->Load(* (dataLoaded[it->first]->Item(0)) );
-	  //get infos before removing it
-	  children = currentDoc->getChildren();
-	  //add his children to the list
-	  for(i = 0; i < children.GetCount(); i++)
-	    {
-	      currentName = children[i]->getName();
-	      if(toProcess.find(currentName) == toProcess.end())
-		toProcess[currentName] = new WiredDocumentArray();
-	      toProcess[currentName]->Add(children[i]);
-	    }
-	  //remove it from the list
-	  it->second->Remove(0);
+	  delete dataLoaded[currentName];
+	  dataLoaded.erase(currentName);
 	}
-    }
-  
+    }  
 }
 
 wxString	SaveCenter::GetDefaultProjectName(wxFileName cwd)
@@ -410,4 +424,9 @@ wxString	SaveCenter::GetProjectNameFromProjectPath(wxFileName path)
   ret = dirs[dirs.GetCount() - 1];
 
   return ret;
+}
+
+bool		SaveCenter::getSaved()
+{
+  return _saved;
 }
