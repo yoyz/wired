@@ -37,7 +37,7 @@
 #include "../xml/WiredSessionXml.h"
 #include "../dssi/WiredExternalPluginMgr.h"
 #include "FileConversion.h"
-#include "config.h"
+#include <config.h>
 #include "Threads.h"
 #include "MediaLibrary.h"
 #include "MLTree.h"
@@ -59,7 +59,7 @@ const struct s_combo_choice		SortSelectChoices[NB_SORTSELECT_CHOICES + 1] =
 };
 
 MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style)
-  : wxPanel(parent, -1, pos, size, style)
+  : wxPanel(parent, wxID_ANY, pos, size, style)
 {
   wxString	sortselect_choices[NB_SORTSELECT_CHOICES];
   long		c;
@@ -291,6 +291,7 @@ void				MediaLibrary::OnLeftClick(wxMouseEvent &event)
 {
   cout << "[MEDIALIBRARY] Test" << endl;
 }
+
 BEGIN_EVENT_TABLE(MediaLibrary, wxPanel)
   EVT_SIZE(MediaLibrary::OnSize)
   EVT_TOOL(MediaLibrary_Add, MediaLibrary::OnAdd)

@@ -32,28 +32,41 @@ void cImportWaveAction::Do ()
 void cImportWaveAction::AddWaveTrack()
 {
   WaveFile *w = WaveCenter.AddWaveFile(_WavePath);
-	
+  long		nb_channel;
+  Track *t;
+
+	  
   if (w) 
     {
-      Track *t = SeqPanel->AddTrack(_TrackKindFlag);
-      t->AddPattern(w);
-      _trackIndex = t->Index;
-      NotifyActionManager();
+      for (nb_channel = 0; nb_channel < w->GetNumberOfChannels(); nb_channel++)
+	{ 
+	  t = SeqPanel->AddTrack(_TrackKindFlag);
+	  w = WaveCenter.AddWaveFile(_WavePath);
+	  w->SetChannelToRead(nb_channel);
+	  t->AddPattern(w);
+	  _trackIndex = t->GetIndex();
+	  NotifyActionManager();
+	}
     }
 }
 
 void cImportWaveAction::AddWaveToEditor()
 {
   WaveFile *w = WaveCenter.AddWaveFile(_WavePath);
-  
+  long	   nb_channel;
+
+
   if (w) 
     {
       Track *t = SeqPanel->AddTrack(_TrackKindFlag);
-      AudioPattern  *pattern = t->AddPattern(w);
-      pattern->OnDirectEdit();
-
-      _trackIndex = t->Index;
-      NotifyActionManager();
+      for (nb_channel = 0; nb_channel < w->GetNumberOfChannels(); nb_channel++)
+	{
+	  AudioPattern  *pattern = t->AddPattern(w);
+	  pattern->OnDirectEdit();
+	  
+	  _trackIndex = t->GetIndex();
+	  NotifyActionManager();
+	}
     }
 }
 

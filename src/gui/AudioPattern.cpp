@@ -57,9 +57,9 @@ void					AudioPattern::Init(WaveFile* w)
   RecordWave = 0;
   InputChan = NULL;
   RecordWave = NULL;
-  SetWave(w);
   if (w)
     {
+      SetWave(w);
       wxSize s = GetSize();
       SetSize(s);
       WaveDrawer::SetWave(w, s);
@@ -138,7 +138,8 @@ void					AudioPattern::SetWave(WaveFile *w)
 #ifdef __DEBUG__
   cout << "WaveDrawer::StartWavePos = " << WaveDrawer::StartWavePos<< " WaveDrawer::EndWavePos = " << WaveDrawer::EndWavePos << endl;
 #endif
-  if (!w)
+ 
+ if (!w)
     {
       StartWavePos = 0;
       EndWavePos = 0;
@@ -304,16 +305,16 @@ Pattern					*AudioPattern::CreateCopy(double pos)
 #ifdef __DEBUG__
   printf(" [ START ] AudioPattern::CreateCopy(%f) on track %d\n", pos, TrackIndex);
 #endif
-  p = new AudioPattern(pos, (pos + Length), TrackIndex);
- 
-  SeqMutex.Lock();
-  p->StartWavePos = StartWavePos;
-  p->EndWavePos = EndWavePos;
-  p->SetDrawColour(WaveDrawer::PenColor);
-  p->SetWave(Wave);
-  p->Update();
-  SeqMutex.Unlock();
-  Seq->Tracks[TrackIndex]->AddColoredPattern((Pattern *) p);
+   p = new AudioPattern(pos, Wave, TrackIndex);
+   SeqMutex.Lock();
+   p->StartWavePos = StartWavePos;
+   p->EndWavePos = EndWavePos;
+   p->EndPosition = pos +  Length;
+   p->Length = Length;
+   p->SetDrawColour(WaveDrawer::PenColor);
+   p->Update();
+   SeqMutex.Unlock();
+   Seq->Tracks[TrackIndex]->AddColoredPattern((Pattern *) p);
  
   //p = new AudioPattern(pos, Wave, TrackIndex);
   //p = Seq->Tracks[TrackIndex]->AddPattern(Wave, pos);
@@ -328,8 +329,10 @@ void					AudioPattern::OnClick(wxMouseEvent &e)
 {
   Pattern::OnClick(e);
   if (SeqPanel->Tool == ID_TOOL_SPLIT_SEQUENCER)
-    Split((double) ((Pattern::GetMPosition().x + e.m_x)
-		    / (MEASURE_WIDTH * SeqPanel->HoriZoomFactor)));
+    {
+      Split((double) ((GetMPosition().x + e.m_x)
+		      / (MEASURE_WIDTH * SeqPanel->HoriZoomFactor)));
+      }
   else
     if (SeqPanel->Tool == ID_TOOL_PAINT_SEQUENCER)
       SetDrawColour(SeqPanel->ColorBox->GetColor());
@@ -344,6 +347,7 @@ void					AudioPattern::Split(double pos)
 {
   AudioPattern				*p;
 
+ 
   if ((Position < pos) && (pos < EndPosition))
     {
       SeqMutex.Lock();
@@ -357,8 +361,9 @@ void					AudioPattern::Split(double pos)
 #endif
       p->StartWavePos = StartWavePos + (long) floor((pos - Position) * Seq->SamplesPerMeasure);
       p->EndWavePos = p->StartWavePos + (long) floor(p->Length * Seq->SamplesPerMeasure);
-      p->SetDrawColour(WaveDrawer::PenColor);
+      
       p->SetWave(Wave);
+      p->SetDrawColour(WaveDrawer::PenColor);
       p->SetCursor(GetCursor());
       if (IsSelected())
 	p->SetSelected(false);
@@ -377,10 +382,11 @@ void					AudioPattern::Split(double pos)
 
 void					AudioPattern::SetDrawColour(wxColour c)
 { 
-  Pattern::SetDrawColour(c);
-  WaveDrawer::PenColor = c;
-  RedrawBitmap(GetSize());
-  Refresh();
+   Pattern::SetDrawColour(c);
+   WaveDrawer::PenColor = c;
+   RedrawBitmap(GetSize());
+   //Refresh();
+  
 }
 
 void					AudioPattern::OnDoubleClick(wxMouseEvent &e)

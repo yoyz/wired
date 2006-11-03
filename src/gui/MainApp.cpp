@@ -11,7 +11,7 @@
 #include "MainWindow.h"
 #include "Settings.h"
 
-#include "../include/config.h"
+#include <config.h>
 
 void	AllocationErrorHandler(void)
 {
@@ -48,7 +48,7 @@ bool				MainApp::OnInit()
   m_condAllDone = new wxCondition(m_mutex);
 
   // splash screen
-  if (bitmap.LoadFile(wxString(INSTALL_PREFIX, *wxConvCurrent) + wxString(wxT("/share/wired/data/ihm/splash/splash.png")), wxBITMAP_TYPE_PNG))
+  if (bitmap.LoadFile(wxString(DATA_DIR, *wxConvCurrent) + wxString(wxT("/wired/ihm/splash/splash.png")), wxBITMAP_TYPE_PNG))
     {
       splash = new wxSplashScreen(bitmap,
 				  wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT,
@@ -71,10 +71,11 @@ bool				MainApp::OnInit()
 #endif  
   SetUseBestVisual(true);
   SetVendorName(L"Wired Team");
-  Frame = new MainWindow(WIRED_TITLE, wxDefaultPosition, wxGetDisplaySize());
+  //  Frame = new MainWindow(WIRED_TITLE, wxDefaultPosition, wxGetDisplaySize());
+  Frame = new MainWindow(WIRED_TITLE, wxDefaultPosition, wxSize(800,600));
   Frame->Show(true);
   SetTopWindow(Frame);
-  splash->Hide();
+  //splash->Hide();
 
   // now error dialog are based on mainframe 
   MainWin = Frame;

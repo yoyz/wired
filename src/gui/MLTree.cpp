@@ -3,7 +3,9 @@
 
 #include <wx/filename.h>
 #include <wx/wx.h>
+#include <wx/file.h>
 #include <wx/treectrl.h>
+//#include "../xml/WiredSessionXml.h"
 #include "MediaLibrary.h"
 #include "MLTree.h"
 #include "MLTreeInfos.h"
@@ -24,13 +26,12 @@
 #include "icon5.xpm"
 #include "icon3.xpm"
 #include "delete.xpm"
-#include "../xml/WiredSessionXml.h"
-#include <wx/file.h>
 
-extern WiredSession				*CurrentSession;
-extern MediaLibrary				*MediaLibraryPanel;
+extern WiredSession	*CurrentSession;
+extern MediaLibrary	*MediaLibraryPanel;
+WiredSessionXml		*CurrXmlSession = NULL;
 
-s_nodeInfo					SetStructInfos(s_nodeInfo infos, wxString label, wxString extention, wxString length)
+s_nodeInfo		SetStructInfos(s_nodeInfo infos, wxString label, wxString extention, wxString length)
 {
   infos.label = label;
   infos.extention = extention;
@@ -42,14 +43,13 @@ s_nodeInfo					SetStructInfos(s_nodeInfo infos, wxString label, wxString extenti
 MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
   : wxTreeCtrl(MediaLibraryPanel, MLTree_Selected, p, s, style)
 {
-
   SetIndent(10);
   /* Set the Root node with the project's name in label */
   root = AddRoot(_("Project's name"));
   SetItemBold(root);
 
   /* Create Image List */
-  wxImageList *images = new wxImageList(16, 16, TRUE);
+  wxImageList *images = new wxImageList(ICON_SIZE, ICON_SIZE, TRUE);
   AddIcon(images, wxIcon(icon3_xpm));
   AddIcon(images, wxIcon(icon5_xpm));
   AddIcon(images, wxIcon(audio_xpm));
@@ -103,33 +103,66 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
 
 MLTree::~MLTree()
 {
- 
+
+}
+
+void			MLTree::SaveTree(WiredSessionXml *XmlSession, wxTreeItemId parent)
+{
+  wxTreeItemIdValue	cookie;
+  s_nodeInfo		infos;
+  wxTreeItemId		item = GetFirstChild(parent, cookie);
+  wxTreeItemId		item_last = GetLastChild(parent);
+
+  while (item.IsOk())
+    {
+      wxString text = GetItemText(item);
+      infos = GetTreeItemStructFromId(item);
+
+      if (ItemHasChildren(item))
+	{
+	  XmlSession->MyStartElement(XmlSession, _("folder"));
+	  XmlSession->MyWriteAttribute(XmlSession, _("name"), text);
+	  SaveTree(XmlSession, item);
+	  XmlSession->MyEndElement(XmlSession);
+	}
+      else // no children
+	{
+	  if (infos.extention.Cmp(_("")))
+	    {
+	      XmlSession->MyStartElement(XmlSession, _("file"));
+	      XmlSession->MyWriteAttribute(XmlSession, _("name"), text);
+	      XmlSession->MyWriteAttribute(XmlSession, _("ext"), infos.extention);
+	      XmlSession->MyEndElement(XmlSession);
+	    }
+	  else
+	    {
+	      XmlSession->MyStartElement(XmlSession, _("folder"));
+	      XmlSession->MyWriteAttribute(XmlSession, _("name"), text);
+	      XmlSession->MyEndElement(XmlSession);
+	    }
+	}
+      item = GetNextChild(parent, cookie);
+    }
 }
 
 
-bool				MLTree::SaveML()
+void				MLTree::SaveML()
 {
-  int		Res = 0;
-  wxChar	Buffer[20];
-
-  //CurrentXmlSession = new WiredSessionXml(wxString(wxT(""), *wxConvCurrent));
-
-
-  //Res += *CurrentXmlSession->StartElement(STR_ML);
-  
-
-
-  return Res == 0;
+  CurrXmlSession = new WiredSessionXml(wxString(wxT(""), *wxConvCurrent));
+  CurrXmlSession->InitSaveML();
+  SaveTree(CurrXmlSession, GetRootItem());
+  CurrXmlSession->EndSaveML();
 }
 
 void				MLTree::AddIcon(wxImageList *images, wxIcon icon)
 {
-  int sizeInit = icon.GetWidth();
+  int wInit = icon.GetWidth();
+  int hInit = icon.GetWidth();
 
-  if (16 == sizeInit)
+  if (wInit == ICON_SIZE && hInit == ICON_SIZE)
     images->Add(icon);
   else
-    images->Add(wxBitmap(wxBitmap(icon).ConvertToImage().Rescale(16, 16)));
+    images->Add(wxBitmap(wxBitmap(icon).ConvertToImage().Rescale(ICON_SIZE, ICON_SIZE)));
 }
 
 // Load extentions known by wired
@@ -360,6 +393,7 @@ void				MLTree::SortNodes(wxString MLselected)
       temp = (*it).first;
       SortChildren(temp);
     }
+  SaveML();
 }
 
 // Return the struct associated to a node, from an ID

@@ -14,13 +14,15 @@ using namespace std;
 
 #define NONE_SELECTED_ID		(999)
 
-#define VUM_GREEN			L"ihm/widgets/vum_green.png"
-#define VUM_ORANGE			L"ihm/widgets/vum_orange.png"
-#define VUM_RED				L"ihm/widgets/vum_red.png"
-#define REC_UP				L"ihm/seqtrack/rec_up.png"
-#define REC_DOWN			L"ihm/seqtrack/rec_down.png"
-#define MUTE_UP				L"ihm/seqtrack/mute_up.png"
-#define MUTE_DOWN			L"ihm/seqtrack/mute_down.png"
+#define VUM_GREEN			L"/ihm/widgets/vum_green.png"
+#define VUM_ORANGE			L"/ihm/widgets/vum_orange.png"
+#define VUM_RED				L"/ihm/widgets/vum_red.png"
+#define REC_UP				L"/ihm/seqtrack/rec_up.png"
+#define REC_DOWN			L"/ihm/seqtrack/rec_down.png"
+#define MUTE_UP				L"/ihm/seqtrack/mute_up.png"
+#define MUTE_DOWN			L"/ihm/seqtrack/mute_down.png"
+#define UNASSIGNED			L"/ihm/seqtrack/unassigned.png"
+#define CAN_ASSIGN			L"/ihm/seqtrack/can_assign.png"
 
 class					ChannelGui;
 class					Plugin;
@@ -37,9 +39,11 @@ class					SeqTrack: public wxControl
   ~SeqTrack();
 
   void					PropagateEvent(wxEvent &event);
+  void					RebuildConnectList();
   void					OnConnectTo(wxCommandEvent &event);
   void					OnConnectSelected(wxCommandEvent &event);
   void					ConnectTo(Plugin *plug);
+  void					RemoveReferenceTo(Plugin *plug);
   void					OnPaint(wxPaintEvent &event);
   void					OnMouseClick(wxMouseEvent &e);
   void					OnDeviceChoice(wxCommandEvent &event);
@@ -64,6 +68,8 @@ class					SeqTrack: public wxControl
   bool					Record;
   bool					Mute;
   wxTextCtrl				*Text;
+  wxBitmap				*UnassignedBmp;
+  wxBitmap				*CanAssignBmp;
   ChannelGui*				ChanGui;
   Plugin				*Connected;
   RackTrack				*ConnectedRackTrack;

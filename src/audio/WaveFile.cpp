@@ -93,6 +93,7 @@ WaveFile::~WaveFile()
 
 void           WaveFile::InitVars()
 {
+  Channel_to_read = 0;
   Data = NULL;
   LoadedInMem = false;
   Error = false;
@@ -287,11 +288,11 @@ unsigned long WaveFile::Read(float **buf, long pos, long size,
     }
     else
     {
-      for (framesCompt = 0, returnedCompt = 0.f; ((int)returnedCompt < ret) && (framesCompt < ret); framesCompt++, returnedCompt += Pitch)
+      for (framesCompt = 0, returnedCompt = 0.f + Channel_to_read; ((int)returnedCompt < ret) && (framesCompt < ret); framesCompt++, returnedCompt += Pitch)
       {
         for (channelsCompt = 0; channelsCompt < sfinfo.channels; channelsCompt++)
           buf[channelsCompt][delta + framesCompt] = TempBuf[(int)returnedCompt];
-        returnedCompt += channelsCompt - 1;
+        returnedCompt +=  channelsCompt - 1;
       }
     }
     if (sfinfo.channels == 1)
@@ -438,4 +439,14 @@ sf_count_t WaveFile::WriteFloatF (float *rw_buffer, int nbr_of_frames)
   sf_count_t read_frames = sf_writef_float(sffile, rw_buffer, nbr_of_frames);
 
   return read_frames;
+}
+
+void		WaveFile::SetChannelToRead(long channel)
+{
+  Channel_to_read = channel;
+}
+
+long		WaveFile::GetChannelToRead()
+{
+  return Channel_to_read;
 }

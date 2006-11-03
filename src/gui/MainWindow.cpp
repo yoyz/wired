@@ -41,7 +41,7 @@
 #include "../xml/WiredSessionXml.h"
 #include "../dssi/WiredExternalPluginMgr.h"
 #include "FileConversion.h"
-#include "config.h"
+#include <config.h>
 #include "Threads.h"
 #include "MediaLibrary.h"
 #include "MLTree.h"
@@ -71,8 +71,8 @@ wxMutex			AudioMutex;
 wxCondition		*SeqStopped = NULL;
 
 MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size)
-  : wxFrame((wxFrame *) NULL, -1, title, pos, size, 
-	    wxDEFAULT_FRAME_STYLE | wxWS_EX_PROCESS_IDLE)
+  : wxFrame((wxFrame *) NULL, wxID_ANY, title, pos, size, 
+	    wxDEFAULT_FRAME_STYLE | wxWS_EX_PROCESS_IDLE | wxMAXIMIZE)
 {	
   SeqTimer = NULL;
   InitLocale();
@@ -154,12 +154,12 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   EditMenu->Append(MainWin_Paste, _("&Paste\tCtrl+V"));
   EditMenu->AppendSeparator();
   EditMenu->Append(MainWin_Delete, _("&Delete\tDel"));
-  EditMenu->Append(MainWin_SelectAll, _("&Select all\tCtrl+A"));
+  EditMenu->Append(MainWin_SelectAll, _("Select &all\tCtrl+A"));
   EditMenu->AppendSeparator();
   EditMenu->Append(MainWin_Settings, _("&Settings..."));
   
   SequencerMenu->Append(MainWin_AddTrackAudio, _("&Add Audio Track"));
-  SequencerMenu->Append(MainWin_AddTrackMidi, _("&Add MIDI Track"));
+  SequencerMenu->Append(MainWin_AddTrackMidi, _("Add &MIDI Track"));
   SequencerMenu->Append(MainWin_DeleteTrack, _("&Delete Track"));
   SequencerMenu->AppendSeparator();
   SequencerMenu->Append(MainWin_ChangeAudioDir, _("&Change Audio directory..."));
@@ -169,18 +169,17 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   HelpMenu->Append(MainWin_IntHelp, _("&Show Integrated Help"));
   HelpMenu->Append(MainWin_About, _("&About..."));
   
-  MediaLibraryMenu->Append(MainWin_MediaLibraryBeta, _("Please beware it is in alpha state"))->Enable(false);
-  ItemShowMediaLibrary = MediaLibraryMenu->Append(MainWin_MediaLibraryShow, _("&Show\tCtrl-M"));
-  ItemHideMediaLibrary = MediaLibraryMenu->Append(MainWin_MediaLibraryHide, _("&Hide\tCtrl-M"));
-  ItemFloatingMediaLibrary = MediaLibraryMenu->AppendCheckItem(MainWin_FloatMediaLibrary, _("Floating"));
+  MediaLibraryMenu->Append(MainWin_MediaLibraryBeta, _("This feature is currently in alpha stage"))->Enable(false);
+  ItemShowMediaLibrary = MediaLibraryMenu->AppendCheckItem(MainWin_MediaLibraryShow, _("&Show/Hide\tCtrl-M"));
+  ItemFloatingMediaLibrary = MediaLibraryMenu->AppendCheckItem(MainWin_FloatMediaLibrary, _("&Floating"));
   
   WindowMenu->Append(MainWin_SwitchRack, _("Switch &Rack/Optional view\tTAB"));
   WindowMenu->Append(MainWin_SwitchSeq, _("Switch &Sequencer/Optional view\tCtrl+TAB"));
   WindowMenu->AppendSeparator();
-  ItemFloatingTrans = WindowMenu->AppendCheckItem(MainWin_FloatTransport, _("Floating Transport"));
+  ItemFloatingTrans = WindowMenu->AppendCheckItem(MainWin_FloatTransport, _("Floating &Transport"));
   WindowMenu->AppendSeparator();
-  ItemFloatingSeq = WindowMenu->AppendCheckItem(MainWin_FloatSequencer,_("Floating Sequencer"));
-  ItemFloatingRacks = WindowMenu->AppendCheckItem(MainWin_FloatRacks, _("Floating Racks"));
+  ItemFloatingSeq = WindowMenu->AppendCheckItem(MainWin_FloatSequencer,_("Floating S&equencer"));
+  ItemFloatingRacks = WindowMenu->AppendCheckItem(MainWin_FloatRacks, _("Floating R&acks"));
   //   ItemFloatingOptView = WindowMenu->AppendCheckItem(MainWin_FloatView, _("Floating Optional View"));
   WindowMenu->AppendSeparator();
   ItemFullscreenToggle = WindowMenu->AppendCheckItem(MainWin_FullScreen,
@@ -448,7 +447,7 @@ void                MainWindow::InitLocale()
 {
   // disable extra output of wx
   wxLog		log(wxLogNull);
-  wxString	prefix = wxString(wxT(INSTALL_PREFIX)) + wxString(wxT("/share/locale/"));
+  wxString	prefix = wxT(PACKAGE_LOCALE_DIR);
   
   mLocale = new wxLocale();
   mLocale->AddCatalogLookupPathPrefix(prefix);
@@ -1248,7 +1247,7 @@ void					MainWindow::ShowMediaLibrary(panelState show)
 	{
 	  wxSize		size;
 
-	  // force size to be enough large
+	  // force size to be large enough
 	  size.SetWidth(200);
 	  size.SetHeight(400);
 	  MediaLibraryFrame = new FloatingFrame(0x0, -1, _("MediaLibrary"),
@@ -1273,7 +1272,6 @@ void					MainWindow::ShowMediaLibrary(panelState show)
 
 	  // disable Show and Hide menu actions
 	  ItemShowMediaLibrary->Enable(false);
-	  ItemHideMediaLibrary->Enable(false);
 	}
     }
   else if (show == panelHideFromWindow || show == panelShow)
@@ -1301,14 +1299,17 @@ void					MainWindow::ShowMediaLibrary(panelState show)
 
       // enable Show and Hide menu actions
       ItemShowMediaLibrary->Enable();
-      ItemHideMediaLibrary->Enable();
     }
 }
 
 void					MainWindow::OnFloatMediaLibrary(wxCommandEvent &event)
 {
   if (MediaLibraryMenu->IsChecked(MainWin_FloatMediaLibrary))
-    ShowMediaLibrary(panelShowInWindow);
+    {
+      if (!MediaLibraryMenu->IsChecked(MainWin_MediaLibraryShow))
+	ItemShowMediaLibrary->Check(true);
+      ShowMediaLibrary(panelShowInWindow);
+    }
   else
     ShowMediaLibrary(panelHideFromWindow);
 }
@@ -1316,14 +1317,17 @@ void					MainWindow::OnFloatMediaLibrary(wxCommandEvent &event)
 // must be called only when medialibrary is docked
 void					MainWindow::MediaLibraryShow(wxCommandEvent &event)
 {
-  ShowMediaLibrary(panelShow);
+  if (MediaLibraryMenu->IsChecked(MainWin_MediaLibraryShow))
+    ShowMediaLibrary(panelShow);
+  else
+    ShowMediaLibrary(panelHide);
 }
 
 // must be called only when medialibrary is docked
-void					MainWindow::MediaLibraryHide(wxCommandEvent &event)
-{
-  ShowMediaLibrary(panelHide);
-}
+//void					MainWindow::MediaLibraryHide(wxCommandEvent &event)
+//{
+//  ShowMediaLibrary(panelHide);
+//}
 
 void					MainWindow::OnSwitchRackOptViewEvent(wxCommandEvent &event)
 {
@@ -1810,7 +1814,6 @@ BEGIN_DECLARE_EVENT_TYPES()
   EVT_MENU(MainWin_FloatRacks, MainWindow::OnFloatRack) 
   EVT_MENU(MainWin_FloatMediaLibrary, MainWindow::OnFloatMediaLibrary) 
   EVT_MENU(MainWin_MediaLibraryShow, MainWindow::MediaLibraryShow)
-  EVT_MENU(MainWin_MediaLibraryHide, MainWindow::MediaLibraryHide)
   EVT_MENU(MainWin_Undo, MainWindow::OnUndo) 
   EVT_MENU(MainWin_Redo, MainWindow::OnRedo)
   //EVT_MENU(MainWin_History, MainWindow::OnHistory)

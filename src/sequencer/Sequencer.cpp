@@ -46,6 +46,7 @@ Sequencer::Sequencer()
   SampleRateConverter = NULL;
   AllocBuf1 = NULL;
   AllocBuf2 = NULL;
+  cout << "[SEQUENCER] Sequencer initialized !" << endl;
 }
 
 Sequencer::~Sequencer()
@@ -78,11 +79,11 @@ void					*Sequencer::Entry()
 
   while (!TestDestroy())
     {
-      // for prevent playing without valid config
+      // to prevent playing without a valid config
       AudioMutex.Lock();
       if (!Audio->IsOk)
 	{
-	  // main thread need Yield for doing something
+	  // main thread needs Yield to do something
 	  Yield();
 	  SeqStopped->Signal();
 	  AudioMutex.Unlock();
@@ -92,7 +93,7 @@ void					*Sequencer::Entry()
 	}
       AudioMutex.Unlock();
 
-      /* - Traitement des messages MIDI recus */
+      /* - gotten MIDI messages analyze */
       MidiMutex.Lock();
       SeqMutex.Lock();
       for (MidiMsg = MidiEvents.begin(); MidiMsg != MidiEvents.end(); MidiMsg++)
@@ -115,12 +116,12 @@ void					*Sequencer::Entry()
 		{		  
 		  midievent.Type = WIRED_MIDI_EVENT;
 		  midievent.NoteLength = CurAudioPos;
-		  midievent.DeltaFrames = 0; //**TODO ----- A REMPLIR ----
+		  midievent.DeltaFrames = 0; //**TODO ----- TO FILL ----
 		  memcpy(midievent.MidiData, (*MidiMsg)->Msg, sizeof(int) * 3);
-		  // Envoyer evenement midi au plugin connecte
+		  // Sends MIDI event to the connected plug-in
 		  if ((*T)->TrackOpt->Connected)
 		    (*T)->TrackOpt->Connected->ProcessEvent(midievent);
-		  // Ajout de l'evenement MIDI sur la piste, si requis
+		  // Adds MIDI event on the track if needed
 		  if (Playing && Recording && (*T)->TrackOpt->Record)
 		    {
 		      AddNote(*T, **MidiMsg);
@@ -141,12 +142,12 @@ void					*Sequencer::Entry()
 	  SetCurrentPos();
 	  SeqMutex.Lock();
 	  */
-	  /* Bouclage */
+	  /* Looping */
 	  if (!Exporting && Loop && (CurrentPos >= EndLoopPos))
 	    SetCurrentPos(BeginLoopPos);
 	  if (Loop && ((EndLoopPos - CurrentPos) < (Audio->SamplesPerBuffer * MeasurePerSample)))
 	    delta = (long)((EndLoopPos - CurrentPos) * SamplesPerMeasure);
-	  /* M?tronome */
+	  /* Metronome */
 	  if (Click)
 	    {
 	      click_coeff = (long)(fmod(CurrentPos, 1.0 / SigNumerator) * SamplesPerMeasure);
@@ -188,27 +189,27 @@ void					*Sequencer::Entry()
 		  click_pos += size;
 		}
 	    }
-	  /* R?cup?rations des patterns ? jouer */
+	  /* Gets patterns that must be played */
 	  for (T = Tracks.begin(); T != Tracks.end(); T++)
 	    {	      
 	      if ((*T)->IsAudioTrack())
 		{
-		  /* - Enregistrement Audio */
+		  /* - Audio recording */
 		  if (Recording && (*T)->TrackOpt->Record)
 		    {	 
 		      //cout << "MixInput()"<< endl;
 		      Mix->MixInput();	// Mutex ou pas ? a prioris non
 
-		      /* - Recuperation des buffers d'enregistrement */
+		      /* - Gets recording buffers */
 		      //cout << "GetRecordBuffer" << endl;
 		      (*T)->Wave->GetRecordBuffer();
 		      if ((*T)->Wave->GetEndPosition() < CurrentPos)
 			ResizePattern((*T)->Wave);
 		    }
-		  // play only if it's NOT mute
+		  // plays only if NOT mute
 		  if (!(*T)->TrackOpt->Mute)
 		    {
-		      /* R?cup?ration des buffers Audio */
+		      /* Gets audio buffers */
 		      AudioP = GetCurrentAudioPattern(*T);
 		      if (AudioP)
 			{
@@ -222,8 +223,8 @@ void					*Sequencer::Entry()
 		}
 	      else
 		{	  
-		  /* Envoi des evenements MIDI (par rapport au timer) de chaque piste du 
-		     sequenceur aux plugins concernes */
+		  /* Sends each sequencer track MIDI events to related plug-ins
+		     depending on the timer*/
 		  if (Recording && (*T)->Midi)
 		    {
 		      if ((*T)->Midi->GetEndPosition() < CurrentPos)
@@ -244,9 +245,9 @@ void					*Sequencer::Entry()
 	  SetCurrentPos();
 	}
 
-      //SeqMutex.Unlock();
-      //SeqMutex.Lock();
-      /* - Appel des fonctions Process de chaque Plugin de chaque piste de racks */
+//       SeqMutex.Unlock();
+//       SeqMutex.Lock();
+      /* - Calls each rack track plug-in's Process function */
       for (RacksTrack = RackPanel->RackTracks.begin(); RacksTrack != RackPanel->RackTracks.end(); 
 	   RacksTrack++)
 	{
@@ -291,7 +292,7 @@ void					*Sequencer::Entry()
 	}
 
       delta = Audio->SamplesPerBuffer;
-      /* Jouer fichier du FileLoader si besoin */
+      /* Plays FileLoader files if needed */
       if (PlayWave)
 	{
 	  float	**fl_buf = NULL;
@@ -316,16 +317,16 @@ void					*Sequencer::Entry()
 	    }
 	}
       //LastCurBlock = CurBlock;
-      /* Envoi des buffers suppl?mentaire */
+      /* Sends additionnal buffers */
       for (B = ExtraBufs.begin(); B != ExtraBufs.end(); B++)
 	{
-	  // Channel Mono
+	  // Mono Channel
 	  if (!(*B)->Buffer[1])
 	    (*B)->Chan->PushBuffer((*B)->Buffer[0]);
-	  else // Channel St?r?o
+	  else // Stereo Channel
 	    (*B)->Chan->PushBuffer((*B)->Buffer);
 	}
-      /* Appel de la fonction Mix->MixOutput(); */
+      /* Mix->MixOutput() function call */
       //SeqMutex.Lock();
       if (Exporting)
 	{
@@ -341,7 +342,7 @@ void					*Sequencer::Entry()
 	Mix->MixOutput(true, this);
       SeqMutex.Unlock();
 
-      /* Cleanage des channels et buffers extra */
+      /* Channel and extra buffers cleaning */
       for (B = ExtraBufs.begin(); B != ExtraBufs.end(); B++)
 	{
 	  if(*B)
@@ -433,7 +434,7 @@ void					Sequencer::StopRecord()
 void					Sequencer::AddTrack(Track *t)
 {
   SeqMutex.Lock();
-  t->Index = Tracks.size();
+  t->SetIndex(Tracks.size());
   Tracks.push_back(t);
   SeqMutex.Unlock();
 }
@@ -474,7 +475,7 @@ void					Sequencer::PrepareTrackForRecording(Track *T)
     {
       if (T->Wave)
 	delete T->Wave;
-      T->Wave = new AudioPattern(CurrentPos, CurrentPos + 0.1, T->Index); 
+      T->Wave = new AudioPattern(CurrentPos, CurrentPos + 0.1, T->GetIndex()); 
       if (!T->Wave->PrepareRecord(type))
 	{
 	  delete T->Wave;
@@ -488,7 +489,7 @@ void					Sequencer::PrepareTrackForRecording(Track *T)
     }
   else if (T->IsMidiTrack())
     {
-      T->Midi = new MidiPattern(CurrentPos, CurrentPos + 0.1, T->Index);
+      T->Midi = new MidiPattern(CurrentPos, CurrentPos + 0.1, T->GetIndex());
       T->TrackPattern->Patterns.push_back(T->Midi);
     }  
 }
@@ -543,7 +544,7 @@ void					Sequencer::AddNote(Track *t, MidiEvent &event)
       e->Position = CurrentPos - t->Midi->GetPosition();
       t->Midi->AddEvent(e);
       PatternsToRefresh.push_back(t->Midi);
-      // envoi evenement rafraichissement patter
+      // Sends pattern refresh event
       /*
       wxCommandEvent evt(ID_SEQ_DRAWMIDI, TYPE_SEQ_DRAWMIDI);
       evt.SetId(ID_SEQ_DRAWMIDI);
@@ -556,10 +557,10 @@ void					Sequencer::AddNote(Track *t, MidiEvent &event)
 void					Sequencer::CalcSpeed()
 {
   /*
-    Calcul du coefficient de vitesse: Nombre de mesure par sample
+    Speed coefficients calculation : mesure per sample number
 
-    BPM = battement/minute
-    SigNumerator = battement/mesure
+    BPM = beat/minute
+    SigNumerator = beat/mesure
     BPM/SigNumerator = mesure/minute
     (minute/mesure) / 60 = mesure/sec
     SampleRate = sample/sec
@@ -616,13 +617,13 @@ void					Sequencer::SetBPM(float bpm)
 
   BPM = bpm;
   CalcSpeed();
-  // update audio pattern size
+  // updates audio pattern size
   for (i = Tracks.begin(); i != Tracks.end(); i++)
     if ((*i)->IsAudioTrack())
       for (j = (*i)->TrackPattern->Patterns.begin(); j != (*i)->TrackPattern->Patterns.end(); 
 	   j++)
 	(*j)->OnBpmChange();
-  // notify the plugins
+  // notify the plug-ins
   list<RackTrack *>::iterator		RacksTrack;
   list<Plugin *>::iterator		Plug;
 
@@ -656,7 +657,7 @@ void					Sequencer::SetSigDenominator(int dennum)
       (*j)->SetSignature(SigNumerator, SigDenominator);
 }
 
-// Call only with a MIDI track
+// Called only in case of a MIDI track
 list<MidiPattern *>			Sequencer::GetCurrentMidiPatterns(Track *t)
 {
   vector<Pattern *>::iterator		i;
@@ -685,7 +686,7 @@ list<MidiPattern *>			Sequencer::GetCurrentMidiPatterns(Track *t)
   return (l);
 }
 
-// Call only with an audio track
+// Called only with in case of an audio track
 AudioPattern				*Sequencer::GetCurrentAudioPattern(Track *t)
 {
   vector<Pattern *>::iterator		i;
@@ -756,7 +757,7 @@ void					Sequencer::ProcessCurrentMidiEvents(Track *T, MidiPattern *p)
 					    * SamplesPerMeasure);
 	      memcpy(curevent->MidiData, (*i)->Msg, sizeof(int) * 3);
 
-	      // Envoi au plugin connect?
+	      // sent to connected plug-in
 	      T->TrackOpt->Connected->ProcessEvent(*curevent);
 	      delete curevent;
 	    }

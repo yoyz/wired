@@ -1,6 +1,8 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
+#include <vector>
+
 #include "MainWindow.h"
 #include "SettingWindow.h"
 #include "AudioEngine.h"
@@ -11,7 +13,7 @@
 
 #include "../samplerate/WiredSampleRate.h"
 
-#define	CATEGORY_ID	45001
+#define	CATEGORY_ID	25001
 
 
 #define	WIN_WIDTH	650
@@ -31,6 +33,11 @@
 #define PAN_SIZE	wxSize(584, 436)
 #define PAN_POS		wxPoint(222, WIN_MARGIN)
 
+#define MENUICON_SIZE   (20)
+#define RESIZE_ICON(ico, w, h)	(wxBitmap(ico).ConvertToImage().Rescale(w, h))
+
+using namespace std;
+
 SettingWindow::SettingWindow()
   : wxDialog(0x0, -1, _("Wired Settings"), wxDefaultPosition, WIN_SIZE)
 {
@@ -47,11 +54,17 @@ SettingWindow::SettingWindow()
 				wxTR_FULL_ROW_HIGHLIGHT);
 
   wxImageList   *imagelist = new wxImageList();
-  imagelist->Add(wxIcon(WiredSettings->DataDir + wxT("ihm/settings/general.xpm"), wxBITMAP_TYPE_XPM));
-  imagelist->Add(wxIcon(WiredSettings->DataDir + wxT("ihm/settings/audio.xpm"), wxBITMAP_TYPE_XPM));
-  imagelist->Add(wxIcon(WiredSettings->DataDir + wxT("ihm/settings/output.xpm"), wxBITMAP_TYPE_XPM));
-  imagelist->Add(wxIcon(WiredSettings->DataDir + wxT("ihm/settings/input.xpm"), wxBITMAP_TYPE_XPM));
-  imagelist->Add(wxIcon(WiredSettings->DataDir + wxT("ihm/settings/midi.xpm"), wxBITMAP_TYPE_XPM));
+
+  imagelist->Add(RESIZE_ICON((wxIcon(WiredSettings->DataDir + wxT("ihm/settings/general.xpm"),
+				     wxBITMAP_TYPE_XPM)), MENUICON_SIZE, MENUICON_SIZE));
+  imagelist->Add(RESIZE_ICON((wxIcon(WiredSettings->DataDir + wxT("ihm/settings/audio.xpm"),
+				     wxBITMAP_TYPE_XPM)), MENUICON_SIZE, MENUICON_SIZE));
+  imagelist->Add(RESIZE_ICON(wxIcon(WiredSettings->DataDir + wxT("ihm/settings/output.xpm"),
+				    wxBITMAP_TYPE_XPM), MENUICON_SIZE, MENUICON_SIZE));
+  imagelist->Add(RESIZE_ICON(wxIcon(WiredSettings->DataDir + wxT("ihm/settings/input.xpm"),
+				    wxBITMAP_TYPE_XPM), MENUICON_SIZE, MENUICON_SIZE));
+  imagelist->Add(RESIZE_ICON(wxIcon(WiredSettings->DataDir + wxT("ihm/settings/midi.xpm"),
+				    wxBITMAP_TYPE_XPM), MENUICON_SIZE, MENUICON_SIZE));
   SettingsTree->AssignImageList(imagelist);
 
   // flags assigned to all sizer in all right panel
@@ -443,55 +456,106 @@ void SettingWindow::Load()
   wxString	strMaxUndoRedoDepth;
   int		i;
 
+  // load misc settings
   QuickWaveBox->SetValue(WiredSettings->QuickWaveRender);
   dBWaveBox->SetValue(WiredSettings->dbWaveRender);
   strMaxUndoRedoDepth << WiredSettings->maxUndoRedoDepth;
   undoRedoMaxDepthTextCtrl->SetValue(strMaxUndoRedoDepth);
-  
+
   // init vars from conf file
-  inCurrentSystem = Audio->GetAudioSystemByName(WiredSettings->InputSystemStr);
-  outCurrentSystem = Audio->GetAudioSystemByName(WiredSettings->OutputSystemStr);
-  inCurrentDevice = Audio->GetDeviceByName(WiredSettings->InputDeviceStr);
-  outCurrentDevice = Audio->GetDeviceByName(WiredSettings->OutputDeviceStr);
+  if (WiredSettings->InputSystemStr.length())
+    {
+      // try to assign AudioSystem id from AudioSystem name
+      inCurrentSystem = Audio->GetAudioSystemByName(WiredSettings->InputSystemStr);
+      if (inCurrentSystem)
+	{
+	  WiredSettings->InputSystemId = inCurrentSystem->GetId() + 1;
 
-  if (outCurrentSystem)
-    {
-      WiredSettings->OutputSystemId = outCurrentSystem->GetId() + 1;
-      OutputSystemChoice->SetSelection(WiredSettings->OutputSystemId);
-      RefreshDevices(OutputDeviceChoice, OutputSystemChoice->GetSelection(),
-		     Audio->GetDefaultOutputDevice());
+	  // try to assign device id from device name
+	  if (WiredSettings->InputDeviceStr.length())
+	    {
+	      inCurrentDevice = Audio->GetDeviceByName(WiredSettings->InputDeviceStr);
+	      if (inCurrentDevice)
+		WiredSettings->InputDeviceId = Audio->GetDeviceIdByTrueId(inCurrentDevice);
+	      else
+		WiredSettings->InputDeviceId = 0;
+	    }
+	}
+      else
+	{
+	  // user has selected "none"
+	  WiredSettings->InputSystemId = 0;
+	  WiredSettings->InputDeviceId = 0;
+	}
     }
-  if (outCurrentDevice)
+  else
     {
-      WiredSettings->OutputDeviceId = Audio->GetDeviceIdByTrueId(outCurrentDevice);
-      OutputDeviceChoice->SetSelection(WiredSettings->OutputDeviceId);
-      RefreshChannels(OutputChannelList, OutputSystemChoice->GetSelection(),
-		      OutputDeviceChoice->GetSelection(), false);
-      LoadChannels(OutputChannelList, WiredSettings->OutputChannels);
-    }
-  if (inCurrentSystem)
-    {
-      WiredSettings->InputSystemId = inCurrentSystem->GetId() + 1;
-      InputSystemChoice->SetSelection(WiredSettings->InputSystemId);
-      RefreshDevices(InputDeviceChoice, InputSystemChoice->GetSelection(),
-		     Audio->GetDefaultInputDevice());
-    }
-  if (inCurrentDevice)
-    {
-      WiredSettings->InputDeviceId = Audio->GetDeviceIdByTrueId(inCurrentDevice);
-      InputDeviceChoice->SetSelection(WiredSettings->InputDeviceId);
-      RefreshChannels(InputChannelList, InputSystemChoice->GetSelection(),
-		      InputDeviceChoice->GetSelection(), true);
-      LoadChannels(InputChannelList, WiredSettings->InputChannels);
+      // If there are no value in conf file, we set default
+      WiredSettings->InputSystemId = Audio->GetDefaultAudioSystem();
+      WiredSettings->InputDeviceId = Audio->GetDefaultInputDevice();
     }
 
+
+  // init vars from conf file
+  if (WiredSettings->OutputSystemStr.length())
+    {
+      // try to assign AudioSystem id from AudioSystem name
+      inCurrentSystem = Audio->GetAudioSystemByName(WiredSettings->OutputSystemStr);
+      if (inCurrentSystem)
+	{
+	  WiredSettings->OutputSystemId = inCurrentSystem->GetId() + 1;
+
+	  // try to assign device id from device name
+	  if (WiredSettings->OutputDeviceStr.length())
+	    {
+	      inCurrentDevice = Audio->GetDeviceByName(WiredSettings->OutputDeviceStr);
+	      if (inCurrentDevice)
+		WiredSettings->OutputDeviceId = Audio->GetDeviceIdByTrueId(inCurrentDevice);
+	      else
+		WiredSettings->OutputDeviceId = 0;
+	    }
+	}
+      else
+	{
+	  // user has selected "none"
+	  WiredSettings->OutputSystemId = 0;
+	  WiredSettings->OutputDeviceId = 0;
+	}
+    }
+  else
+    {
+      // If there are no value in conf file, we set default
+      WiredSettings->OutputSystemId = Audio->GetDefaultAudioSystem();
+      WiredSettings->OutputDeviceId = Audio->GetDefaultOutputDevice();
+    }
+
+
+  // apply changes in controls for INPUT
+  InputDeviceChoice->SetSelection(WiredSettings->InputDeviceId);
+  InputSystemChoice->SetSelection(WiredSettings->InputSystemId);
+  RefreshDevices(InputDeviceChoice, InputSystemChoice->GetSelection(),
+		 WiredSettings->InputDeviceId);
+  RefreshChannels(InputChannelList, InputSystemChoice->GetSelection(),
+		  InputDeviceChoice->GetSelection(), true);
+  LoadChannels(InputChannelList, WiredSettings->InputChannels);
+
+  // apply changes in controls for OUTPUT
+  OutputDeviceChoice->SetSelection(WiredSettings->OutputDeviceId);
+  OutputSystemChoice->SetSelection(WiredSettings->OutputSystemId);
+  RefreshDevices(OutputDeviceChoice, OutputSystemChoice->GetSelection(),
+		 WiredSettings->OutputDeviceId);
+  RefreshChannels(OutputChannelList, OutputSystemChoice->GetSelection(),
+		  OutputDeviceChoice->GetSelection(), false);
+  LoadChannels(OutputChannelList, WiredSettings->OutputChannels);
+
+  // changes audio settings related to output device
   if (WiredSettings->SamplesPerBuffer > 0)
     {
       for (i = 0; i < 9; i++)
 	if (Latencies[i] == WiredSettings->SamplesPerBuffer)
 	  LatencySlider->SetValue(i);
       UpdateLatency();
-    }    
+    }
 }
 
 void SettingWindow::LoadChannels(wxCheckListBox* to, vector<long>& from)
@@ -520,32 +584,42 @@ void SettingWindow::Save()
   WiredSettings->dbWaveRender = dBWaveBox->IsChecked();
   undoRedoMaxDepthTextCtrl->GetValue().ToLong(&WiredSettings->maxUndoRedoDepth);
 
-  // we need to save system and device names instead their id
-  Device*	output;
-  Device*	input;
-
-  WiredSettings->OutputSystemId = OutputSystemChoice->GetSelection();
-  WiredSettings->InputSystemId = InputSystemChoice->GetSelection();
-  WiredSettings->OutputDeviceId = OutputDeviceChoice->GetSelection();
-  WiredSettings->InputDeviceId = InputDeviceChoice->GetSelection();
-
-  output = Audio->GetDevice(WiredSettings->OutputDeviceId, WiredSettings->OutputSystemId);
-  input = Audio->GetDevice(WiredSettings->InputDeviceId, WiredSettings->InputSystemId);
-  if (output)
-    {
-      WiredSettings->OutputSystemStr = output->Host->GetName();
-      WiredSettings->OutputDeviceStr = output->Name;
-    }
-  if (input)
-    {
-      WiredSettings->InputSystemStr = input->Host->GetName();
-      WiredSettings->InputDeviceStr = input->Name;
-    }
-
   // if we changed audio settings
   if (AudioLoaded)
     {
       cout << "[SETTINGS] Save Audio settings" << endl;
+
+      // we need to save system and device names instead their id
+      Device*	output;
+      Device*	input;
+
+      WiredSettings->OutputSystemId = OutputSystemChoice->GetSelection();
+      WiredSettings->InputSystemId = InputSystemChoice->GetSelection();
+      WiredSettings->OutputDeviceId = OutputDeviceChoice->GetSelection();
+      WiredSettings->InputDeviceId = InputDeviceChoice->GetSelection();
+
+      output = Audio->GetDevice(WiredSettings->OutputDeviceId, WiredSettings->OutputSystemId);
+      input = Audio->GetDevice(WiredSettings->InputDeviceId, WiredSettings->InputSystemId);
+      if (output)
+	{
+	  WiredSettings->OutputSystemStr = output->Host->GetName();
+	  WiredSettings->OutputDeviceStr = output->Name;
+	}
+      else
+	{
+	  WiredSettings->OutputSystemStr = wxT("None");
+	  WiredSettings->OutputDeviceStr = wxT("None");
+	}
+      if (input)
+	{
+	  WiredSettings->InputSystemStr = input->Host->GetName();
+	  WiredSettings->InputDeviceStr = input->Name;
+	}
+      else
+	{
+	  WiredSettings->InputSystemStr = wxT("None");
+	  WiredSettings->InputDeviceStr = wxT("None");
+	}
 
       // save output channels
       SaveChannels(OutputChannelList, WiredSettings->OutputChannels);
@@ -564,6 +638,15 @@ void SettingWindow::Save()
     {
       cout << "[SETTINGS] Save Midi settings" << endl;
       SaveChannels(MidiInList, WiredSettings->MidiIn);
+
+      // MidiInStr things
+      int	i;
+      
+      WiredSettings->MidiInStr.clear();
+      for (i = 0; i < MidiInList->GetCount(); i++)
+	if (MidiInList->IsChecked(i))
+	  WiredSettings->MidiInStr.push_back(MidiInList->GetString(i));
+
     }    
   if (AudioLoaded || MidiLoaded)
     WiredSettings->Save();
@@ -627,7 +710,8 @@ void SettingWindow::LoadSampleRates()
 	    RateChoice->SetSelection(k);
 	}
     }
-  if (WiredSettings->SampleRate < RateChoice->GetCount())
+  if (WiredSettings->SampleRate >= 0 &&
+      WiredSettings->SampleRate < RateChoice->GetCount())
     RateChoice->SetSelection(WiredSettings->SampleRate);
   else
     RateChoice->SetSelection(0);
@@ -647,7 +731,7 @@ void SettingWindow::LoadSampleRates()
     }
 }
 
-void SettingWindow::SetDefaultSampleFormat(void)
+void SettingWindow::SetDefaultSampleFormat()
 {
   Device *dev = Audio->GetDevice(OutputDeviceChoice->GetSelection(),
 				 OutputSystemChoice->GetSelection());

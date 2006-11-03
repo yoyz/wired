@@ -9,7 +9,7 @@
 
 #include "AudioEngine.h"
 
-#include "config.h"
+#include <config.h>
 
 // we can't move this global var until plugins doesn't use it anymore
 // TODO : write missing API functions to handle this
@@ -17,37 +17,29 @@ Settings		*WiredSettings = NULL;
 
 Settings::Settings()
 {
-  SetDefault();
-
-  ConfDir = wxString(wxT(INSTALL_PREFIX)) + wxString(wxT("/etc/"));
-  PlugConfFile = ConfDir + PLUG_CONF_FILE;
-
   wxFileName f;
 
+  SetDefault();
+
+  ConfDir = wxString(wxT(SYSCONF_DIR)) + wxT("/");
+  PlugConfFile = ConfDir + PLUG_CONF_FILE;
+
   f.Assign(PlugConfFile);
-  if (!f.FileExists()) // if not found try /etc 
+  if (!f.FileExists())
     {
-      ConfDir = wxT("/etc/");
-      PlugConfFile = ConfDir + wxString(PLUG_CONF_FILE);
-      f.Assign(PlugConfFile);
-      if (!f.FileExists()) // if not found let hope it belongs the current directory
-	{
-	  ConfDir = wxT("./");
-	  PlugConfFile = ConfDir + wxString(PLUG_CONF_FILE);
-	}
+      // if not found let hope it belongs the current directory
+      ConfDir = wxT("./");
+      PlugConfFile = ConfDir + PLUG_CONF_FILE;
     }
 
-  DataDir = wxT(INSTALL_PREFIX);
-  DataDir += WIRED_DATADIR;
-  
+  DataDir = wxString(wxT(DATA_DIR)) + wxT("/wired/");
   f.Assign(DataDir);
-  if (!f.DirExists()) // if not found try /usr
+
+  if (!f.DirExists())
     {
-      DataDir = wxT("/usr");
-      DataDir += WIRED_DATADIR;
+      // if not found let hope it belongs the current directory
+      DataDir = wxT("./");
       f.Assign(DataDir);
-      if (!f.DirExists()) // if not found let hope it belongs the current directory
-	DataDir = WIRED_DATADIR;
     }
 
   f.AssignDir(f.GetHomeDir() + wxString(wxT("/")) + wxString(WIRED_DIRECTORY));
@@ -145,6 +137,7 @@ void Settings::Load()
     {
       cout << "[SETTINGS] Your configuration file is deprecated" << version.mb_str() << endl;
       ConfDeprecated = true;
+      return;
     }
 
   conf->Read(wxT("QuickWaveRender"), &QuickWaveRender, false);
@@ -162,7 +155,7 @@ void Settings::Load()
 
   // audio part, options
   conf->SetPath(wxT("/AudioOptions"));
-  conf->Read(wxT("SampleRate"), &SampleRate, DEFAULT_SAMPLE_RATE_INT);
+  conf->Read(wxT("SampleRate"), &SampleRate, DEFAULT_SAMPLE_RATE);
   conf->Read(wxT("SampleFormat"), &SampleFormat, 0);
   conf->Read(wxT("SamplesPerBuffer"), &SamplesPerBuffer, DEFAULT_SAMPLES_PER_BUFFER);
 
