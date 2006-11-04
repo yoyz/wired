@@ -13,7 +13,7 @@
 
 /********************   class cImportWaveAction   ********************/
 
-cImportWaveAction::cImportWaveAction (const wxString& path, bool kind, bool shouldAdd)
+cImportWaveAction::cImportWaveAction (const wxString& path, trackType kind, bool shouldAdd)
 {
 	_TrackKindFlag = kind;
 	_WavePath = path;
@@ -105,7 +105,7 @@ cImportWaveAction			cImportWaveAction::operator=(const cImportWaveAction& right)
 
 /********************   class cImportMidiAction   ********************/
 
-cImportMidiAction::cImportMidiAction (wxString& path, bool kind)
+cImportMidiAction::cImportMidiAction (wxString& path, trackType kind)
 {
   mTrackKindFlag = kind;
   mMidiPath = path;
@@ -151,7 +151,7 @@ cImportMidiAction			cImportMidiAction::operator=(const cImportMidiAction& right)
 
 /********************   class cImportAkaiAction   ********************/
 
-cImportAkaiAction::cImportAkaiAction (wxString& path, bool kind)
+cImportAkaiAction::cImportAkaiAction (wxString& path, trackType kind)
 {
   mTrackKindFlag = kind;
   mDevice = path.substr(0, path.find(wxT(":"), 0));
@@ -180,7 +180,7 @@ void cImportAkaiAction::Do ()
     try
       {
 	WaveFile *w = new WaveFile(sample->buffer, sample->size, 2, sample->rate);
-	Track *t = SeqPanel->AddTrack(true);
+	Track *t = SeqPanel->AddTrack(eAudioTrack);
 	t->AddPattern(w);
       }
     catch (...)

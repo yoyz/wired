@@ -17,8 +17,9 @@
 #include "Ruler.h"
 #include "AccelCenter.h"
 
-Pattern::Pattern(double pos, double endpos, long trackindex) :
-  wxWindow(SeqPanel->SeqView, -1, wxPoint(0, 0), wxSize(0, 0))
+Pattern::Pattern(WiredDocument *parent, double pos, double endpos, long trackindex) :
+  wxWindow(SeqPanel->SeqView, -1, wxPoint(0, 0), wxSize(0, 0)),
+  WiredDocument(wxT("Pattern"), parent)
 {
 #ifdef __DEBUG__
   printf("Pattern::Pattern(%f, %f, %d)\n", pos, endpos, trackindex);
@@ -28,8 +29,6 @@ Pattern::Pattern(double pos, double endpos, long trackindex) :
   Length = endpos - pos;
   TrackIndex = trackindex;
   StateMask = 0;
-  xdrag = 0;
-  ydrag = 0;
   m_pos = wxPoint((int) floor(MEASURE_WIDTH * SeqPanel->HoriZoomFactor * pos), 
 		  (int) floor(TRACK_HEIGHT * SeqPanel->VertZoomFactor * trackindex));
   m_size = wxSize((int) ceil(Length * MEASURE_WIDTH * SeqPanel->HoriZoomFactor),
@@ -197,7 +196,7 @@ void					Pattern::OnMotion(wxMouseEvent &e)
   double				mes;
   
  
-  if (IsSelected() && (SeqPanel->Tool == ID_TOOL_MOVE_SEQUENCER) && e.Dragging() && (Seq->Tracks[TrackIndex]->Wave != this))
+  if (IsSelected() && (SeqPanel->Tool == ID_TOOL_MOVE_SEQUENCER) && e.Dragging() && (Seq->Tracks[TrackIndex]->GetAudioPattern() != this))
     {
       if (m_click.x != -1)
 	StateMask |= (unsigned char) PATTERN_MASK_DRAGGED;
@@ -281,4 +280,19 @@ void					Pattern::DrawName(wxPaintDC &dc, const wxSize &s)
 double					Pattern::GetEndPos()
 {
   return EndPosition;
+}
+
+void				Pattern::Save()
+{
+  SaveElement*			saved;
+
+  saved = new SaveElement();
+  saved->setPair(wxT("xdrag"), Name);
+  saveDocData(WIRED_PROJECT_FILE, saved);
+
+}
+
+void				Pattern::Load(SaveElementArray data)
+{
+
 }

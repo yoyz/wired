@@ -15,5 +15,6 @@ libsequencer_a_SOURCES = 		\
 		../gui/AudioPattern.cpp \
 		Track.cpp		\
 		Track.h			\
+		SeqTrackPattern.cpp	\
 		../gui/WaveDrawer.cpp
 

@@ -4,18 +4,18 @@
 #ifndef __SEQUENCER_H__
 #define __SEQUENCER_H__
 
-using namespace	std;
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+   #include <wx/wx.h>
+#endif
+
+#include <wx/thread.h>
 
 #include <vector>
 #include <list>
 #include <iostream>
 
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-   #include <wx/wx.h>
-#endif
-#include <wx/thread.h>
-
+#include "WiredDocument.h"
 
 typedef struct s_SeqCreateEvent		SeqCreateEvent;
 typedef int				MidiType;
@@ -75,6 +75,9 @@ class ChanBuf
  */
 class Sequencer : public wxThread
 {
+ private:
+  WiredDocument*	_documentParent;
+
  public:
 
   /** Default constructor.
@@ -82,11 +85,14 @@ class Sequencer : public wxThread
    * directory. Creates the main output in the mixer. Initialiazes all buffers
    * to NULL.
    */
-  Sequencer();
+  Sequencer(WiredDocument* docParent);
 
   /** Default destructor. */
   ~Sequencer();
-
+  
+  /** Init basic vars */
+  void					Init();
+  
   /** Executes sequencer thread.*/
   virtual void				*Entry();
   /** Kills sequencer thread.*/
@@ -126,7 +132,7 @@ class Sequencer : public wxThread
    * \param l is a list of the MIDI events.
    * \param plug points to the associated plug-in.
    */
-  void					AddMidiPattern(list<SeqCreateEvent *> *l, 
+  void					AddMidiPattern(std::list<SeqCreateEvent *> *l, 
 						       Plugin *plug);
   /** Adds a note to a MIDI track.
    * \param t points to the track.
@@ -183,17 +189,17 @@ class Sequencer : public wxThread
   /** End position.*/
   double				EndPos;
   /** Contains pointers to all the tracks.*/
-  vector<Track *>			Tracks;
+  std::vector<Track *>			Tracks;
   /** Number of measures per sample.*/
   double				MeasurePerSample;
   /** Number of samples per measure.*/
   double				SamplesPerMeasure;
   /** List of patterns to resize.*/
-  list<Pattern *>			PatternsToResize;
+  std::list<Pattern *>			PatternsToResize;
   /** List of patterns to refresh.*/
-  list<MidiPattern *>			PatternsToRefresh;
+  std::list<MidiPattern *>			PatternsToRefresh;
   /** List of tracks to refresh.*/
-  list<Track *>				TracksToRefresh;
+  std::list<Track *>				TracksToRefresh;
 
  protected:
 
@@ -210,7 +216,7 @@ class Sequencer : public wxThread
   void					FinishRecording();
 
   AudioPattern				*GetCurrentAudioPattern(Track *t);
-  list<MidiPattern *>			GetCurrentMidiPatterns(Track *t);
+  std::list<MidiPattern *>			GetCurrentMidiPatterns(Track *t);
 
   float					**GetCurrentAudioBuffer(AudioPattern *p);
   /** Processes MIDI events from a MIDI pattern.*/
@@ -220,7 +226,7 @@ class Sequencer : public wxThread
   /** Start position.*/
   double				StartAudioPos;
   /** List of MidiEvents.*/
-  list<MidiEvent *>			MidiEvents;
+  std::list<MidiEvent *>			MidiEvents;
   /** Wavefile of the metronome sound.*/
   WaveFile				*ClickWave;
   /** Output cahannel for the metronome.*/

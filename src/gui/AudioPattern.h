@@ -7,15 +7,19 @@
 #include "Pattern.h"
 #include "WaveDrawer.h"
 
+#include "WiredDocument.h"
+
 class					WriteWaveFile;
 class					Channel;
 
 class					AudioPattern: public Pattern, public WaveDrawer
 {
+ private:
+  WiredDocument*			_documentParent;
+
  public:
-  AudioPattern(double pos, double endpos, long trackindex);
-  AudioPattern(double pos, WaveFile *w, long trackindex);
-	AudioPattern(const AudioPattern& copy){*this = copy;};
+  AudioPattern(WiredDocument *parent, double pos, double endpos, long trackindex);
+  AudioPattern(WiredDocument *parent, double pos, WaveFile *w, long trackindex);
   ~AudioPattern();
   
   float					**GetBlock(long block);
@@ -33,6 +37,10 @@ class					AudioPattern: public Pattern, public WaveDrawer
   void					OnDirectEdit();
   Pattern				*CreateCopy(double pos);
   
+  // WiredDocument implementation
+  void				Save();
+  void				Load(SaveElementArray data);
+
   AudioPattern				operator=(const AudioPattern& right);
 
   Channel				*InputChan;
@@ -40,7 +48,7 @@ class					AudioPattern: public Pattern, public WaveDrawer
   wxString				FileName;
 
  private:
-  void					Init(WaveFile *w);
+  void					Init(WaveFile *w, WiredDocument* parent);
 
  protected:
   void					OnClick(wxMouseEvent &e);

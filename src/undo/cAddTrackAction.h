@@ -9,6 +9,7 @@
 #include "cActionManager.h"
 #include "Visitor.h"
 #include "SequencerGui.h"
+#include "Track.h"
 
 #define	HISTORY_LABEL_ADD_TRACK_ACTION	_("AddTrackAction")
 
@@ -19,10 +20,10 @@ extern SequencerGui		*SeqPanel;
 class				cAddTrackAction : public cAction 
 {
  private:
-  bool				mTrackKindFlag;
+  trackType			mTrackKindFlag;
   
  public:
-  cAddTrackAction (bool kind)
+  cAddTrackAction (trackType kind)
     { mTrackKindFlag = kind; };
   cAddTrackAction(const cAddTrackAction& copy)
     { *this = copy; };

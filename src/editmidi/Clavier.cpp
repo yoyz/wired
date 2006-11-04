@@ -241,8 +241,8 @@ void				Clavier::OnKeyDown(wxMouseEvent &event)
   midievent.MidiData[0] = 0x90;
   midievent.MidiData[1] = k->code;
   midievent.MidiData[2] = 100;
-  if (Seq->Tracks[em->midi_pattern->GetTrackIndex()]->TrackOpt->Connected)
-    Seq->Tracks[em->midi_pattern->GetTrackIndex()]->TrackOpt->Connected->ProcessEvent(midievent);
+  if (Seq->Tracks[em->midi_pattern->GetTrackIndex()]->GetTrackOpt()->Connected)
+    Seq->Tracks[em->midi_pattern->GetTrackIndex()]->GetTrackOpt()->Connected->ProcessEvent(midievent);
 }
 
 void				Clavier::OnKeyUp(wxMouseEvent &event)
@@ -256,8 +256,8 @@ void				Clavier::OnKeyUp(wxMouseEvent &event)
   midievent.MidiData[0] = 0x90;
   midievent.MidiData[1] = k->code;
   midievent.MidiData[2] = 0;
-  if (Seq->Tracks[em->midi_pattern->GetTrackIndex()]->TrackOpt->Connected)
-    Seq->Tracks[em->midi_pattern->GetTrackIndex()]->TrackOpt->Connected->ProcessEvent(midievent);
+  if (Seq->Tracks[em->midi_pattern->GetTrackIndex()]->GetTrackOpt()->Connected)
+    Seq->Tracks[em->midi_pattern->GetTrackIndex()]->GetTrackOpt()->Connected->ProcessEvent(midievent);
 }
 
 BEGIN_EVENT_TABLE(Clavier, wxControl)

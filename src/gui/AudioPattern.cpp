@@ -22,18 +22,18 @@
 static long				audio_pattern_count = 1;
 extern SaveCenter	*saveCenter;
 
-AudioPattern::AudioPattern(double pos, double endpos, long trackindex)
-  : Pattern(pos, endpos, trackindex),
+AudioPattern::AudioPattern(WiredDocument *parent, double pos, double endpos, long trackindex)
+  : Pattern(parent, pos, endpos, trackindex),
     WaveDrawer(Pattern::GetSize())
 {
-  Init(NULL);
+  Init(NULL, parent);
 }
 
-AudioPattern::AudioPattern(double pos, WaveFile *w, long trackindex)
-  : Pattern(pos, pos + Seq->MeasurePerSample * w->GetNumberOfFrames(), trackindex),
+AudioPattern::AudioPattern(WiredDocument *parent, double pos, WaveFile *w, long trackindex)
+  : Pattern(parent, pos, pos + Seq->MeasurePerSample * w->GetNumberOfFrames(), trackindex),
     WaveDrawer(Pattern::GetSize())
 {
-  Init(w);
+  Init(w, parent);
 }
 
 AudioPattern::~AudioPattern()
@@ -43,7 +43,7 @@ AudioPattern::~AudioPattern()
   if (RecordWave) delete RecordWave;
 }
 
-void					AudioPattern::Init(WaveFile* w)
+void					AudioPattern::Init(WaveFile* w, WiredDocument* parent)
 {
 #ifdef __DEBUG__
   cout << " ### NEW AUDIO PATTERN ###\n\t Position: "<< Position << "; EndPosition: " << EndPosition << "; Length: " << Length
@@ -64,6 +64,8 @@ void					AudioPattern::Init(WaveFile* w)
       SetSize(s);
       WaveDrawer::SetWave(w, s);
     }
+
+  _documentParent = parent;
 
   Connect(GetId(), wxEVT_MOTION, (wxObjectEventFunction)(wxEventFunction)(wxMouseEventFunction)
 	  &AudioPattern::OnMotion);
@@ -225,10 +227,10 @@ bool					AudioPattern::PrepareRecord(int type)
 	  wxString::Format(wxT("%f"), Audio->SampleRate).ToLong(&sample_rate);
 	  RecordWave = new WriteWaveFile(s, sample_rate, 1, type);
 	  FileName = s;
-	  InputChan = Mix->OpenInput(Seq->Tracks[TrackIndex]->TrackOpt->DeviceId);
-	  Mix->FlushInput(Seq->Tracks[TrackIndex]->TrackOpt->DeviceId);
+	  InputChan = Mix->OpenInput(Seq->Tracks[TrackIndex]->GetTrackOpt()->DeviceId);
+	  Mix->FlushInput(Seq->Tracks[TrackIndex]->GetTrackOpt()->DeviceId);
 	  cout << "[AUDIOPATTERN] Recording on input: " 
-	       << Seq->Tracks[TrackIndex]->TrackOpt->DeviceId << endl;
+	       << Seq->Tracks[TrackIndex]->GetTrackOpt()->DeviceId << endl;
 	  return (true);
 	}
       catch (...)
@@ -305,20 +307,17 @@ Pattern					*AudioPattern::CreateCopy(double pos)
 #ifdef __DEBUG__
   printf(" [ START ] AudioPattern::CreateCopy(%f) on track %d\n", pos, TrackIndex);
 #endif
-   p = new AudioPattern(pos, Wave, TrackIndex);
-   SeqMutex.Lock();
-   p->StartWavePos = StartWavePos;
-   p->EndWavePos = EndWavePos;
-   p->EndPosition = pos +  Length;
-   p->Length = Length;
-   p->SetDrawColour(WaveDrawer::PenColor);
-   p->Update();
-   SeqMutex.Unlock();
-   Seq->Tracks[TrackIndex]->AddColoredPattern((Pattern *) p);
- 
-  //p = new AudioPattern(pos, Wave, TrackIndex);
-  //p = Seq->Tracks[TrackIndex]->AddPattern(Wave, pos);
-  //printf("AudioPattern::CreateCopy(%d) new pat %d -- OVER\n", pos, p);
+  p = new AudioPattern(_documentParent, pos, Wave, TrackIndex);
+  SeqMutex.Lock();
+  p->StartWavePos = StartWavePos;
+  p->EndWavePos = EndWavePos;
+  p->EndPosition = pos +  Length;
+  p->Length = Length;
+  p->SetDrawColour(WaveDrawer::PenColor);
+  p->Update();
+  SeqMutex.Unlock();
+  Seq->Tracks[TrackIndex]->AddColoredPattern((Pattern *) p);
+
 #ifdef __DEBUG__
   printf(" [  END  ] AudioPattern::CreateCopy(%f) on track %d\n", pos, TrackIndex);
 #endif
@@ -355,7 +354,7 @@ void					AudioPattern::Split(double pos)
       cout << " >>> HERE OLD:\n\t Position = " << Position << "\n\t Length = " << Length << "\n\t EndPosition = " << EndPosition << endl;
       cout << "new pos: " << pos << endl;
 #endif
-      p = new AudioPattern(pos, EndPosition, TrackIndex);
+      p = new AudioPattern(_documentParent, pos, EndPosition, TrackIndex);
 #ifdef __DEBUG__
       cout << " >>> HERE NEW :\n\t p->Position = " << p->Position << "\n\t p->Length = " << p->Length << "\n\t p->EndPosition = " << p->EndPosition << endl;
 #endif
@@ -445,28 +444,12 @@ void					AudioPattern::SetSize(wxSize s)
   //  printf(" [  END  ] AudioPattern::SetSize(wxSize s) >> [ %d ] [ %d ]\n", s.x, s.y);
 }
 
-AudioPattern			AudioPattern::operator=(const AudioPattern& right)
+void				AudioPattern::Save()
 {
-	if (this != &right)
-	{
-		//TODO xdrag = right.xdrag (When used)
-		//TODO ydrag = right.ydrag (When used)
-		Position = right.Position;
-		EndPosition = right.EndPosition;
-		Length = right.Length;
-		TrackIndex = right.TrackIndex;
-		StateMask = right.StateMask;
-		m_pos = right.m_pos;
-		m_size = right.m_size;
-		m_click = right.m_click;
-		Name = right.Name;
-		//TODO PenColor = right.PenColor;
-		//TODO BrushColor = right.BrushColor;
+  
+}
 
-		InputChan = right.InputChan;
-		LastBlock = right.LastBlock;
-		FileName = right.FileName;
-		RecordWave = right.RecordWave;
-	}
-	return *this;
+void				AudioPattern::Load(SaveElementArray data)
+{
+  
 }

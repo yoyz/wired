@@ -17,6 +17,8 @@ using namespace std;
 #include <wx/toolbar.h>
 #include <wx/colordlg.h>
 
+#include "Track.h"
+#include "AudioPattern.h"
 #include "MidiPattern.h"
 
 #define ID_SEQ_SETPOS			(101010)
@@ -144,6 +146,7 @@ class				SequencerView: public wxWindow
   SelectionZone			*TheZone;
   AccelCenter			*HAxl;
   AccelCenter			*VAxl;
+
  public:
   SequencerView(wxWindow *parent, const wxPoint &pos, const wxSize &size);
   ~SequencerView();
@@ -236,12 +239,14 @@ class				SequencerGui: public wxPanel
   wxColour			PenColor;
   ColoredBox			*ColorBox;
 
-	
+  WiredDocument*		_documentParent;
+
  public:
-  SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size, wxWindow *mainwindow = NULL);
+  SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size,
+	       wxWindow *mainwindow = NULL, WiredDocument* docParent = NULL);
   ~SequencerGui();
 
-  Track				*AddTrack(bool is_audio = true);
+  Track				*AddTrack(trackType type = eAudioTrack);
   void				RemoveTrack();
   void				UnselectTracks();
   void				SelectTrack(long trackindex);

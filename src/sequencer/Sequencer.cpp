@@ -12,7 +12,7 @@
 #include "Track.h"
 #include "../gui/SequencerGui.h"
 #include "../gui/SeqTrack.h"
-#include "../gui/SeqTrackPattern.h"
+#include "SeqTrackPattern.h"
 #include "../gui/Pattern.h"
 #include "../gui/AudioPattern.h"
 #include "../gui/MidiPattern.h"
@@ -24,12 +24,14 @@
 #include "../samplerate/WiredSampleRate.h"
 #include "../gui/Threads.h"
 
-Sequencer::Sequencer() 
-  : wxThread(), BPM(96), SigNumerator(4), SigDenominator(4), Loop(false), 
-    Exporting(false), ExportWave(0), PlayWave(0), PlayWavePos(0), Click(false),
-    CurrentPos(0), BeginLoopPos(0), EndLoopPos(4), EndPos(16), Playing(false),
-    Recording(false), CurAudioPos(0)
+using namespace	std;
+
+Sequencer::Sequencer(WiredDocument* docParent)
+  : wxThread()
 {
+  _documentParent = docParent;
+
+  Init();
   try
     {
       ClickWave = new WaveFile(WiredSettings->DataDir + wxString(wxT("wired_click.wav"), *wxConvCurrent));
@@ -53,6 +55,26 @@ Sequencer::~Sequencer()
 {
   if (ClickWave)
     delete ClickWave;
+}
+
+void					Sequencer::Init()
+{
+  BPM = 96;
+  SigNumerator = 4;
+  SigDenominator = 4;
+  Loop = false;
+  Exporting = false;
+  ExportWave = 0;
+  PlayWave = 0;
+  PlayWavePos = 0;
+  Click = false;
+  CurrentPos = 0;
+  BeginLoopPos = 0;
+  EndLoopPos = 4;
+  EndPos = 16;
+  Playing = false;
+  Recording = false;
+  CurAudioPos = 0;
 }
 
 void					*Sequencer::Entry()
@@ -112,17 +134,17 @@ void					*Sequencer::Entry()
 	    }
 	  else
 	    for (T = Tracks.begin(); T != Tracks.end(); T++)
-	      if ((*T)->IsMidiTrack() && ((*T)->TrackOpt->DeviceId == (*MidiMsg)->Id))
+	      if ((*T)->IsMidiTrack() && ((*T)->GetTrackOpt()->DeviceId == (*MidiMsg)->Id))
 		{		  
 		  midievent.Type = WIRED_MIDI_EVENT;
 		  midievent.NoteLength = CurAudioPos;
 		  midievent.DeltaFrames = 0; //**TODO ----- TO FILL ----
 		  memcpy(midievent.MidiData, (*MidiMsg)->Msg, sizeof(int) * 3);
 		  // Sends MIDI event to the connected plug-in
-		  if ((*T)->TrackOpt->Connected)
-		    (*T)->TrackOpt->Connected->ProcessEvent(midievent);
+		  if ((*T)->GetTrackOpt()->Connected)
+		    (*T)->GetTrackOpt()->Connected->ProcessEvent(midievent);
 		  // Adds MIDI event on the track if needed
-		  if (Playing && Recording && (*T)->TrackOpt->Record)
+		  if (Playing && Recording && (*T)->GetTrackOpt()->Record)
 		    {
 		      AddNote(*T, **MidiMsg);
 		    }
@@ -195,29 +217,29 @@ void					*Sequencer::Entry()
 	      if ((*T)->IsAudioTrack())
 		{
 		  /* - Audio recording */
-		  if (Recording && (*T)->TrackOpt->Record)
+		  if (Recording && (*T)->GetTrackOpt()->Record)
 		    {	 
 		      //cout << "MixInput()"<< endl;
 		      Mix->MixInput();	// Mutex ou pas ? a prioris non
 
 		      /* - Gets recording buffers */
 		      //cout << "GetRecordBuffer" << endl;
-		      (*T)->Wave->GetRecordBuffer();
-		      if ((*T)->Wave->GetEndPosition() < CurrentPos)
-			ResizePattern((*T)->Wave);
+		      (*T)->GetAudioPattern()->GetRecordBuffer();
+		      if ((*T)->GetAudioPattern()->GetEndPosition() < CurrentPos)
+			ResizePattern((*T)->GetAudioPattern());
 		    }
 		  // plays only if NOT mute
-		  if (!(*T)->TrackOpt->Mute)
+		  if (!(*T)->GetTrackOpt()->Mute)
 		    {
 		      /* Gets audio buffers */
 		      AudioP = GetCurrentAudioPattern(*T);
 		      if (AudioP)
 			{
 			  buf = GetCurrentAudioBuffer(AudioP);
-			  if ((*T)->TrackOpt->ConnectedRackTrack)
-			    (*T)->TrackOpt->ConnectedRackTrack->CurrentBuffer = buf;
+			  if ((*T)->GetTrackOpt()->ConnectedRackTrack)
+			    (*T)->GetTrackOpt()->ConnectedRackTrack->CurrentBuffer = buf;
 			  else if (buf)
-			    ExtraBufs.push_back(new ChanBuf(buf, (*T)->Output));
+			    ExtraBufs.push_back(new ChanBuf(buf, (*T)->GetOutputChannel()));
 			}
 		    }
 		}
@@ -225,15 +247,15 @@ void					*Sequencer::Entry()
 		{	  
 		  /* Sends each sequencer track MIDI events to related plug-ins
 		     depending on the timer*/
-		  if (Recording && (*T)->Midi)
+		  if (Recording && (*T)->GetMidiPattern())
 		    {
-		      if ((*T)->Midi->GetEndPosition() < CurrentPos)
-			ResizePattern((*T)->Midi);
+		      if ((*T)->GetMidiPattern()->GetEndPosition() < CurrentPos)
+			ResizePattern((*T)->GetMidiPattern());
 		    }
 		  list<MidiPattern *> l;
 		  list<MidiPattern *>::iterator midi_it;
 
-		  if (!((*T)->TrackOpt->Mute))
+		  if (!((*T)->GetTrackOpt()->Mute))
 		    {
 		      l = GetCurrentMidiPatterns(*T);
 		      for (midi_it = l.begin(); midi_it != l.end(); midi_it++)
@@ -395,7 +417,7 @@ void					Sequencer::Stop()
   for (T = Tracks.begin(); T != Tracks.end(); T++)
     if ((*T)->IsMidiTrack())
       {	
-	(*T)->TrackOpt->VuValue = 0;
+	(*T)->GetTrackOpt()->VuValue = 0;
 	TracksToRefresh.push_back(*T);
       }  
 
@@ -455,7 +477,7 @@ void					Sequencer::PrepareRecording()
 
   for (T = Tracks.begin(); T != Tracks.end(); T++)
     {
-      if ((*T)->TrackOpt->Record)
+      if ((*T)->GetTrackOpt()->Record)
 	PrepareTrackForRecording(*T);
     }
 }
@@ -465,32 +487,31 @@ void					Sequencer::PrepareTrackForRecording(Track *T)
   int					type;
 
   PatternsToResize.clear();  
-  if (T->TrackOpt->Record && (T->TrackOpt->DeviceId == -1))
+  if (T->GetTrackOpt()->Record && (T->GetTrackOpt()->DeviceId == -1))
     {
-      T->TrackOpt->SetRecording(false);
+      T->GetTrackOpt()->SetRecording(false);
       return;
     }
   type = Audio->GetLibSndFileFormat();
   if (T->IsAudioTrack())
     {
-      if (T->Wave)
-	delete T->Wave;
-      T->Wave = new AudioPattern(CurrentPos, CurrentPos + 0.1, T->GetIndex()); 
-      if (!T->Wave->PrepareRecord(type))
+      T->SetAudioPattern(new AudioPattern(_documentParent, CurrentPos,
+					  CurrentPos + 0.1, T->GetIndex()));
+      if (!T->GetAudioPattern()->PrepareRecord(type))
 	{
-	  delete T->Wave;
-	  T->Wave = 0x0;
-	  T->TrackOpt->SetRecording(false);
+	  T->SetAudioPattern(NULL);
+	  T->GetTrackOpt()->SetRecording(false);
 	  return;
 	}
       else
-	T->TrackPattern->Patterns.push_back(T->Wave);	      
+	T->GetTrackPattern()->Patterns.push_back(T->GetAudioPattern());	      
 
     }
   else if (T->IsMidiTrack())
     {
-      T->Midi = new MidiPattern(CurrentPos, CurrentPos + 0.1, T->GetIndex());
-      T->TrackPattern->Patterns.push_back(T->Midi);
+      T->SetMidiPattern(new MidiPattern(_documentParent, CurrentPos,
+					CurrentPos + 0.1, T->GetIndex()));
+      T->GetTrackPattern()->Patterns.push_back(T->GetMidiPattern());
     }  
 }
 
@@ -500,15 +521,15 @@ void					Sequencer::FinishRecording()
 
   for (T = Tracks.begin(); T != Tracks.end(); T++)
     {
-      if ((*T)->TrackOpt->Record)
+      if ((*T)->GetTrackOpt()->Record)
 	{
 	  if ((*T)->IsAudioTrack())
 	    {	
-	      if ((*T)->Wave)
-		(*T)->Wave->StopRecord();
+	      if ((*T)->GetAudioPattern())
+		(*T)->GetAudioPattern()->StopRecord();
 	      SeqMutex.Lock();
 
-	      (*T)->Wave = 0x0;
+	      (*T)->SetAudioPattern(NULL);
 	      
 	      SeqMutex.Unlock();
 		
@@ -517,7 +538,7 @@ void					Sequencer::FinishRecording()
 	    {
 	      SeqMutex.Lock();
 	      
-	      (*T)->Midi = 0x0;
+	      (*T)->SetMidiPattern(NULL);
 	      
 	      SeqMutex.Unlock();  
 	    }
@@ -537,19 +558,19 @@ void					Sequencer::AddMidiEvent(int id, MidiType midi_msg[3])
 void					Sequencer::AddNote(Track *t, MidiEvent &event)
 {
 	if (!t)	return;
-  if (t->Midi)
+  if (t->GetMidiPattern())
     {
       cout << "[SEQ] Adding note to track" << endl;
       MidiEvent *e = new MidiEvent(event);
-      e->Position = CurrentPos - t->Midi->GetPosition();
-      t->Midi->AddEvent(e);
-      PatternsToRefresh.push_back(t->Midi);
+      e->Position = CurrentPos - t->GetMidiPattern()->GetPosition();
+      t->GetMidiPattern()->AddEvent(e);
+      PatternsToRefresh.push_back(t->GetMidiPattern());
       // Sends pattern refresh event
       /*
       wxCommandEvent evt(ID_SEQ_DRAWMIDI, TYPE_SEQ_DRAWMIDI);
       evt.SetId(ID_SEQ_DRAWMIDI);
       evt.SetEventType(TYPE_SEQ_DRAWMIDI);
-      evt.SetEventObject((wxObject *)t->Midi);
+      evt.SetEventObject((wxObject *)t->GetMidiPattern());
       wxPostEvent(SeqPanel, evt);*/
     }
 }
@@ -620,7 +641,8 @@ void					Sequencer::SetBPM(float bpm)
   // updates audio pattern size
   for (i = Tracks.begin(); i != Tracks.end(); i++)
     if ((*i)->IsAudioTrack())
-      for (j = (*i)->TrackPattern->Patterns.begin(); j != (*i)->TrackPattern->Patterns.end(); 
+      for (j = (*i)->GetTrackPattern()->Patterns.begin();
+	   j != (*i)->GetTrackPattern()->Patterns.end(); 
 	   j++)
 	(*j)->OnBpmChange();
   // notify the plug-ins
@@ -665,7 +687,7 @@ list<MidiPattern *>			Sequencer::GetCurrentMidiPatterns(Track *t)
   double				delta_mes = MeasurePerSample * Audio->SamplesPerBuffer;
   list<MidiPattern *>			l;
 
-  for (i = t->TrackPattern->Patterns.begin(); i != t->TrackPattern->Patterns.end(); i++)
+  for (i = t->GetTrackPattern()->Patterns.begin(); i != t->GetTrackPattern()->Patterns.end(); i++)
     {
       if ((CurrentPos + delta_mes >= (*i)->GetPosition()) && 
 	  (CurrentPos < (*i)->GetEndPosition()))
@@ -674,7 +696,7 @@ list<MidiPattern *>			Sequencer::GetCurrentMidiPatterns(Track *t)
 	  
 	  // Check if the next pattern starts when this one finishes
 	  //i++;
-	  /*	  if (i != t->TrackPattern->Patterns.end())
+	  /*	  if (i != t->GetTrackPattern()->Patterns.end())
 	    {
 	      if (((*ret)->GetEndPosition() == (*i)->GetPosition()) &&
 		  ((CurrentPos + delta_mes > (*ret)->GetEndPosition())))
@@ -693,7 +715,7 @@ AudioPattern				*Sequencer::GetCurrentAudioPattern(Track *t)
   vector<Pattern *>::iterator		ret;
   double				delta_mes = MeasurePerSample * Audio->SamplesPerBuffer;
 
-  for (i = t->TrackPattern->Patterns.begin(); i != t->TrackPattern->Patterns.end(); i++)
+  for (i = t->GetTrackPattern()->Patterns.begin(); i != t->GetTrackPattern()->Patterns.end(); i++)
     {
       if ((CurrentPos + delta_mes >= (*i)->GetPosition()) && 
 	  (CurrentPos < (*i)->GetEndPosition()))
@@ -702,7 +724,7 @@ AudioPattern				*Sequencer::GetCurrentAudioPattern(Track *t)
 	  
 	  // Check if the next pattern starts when this one finishes
 	  i++;
-	  if (i != t->TrackPattern->Patterns.end())
+	  if (i != t->GetTrackPattern()->Patterns.end())
 	    {
 	      if (((*ret)->GetEndPosition() == (*i)->GetPosition()) &&
 		  ((CurrentPos + delta_mes > (*ret)->GetEndPosition())))
@@ -736,7 +758,7 @@ void					Sequencer::ProcessCurrentMidiEvents(Track *T, MidiPattern *p)
   vector<MidiEvent *>::iterator		i;
   
   //  cout << "POSITION [ " << p->GetPosition() << " ] youpla :D" << endl;
-  //  T->TrackOpt->SetVuValue(0);
+  //  T->GetTrackOpt()->SetVuValue(0);
   delta_mes = MeasurePerSample * Audio->SamplesPerBuffer;
   
   for (i = p->Events.begin(); i != p->Events.end(); i++)
@@ -744,10 +766,10 @@ void					Sequencer::ProcessCurrentMidiEvents(Track *T, MidiPattern *p)
       if ((p->GetPosition() + (*i)->Position >= CurrentPos) && 
 	  (p->GetPosition() + (*i)->Position < CurrentPos + delta_mes))
 	{
-	  T->TrackOpt->VuValue = (*i)->Msg[2];
+	  T->GetTrackOpt()->VuValue = (*i)->Msg[2];
 	  TracksToRefresh.push_back(T);
 
-	  if (T->TrackOpt->Connected)
+	  if (T->GetTrackOpt()->Connected)
 	    {
 	      curevent = new WiredEvent; //** really needed to dyn alloc ?
 	      curevent->Type = WIRED_MIDI_EVENT;
@@ -758,7 +780,7 @@ void					Sequencer::ProcessCurrentMidiEvents(Track *T, MidiPattern *p)
 	      memcpy(curevent->MidiData, (*i)->Msg, sizeof(int) * 3);
 
 	      // sent to connected plug-in
-	      T->TrackOpt->Connected->ProcessEvent(*curevent);
+	      T->GetTrackOpt()->Connected->ProcessEvent(*curevent);
 	      delete curevent;
 	    }
 	}
@@ -772,7 +794,7 @@ void					Sequencer::DeletePattern(Pattern *p)
 
   if (p->GetTrackIndex() < Tracks.size())
     {
-      t = Tracks[p->GetTrackIndex()]->TrackPattern;
+      t = Tracks[p->GetTrackIndex()]->GetTrackPattern();
       for (k = t->Patterns.begin(); k != t->Patterns.end(); k++)
 	if ((*k) == p)
 	  {
@@ -834,17 +856,18 @@ void					Sequencer::AddMidiPattern(list<SeqCreateEvent *> *l,
   double				max_end = 0.0;
 
   for (i = Tracks.begin(); i != Tracks.end(); i++)
-    if ((*i)->TrackOpt->GetSelected() && (*i)->IsMidiTrack())
+    if ((*i)->GetTrackOpt()->GetSelected() && (*i)->IsMidiTrack())
       {
 	t = *i;
 	break;
       }
   if (!t)
     {
-      t = SeqPanel->AddTrack(false);
-      t->TrackOpt->ConnectTo(plug);
+      t = SeqPanel->AddTrack(eMidiTrack);
+      t->GetTrackOpt()->ConnectTo(plug);
     }
-  p = new MidiPattern(CurrentPos, CurrentPos, t->TrackOpt->Index - 1);
+  p = new MidiPattern(_documentParent, CurrentPos, CurrentPos,
+		      t->GetTrackOpt()->Index - 1);
   for (j = l->begin(); j != l->end(); j++)
     {
       e = new MidiEvent(0, (*j)->Position, (*j)->MidiMsg);

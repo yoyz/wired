@@ -36,13 +36,13 @@ void	cActionManager::AddEffectAction(PlugStartInfo* startInfo, PluginLoader* plu
 	action->Do();
 }
 
-void	cActionManager::AddImportWaveAction(const wxString& path, bool kind, bool selectFromIndex)
+void	cActionManager::AddImportWaveAction(const wxString& path, trackType kind, bool selectFromIndex)
 {
 	cImportWaveAction* action = new cImportWaveAction(path, kind, selectFromIndex);
 	action->Do();
 }
 
-void	cActionManager::AddEditWaveAction(const wxString& path, bool kind, bool selectFromIndex)
+void	cActionManager::AddEditWaveAction(const wxString& path, trackType kind, bool selectFromIndex)
 {
 	cImportWaveAction* action = new cImportWaveAction(path, kind, selectFromIndex);
 	action->AddWaveToEditor();

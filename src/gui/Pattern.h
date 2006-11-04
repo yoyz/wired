@@ -1,15 +1,14 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
-
 #ifndef __PATTERN_H__
 #define __PATTERN_H__
 
 #include <vector>
 #include <wx/string.h>
 #include <wx/wx.h>
+
+#include "WiredDocument.h"
 
 using namespace				std;
 
@@ -30,22 +29,10 @@ class					MidiEvent;
 /**
  * creating a pattern.
  */
-class					Pattern : public wxWindow
+class					Pattern : public wxWindow, public WiredDocument
 {
-  
-  /**
-   * Still unused,it'll to be avoid wrong way scroll during a pattern dragging.
-   * The default value is 0. 
-   */    
-  double							xdrag;		
-  
-  /**
-   * The default value is 0.
-   */
-  double							ydrag;		
-
  protected:
-	Pattern(){};
+  Pattern(WiredDocument *parent) : WiredDocument(wxT("Pattern"), parent){};
 
   virtual void				OnClick(wxMouseEvent &e);
   virtual void				OnLeftUp(wxMouseEvent &e);
@@ -126,9 +113,15 @@ class					Pattern : public wxWindow
    * \param endpos a  double,the end position of pattern.
    * \param trackindex a long,the index of track.
    */
-  Pattern(double pos, double endpos, long trackindex);
+  Pattern(WiredDocument *parent, double pos, double endpos, long trackindex);
 //  Pattern(const Pattern& copy){*this = copy;};
   virtual ~Pattern();
+
+
+  // WiredDocument implementation
+  void				Save();
+  void				Load(SaveElementArray data);
+
 
   /**
    * To modify the pattern.

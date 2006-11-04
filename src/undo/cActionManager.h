@@ -79,9 +79,9 @@ public:
 								PluginLoader* plugLoader, 
 								bool shouldAdd);
 	void		AddChangeParamsEffectAction(Plugin* plugin, bool shouldSave);	// Adds a cChangeParamsEffectAction in cActionManager
-	void		AddImportWaveAction(const wxString& path, bool kind, 
+	void		AddImportWaveAction(const wxString& path, trackType kind, 
 									bool selectFromIndex);				// Adds a cImportWaveAction in cActionManager
-	void		AddEditWaveAction(const wxString& path, bool kind, bool selectFromIndex);
+	void		AddEditWaveAction(const wxString& path, trackType kind, bool selectFromIndex);
 	std::list<t_menuInfo*>		getListActions(int* separatorIndex);	// Retourne la liste des actions Undo
 
 };

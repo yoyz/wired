@@ -122,7 +122,7 @@ void					SequencerView::SelectZonePatterns(bool shift)
       y1 = y2 - TheZone->GetZoneH();
     }
   for (t = Seq->Tracks.begin(); t != Seq->Tracks.end(); t++)
-    for (p = (*t)->TrackPattern->Patterns.begin(); p != (*t)->TrackPattern->Patterns.end(); p++)
+    for (p = (*t)->GetTrackPattern()->Patterns.begin(); p != (*t)->GetTrackPattern()->Patterns.end(); p++)
       if ((((*p)->GetPosition() > x2) || ((*p)->GetEndPosition() < x1)) ||
 	  ((((*p)->GetTrackIndex() * TRACK_HEIGHT * SeqPanel->VertZoomFactor) > y2) ||
 	   ((((*p)->GetTrackIndex() + 1) * TRACK_HEIGHT * SeqPanel->VertZoomFactor) < y1)))
@@ -342,7 +342,9 @@ void					SequencerView::Drop(int x, int y, wxString file)
       if (Seq->Tracks.size() != 0 && track < Seq->Tracks.size() && (*i)->IsAudioTrack())
 	{
 	  wave = WaveCenter.AddWaveFile(file);
-	  for (pattern_iterator = (*i)->TrackPattern->Patterns.begin(); pattern_iterator != (*i)->TrackPattern->Patterns.end(); pattern_iterator++)
+	  for (pattern_iterator = (*i)->GetTrackPattern()->Patterns.begin();
+	       pattern_iterator != (*i)->GetTrackPattern()->Patterns.end();
+	       pattern_iterator++)
 	    if (last_pos < (*pattern_iterator)->GetEndPosition())
 	      last_pos = (*pattern_iterator)->GetEndPosition();
 	  for (nb_channel = 0; nb_channel < wave->GetNumberOfChannels() && i != Seq->Tracks.end(); nb_channel++)
@@ -354,7 +356,7 @@ void					SequencerView::Drop(int x, int y, wxString file)
 	    }
 	  for (;nb_channel < wave->GetNumberOfChannels(); nb_channel++)
 	    {
-	      track_to_add = SeqPanel->AddTrack(true);
+	      track_to_add = SeqPanel->AddTrack(eAudioTrack);
 	      wave = WaveCenter.AddWaveFile(file);
 	      wave->SetChannelToRead(nb_channel);
 	      track_to_add->AddPattern(wave, 0);
@@ -365,7 +367,7 @@ void					SequencerView::Drop(int x, int y, wxString file)
 	  wave = WaveCenter.AddWaveFile(file);
 	  for (nb_channel = 0; nb_channel < wave->GetNumberOfChannels(); nb_channel++)
 	    {
-	      track_to_add = SeqPanel->AddTrack(true);
+	      track_to_add = SeqPanel->AddTrack(eAudioTrack);
 	      wave = WaveCenter.AddWaveFile(file);
 	      wave->SetChannelToRead(nb_channel);
 	      track_to_add->AddPattern(wave, 0);
@@ -380,9 +382,9 @@ void					SequencerView::DrawTrackLines(wxDC &dc)
   long					h;
   
   for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)  
-    if ((*i)->TrackPattern)
+    if ((*i)->GetTrackPattern())
       {
-	if ((h = (*i)->TrackOpt->GetPosition().y + (*i)->TrackOpt->GetSize().y) > 0)
+	if ((h = (*i)->GetTrackOpt()->GetPosition().y + (*i)->GetTrackOpt()->GetSize().y) > 0)
 	  {
 	    dc.SetPen(wxPen(CL_SEQVIEW_TRACK_LINE_TOP, 1, wxSOLID));
 	    dc.DrawLine(0, h - 1, GetClientSize().x + 1, h - 1);
@@ -397,9 +399,12 @@ void					SequencerView::DrawTrackLines(wxDC &dc)
       }
 }
 
-SequencerGui::SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size, wxWindow *mainwindow)
+SequencerGui::SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size,
+			   wxWindow *mainwindow, WiredDocument* docParent)
   : wxPanel(parent, -1, pos, size, wxSIMPLE_BORDER | wxWS_EX_PROCESS_IDLE)
 {
+  _documentParent = docParent;
+
   wxSize				s;
   wxSize				v;
   wxBoxSizer				*zer_1;
@@ -548,37 +553,27 @@ SequencerGui::~SequencerGui()
 {
 }
 
-Track					*SequencerGui::AddTrack(bool is_audio)
+Track					*SequencerGui::AddTrack(trackType type)
 {
-  Track					*n;
-  SeqTrack				*n1;
-  SeqTrackPattern			*n2;
-  long					yy;
+  // create a new track
+  Track*	newTrack;
+  wxPoint	pos(0, SeqView->GetTotalHeight() -
+		    (long) floor(CurrentYScrollPos));
+  wxSize	size(TRACK_WIDTH, (long) floor(TRACK_HEIGHT * VertZoomFactor));
 
-  yy = SeqView->GetTotalHeight() - (long) floor(CurrentYScrollPos);
-  wxPoint p(0, yy);
-  wxSize  s(TRACK_WIDTH, (long) floor(TRACK_HEIGHT * VertZoomFactor));
-//    printf("adding SEQTRACK %d with Y=%d\n", Seq->Tracks.size() + 1, yy);
-  n1 = new SeqTrack(Seq->Tracks.size() + 1, TrackView, p, s, is_audio);
-  //  printf("adding SEQTRACK PATTERN\n");
-  n2 = new SeqTrackPattern(SeqView, n1, SeqView->GetTotalWidth());
-  //  printf("adding TRACK\n");
-  n = new Track(n1, n2, is_audio ? IS_AUDIO_TRACK : IS_MIDI_TRACK);
-  if (is_audio)
-    {
-      n1->ChanGui = MixerPanel->AddChannel(n->Output, n1->Text->GetValue());
-      n1->ChanGui->SetOpt(n1);
-    }
-  Seq->AddTrack(n);
+  newTrack = new Track(_documentParent, type, pos, size, TrackView);
+
   UpdateTracks();
   SeqPanel->SetScrolling();
   ReSizeCursors();
 
+  // refresh on-the-fly sequencer view (maybe it should be in only one method)
   wxClientDC				drawme(SeqView);
   PrepareDC(drawme);
   SeqView->DrawMeasures(drawme);
   SeqView->DrawTrackLines(drawme);
-  return (n);
+
+  return (newTrack);
 }
 
 void					SequencerGui::RemoveTrack()
@@ -621,7 +616,7 @@ void					SequencerGui::UpdateAudioPatterns(WaveFile *w)
   vector<Pattern *>::iterator		p;
 
   for (t = Seq->Tracks.begin(); t != Seq->Tracks.end(); t++)
-    for (p = (*t)->TrackPattern->Patterns.begin(); p != (*t)->TrackPattern->Patterns.end(); p++)
+    for (p = (*t)->GetTrackPattern()->Patterns.begin(); p != (*t)->GetTrackPattern()->Patterns.end(); p++)
       if ((*t)->IsAudioTrack() && (((AudioPattern *) *p)->GetWaveFile() == w))
 	((AudioPattern *) *p)->SetDrawing();
 }
@@ -722,9 +717,9 @@ void					SequencerGui::UpdateTracks()
   h = (long) floor(VertZoomFactor * TRACK_HEIGHT);
   for (z = -SeqView->GetYScroll(), i = Seq->Tracks.begin(); i != Seq->Tracks.end(); z += h)
     {
-      (*i)->TrackOpt->SetPosition(wxPoint(0, z));
-      (*i)->TrackOpt->SetSize(wxSize(TRACK_WIDTH, h)); 
-      (*i++)->TrackOpt->Refresh();
+      (*i)->GetTrackOpt()->SetPosition(wxPoint(0, z));
+      (*i)->GetTrackOpt()->SetSize(wxSize(TRACK_WIDTH, h)); 
+      (*i++)->GetTrackOpt()->Refresh();
     }
   UpdateMeasures();
 }
@@ -765,8 +760,8 @@ void					SequencerGui::UpdateMeasures()
 
   for (t = Seq->Tracks.begin(); t != Seq->Tracks.end(); t++)
     {
-      //      (*t)->TrackPattern->Update();
-      for (p = (*t)->TrackPattern->Patterns.begin(); p != (*t)->TrackPattern->Patterns.end(); p++)
+      //      (*t)->GetTrackPattern()->Update();
+      for (p = (*t)->GetTrackPattern()->Patterns.begin(); p != (*t)->GetTrackPattern()->Patterns.end(); p++)
 	(*p)->Update();
     }  
 }
@@ -795,8 +790,8 @@ void					SequencerGui::UnselectTracks()
   vector<Track *>::iterator		i;
 
   for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)
-    if ((*i)->TrackOpt->GetSelected())
-      (*i)->TrackOpt->SetSelected(false);
+    if ((*i)->GetTrackOpt()->GetSelected())
+      (*i)->GetTrackOpt()->SetSelected(false);
 }
 
 void					SequencerGui::AddPattern(Pattern *p, long trackindex)
@@ -836,16 +831,16 @@ void					SequencerGui::SelectTrack(long trackindex)
   UnselectTracks();
   for (iter = Seq->Tracks.begin(); iter != Seq->Tracks.end(); iter++)
     if ((*iter)->GetIndex() == trackindex)
-      (*iter)->TrackOpt->SetSelected(true);
+      (*iter)->GetTrackOpt()->SetSelected(true);
 }
 
 void					SequencerGui::SwapTracksPos(Track *t1, Track *t2)
 {
   long					z;
   
-  z = t1->TrackOpt->GetPosition().y;
-  t1->TrackOpt->SetPosition(wxPoint(0, t2->TrackOpt->GetPosition().y));
-  t2->TrackOpt->SetPosition(wxPoint(0, z));
+  z = t1->GetTrackOpt()->GetPosition().y;
+  t1->GetTrackOpt()->SetPosition(wxPoint(0, t2->GetTrackOpt()->GetPosition().y));
+  t2->GetTrackOpt()->SetPosition(wxPoint(0, z));
 }
 
 void					SequencerGui::ChangeSelectedTrackIndex(long trackindexdelta)
@@ -861,7 +856,7 @@ void					SequencerGui::ChangeSelectedTrackIndex(long trackindexdelta)
   printf("SequencerGui::ChangeSelectedTrackIndex(%d)\n", trackindexdelta);
 #endif
 
-	for (i = Seq->Tracks.begin(); (i != Seq->Tracks.end()) && !((*i)->TrackOpt->GetSelected()); i++);
+	for (i = Seq->Tracks.begin(); (i != Seq->Tracks.end()) && !((*i)->GetTrackOpt()->GetSelected()); i++);
 	if (i == Seq->Tracks.end())
     	return;
 	if ((z = trackindexdelta) > 0)
@@ -912,7 +907,7 @@ void					SequencerGui::RemoveReferenceTo(Plugin *plug)
   vector<Track *>::iterator		i;
 
   for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)
-    (*i)->TrackOpt->RemoveReferenceTo(plug);
+    (*i)->GetTrackOpt()->RemoveReferenceTo(plug);
 }
 
 void					SequencerGui::RefreshConnectMenu()
@@ -920,7 +915,7 @@ void					SequencerGui::RefreshConnectMenu()
   vector<Track *>::iterator		i;
 
   for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)
-    (*i)->TrackOpt->RebuildConnectList();
+    (*i)->GetTrackOpt()->RebuildConnectList();
 }
 
 void					SequencerGui::DeleteAllTracks()
@@ -929,8 +924,8 @@ void					SequencerGui::DeleteAllTracks()
   
   for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)  
     {
-      if ((*i)->TrackOpt->ChanGui)
-	MixerPanel->RemoveChannel((*i)->TrackOpt->ChanGui);
+      if ((*i)->GetTrackOpt()->ChanGui)
+	MixerPanel->RemoveChannel((*i)->GetTrackOpt()->ChanGui);
       delete (*i);
     }
   Seq->Tracks.clear();
@@ -948,14 +943,14 @@ void					SequencerGui::DeleteSelectedTrack()
   printf("SequencerGui::DeleteSelectedTrack()\n");
 #endif
 
-  for (iterTrack = Seq->Tracks.begin(); (iterTrack != Seq->Tracks.end()) && !((*iterTrack)->TrackOpt->GetSelected()); iterTrack++)
+  for (iterTrack = Seq->Tracks.begin(); (iterTrack != Seq->Tracks.end()) && !((*iterTrack)->GetTrackOpt()->GetSelected()); iterTrack++)
     ;
   if (iterTrack == Seq->Tracks.end())
     return;
-  if ((*iterTrack)->TrackOpt->Record && Seq->Recording)
+  if ((*iterTrack)->GetTrackOpt()->Record && Seq->Recording)
     return;
-  if ((*iterTrack)->TrackOpt->ChanGui)
-    MixerPanel->RemoveChannel((*iterTrack)->TrackOpt->ChanGui);
+  if ((*iterTrack)->GetTrackOpt()->ChanGui)
+    MixerPanel->RemoveChannel((*iterTrack)->GetTrackOpt()->ChanGui);
   for (iterPattern = SelectedItems.begin(); iterPattern != SelectedItems.end(); )
     {
       if (((*iterTrack)->GetIndex() == (*iterPattern)->GetTrackIndex()) && (*iterPattern)->IsSelected())
@@ -1029,8 +1024,8 @@ void					SequencerGui::PasteItems()
 	  return;
 	}
 
-      for (pattern_iterator = (*itTrackSelected)->TrackPattern->Patterns.begin();
-	   pattern_iterator != (*itTrackSelected)->TrackPattern->Patterns.end();
+      for (pattern_iterator = (*itTrackSelected)->GetTrackPattern()->Patterns.begin();
+	   pattern_iterator != (*itTrackSelected)->GetTrackPattern()->Patterns.end();
 	   pattern_iterator++)
 	if (last_pos < (*pattern_iterator)->GetEndPosition())
 	  last_pos = (*pattern_iterator)->GetEndPosition();
@@ -1182,7 +1177,7 @@ void					SequencerGui::ChangeMouseCursor(wxCursor c)
 
   SeqView->SetCursor(c);
   for (t = Seq->Tracks.begin(); t != Seq->Tracks.end(); t++)
-    for (p = (*t)->TrackPattern->Patterns.begin(); p != (*t)->TrackPattern->Patterns.end(); p++)
+    for (p = (*t)->GetTrackPattern()->Patterns.begin(); p != (*t)->GetTrackPattern()->Patterns.end(); p++)
       (*p)->SetCursor(c);
 }
 

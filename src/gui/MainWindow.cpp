@@ -35,10 +35,8 @@
 #include "../sequencer/Sequencer.h"
 #include "../sequencer/Track.h"
 #include "../mixer/Mixer.h"
-#include "../engine/WiredSession.h"
 #include "../midi/MidiThread.h"
 #include "../plugins/PluginLoader.h"
-#include "../xml/WiredSessionXml.h"
 #include "../dssi/WiredExternalPluginMgr.h"
 #include "FileConversion.h"
 #include <config.h>
@@ -106,7 +104,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   
   // Mixer must be declared after AudioEngine 
   Mix = new Mixer();
-  Seq = new Sequencer();
+  Seq = new Sequencer(NULL);
   MidiEngine = new MidiThread();
   MidiEngine->OpenDefaultDevices();
   SettingsWin = new SettingWindow();
@@ -399,7 +397,7 @@ int			MainWindow::InitAudio(bool restart)
       // Refill tracks connections
       if (SettingsWin->AudioLoaded || SettingsWin->MidiLoaded)
 	for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)
-	  (*i)->TrackOpt->FillChoices();      
+	  (*i)->GetTrackOpt()->FillChoices();      
       // Sends sample rate and buffer size modifications to plugins
       if (SettingsWin->AudioLoaded)
 	{
@@ -752,7 +750,7 @@ void					MainWindow::OnImportMIDI(wxCommandEvent &event)
 				this, wxPD_AUTO_HIDE | wxPD_CAN_ABORT 
 				| wxPD_REMAINING_TIME);
       Progress.Update(1);
-      cImportMidiAction* action = new cImportMidiAction(selfile, false);
+      cImportMidiAction* action = new cImportMidiAction(selfile, eMidiTrack);
       action->Do();
       Progress.Update(99);	
       //delete Progress;
@@ -793,7 +791,7 @@ void					MainWindow::OnImportAKAI(wxCommandEvent &event)
 				this, wxPD_AUTO_HIDE | wxPD_CAN_ABORT 
 				| wxPD_REMAINING_TIME);
       Progress.Update(1);
-      cImportAkaiAction* action = new cImportAkaiAction(selfile, true);
+      cImportAkaiAction* action = new cImportAkaiAction(selfile, eAudioTrack);
       action->Do();
       Progress.Update(99);	
       //delete Progress;
@@ -1111,20 +1109,12 @@ void					MainWindow::OnDeleteRack(wxCommandEvent &event)
 
 void					MainWindow::OnAddTrackAudio(wxCommandEvent &event)
 {
-  //cAddTrackAction			*action = new cAddTrackAction(true);
-
-  //action->Do();
-  //CreateUndoRedoMenus(EditMenu);
-  SeqPanel->AddTrack(true);
+  SeqPanel->AddTrack(eAudioTrack);
 }
 
 void					MainWindow::OnAddTrackMidi(wxCommandEvent &event)
 {
-  //cAddTrackAction			*action = new cAddTrackAction(false);
-
-  //action->Do();
-  //CreateUndoRedoMenus(EditMenu);
-  SeqPanel->AddTrack(false);
+  SeqPanel->AddTrack(eMidiTrack);
 }
 
 void					MainWindow::OnFloatTransport(wxCommandEvent &event)
@@ -1695,7 +1685,7 @@ void					MainWindow::OnTimer(wxTimerEvent &event)
   UpdatePlugins.clear();
 
   for (trackIt = Seq->TracksToRefresh.begin(); trackIt != Seq->TracksToRefresh.end(); trackIt++)
-    (*trackIt)->TrackOpt->SetVuValue();
+    (*trackIt)->GetTrackOpt()->SetVuValue();
   Seq->TracksToRefresh.clear();
   
   SeqMutex.Unlock();

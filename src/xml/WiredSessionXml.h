@@ -28,7 +28,7 @@
 #include "../sequencer/Track.h"
 #include "../sequencer/Sequencer.h"
 #include "../gui/SeqTrack.h"
-#include "../gui/SeqTrackPattern.h"
+#include "../SeqTrackPattern.h"
 #include "../gui/Pattern.h"
 #include "../gui/AudioPattern.h"
 #include "../gui/SequencerGui.h"

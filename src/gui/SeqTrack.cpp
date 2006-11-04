@@ -1,8 +1,7 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
+#include <list>
 
 #include <math.h>
 #include "SeqTrack.h"
@@ -17,9 +16,9 @@
 #include "Plugin.h"
 #include "DownButton.h"
 #include "VUMCtrl.h"
-#include "../midi/MidiInDevice.h"
-#include "../midi/MidiThread.h"
-#include "../sequencer/Sequencer.h"
+#include "MidiInDevice.h"
+#include "MidiThread.h"
+#include "Sequencer.h"
 
 // Counts number of Audio and MIDI tracks created yet
 int				AudioTrackCount = 0;
@@ -27,17 +26,17 @@ int				MidiTrackCount = 0;
 
 SeqTrack::SeqTrack(long index, wxWindow *parent, 
 		   const wxPoint& pos = wxDefaultPosition, 
-		   const wxSize& size = wxDefaultSize, bool audio)
+		   const wxSize& size = wxDefaultSize,
+		   trackType type = eAudioTrack, ChannelGui* seqview = NULL)
   : wxControl(parent, -1, pos, size)
 {
-  wxString					s;
-  //  wxTextAttr					attr;  
+  wxString	str;
 
   Index = index;
-  ChanGui = 0X0;
+  ChanGui = seqview;
   Connected = 0x0;
   ConnectedRackTrack = 0x0;
-  IsAudio = audio;
+  Type = type;
   DeviceId = -1;
   Record = false;
   Mute = false;
@@ -48,18 +47,18 @@ SeqTrack::SeqTrack(long index, wxWindow *parent,
   wxWindow::SetBackgroundStyle(wxBG_STYLE_CUSTOM);
   
   // name of track
-  if (audio)
-    s.Printf(_("Audio %d"), ++AudioTrackCount);
+  if (type == eAudioTrack)
+    str.Printf(_("Audio %d"), ++AudioTrackCount);
   else
-    s.Printf(wxT("MIDI %d"), ++MidiTrackCount);
-  Text = new wxTextCtrl(this, SeqTrack_OnNameChange, s, wxPoint(6, 8), 
+    str.Printf(wxT("MIDI %d"), ++MidiTrackCount);
+  Text = new wxTextCtrl(this, SeqTrack_OnNameChange, str, wxPoint(6, 8), 
 			wxSize(TRACK_WIDTH - 68, 18), wxTE_PROCESS_ENTER);
   Text->SetFont(wxFont(8, wxDEFAULT, wxNORMAL, wxNORMAL));
 
   // add pixmap to see what sort of track it is (audio or midi).
   wxImage*		trackTypeImage;
 
-  if (!IsAudio)
+  if (Type != eAudioTrack)
     trackTypeImage = new wxImage(wxString(WiredSettings->DataDir + _("ihm/seqtrack/tracktype-midi.png")), wxBITMAP_TYPE_PNG);
   else
     trackTypeImage = new wxImage(wxString(WiredSettings->DataDir + _("ihm/seqtrack/tracktype-wave.png")), wxBITMAP_TYPE_PNG);
@@ -171,7 +170,7 @@ void					SeqTrack::FillChoices()
   DeviceBox->Clear();
   DeviceBox->Append(wxString(_("None")));
   DeviceBox->SetSelection(0);
-  if (IsAudio)
+  if (Type == eAudioTrack)
     {
       for (i = WiredSettings->InputChannels.begin(); i != WiredSettings->InputChannels.end(); i++)
 	{
@@ -217,8 +216,8 @@ void					SeqTrack::RebuildConnectList()
     for (itPlugin = (*itRackTrack)->Racks.begin(); itPlugin != (*itRackTrack)->Racks.end();
 	 itPlugin++, id++)
       {
-	if ((IsAudio && (*itPlugin)->IsAudio()) ||
-	    (!IsAudio && (*itPlugin)->IsMidi()))
+	if ((Type == eAudioTrack && (*itPlugin)->IsAudio()) ||
+	    (Type == eMidiTrack && (*itPlugin)->IsMidi()))
 	  {
 	    // append valid rack, and connect the menu entry to OnConnectSelected()
 	    menu->Append(id, (*itPlugin)->Name);
@@ -381,7 +380,7 @@ void					SeqTrack::SetSelected(bool sel)
   Refresh();
 }
 
-void					SeqTrack::OnNameChange(wxCommandEvent& event)
+void					SeqTrack::OnNameChange(wxCommandEvent &WXUNUSED(event))
 {
   if (ChanGui)
     ChanGui->SetLabel(Text->GetValue());
@@ -389,16 +388,17 @@ void					SeqTrack::OnNameChange(wxCommandEvent& event)
 
 void					SeqTrack::SetName(const wxString& name)
 {
+  wxCommandEvent			event;
+
   Text->SetValue(name);
-  if (ChanGui)
-    ChanGui->SetLabel(name);
+  OnNameChange(event);
 }
 
 void					SeqTrack::OnDeviceChoice(wxCommandEvent &WXUNUSED(event))
 {
   int					k = 0;
 
-  if (IsAudio)
+  if (Type == eAudioTrack)
     {
       vector<long>::iterator		i;
 
@@ -410,7 +410,7 @@ void					SeqTrack::OnDeviceChoice(wxCommandEvent &WXUNUSED(event))
 	    return;
 	  }
     }
-  else
+  else if (Type == eMidiTrack)
     {
       vector<MidiInDevice *>::iterator	i;
 
@@ -480,7 +480,7 @@ void					SeqTrack::SetDeviceId(long devid)
   int					k = 1; // + 1 for the "None" parameter
 
   DeviceId = devid; 
-  if (IsAudio)
+  if (Type == eAudioTrack)
     {
       vector<long>::iterator		i;
 
@@ -492,7 +492,7 @@ void					SeqTrack::SetDeviceId(long devid)
 	    return;
 	  }
     }
-  else
+  else if (Type == eMidiTrack)
     {
       vector<MidiInDevice *>::iterator	i;
 

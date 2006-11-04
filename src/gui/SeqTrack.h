@@ -1,16 +1,15 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
-
 #ifndef __SEQTRACK_H__
 #define __SEQTRACK_H__
 
-using namespace std;
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+   #include <wx/wx.h>
+#endif
 
-#include <list>
-#include <wx/wx.h>
+#include "Track.h"
 
 #define NONE_SELECTED_ID		(999)
 
@@ -35,7 +34,7 @@ class					SeqTrack: public wxControl
 {
  public:
   SeqTrack(long index, wxWindow *parent, const wxPoint& pos, 
-	   const wxSize& size, bool audio = true);
+	   const wxSize& size, trackType type, ChannelGui* seqview);
   ~SeqTrack();
 
   void					PropagateEvent(wxEvent &event);
@@ -74,6 +73,7 @@ class					SeqTrack: public wxControl
   Plugin				*Connected;
   RackTrack				*ConnectedRackTrack;
   int					VuValue;
+  trackType				Type;
 
  protected:
   void					OnMotion(wxMouseEvent &e);

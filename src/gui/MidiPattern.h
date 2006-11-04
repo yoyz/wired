@@ -1,9 +1,6 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
-
 #ifndef __MIDIPATTERN_H__
 #define __MIDIPATTERN_H__
 
@@ -11,16 +8,20 @@ using namespace std;
 
 #include <list>
 #include "Pattern.h"
+#include "WiredDocument.h"
 
 class				MidiTrack;
 class				MidiEvent;
 class				MidiFileEvent;
 
-class				MidiPattern: public Pattern
+class				MidiPattern : public Pattern
 {
+ private:
+  WiredDocument*		_documentParent;
+
  public:
-  MidiPattern(double pos, double endpos, long trackindex);
-  MidiPattern(double pos, MidiTrack *t, long trackindex);
+  MidiPattern(WiredDocument *parent, double pos, double endpos, long trackindex);
+  MidiPattern(WiredDocument *parent, double pos, MidiTrack *t, long trackindex);
   ~MidiPattern();
   
   void				AddEvent(MidiEvent *event);
@@ -33,13 +34,17 @@ class				MidiPattern: public Pattern
   Pattern			*CreateCopy(double pos);
   void				DrawMidi();
   void				Split(double pos);
-  
+
+  // WiredDocument implementation
+  void				Save();
+  void				Load(SaveElementArray data);
+
   vector<MidiEvent *>		Events;
   list<MidiEvent *>		temp;
   list<MidiEvent *>		RecordingEvents;  // Events being record (waits for NOTE OFF)
 
  protected:
-  void				Init();
+  void				Init(WiredDocument* parent);
   void				OnClick(wxMouseEvent &e);
   void				OnLeftUp(wxMouseEvent &e);
   void				OnDoubleClick(wxMouseEvent &e);

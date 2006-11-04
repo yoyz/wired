@@ -79,6 +79,7 @@ class				Transport : public wxPanel, WiredDocument
   void				OnPaint(wxPaintEvent &event);
   void				OnIdle(wxIdleEvent &WXUNUSED(event));
 
+  // WiredDocument implementation
   void				Save();
   void				Load(SaveElementArray data);
 

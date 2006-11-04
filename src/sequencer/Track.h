@@ -9,8 +9,20 @@
    #include <wx/wx.h>
 #endif
 
-#define IS_MIDI_TRACK			(0x0)
-#define IS_AUDIO_TRACK		      	(0x1)
+enum trackType
+  {
+    eUnknownTrack = 0,
+    eMidiTrack,
+    eAudioTrack,
+    eEndTrackType
+  };
+
+#include "SeqTrack.h"
+#include "SeqTrackPattern.h"
+#include "Pattern.h"
+#include "SequencerGui.h"
+#include "ChannelGui.h"
+
 #define MAX_AUTO_COLOURS		(16)		
 
 class					WaveFile;
@@ -21,14 +33,27 @@ class					MidiPattern;
 class					SeqTrack;
 class					SeqTrackPattern;
 class					Channel;
+class					ChannelGui;
+class					SequencerView;
 
 class					Track
 {
  private:
   long					Index;
+  trackType				Type;
+
+  SeqTrack				*TrackOpt;
+  SeqTrackPattern			*TrackPattern;
+  AudioPattern				*Wave;
+  MidiPattern				*Midi;
+  Channel				*Output;
+  ChannelGui*				ChanGui;
+
+  WiredDocument*			_documentParent;
 
  public:
-  Track(SeqTrack *n1, SeqTrackPattern *n2, char typ = IS_MIDI_TRACK); 
+  Track(WiredDocument* parentDoc, trackType type, wxPoint& pos, wxSize& size,
+	wxWindow* trackview); 
   ~Track(); 
   Track(const Track& copy) {*this = copy;}
   Track	operator=(const Track& right);
@@ -44,10 +69,19 @@ class					Track
   void					UpdateIndex(long trackindex);
   void					RefreshFullTrack();
   void					ChangeTrackColour(wxColour &c);
-  bool					IsAudioTrack() { return (Type == IS_AUDIO_TRACK); }
-  bool					IsMidiTrack() { return (Type == IS_MIDI_TRACK); }
+  bool					IsAudioTrack() { return ((Type == eAudioTrack) ? (true) : (false)); }
+  bool					IsMidiTrack() { return ((Type == eMidiTrack) ? (true) : (false)); }
 
   inline long				GetIndex() { return (Index); };
+
+  inline SeqTrack*			GetTrackOpt() { return (TrackOpt); };
+  inline AudioPattern*			GetAudioPattern() { return (Wave); };
+  inline MidiPattern*			GetMidiPattern() { return (Midi); };
+  inline SeqTrackPattern*		GetTrackPattern() { return (TrackPattern); };
+  inline Channel*			GetOutputChannel() { return (Output); };
+
+  void					SetMidiPattern(MidiPattern* mp);
+  void					SetAudioPattern(AudioPattern* ap);
 
   /**
    * This method is set only once, and just after his creation.
@@ -57,14 +91,7 @@ class					Track
    */
   inline void				SetIndex(long trackindex) { Index = trackindex; };
 
-  SeqTrack				*TrackOpt;
-  SeqTrackPattern			*TrackPattern;
-  AudioPattern				*Wave;
-  MidiPattern				*Midi;
-  Channel				*Output;
-
  protected:
-  char					Type;
   char					ColourIndex;
 };
 

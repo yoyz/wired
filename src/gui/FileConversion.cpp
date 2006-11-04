@@ -303,7 +303,7 @@ void				FileConversion::ImportWavePattern(wxString &FileName)
 //														NULL, wxPD_AUTO_HIDE | wxPD_CAN_ABORT
 //														| wxPD_REMAINING_TIME);
 //	Progress->Update(1);
-	cActionManager::Global().AddImportWaveAction(FileName, true, true);
+	cActionManager::Global().AddImportWaveAction(FileName, eAudioTrack, true);
 //	Progress->Update(80);
 	//CreateUndoRedoMenus(EditMenu); // ??
 //	Progress->Update(99);

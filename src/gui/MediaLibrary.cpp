@@ -31,10 +31,8 @@
 #include "../sequencer/Sequencer.h"
 #include "../sequencer/Track.h"
 #include "../mixer/Mixer.h"
-#include "../engine/WiredSession.h"
 #include "../midi/MidiThread.h"
 #include "../plugins/PluginLoader.h"
-#include "../xml/WiredSessionXml.h"
 #include "../dssi/WiredExternalPluginMgr.h"
 #include "FileConversion.h"
 #include <config.h>
@@ -215,7 +213,7 @@ void				MediaLibrary::OnEdit(wxCommandEvent &WXUNUSED(event))
   SeqMutex.Unlock();
   FileConverter->ConvertFromCodec(selfile);
   FileConverter->ConvertSamplerate(selfile);
-  cActionManager::Global().AddEditWaveAction(selfile, true, true);
+  cActionManager::Global().AddEditWaveAction(selfile, eAudioTrack, true);
   MidiMutex.Unlock();
   MidiDeviceMutex.Unlock();
   AudioMutex.Unlock();

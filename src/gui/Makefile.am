@@ -48,8 +48,6 @@ libgui_a_SOURCES = 			\
 		Ruler.h			\
 		SeqTrack.cpp		\
 		SeqTrack.h		\
-		SeqTrackPattern.cpp	\
-		SeqTrackPattern.h	\
 		SequencerGui.cpp	\
 		SequencerGui.h		\
 		SelectionZone.h		\
