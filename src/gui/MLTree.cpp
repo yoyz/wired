@@ -5,7 +5,7 @@
 #include <wx/wx.h>
 #include <wx/file.h>
 #include <wx/treectrl.h>
-//#include "../xml/WiredSessionXml.h"
+// #include <WiredSessionXml.h>
 #include "MediaLibrary.h"
 #include "MLTree.h"
 #include "MLTreeInfos.h"
@@ -13,7 +13,7 @@
 #include "Sequencer.h"
 #include "SequencerGui.h"
 #include "Colour.h"
-#include "WiredSession.h"
+// #include "WiredSession.h"
 #include "HelpPanel.h"
 #include "DownButton.h"
 #include "HoldButton.h"
@@ -26,11 +26,12 @@
 #include "icon5.xpm"
 #include "icon3.xpm"
 #include "delete.xpm"
+#include <SaveCenter.h>
 
-extern WiredSession	*CurrentSession;
+//extern WiredSession	*CurrentSession;
 extern MediaLibrary	*MediaLibraryPanel;
-WiredSessionXml		*CurrXmlSession = NULL;
-
+//WiredSessionXml		*CurrXmlSession = NULL;
+extern SaveCenter	*saveCenter;
 s_nodeInfo		SetStructInfos(s_nodeInfo infos, wxString label, wxString extention, wxString length)
 {
   infos.label = label;
@@ -41,11 +42,12 @@ s_nodeInfo		SetStructInfos(s_nodeInfo infos, wxString label, wxString extention,
 }
 
 MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
-  : wxTreeCtrl(MediaLibraryPanel, MLTree_Selected, p, s, style)
+  : wxTreeCtrl(MediaLibraryPanel, MLTree_Selected, p, s, style), 
+    WiredDocument(wxT("MLTree"), NULL)
 {
   SetIndent(10);
   /* Set the Root node with the project's name in label */
-  root = AddRoot(_("Project's name"));
+  root = AddRoot(saveCenter->getProjectName());
   SetItemBold(root);
 
   /* Create Image List */
@@ -106,52 +108,60 @@ MLTree::~MLTree()
 
 }
 
-void			MLTree::SaveTree(WiredSessionXml *XmlSession, wxTreeItemId parent)
+void		MLTree::SaveTree(wxTreeItemId parent, SaveElement *parentElem)
 {
   wxTreeItemIdValue	cookie;
   s_nodeInfo		infos;
   wxTreeItemId		item = GetFirstChild(parent, cookie);
   wxTreeItemId		item_last = GetLastChild(parent);
+  SaveElement		*currSaveElem = NULL;
 
   while (item.IsOk())
     {
       wxString text = GetItemText(item);
       infos = GetTreeItemStructFromId(item);
 
+      currSaveElem = new SaveElement();
+      parentElem->addChildren(currSaveElem);
+      
       if (ItemHasChildren(item))
 	{
-	  XmlSession->MyStartElement(XmlSession, _("folder"));
-	  XmlSession->MyWriteAttribute(XmlSession, _("name"), text);
-	  SaveTree(XmlSession, item);
-	  XmlSession->MyEndElement(XmlSession);
+	  currSaveElem->setKey(wxT("folder"));
+	  currSaveElem->addAttribute(wxT("name"), text);
+	  SaveTree(item, currSaveElem);
 	}
       else // no children
 	{
 	  if (infos.extention.Cmp(_("")))
 	    {
-	      XmlSession->MyStartElement(XmlSession, _("file"));
-	      XmlSession->MyWriteAttribute(XmlSession, _("name"), text);
-	      XmlSession->MyWriteAttribute(XmlSession, _("ext"), infos.extention);
-	      XmlSession->MyEndElement(XmlSession);
+	      currSaveElem->setKey(wxT("file"));
+	      currSaveElem->addAttribute(wxT("name"), text);
+	      currSaveElem->addAttribute(wxT("ext"), infos.extention);
 	    }
 	  else
 	    {
-	      XmlSession->MyStartElement(XmlSession, _("folder"));
-	      XmlSession->MyWriteAttribute(XmlSession, _("name"), text);
-	      XmlSession->MyEndElement(XmlSession);
+	      currSaveElem->setKey(wxT("folder"));
+	      currSaveElem->addAttribute(wxT("name"), text);
 	    }
 	}
       item = GetNextChild(parent, cookie);
     }
 }
 
-
-void				MLTree::SaveML()
+void				MLTree::Save()
 {
-  CurrXmlSession = new WiredSessionXml(wxString(wxT(""), *wxConvCurrent));
-  CurrXmlSession->InitSaveML();
-  SaveTree(CurrXmlSession, GetRootItem());
-  CurrXmlSession->EndSaveML();
+  SaveElement	*rootTreeSaveElem = new SaveElement();
+
+  rootTreeSaveElem->setKey(wxT("root"));
+  
+  SaveTree(GetRootItem(), rootTreeSaveElem);
+
+  saveDocData(wxT("MediaLibrary/MLTree"), rootTreeSaveElem);
+}
+
+void				MLTree::Load(SaveElementArray data)
+{
+
 }
 
 void				MLTree::AddIcon(wxImageList *images, wxIcon icon)
@@ -393,7 +403,7 @@ void				MLTree::SortNodes(wxString MLselected)
       temp = (*it).first;
       SortChildren(temp);
     }
-  SaveML();
+  saveCenter->SaveFile(this, SAVE_TREE_FILE);
 }
 
 // Return the struct associated to a node, from an ID
@@ -428,8 +438,8 @@ void				MLTree::OnAdd(wxString FileToAdd)
 	  //	  cout << "[MEDIALIBRARY] File added : " << FileToAdd <<  " Extention is : " << File->GetExt() << endl;
 	  wxFile *FileInfos = new wxFile(FileToAdd);
 	  wxString length_str;
-	  int popo = FileInfos->Length();
-	  length_str << popo;
+	  int fileInfosLength = FileInfos->Length();
+	  length_str << fileInfosLength;
 
 	  for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
 	    if (iter->Contains(File->GetExt()) == true)

@@ -38,6 +38,9 @@ class SaveElement
   inline void		addAttribute(wxString key, wxString value) 
     { _attributes[key] = value; }
   
+  inline void		addChildren(SaveElement *children)
+    { _children.Add(children); }
+
   inline wxString	getKey() { return _key; }
   inline wxString	getValue() { return _value; }
 
@@ -61,6 +64,7 @@ class SaveElement
   wxString			_key;
   wxString			_value;
   AttributesHashMap		_attributes;
+  SaveElementArray		_children;
 };
 
 #endif /*_SAVEELEMENT_H_ */

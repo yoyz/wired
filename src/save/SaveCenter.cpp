@@ -139,29 +139,29 @@ void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
   xmlFile->EndElement();
 }
 
-void		SaveCenter::WriteFile(wxString rootTag, SaveElementArray *elements)
+void		SaveCenter::WriteFile(wxString relativeFileName, 
+				      SaveElementArray *elements)
 {
   wxFileName	filename;
-  wxString	path;
   WiredXml	*xmlFile = new WiredXml();
   int		i;
   
-  filename = getProjectPath();
+  filename.Assign(getProjectPath());
 
-  //there is certainly a much nicer way to do this...
-  while(rootTag.Find('/') != -1)
+  while(relativeFileName.Find('/') != -1)
     {
-      filename.AppendDir(rootTag.BeforeFirst('/'));
-      rootTag = rootTag.AfterFirst('/');
+      filename.AppendDir(relativeFileName.BeforeFirst('/'));
+      relativeFileName = relativeFileName.AfterFirst('/');
     }
-  filename.SetName(rootTag);
+  relativeFileName = relativeFileName.BeforeFirst('.');
+  filename.SetName(relativeFileName);
   filename.SetExt(wxT(".xml"));
   
   filename.MakeAbsolute();
 
   xmlFile->CreateDocument(filename.GetFullPath());
   
-  xmlFile->StartElement(rootTag);
+  xmlFile->StartElement(relativeFileName);
   
   for (i = 0; i < elements->GetCount(); i++)
     WriteElement(elements->Item(i), xmlFile);
@@ -227,6 +227,10 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
   WiredXml		*xmlFile = new WiredXml();
   wxString		rootTag;
   SaveElementArray	ret;
+
+  wxString	nodeName;
+  int			nodeType;
+
   SaveElement		*currSaveElem;
 
   rootTag = filename.AfterLast('/');
@@ -242,19 +246,19 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
 	  nodeName = xmlFile->GetNodeName();
 	  if(nodeName != rootTag)
 	    {
-	      ret->Add(new SaveElement());
-	      currSaveElem = ret->Last();
-	      currSaveElem->SetKey(nodeName);
+	      ret.Add(new SaveElement());
+	      currSaveElem = ret.Last();
+	      currSaveElem->setKey(nodeName);
 	      
 	      //attributes handling
 	      for(int i = 0; i < xmlFile->GetAttributeCount(); i++)
-		currentSaveElem->addAttribute(xmlFile->GetAttributeName(i),
-					      xmlFile->GetAttributeValue(i));
+		currSaveElem->addAttribute(xmlFile->GetAttributeName(i),
+					   xmlFile->GetAttributeValue(i));
 	    }
 	}
       else if(nodeType == XML_READER_TYPE_TEXT)
 	{
-	  currentSaveElem->setValue(xmlFile->GetNodeValue());
+	  currSaveElem->setValue(xmlFile->GetNodeValue());
 	}
     }
   return ret;

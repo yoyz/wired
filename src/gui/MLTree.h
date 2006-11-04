@@ -7,13 +7,15 @@
 #include <vector>
 #include <map>
 #include <wx/treectrl.h>
-#include "../xml/WiredSessionXml.h"
+#include <WiredDocument.h>
+//#include "../xml/WiredSessionXml.h"
 
 using std::string;
 using std::vector;
 using std::map;
 
 #define EXT_FILE		wxT("wired_exts.conf")
+#define SAVE_TREE_FILE		wxT("MediaLibrary/MLTree")
 
 /**
  * The size of ML icon (square)
@@ -34,7 +36,7 @@ struct				s_nodeInfo
 /**
  * The MLTree class handle the tree of the MediaLibrary. It is derived from wxTreeCtrl
  */
-class				MLTree : public wxTreeCtrl
+class				MLTree : public wxTreeCtrl, public WiredDocument
 {
  public:
 /**
@@ -107,12 +109,15 @@ class				MLTree : public wxTreeCtrl
  * \param parent a wxTreeItemId
  * \return void
 */
-  void				SaveTree(WiredSessionXml *XmlSession, wxTreeItemId parent);
+  void			SaveTree(wxTreeItemId parent, SaveElement *parentElem);
 /**
  * The method used to serialize the MediaLibrary Content (calls SaveTree)
  * \return void
 */
-  void				SaveML();
+  void			Save();
+
+  void			Load(SaveElementArray data);
+
 /**
  * The function IsTreeCollapsed is used to know if the nodes are expanded or
  * not.
@@ -300,6 +305,7 @@ class				MLTree : public wxTreeCtrl
  * \return void
 */
   void				OnLeftClick(wxMouseEvent &event);
+
 /**
  * The declaration of the event table
 */

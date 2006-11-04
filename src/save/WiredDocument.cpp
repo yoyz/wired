@@ -1,6 +1,12 @@
 #include "WiredDocument.h"
 
+//Only used for debug
 #include <iostream>
+
+#include <SaveCenter.h>
+
+extern SaveCenter	*saveCenter;
+
 WiredDocument::WiredDocument(wxString name, WiredDocument *parent, bool noParent)
 {
    if (!parent && !noParent)
