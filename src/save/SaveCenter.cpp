@@ -119,6 +119,7 @@ void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements,
 
   SaveElementsHashMap::iterator	saveElementsIt;
   SaveElement			*ref = new SaveElement();
+  wxFileName			relativePath;
 
   //for each entry of the hash map....
   for (saveElementsIt = saveElements.begin();
@@ -129,7 +130,13 @@ void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements,
       {
 	//fill a SaveElement
 	ref->clear();
-	ref->setPair(wxT("reference"), saveElementsIt->first);
+	std::cerr << "[SaveCenter] trying to make path relative..." << std::endl;
+	std::cerr << "[SaveCenter] source :" << saveElementsIt->first.mb_str() << std::endl;	
+	relativePath.Assign(getPathFromRelativeTag(saveElementsIt->first));
+	std::cerr << "[SaveCenter] relativePath = " << relativePath.GetFullPath().mb_str() << std::endl;
+	relativePath.MakeRelativeTo(getProjectPath().GetPath());
+	std::cerr << "[SaveCenter] relativePath, once relative = " << relativePath.GetFullPath().mb_str() << std::endl;
+	ref->setPair(wxT("reference"), relativePath.GetFullPath());
 	//and write it.
 	WriteElement(ref, xmlFile);
       }
@@ -145,21 +152,53 @@ void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
   int				i;
   AttributesHashMap		attributes;
   AttributesHashMap::iterator	attributesIt;
+  SaveElementArray		children;
 
   attributes = elem->getAttributes();
+  std::cerr << "[SaveCenter] elem->getAttributes()" << std::endl;
 
   xmlFile->StartElement(elem->getKey());  
+  std::cerr << "[SaveCenter] startElement" << std::endl;
 
   for(attributesIt = attributes.begin();
       attributesIt != attributes.end();
       attributesIt++)
-    xmlFile->WriteAttribute(attributesIt->first, attributesIt->second, true);
-
+    {
+      xmlFile->WriteAttribute(attributesIt->first, attributesIt->second, true);
+      std::cerr << "[SaveCenter] attribute iteration" << std::endl;
+    }
   xmlFile->WriteString(elem->getValue());
+  std::cerr << "[SaveCenter] Write value" << std::endl;
   
+  children = elem->getChildren();
+  std::cerr << "[SaveCenter] get children (" << children.GetCount() << ")" << std::endl;
+  
+  for(int j = 0; j < children.GetCount(); j++)
+    {
+      std::cerr << "[SaveCenter] children iteration" << std::endl;
+      if(children.Item(j) == NULL)
+	std::cerr << "[SaveCenter] children[j] == NULL" << std::endl;
+      WriteElement(children.Item(j), xmlFile);
+    }  
   xmlFile->EndElement();
-
+  
   std::cerr << "[SaveCenter] END WriteElement" << std::endl;
+}
+
+wxFileName	SaveCenter::getPathFromRelativeTag(wxString tag)
+{
+  wxFileName	ret;
+
+  while(tag.Find('/') != -1)
+    {
+      ret.AppendDir(tag.BeforeFirst('/'));
+      tag = tag.AfterFirst('/');
+    }
+  tag = tag.BeforeFirst('.');
+  ret.SetName(tag);
+  ret.SetExt(wxT("xml"));
+
+  return ret;
 }
 
 void		SaveCenter::WriteFile(wxString relativeFileName, 
@@ -168,23 +207,29 @@ void		SaveCenter::WriteFile(wxString relativeFileName,
   std::cerr << "[SaveCenter] WriteFile" << std::endl;
 
   wxFileName	filename;
+  wxFileName	relativePath;
+  wxArrayString	dirs;
+
   WiredXml	*xmlFile = new WiredXml();
   int		i;
   
   std::cerr << "[SaveCenter] WriteFile : " << relativeFileName.mb_str() << std::endl;
 
   filename.Assign(getProjectPath());
+  relativePath = getPathFromRelativeTag(relativeFileName);
+  dirs = relativePath.GetDirs();
 
-  while(relativeFileName.Find('/') != -1)
-    {
-      filename.AppendDir(relativeFileName.BeforeFirst('/'));
-      relativeFileName = relativeFileName.AfterFirst('/');
-    }
-  relativeFileName = relativeFileName.BeforeFirst('.');
-  filename.SetName(relativeFileName);
-  filename.SetExt(wxT(".xml"));
+  for(int j = 0; j < dirs.GetCount(); j++)
+    filename.AppendDir(dirs[j]);
+
+  filename.SetName(relativePath.GetName());
+  filename.SetExt(relativePath.GetExt());
   
   filename.MakeAbsolute();
+  
+  if(!wxFileName::DirExists(filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME)))
+    wxFileName::Mkdir(filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME),
+		      0777, wxPATH_MKDIR_FULL);
 
   xmlFile->CreateDocument(filename.GetFullPath());
   

@@ -44,6 +44,8 @@ class SaveElement
   inline wxString	getKey() { return _key; }
   inline wxString	getValue() { return _value; }
 
+  inline SaveElementArray	getChildren() { return _children; }
+  
   inline wxString	getAttribute(wxString key)
     {
       if (_attributes.find(key) != _attributes.end())

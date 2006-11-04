@@ -114,6 +114,7 @@ class SaveCenter : public WiredDocument
   wxString	GetDefaultProjectName(wxFileName cwd);
   wxString	GetProjectNameFromProjectPath(wxFileName path);
 
+  wxFileName	getPathFromRelativeTag(wxString tag);
 
  private:
   
