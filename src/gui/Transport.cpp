@@ -465,42 +465,42 @@ void				Transport::Save()
 {
   wxString	s;
 
-  std::cerr << "[Save] Transport::Save()" << std::endl;
-  
+  std::cerr << "[Transport] Save()" << std::endl;
+
   SaveElement	*BPM = new SaveElement();
   s.clear();
   s << Seq->BPM;
   BPM->setKey(wxT("BPM"));
   BPM->setValue(s);
   saveDocData(WIRED_PROJECT_FILE, BPM);
-
+  
   SaveElement	*SigNum = new SaveElement();
   s.clear();
   s << Seq->SigNumerator;
   SigNum->setKey(wxT("SigNumerator"));
   SigNum->setValue(s);
-  this->saveDocData(WIRED_PROJECT_FILE, SigNum);
+  saveDocData(WIRED_PROJECT_FILE, SigNum);
 
   SaveElement	*SigDen = new SaveElement();
   s.clear();
   s << Seq->SigDenominator;
   SigDen->setKey(wxT("SigDenominator"));
   SigDen->setValue(s);
-  this->saveDocData(WIRED_PROJECT_FILE, SigDen);
+  saveDocData(WIRED_PROJECT_FILE, SigDen);
 
   SaveElement	*Click = new SaveElement();
   s.clear();
   s << Seq->Click;
   Click->setKey(wxT("Click"));
   Click->setValue(s);
-  this->saveDocData(WIRED_PROJECT_FILE, Click);
+  saveDocData(WIRED_PROJECT_FILE, Click);
 
   SaveElement	*Loop = new SaveElement();
   s.clear();
   s << Seq->Loop;
   Loop->setKey(wxT("Loop"));
   Loop->setValue(s);
-  this->saveDocData(WIRED_PROJECT_FILE, Loop);
+  saveDocData(WIRED_PROJECT_FILE, Loop);
 }
 
 void				Transport::Load(SaveElementArray data)

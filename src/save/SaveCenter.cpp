@@ -27,6 +27,8 @@ void	SaveCenter::Load(SaveElementArray)
 
 void	SaveCenter::SaveProject()
 {
+  std::cerr << "[SaveCenter] SaveProject" << std::endl;
+
   wxString	fileName;
   WiredXml	*xmlFile = new WiredXml();
 
@@ -41,12 +43,19 @@ void	SaveCenter::SaveProject()
 
   xmlFile->EndDocumentWriter();
   delete xmlFile;
+
+  std::cerr << "[SaveCenter] END SaveProject" << std::endl;
+
 }
 
 void	SaveCenter::SaveFile(WiredDocument *doc, wxString file)
 {
+  std::cerr << "[SaveCenter] SaveFile" << std::endl;
+
   doc->SaveMe();
   WriteFile(file, doc->getDocFile(file)); 
+
+  std::cerr << "[SaveCenter] END SaveFile" << std::endl;
 }
 
 void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
@@ -56,6 +65,8 @@ void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
   SaveElementsHashMap			saveElements;
   SaveElementArray			*toWrite;
   SaveElementsHashMap::iterator		saveElementsIt;
+
+  std::cerr << "[SaveCenter] SaveDocument" << std::endl;
 
   //Get our children
   childrenOfCurrentNode = currentNode->getChildren();
@@ -96,13 +107,18 @@ void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
   
   //...finish by closing things
   xmlFile->EndElement();
+
+  std::cerr << "[SaveCenter] END SaveDocument" << std::endl;
+
 }
 
 void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements, 
 				  WiredXml *xmlFile)
 {
+  std::cerr << "[SaveCenter] AddReferences" << std::endl;
+
   SaveElementsHashMap::iterator	saveElementsIt;
-  SaveElement			*ref;
+  SaveElement			*ref = new SaveElement();
 
   //for each entry of the hash map....
   for (saveElementsIt = saveElements.begin();
@@ -117,10 +133,15 @@ void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements,
 	//and write it.
 	WriteElement(ref, xmlFile);
       }
+
+  delete ref;
+  std::cerr << "[SaveCenter] END AddReferences" << std::endl;
 }
 
 void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
 {
+  std::cerr << "[SaveCenter] WriteElement" << std::endl;
+
   int				i;
   AttributesHashMap		attributes;
   AttributesHashMap::iterator	attributesIt;
@@ -137,15 +158,21 @@ void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
   xmlFile->WriteString(elem->getValue());
   
   xmlFile->EndElement();
+
+  std::cerr << "[SaveCenter] END WriteElement" << std::endl;
 }
 
 void		SaveCenter::WriteFile(wxString relativeFileName, 
 				      SaveElementArray *elements)
 {
+  std::cerr << "[SaveCenter] WriteFile" << std::endl;
+
   wxFileName	filename;
   WiredXml	*xmlFile = new WiredXml();
   int		i;
   
+  std::cerr << "[SaveCenter] WriteFile : " << relativeFileName.mb_str() << std::endl;
+
   filename.Assign(getProjectPath());
 
   while(relativeFileName.Find('/') != -1)
@@ -168,6 +195,8 @@ void		SaveCenter::WriteFile(wxString relativeFileName,
   
   xmlFile->EndElement();
   delete xmlFile;
+
+  std::cerr << "[SaveCenter] END WriteFile" << std::endl;
 }
 
 //Accessors
