@@ -41,6 +41,9 @@ class SaveElement
   inline void		addChildren(SaveElement *children)
     { _children.Add(children); }
 
+  inline bool		hasChildren()
+    { return ( _children.GetCount() > 0 ); }
+
   inline wxString	getKey() { return _key; }
   inline wxString	getValue() { return _value; }
 

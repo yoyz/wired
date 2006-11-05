@@ -119,7 +119,9 @@ void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements,
 
   SaveElementsHashMap::iterator	saveElementsIt;
   SaveElement			*ref = new SaveElement();
-  wxFileName			relativePath;
+  wxFileName			relativePath, absolutePath;
+
+  wxArrayString			dirs;
 
   //for each entry of the hash map....
   for (saveElementsIt = saveElements.begin();
@@ -130,13 +132,30 @@ void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements,
       {
 	//fill a SaveElement
 	ref->clear();
-	std::cerr << "[SaveCenter] trying to make path relative..." << std::endl;
-	std::cerr << "[SaveCenter] source :" << saveElementsIt->first.mb_str() << std::endl;	
+
+	//get the path to the file we will create later...
+	absolutePath.Assign(getProjectPath());
+
 	relativePath.Assign(getPathFromRelativeTag(saveElementsIt->first));
-	std::cerr << "[SaveCenter] relativePath = " << relativePath.GetFullPath().mb_str() << std::endl;
-	relativePath.MakeRelativeTo(getProjectPath().GetPath());
-	std::cerr << "[SaveCenter] relativePath, once relative = " << relativePath.GetFullPath().mb_str() << std::endl;
-	ref->setPair(wxT("reference"), relativePath.GetFullPath());
+	dirs = relativePath.GetDirs();
+	
+	for(int j = 0; j < dirs.GetCount(); j++)
+	  absolutePath.AppendDir(dirs[j]);
+	
+	absolutePath.SetName(relativePath.GetName());
+	absolutePath.SetExt(relativePath.GetExt());
+
+	absolutePath.MakeRelativeTo(getProjectPath().GetPath());
+
+	
+// 	std::cerr << "[SaveCenter] trying to make path relative..." << std::endl;
+// 	std::cerr << "[SaveCenter] source :" << saveElementsIt->first.mb_str() << std::endl;	
+// 	std::cerr << "[SaveCenter] relativePath = " << relativePath.GetFullPath().mb_str() << std::endl;
+
+// 	std::cerr << "[SaveCenter] projectPath = " << getProjectPath().GetPath().mb_str() << std::endl;	
+
+// 	std::cerr << "[SaveCenter] relativePath, once relative = " << relativePath.GetFullPath().mb_str() << std::endl;
+	ref->setPair(wxT("reference"), absolutePath.GetFullPath());
 	//and write it.
 	WriteElement(ref, xmlFile);
       }
@@ -209,6 +228,7 @@ void		SaveCenter::WriteFile(wxString relativeFileName,
   wxFileName	filename;
   wxFileName	relativePath;
   wxArrayString	dirs;
+  wxString	rootTag;
 
   WiredXml	*xmlFile = new WiredXml();
   int		i;
@@ -232,8 +252,11 @@ void		SaveCenter::WriteFile(wxString relativeFileName,
 		      0777, wxPATH_MKDIR_FULL);
 
   xmlFile->CreateDocument(filename.GetFullPath());
+
+  rootTag = filename.GetName();
+  std::cerr << "[SaveCenter] rootTag = " << rootTag.mb_str() << std::endl;
   
-  xmlFile->StartElement(relativeFileName);
+  xmlFile->StartElement(rootTag);
   
   for (i = 0; i < elements->GetCount(); i++)
     WriteElement(elements->Item(i), xmlFile);
@@ -295,23 +318,42 @@ void		SaveCenter::setProjectName(wxString projectName)
 
 }
 
+
+
 //This method really looks like LoadProject... maybe we could do something...
 SaveElementArray	SaveCenter::LoadFile(wxString filename)
 {
   WiredXml		*xmlFile = new WiredXml();
   wxString		rootTag;
   SaveElementArray	ret;
+  SaveElementArray	history;
 
-  wxString	nodeName;
+  wxFileName		absoluteFilename, relativeFilename;
+  wxArrayString		dirs;
+
+  wxString		nodeName;
   int			nodeType;
 
   SaveElement		*currSaveElem;
 
-  rootTag = filename.AfterLast('/');
-  rootTag = filename.BeforeLast('.');
 
-  xmlFile->OpenDocument(filename);
+  //Filename management
+  absoluteFilename.Assign(getProjectPath());
+  relativeFilename.Assign(filename);
 
+  dirs = relativeFilename.GetDirs();
+  
+  for(int i = 0; i < dirs.GetCount(); i++)
+    absoluteFilename.AppendDir(dirs.Item(i));
+
+  absoluteFilename.SetName(relativeFilename.GetName());
+  absoluteFilename.SetExt(relativeFilename.GetExt());
+  
+  xmlFile->OpenDocument(absoluteFilename.GetFullPath());
+
+  rootTag = absoluteFilename.GetName();
+
+  //data management
   while(xmlFile->Read())
     {
       nodeType = xmlFile->GetNodeType();
@@ -320,19 +362,31 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
 	  nodeName = xmlFile->GetNodeName();
 	  if(nodeName != rootTag)
 	    {
-	      ret.Add(new SaveElement());
-	      currSaveElem = ret.Last();
+	      currSaveElem = new SaveElement();
+	      
+	      std::cerr << "[SaveCenter] xmlFile->GetDepth() = " << xmlFile->GetDepth() << std::endl;
+
+	      if(xmlFile->GetDepth() <= 1)
+		ret.Add(currSaveElem);
+	      else
+		history.Last()->addChildren(currSaveElem);
 	      currSaveElem->setKey(nodeName);
 	      
 	      //attributes handling
 	      for(int i = 0; i < xmlFile->GetAttributeCount(); i++)
 		currSaveElem->addAttribute(xmlFile->GetAttributeName(i),
 					   xmlFile->GetAttributeValue(i));
+
+	      history.Add(currSaveElem);
 	    }
 	}
       else if(nodeType == XML_READER_TYPE_TEXT)
 	{
 	  currSaveElem->setValue(xmlFile->GetNodeValue());
+	}
+      else if(nodeType == XML_READER_TYPE_END_ELEMENT)
+	{
+	  history.RemoveAt(history.GetCount() - 1);
 	}
     }
   return ret;

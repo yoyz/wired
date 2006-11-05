@@ -260,6 +260,8 @@ class WiredXml
 	wxString			GetAttributeName(int no);
 	wxString			GetAttributeValue(int no);
 	
+	bool				HasChildren();
+	int				GetDepth();
 
 	/** Gets the node type of the current node.
 	 * This is mainly a call to xmlTextReaderNodeType. <br>

@@ -117,6 +117,8 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
   void			Save();
 
   void			Load(SaveElementArray data);
+  
+  void			LoadItem(wxTreeItemId parent, SaveElement *parentData);
 
 /**
  * The function IsTreeCollapsed is used to know if the nodes are expanded or
@@ -162,11 +164,11 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
  * \param ParentNode a wxTreeItemId corresponding to the parent node of the
  * new node.
  * \param wxString FileToAdd the full path to the file to add
- * \param infosx a s_nodeInfo struct used to hold informations about the file
+ * \param infos a s_nodeInfo struct used to hold informations about the file
  * \param expand, a boolean used to expand or not the new node
- * \return void
+ * \return the wxTreeItemId of the newly added tree item.
 */
-  void				AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_nodeInfo infos, bool expand);
+  wxTreeItemId			AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_nodeInfo infos, bool expand);
 /**
  * The ExpandAll function sets all the existing nodes to the state expanded 
  * \param Tree, a wxTreeCtrl which is the tree to expand

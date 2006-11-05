@@ -400,3 +400,25 @@ wxString		WiredXml::GetAttributeName(int no)
 
   return ret;
 }
+
+bool			WiredXml::HasChildren()
+{
+  xmlNodePtr	currNode;
+  
+  if(_DocumentFile)
+    {
+      currNode = xmlTextReaderCurrentNode(_DocumentFile);
+
+      return (currNode->children == NULL);
+    }
+  else
+    return false;
+}
+
+int			WiredXml::GetDepth()
+{
+  if(_DocumentFile)
+    return xmlTextReaderDepth(_DocumentFile);
+  else 
+    return -1;
+}

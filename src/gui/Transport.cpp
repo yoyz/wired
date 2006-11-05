@@ -513,8 +513,6 @@ void				Transport::Load(SaveElementArray data)
   std::cerr << "[Transport] Load()" << std::endl; 
   for(i = 0; i < data.GetCount(); i++)
     {
-      std::cerr << "[Transport] key = " << data[i]->getKey() << std::endl;
-      std::cerr << "[Transport] value = " << data[i]->getValue() << std::endl;
       if(data[i]->getKey() == wxT("BPM"))
 	{
 	  s = data[i]->getValue();
