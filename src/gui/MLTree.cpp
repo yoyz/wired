@@ -131,7 +131,7 @@ void		MLTree::SaveTree(wxTreeItemId parent, SaveElement *parentElem)
 	  currSaveElem->setKey(wxT("folder"));
 	  currSaveElem->addAttribute(wxT("name"), text);
 	  if(IsExpanded(item))
-	    currSaveElem->addAttribute(wxT("is_expanded"), wxT("true"));
+	      currSaveElem->addAttribute(wxT("is_expanded"), wxT("true"));
 	  else
 	    currSaveElem->addAttribute(wxT("is_expanded"), wxT("false"));
 	  
@@ -181,7 +181,6 @@ void				MLTree::Load(SaveElementArray data)
   SaveElementArray	treeData;
   wxString		treeFile;
   SaveElement		*rootSaveElem;
-  
 
   DeleteAllItems();
 
@@ -210,9 +209,11 @@ void				MLTree::Load(SaveElementArray data)
 	  LoadItem(GetRootItem(), rootSaveElem);
 	}
     }
+  Expand(root);
 }
 
-void				MLTree::LoadItem(wxTreeItemId parent, SaveElement *parentData)
+void				MLTree::LoadItem(wxTreeItemId parent, 
+						 SaveElement *parentData)
 {
   SaveElementArray	saveElemChildren;
   int			i;
@@ -236,12 +237,17 @@ void				MLTree::LoadItem(wxTreeItemId parent, SaveElement *parentData)
 	  infos = SetStructInfos(infos,
 				 currSaveElem->getAttribute(wxT("name")),
 				 wxT(""), wxT(""));
-	  if(currSaveElem->getAttribute(wxT("expand")) == wxT("true"))
+	  if(currSaveElem->getAttribute(wxT("is_expanded")) == wxT("true"))
 	    expand = true;
 	  else
 	    expand = false;
 
 	  next = AddFile(parent, infos.label, infos, expand); 
+	  if(expand)
+	    SetItemImage(next, 1);
+	  else
+	    SetItemImage(next, 0);
+
 	  if(next.IsOk())
 	    std::cerr << "[MLTree] next is ok" << std::cerr;
 	  LoadItem(next, currSaveElem);
@@ -253,8 +259,11 @@ void				MLTree::LoadItem(wxTreeItemId parent, SaveElement *parentData)
 				 currSaveElem->getAttribute(wxT("infos_label")),
 				 currSaveElem->getAttribute(wxT("infos_ext")),
 				 currSaveElem->getAttribute(wxT("infos_length"))); 
-	  AddFile(parent, infos.label, infos, false);
+	  AddFile(parent, currSaveElem->getAttribute(wxT("name")), infos, false);
+	  SetItemImage(next, 3);
 	}
+      if(parentData->getAttribute(wxT("is_expanded")) == wxT("true"))
+	 Expand(parent);
     }
 
 }
