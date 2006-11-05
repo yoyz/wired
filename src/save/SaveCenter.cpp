@@ -1,6 +1,6 @@
 #include "SaveCenter.h"
 
-SaveCenter::SaveCenter(wxFileName  projectPath,
+SaveCenter::SaveCenter(wxFileName  projectPath)
   : WiredDocument(wxT("savecenter"), NULL, true)
 {
   setProjectPath(projectPath);

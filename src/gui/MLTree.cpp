@@ -195,19 +195,11 @@ void				MLTree::Load(SaveElementArray data)
   if(treeData.GetCount() > 0)
     {
       rootSaveElem = treeData.Item(0);
-      std::cerr << "[MLTree] rootSaveElem->getKey() = " << rootSaveElem->getKey().mb_str() << std::endl;
-
       while(rootSaveElem->getKey() != wxT("root") && rootSaveElem->hasChildren())
-	{
-	  rootSaveElem = rootSaveElem->getChildren().Item(0);
-	  std::cerr << "[MLTree] rootSaveElem->getKey() = " << rootSaveElem->getKey().mb_str() << std::endl;
-	}
+	rootSaveElem = rootSaveElem->getChildren().Item(0);
 
       if(rootSaveElem->getKey() == wxT("root"))
-	{
-	  std::cerr << "[MLTree] rootSaveElem" << std::endl;
-	  LoadItem(GetRootItem(), rootSaveElem);
-	}
+	LoadItem(GetRootItem(), rootSaveElem);
     }
   Expand(root);
 }

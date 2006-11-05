@@ -34,7 +34,10 @@ class SaveElement
    */
   inline SaveElement(SaveElement &copy):
     _attributes(copy.getAttributes()), _key(copy.getKey()), _value(copy.getValue())
-    {      
+    { 
+      SaveElementArray	children = copy.getChildren();
+      for(int i; i < children.GetCount(); i ++)
+	addChildren(new SaveElement(*(children.Item(i))));
     }
 
   /** Destructor. */
@@ -115,7 +118,7 @@ class SaveElement
   inline void		clearAttributes() { _attributes.clear(); }
   /** Clears the whole SaveElement. */
   inline void		clear() 
-    { _key.Clear(); _value.Clear(); clearAttributes(); _children.clear() }
+    { _key.Clear(); _value.Clear(); clearAttributes(); _children.clear(); }
 
   /** Attributes getter.
    * \return The whole attribute HashMap.
