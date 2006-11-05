@@ -18,10 +18,21 @@ class					AudioPattern: public Pattern, public WaveDrawer
   WiredDocument*			_documentParent;
 
  public:
+  Channel*				InputChan;
+  long					LastBlock;
+  wxString				FileName;
+
+ public:
   AudioPattern(WiredDocument *parent, double pos, double endpos, long trackindex);
   AudioPattern(WiredDocument *parent, double pos, WaveFile *w, long trackindex);
   ~AudioPattern();
-  
+
+  AudioPattern				operator=(const AudioPattern& right);
+
+ private:
+  void					Init(WaveFile *w, WiredDocument* parent);
+
+ public:  
   float					**GetBlock(long block);
   void					Update();
   void					SetSelected(bool sel);
@@ -38,17 +49,8 @@ class					AudioPattern: public Pattern, public WaveDrawer
   Pattern				*CreateCopy(double pos);
   
   // WiredDocument implementation
-  void				Save();
-  void				Load(SaveElementArray data);
-
-  AudioPattern				operator=(const AudioPattern& right);
-
-  Channel				*InputChan;
-  long					LastBlock;
-  wxString				FileName;
-
- private:
-  void					Init(WaveFile *w, WiredDocument* parent);
+  void					Save();
+  void					Load(SaveElementArray data);
 
  protected:
   void					OnClick(wxMouseEvent &e);

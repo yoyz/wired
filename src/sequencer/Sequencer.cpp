@@ -27,10 +27,9 @@
 using namespace	std;
 
 Sequencer::Sequencer(WiredDocument* docParent)
-  : wxThread()
+  : wxThread(),
+    WiredDocument(wxT("Sequencer"), docParent)
 {
-  _documentParent = docParent;
-
   Init();
   try
     {
@@ -495,7 +494,7 @@ void					Sequencer::PrepareTrackForRecording(Track *T)
   type = Audio->GetLibSndFileFormat();
   if (T->IsAudioTrack())
     {
-      T->SetAudioPattern(new AudioPattern(_documentParent, CurrentPos,
+      T->SetAudioPattern(new AudioPattern((WiredDocument*)T, CurrentPos,
 					  CurrentPos + 0.1, T->GetIndex()));
       if (!T->GetAudioPattern()->PrepareRecord(type))
 	{
@@ -509,7 +508,7 @@ void					Sequencer::PrepareTrackForRecording(Track *T)
     }
   else if (T->IsMidiTrack())
     {
-      T->SetMidiPattern(new MidiPattern(_documentParent, CurrentPos,
+      T->SetMidiPattern(new MidiPattern((WiredDocument*)T, CurrentPos,
 					CurrentPos + 0.1, T->GetIndex()));
       T->GetTrackPattern()->Patterns.push_back(T->GetMidiPattern());
     }  
@@ -866,8 +865,7 @@ void					Sequencer::AddMidiPattern(list<SeqCreateEvent *> *l,
       t = SeqPanel->AddTrack(eMidiTrack);
       t->GetTrackOpt()->ConnectTo(plug);
     }
-  p = new MidiPattern(_documentParent, CurrentPos, CurrentPos,
-		      t->GetTrackOpt()->Index - 1);
+  p = new MidiPattern((WiredDocument*)t, CurrentPos, CurrentPos, t->GetTrackOpt()->Index - 1);
   for (j = l->begin(); j != l->end(); j++)
     {
       e = new MidiEvent(0, (*j)->Position, (*j)->MidiMsg);
@@ -1052,4 +1050,14 @@ void                    Sequencer::OnExit()
   if (threads.IsEmpty())
     wxGetApp().m_condAllDone->Signal();
   cout << "[SEQ] Thread terminated" << endl;
+}
+
+void			Sequencer::Load(SaveElementArray data)
+{
+
+}
+
+void			Sequencer::Save()
+{
+
 }

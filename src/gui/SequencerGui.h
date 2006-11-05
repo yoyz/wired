@@ -191,7 +191,7 @@ class				CursorEvent: public wxEvent
   virtual wxEvent*		Clone() const { return new CursorEvent(*this); }
 };
 
-class				SequencerGui: public wxPanel
+class				SequencerGui: public wxPanel, public WiredDocument
 {
   friend class			Pattern;
   friend class			AudioPattern;
@@ -238,8 +238,6 @@ class				SequencerGui: public wxPanel
   wxColour			BrushColor;
   wxColour			PenColor;
   ColoredBox			*ColorBox;
-
-  WiredDocument*		_documentParent;
 
  public:
   SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size,
@@ -308,6 +306,10 @@ class				SequencerGui: public wxPanel
   void				OnColoredBoxClick(wxCommandEvent &event);
   void				Drop(int x, int y, wxString file);
   //bool				Floating;
+
+  // WiredDocument things
+  void				Save();
+  void				Load(SaveElementArray data);
 
   double			CurrentPos;
 

@@ -8,10 +8,9 @@
 #ifndef WX_PRECOMP
    #include <wx/wx.h>
 #endif
+
 #include <list>
 #include "WaveFile.h"
-
-using std::list;
 
 class AudioCenter
 {
@@ -19,11 +18,11 @@ class AudioCenter
   AudioCenter();
   ~AudioCenter();
 
-  WaveFile *AddWaveFile(wxString filename);
-  void		RemoveWaveFile(WaveFile *File);
-  void	    Clear();
+  WaveFile*		AddWaveFile(wxString filename);
+  void			RemoveWaveFile(WaveFile *File);
+  void			Clear();
 
-  list<WaveFile *> WaveFiles;
+  std::list<WaveFile *> WaveFiles;
 };
 
 extern AudioCenter WaveCenter;

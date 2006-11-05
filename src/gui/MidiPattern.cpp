@@ -18,17 +18,16 @@ BEGIN_EVENT_TABLE(MidiPattern, wxWindow)
   EVT_PAINT(MidiPattern::OnPaint)
 END_EVENT_TABLE()
 
-
 static int midi_pattern_count = 1;
 
 MidiPattern::MidiPattern(WiredDocument *parent, double pos, double endpos, long trackindex)
-  : Pattern(parent, pos, endpos, trackindex)
+  : Pattern(parent, wxT("MidiPattern"), pos, endpos, trackindex)
 {
   Init(parent);
 }
 
 MidiPattern::MidiPattern(WiredDocument *parent, double pos, MidiTrack *t, long trackindex)
-  : Pattern(parent, pos, ((double) t->GetMaxPos()) / (Seq->SigNumerator * t->GetPPQN()), trackindex)
+  : Pattern(parent, wxT("MidiPattern"), pos, ((double) t->GetMaxPos()) / (Seq->SigNumerator * t->GetPPQN()), trackindex)
 {
   vector<MidiFileEvent *>		me;
   unsigned long				i;
@@ -50,7 +49,6 @@ void					MidiPattern::Init(WiredDocument* parent)
 {
   wxString	s;
 
-  _documentParent = parent;
   s.Printf(wxT("T%d M%d"), TrackIndex + 1, midi_pattern_count++);
   PenColor = CL_MIDI_DRAW;
   BrushColor = CL_MIDIDRAWER_BRUSH;

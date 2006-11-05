@@ -36,7 +36,7 @@ class					Channel;
 class					ChannelGui;
 class					SequencerView;
 
-class					Track
+class					Track : public WiredDocument
 {
  private:
   long					Index;
@@ -49,13 +49,10 @@ class					Track
   Channel				*Output;
   ChannelGui*				ChanGui;
 
-  WiredDocument*			_documentParent;
-
  public:
   Track(WiredDocument* parentDoc, trackType type, wxPoint& pos, wxSize& size,
 	wxWindow* trackview); 
   ~Track(); 
-  Track(const Track& copy) {*this = copy;}
   Track	operator=(const Track& right);
 
   void					Dump();
@@ -82,6 +79,10 @@ class					Track
 
   void					SetMidiPattern(MidiPattern* mp);
   void					SetAudioPattern(AudioPattern* ap);
+
+  // WiredDocument implementation
+  void					Save();
+  void					Load(SaveElementArray data);
 
   /**
    * This method is set only once, and just after his creation.

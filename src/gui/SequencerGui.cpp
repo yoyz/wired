@@ -401,11 +401,10 @@ void					SequencerView::DrawTrackLines(wxDC &dc)
 
 SequencerGui::SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size,
 			   wxWindow *mainwindow, WiredDocument* docParent)
-  : wxPanel(parent, -1, pos, size, wxSIMPLE_BORDER | wxWS_EX_PROCESS_IDLE)
+  : wxPanel(parent, -1, pos, size, wxSIMPLE_BORDER | wxWS_EX_PROCESS_IDLE),
+    WiredDocument(wxT("SequencerGui"), docParent)
 {
-  _documentParent = docParent;
-
-  wxSize				s;
+ wxSize				s;
   wxSize				v;
   wxBoxSizer				*zer_1;
   wxBoxSizer				*zer_2;
@@ -561,7 +560,7 @@ Track					*SequencerGui::AddTrack(trackType type)
 		    (long) floor(CurrentYScrollPos));
   wxSize	size(TRACK_WIDTH, (long) floor(TRACK_HEIGHT * VertZoomFactor));
 
-  newTrack = new Track(_documentParent, type, pos, size, TrackView);
+  newTrack = new Track(this, type, pos, size, TrackView);
 
   UpdateTracks();
   SeqPanel->SetScrolling();
@@ -1346,6 +1345,17 @@ void					SequencerGui::Drop(int x, int y, wxString file)
 
   SeqView->Drop(x, y, file);
   
+}
+
+// WiredDocument implementation
+void					SequencerGui::Save()
+{
+
+}
+
+void					SequencerGui::Load(SaveElementArray data)
+{
+
 }
 
 /*

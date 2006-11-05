@@ -17,9 +17,9 @@
 #include "Ruler.h"
 #include "AccelCenter.h"
 
-Pattern::Pattern(WiredDocument *parent, double pos, double endpos, long trackindex) :
+Pattern::Pattern(WiredDocument *parent, wxString name, double pos, double endpos, long trackindex) :
   wxWindow(SeqPanel->SeqView, -1, wxPoint(0, 0), wxSize(0, 0)),
-  WiredDocument(wxT("Pattern"), parent)
+  WiredDocument(name, parent)
 {
 #ifdef __DEBUG__
   printf("Pattern::Pattern(%f, %f, %d)\n", pos, endpos, trackindex);

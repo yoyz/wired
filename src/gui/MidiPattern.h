@@ -4,8 +4,7 @@
 #ifndef __MIDIPATTERN_H__
 #define __MIDIPATTERN_H__
 
-using namespace std;
-
+#include <vector>
 #include <list>
 #include "Pattern.h"
 #include "WiredDocument.h"
@@ -23,7 +22,7 @@ class				MidiPattern : public Pattern
   MidiPattern(WiredDocument *parent, double pos, double endpos, long trackindex);
   MidiPattern(WiredDocument *parent, double pos, MidiTrack *t, long trackindex);
   ~MidiPattern();
-  
+
   void				AddEvent(MidiEvent *event);
   void				AddEvent(MidiFileEvent *event);
   void				Update();
@@ -39,9 +38,9 @@ class				MidiPattern : public Pattern
   void				Save();
   void				Load(SaveElementArray data);
 
-  vector<MidiEvent *>		Events;
-  list<MidiEvent *>		temp;
-  list<MidiEvent *>		RecordingEvents;  // Events being record (waits for NOTE OFF)
+  std::vector<MidiEvent *>	Events;
+  std::list<MidiEvent *>	temp;
+  std::list<MidiEvent *>	RecordingEvents;  // Events being record (waits for NOTE OFF)
 
  protected:
   void				Init(WiredDocument* parent);
@@ -55,7 +54,7 @@ class				MidiPattern : public Pattern
   void				OnPaint(wxPaintEvent &e);
   void				OnHelp(wxMouseEvent &event);
 
-  vector<MidiEvent *>		*GetEvents() { return (&Events); };
+  std::vector<MidiEvent *>	*GetEvents() { return (&Events); };
   wxBitmap			*Bmp;
   wxMemoryDC			memDC;
   unsigned short		ppqn;

@@ -73,10 +73,9 @@ class ChanBuf
 
 /** This class handles the sequencer.
  */
-class Sequencer : public wxThread
+class Sequencer : public wxThread, public WiredDocument
 {
  private:
-  WiredDocument*	_documentParent;
 
  public:
 
@@ -89,6 +88,12 @@ class Sequencer : public wxThread
 
   /** Default destructor. */
   ~Sequencer();
+
+  /**
+   * Saving implementation
+   */
+  void					Load(SaveElementArray data);
+  void					Save();
   
   /** Init basic vars */
   void					Init();

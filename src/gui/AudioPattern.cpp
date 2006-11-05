@@ -23,14 +23,14 @@ static long				audio_pattern_count = 1;
 extern SaveCenter	*saveCenter;
 
 AudioPattern::AudioPattern(WiredDocument *parent, double pos, double endpos, long trackindex)
-  : Pattern(parent, pos, endpos, trackindex),
+  : Pattern(parent, wxT("AudioPattern"), pos, endpos, trackindex),
     WaveDrawer(Pattern::GetSize())
 {
   Init(NULL, parent);
 }
 
 AudioPattern::AudioPattern(WiredDocument *parent, double pos, WaveFile *w, long trackindex)
-  : Pattern(parent, pos, pos + Seq->MeasurePerSample * w->GetNumberOfFrames(), trackindex),
+  : Pattern(parent,wxT("AudioPattern"), pos, pos + Seq->MeasurePerSample * w->GetNumberOfFrames(), trackindex),
     WaveDrawer(Pattern::GetSize())
 {
   Init(w, parent);
@@ -446,10 +446,20 @@ void					AudioPattern::SetSize(wxSize s)
 
 void				AudioPattern::Save()
 {
-  
+  cout << "Audio PATTERN SAVING" << endl;
+  SaveElement*			saved;
+
+  saved = new SaveElement(wxT("filename"), FileName);
+  saveDocData(WIRED_PROJECT_FILE, saved);
 }
 
 void				AudioPattern::Load(SaveElementArray data)
 {
-  
+  int				i;
+
+  for (i = 0; i < data.GetCount(); i++)
+    {
+      if (data[i]->getKey() == wxT("filename"))
+	FileName = data[i]->getValue();
+    }
 }

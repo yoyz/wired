@@ -38,11 +38,9 @@ wxColour				PatternColours[MAX_AUTO_COLOURS] =
   };
 
 Track::Track(WiredDocument* parentDoc, trackType type,
-	     wxPoint& pos, wxSize& size, wxWindow* TrackView)
+	     wxPoint& pos, wxSize& size, wxWindow* TrackView) : 
+  WiredDocument(wxT("track"), parentDoc)
 {
-  // saving related informations
-  _documentParent = parentDoc;
-
   // basic initialization
   Wave = 0x0;
   Midi = 0x0;
@@ -132,7 +130,7 @@ AudioPattern					*Track::AddPattern(WaveFile *w, double pos)
 #ifdef __DEBUG__
   printf("Track::AddPattern(%d, %f) -- START (AUDIO) Index=%d\n", w, pos, Index);
 #endif
-  a = new AudioPattern(_documentParent, pos, w, Index);
+  a = new AudioPattern(this, pos, w, Index);
   a->SetDrawColour(PatternColours[ColourIndex]);
 
   SeqMutex.Lock();
@@ -181,7 +179,7 @@ MidiPattern					*Track::AddPattern(MidiTrack *t)
 #ifdef __DEBUG__
   printf("Track::AddPattern(%d) -- START (MIDI)\n", t);
 #endif
-  a = new MidiPattern(_documentParent, 0, t, Index);
+  a = new MidiPattern(this, 0, t, Index);
   a->SetDrawColour(PatternColours[ColourIndex]);
   SeqMutex.Lock();
   TrackPattern->Patterns.push_back(a);
@@ -249,4 +247,15 @@ void						Track::SetAudioPattern(AudioPattern* ap)
   if (Wave)
     delete Wave;
   Wave = ap;
+}
+
+// WiredDocument implementation
+void						Track::Save()
+{
+
+}
+
+void						Track::Load(SaveElementArray data)
+{
+
 }

@@ -4,13 +4,10 @@
 #ifndef __PATTERN_H__
 #define __PATTERN_H__
 
-#include <vector>
 #include <wx/string.h>
 #include <wx/wx.h>
 
 #include "WiredDocument.h"
-
-using namespace				std;
 
 #define PATTERN_DRAG_SCROLL_UNIT	(MEASURE_WIDTH + 1)
 #define PATTERN_NAME_WIDTH		(42)
@@ -32,7 +29,6 @@ class					MidiEvent;
 class					Pattern : public wxWindow, public WiredDocument
 {
  protected:
-  Pattern(WiredDocument *parent) : WiredDocument(wxT("Pattern"), parent){};
 
   virtual void				OnClick(wxMouseEvent &e);
   virtual void				OnLeftUp(wxMouseEvent &e);
@@ -113,7 +109,7 @@ class					Pattern : public wxWindow, public WiredDocument
    * \param endpos a  double,the end position of pattern.
    * \param trackindex a long,the index of track.
    */
-  Pattern(WiredDocument *parent, double pos, double endpos, long trackindex);
+  Pattern(WiredDocument *parent, wxString name, double pos, double endpos, long trackindex);
 //  Pattern(const Pattern& copy){*this = copy;};
   virtual ~Pattern();
 
