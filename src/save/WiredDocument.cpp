@@ -81,3 +81,8 @@ SaveElementArray	*WiredDocument::getDocFile(wxString file)
 {
   return _dataSave[file];
 }
+
+SaveElementArray	WiredDocument::AskData(wxString filename)
+{
+  return saveCenter->LoadFile(filename);
+}

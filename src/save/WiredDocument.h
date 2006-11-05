@@ -77,6 +77,14 @@ class WiredDocument
 
  protected:
 
+  /** Gets data from an external xml file.
+   * When implementing a WiredDocument, you can the path to those files in the
+   * "reference" SaveElements passed to Load().
+   * \param filename the path to the external file.
+   * \return The data contained in the external file.
+   */
+  SaveElementArray		AskData(wxString filename);
+
   /** Adds data that will be saved.
    * When implementing a WiredDocument, one has to instanciate on SaveElement per call
    * to this function, but does not have to worry about deleting it.

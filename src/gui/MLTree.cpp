@@ -190,8 +190,7 @@ void				MLTree::Load(SaveElementArray data)
   ref = data.Item(0);
   treeFile = ref->getValue();
 
-  treeData = saveCenter->LoadFile(treeFile);
-
+  treeData = AskData(treeFile);
   if(treeData.GetCount() > 0)
     {
       rootSaveElem = treeData.Item(0);

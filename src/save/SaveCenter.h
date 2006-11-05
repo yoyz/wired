@@ -29,6 +29,8 @@ class SaveCenter : public WiredDocument
    * be assigned.
    */
   SaveCenter(wxFileName projectPath = wxString(wxT("")));
+
+  /** Destructor. */
   ~SaveCenter();
 
   /** Main Save function, implementation of WiredDocument.
@@ -88,8 +90,15 @@ class SaveCenter : public WiredDocument
    */
   void		SaveFile(WiredDocument *doc, wxString file);
 
+  /** Main function to call when loading a saved project.
+   * It loads the project designated by getProjectPath().
+   */
   void			LoadProject();
 
+  /** Gets data from an external file.
+   * \param filename the path to the external file.
+   * \return The data contained in the external file.
+   */
   SaveElementArray	LoadFile(wxString filename);
 
  private:
