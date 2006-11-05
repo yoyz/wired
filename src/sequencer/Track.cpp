@@ -51,6 +51,12 @@ Track::Track(WiredDocument* parentDoc, trackType type,
 
   ColourIndex = (AudioTrackCount + MidiTrackCount - 1) % MAX_AUTO_COLOURS;
 
+  // relative to the header of track (mostly GUI)
+  TrackOpt = new SeqTrack(Seq->Tracks.size() + 1, TrackView, pos, size, type);
+
+  // list of patterns in the track
+  TrackPattern = new SeqTrackPattern();
+
   // mixer output 
   if (IsAudioTrack())
     Output = Mix->AddStereoOutputChannel(true);
@@ -62,16 +68,11 @@ Track::Track(WiredDocument* parentDoc, trackType type,
     {
       ChanGui = MixerPanel->AddChannel(Output, TrackOpt->Text->GetValue());
       ChanGui->SetOpt(TrackOpt);
+      TrackOpt->SetChannelGui(ChanGui);
     }
   else
     ChanGui = NULL;
 
-  // relative to the header of track (mostly GUI)
-  TrackOpt = new SeqTrack(Seq->Tracks.size() + 1, TrackView, pos, size,
-			  type, ChanGui);
-
-  // list of patterns in the track
-  TrackPattern = new SeqTrackPattern();
 
   // add itself to sequencer management
   Seq->AddTrack(this);

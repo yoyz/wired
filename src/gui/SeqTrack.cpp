@@ -27,13 +27,13 @@ int				MidiTrackCount = 0;
 SeqTrack::SeqTrack(long index, wxWindow *parent, 
 		   const wxPoint& pos = wxDefaultPosition, 
 		   const wxSize& size = wxDefaultSize,
-		   trackType type = eAudioTrack, ChannelGui* seqview = NULL)
+		   trackType type = eAudioTrack)
   : wxControl(parent, -1, pos, size)
 {
   wxString	str;
 
   Index = index;
-  ChanGui = seqview;
+  ChanGui = NULL;
   Connected = 0x0;
   ConnectedRackTrack = 0x0;
   Type = type;

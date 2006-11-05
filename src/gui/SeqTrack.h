@@ -34,8 +34,11 @@ class					SeqTrack: public wxControl
 {
  public:
   SeqTrack(long index, wxWindow *parent, const wxPoint& pos, 
-	   const wxSize& size, trackType type, ChannelGui* seqview);
+	   const wxSize& size, trackType type);
   ~SeqTrack();
+
+  inline void				SetChannelGui(ChannelGui* chan)
+  { ChanGui = chan; };
 
   void					PropagateEvent(wxEvent &event);
   void					RebuildConnectList();
