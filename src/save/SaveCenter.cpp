@@ -1,8 +1,7 @@
 #include "SaveCenter.h"
 
 SaveCenter::SaveCenter(wxFileName  projectPath,
-		       WiredDocument *docParent)
-  : WiredDocument(wxT("savecenter"), docParent, true)
+  : WiredDocument(wxT("savecenter"), NULL, true)
 {
   setProjectPath(projectPath);
   _audioDir = _projectPath;
@@ -27,8 +26,6 @@ void	SaveCenter::Load(SaveElementArray)
 
 void	SaveCenter::SaveProject()
 {
-  std::cerr << "[SaveCenter] SaveProject" << std::endl;
-
   wxString	fileName;
   WiredXml	*xmlFile = new WiredXml();
 
@@ -43,19 +40,12 @@ void	SaveCenter::SaveProject()
 
   xmlFile->EndDocumentWriter();
   delete xmlFile;
-
-  std::cerr << "[SaveCenter] END SaveProject" << std::endl;
-
 }
 
 void	SaveCenter::SaveFile(WiredDocument *doc, wxString file)
 {
-  std::cerr << "[SaveCenter] SaveFile" << std::endl;
-
   doc->SaveMe();
   WriteFile(file, doc->getDocFile(file)); 
-
-  std::cerr << "[SaveCenter] END SaveFile" << std::endl;
 }
 
 void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
@@ -65,8 +55,6 @@ void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
   SaveElementsHashMap			saveElements;
   SaveElementArray			*toWrite;
   SaveElementsHashMap::iterator		saveElementsIt;
-
-  std::cerr << "[SaveCenter] SaveDocument" << std::endl;
 
   //Get our children
   childrenOfCurrentNode = currentNode->getChildren();
@@ -107,16 +95,11 @@ void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
   
   //...finish by closing things
   xmlFile->EndElement();
-
-  std::cerr << "[SaveCenter] END SaveDocument" << std::endl;
-
 }
 
 void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements, 
 				  WiredXml *xmlFile)
 {
-  std::cerr << "[SaveCenter] AddReferences" << std::endl;
-
   SaveElementsHashMap::iterator	saveElementsIt;
   SaveElement			*ref = new SaveElement();
   wxFileName			relativePath, absolutePath;
@@ -147,14 +130,6 @@ void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements,
 
 	absolutePath.MakeRelativeTo(getProjectPath().GetPath());
 
-	
-// 	std::cerr << "[SaveCenter] trying to make path relative..." << std::endl;
-// 	std::cerr << "[SaveCenter] source :" << saveElementsIt->first.mb_str() << std::endl;	
-// 	std::cerr << "[SaveCenter] relativePath = " << relativePath.GetFullPath().mb_str() << std::endl;
-
-// 	std::cerr << "[SaveCenter] projectPath = " << getProjectPath().GetPath().mb_str() << std::endl;	
-
-// 	std::cerr << "[SaveCenter] relativePath, once relative = " << relativePath.GetFullPath().mb_str() << std::endl;
 	ref->setPair(wxT("reference"), absolutePath.GetFullPath());
 	//and write it.
 	WriteElement(ref, xmlFile);
@@ -174,34 +149,23 @@ void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
   SaveElementArray		children;
 
   attributes = elem->getAttributes();
-  std::cerr << "[SaveCenter] elem->getAttributes()" << std::endl;
 
   xmlFile->StartElement(elem->getKey());  
-  std::cerr << "[SaveCenter] startElement" << std::endl;
 
   for(attributesIt = attributes.begin();
       attributesIt != attributes.end();
       attributesIt++)
     {
       xmlFile->WriteAttribute(attributesIt->first, attributesIt->second, true);
-      std::cerr << "[SaveCenter] attribute iteration" << std::endl;
     }
   xmlFile->WriteString(elem->getValue());
-  std::cerr << "[SaveCenter] Write value" << std::endl;
   
   children = elem->getChildren();
-  std::cerr << "[SaveCenter] get children (" << children.GetCount() << ")" << std::endl;
   
   for(int j = 0; j < children.GetCount(); j++)
-    {
-      std::cerr << "[SaveCenter] children iteration" << std::endl;
-      if(children.Item(j) == NULL)
-	std::cerr << "[SaveCenter] children[j] == NULL" << std::endl;
       WriteElement(children.Item(j), xmlFile);
-    }  
   xmlFile->EndElement();
   
-  std::cerr << "[SaveCenter] END WriteElement" << std::endl;
 }
 
 wxFileName	SaveCenter::getPathFromRelativeTag(wxString tag)
@@ -223,8 +187,6 @@ wxFileName	SaveCenter::getPathFromRelativeTag(wxString tag)
 void		SaveCenter::WriteFile(wxString relativeFileName, 
 				      SaveElementArray *elements)
 {
-  std::cerr << "[SaveCenter] WriteFile" << std::endl;
-
   wxFileName	filename;
   wxFileName	relativePath;
   wxArrayString	dirs;
@@ -233,8 +195,6 @@ void		SaveCenter::WriteFile(wxString relativeFileName,
   WiredXml	*xmlFile = new WiredXml();
   int		i;
   
-  std::cerr << "[SaveCenter] WriteFile : " << relativeFileName.mb_str() << std::endl;
-
   filename.Assign(getProjectPath());
   relativePath = getPathFromRelativeTag(relativeFileName);
   dirs = relativePath.GetDirs();
@@ -254,8 +214,7 @@ void		SaveCenter::WriteFile(wxString relativeFileName,
   xmlFile->CreateDocument(filename.GetFullPath());
 
   rootTag = filename.GetName();
-  std::cerr << "[SaveCenter] rootTag = " << rootTag.mb_str() << std::endl;
-  
+
   xmlFile->StartElement(rootTag);
   
   for (i = 0; i < elements->GetCount(); i++)
@@ -263,8 +222,6 @@ void		SaveCenter::WriteFile(wxString relativeFileName,
   
   xmlFile->EndElement();
   delete xmlFile;
-
-  std::cerr << "[SaveCenter] END WriteFile" << std::endl;
 }
 
 //Accessors
@@ -309,16 +266,11 @@ wxString	SaveCenter::getProjectName()
 
 void		SaveCenter::setProjectName(wxString projectName)
 {
-  std::cerr << "[SaveCenter] setProjectName : " << projectName << std::endl;
-
   _projectName = projectName;
 
   _projectPath.RemoveLastDir();
   _projectPath.AppendDir(_projectName);
-
 }
-
-
 
 //This method really looks like LoadProject... maybe we could do something...
 SaveElementArray	SaveCenter::LoadFile(wxString filename)
@@ -364,8 +316,6 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
 	    {
 	      currSaveElem = new SaveElement();
 	      
-	      std::cerr << "[SaveCenter] xmlFile->GetDepth() = " << xmlFile->GetDepth() << std::endl;
-
 	      if(xmlFile->GetDepth() <= 1)
 		ret.Add(currSaveElem);
 	      else
@@ -415,6 +365,7 @@ void	SaveCenter::LoadProject()
   SaveElementArrayHashMap	dataLoaded;
 
   wxArrayString			pathToCurrentDoc;
+  SaveElementArray		history;
 
   filename.Clear();
   filename << getProjectPath().GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
@@ -437,7 +388,6 @@ void	SaveCenter::LoadProject()
 	    {
 	      currentDoc = xmlFile->GetAttribute(wxT("id"));
 	      pathToCurrentDoc.Add(currentDoc);
-
 	      //if it is the first doc of this type
 	      if(dataLoaded.find(currentDoc) == dataLoaded.end())
 		{
@@ -451,8 +401,11 @@ void	SaveCenter::LoadProject()
 	    }
 	  else
 	    {
-	      currentArray->Add(new SaveElement);
-	      currentSaveElem = currentArray->Last();
+	      currentSaveElem = new SaveElement();
+	      if(xmlFile->GetDepth() <= 2)
+		currentArray->Add(currentSaveElem);
+	      else
+		history.Add(currentSaveElem);
 
 	      currentSaveElem->setKey(nodeName);
 
@@ -471,25 +424,20 @@ void	SaveCenter::LoadProject()
 	{
 	  pathToCurrentDoc.Remove(nodeName);
 	  currentDoc = pathToCurrentDoc.Last();
+	  if(history.GetCount() > 1)
+	    history.RemoveAt(history.GetCount() - 1);
 	}
     }
   
- 
-  //DumpSaveElementArrayHashMap(dataLoaded);
-
-  //redistribute the elements of the hash
+   //redistribute the elements of the hash
   //In a separated method for readability and for logic
   //check technical documentation for more informations.
   
   RedistributeHash(dataLoaded);
-
- 
 }
 
 void		SaveCenter::DumpSaveElementArrayHashMap(SaveElementArrayHashMap dataLoaded)
 {
-  //un petit dump de la table de hash pour le debug
-  std::cerr << "[SaveCenter] dataLoaded Big Dump" << std::endl;
   //iterate on the keys of the hash map
   for(SaveElementArrayHashMap::iterator myIt = dataLoaded.begin();
       myIt != dataLoaded.end();

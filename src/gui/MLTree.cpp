@@ -222,18 +222,13 @@ void				MLTree::LoadItem(wxTreeItemId parent,
   bool			expand;
   wxTreeItemId		next;
 
-  std::cerr << "[MLTree] LoadItem" << std::endl;
-
   saveElemChildren = parentData->getChildren();
-
-  std::cerr << "[MLTree] saveElemChildren.GetCount() = " << saveElemChildren.GetCount() << std::endl;
 
   for(i = 0; i < saveElemChildren.GetCount(); i++)
     {
       currSaveElem = saveElemChildren.Item(i);
       if(currSaveElem->getKey() == wxT("folder"))
 	{
-	  std::cerr << "[MLTree] folder : " << currSaveElem->getAttribute(wxT("name")).mb_str() << std::endl;
 	  infos = SetStructInfos(infos,
 				 currSaveElem->getAttribute(wxT("name")),
 				 wxT(""), wxT(""));
@@ -248,13 +243,10 @@ void				MLTree::LoadItem(wxTreeItemId parent,
 	  else
 	    SetItemImage(next, 0);
 
-	  if(next.IsOk())
-	    std::cerr << "[MLTree] next is ok" << std::cerr;
 	  LoadItem(next, currSaveElem);
 	}
       else if(currSaveElem->getKey() == wxT("file"))
 	{
-	  std::cerr << "[MLTree] file : " << currSaveElem->getAttribute(wxT("name")).mb_str() << std::endl;
 	  infos = SetStructInfos(infos,
 				 currSaveElem->getAttribute(wxT("infos_label")),
 				 currSaveElem->getAttribute(wxT("infos_ext")),

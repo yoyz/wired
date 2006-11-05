@@ -25,11 +25,10 @@ class SaveCenter : public WiredDocument
 {
  public:
   /** Constructor.
-   * \param projectName
-   * \param docParent
-   * \param projectPath
+   * \param projectPath The path to the project. If none is set, a default one will 
+   * be assigned.
    */
-  SaveCenter(wxFileName projectPath = wxString(wxT("")), WiredDocument *docParent = NULL);
+  SaveCenter(wxFileName projectPath = wxString(wxT("")));
   ~SaveCenter();
 
   /** Main Save function, implementation of WiredDocument.
@@ -55,7 +54,16 @@ class SaveCenter : public WiredDocument
   /** Returns the project name. */
   wxString	getProjectName();
 
+  /** Returns the audio directory.
+   * Check the _audio member for more explanations.
+   * \return The path to the audio directory.
+   */
   wxString	getAudioDir();
+
+  /** Sets the audio directory.
+   * Check the _audio member for more explanations.
+   * \param audioDir The new path to the audio directory.
+   */
   void		setAudioDir(wxString audioDir);
 
   bool		getSaved();
@@ -106,27 +114,72 @@ class SaveCenter : public WiredDocument
    */
   void		WriteFile(wxString filename, SaveElementArray *elements);
 
+
+  /** Adds the references to external files in the project file.
+   * \param saveElements the SaveElements HashMap of the current WiredDocument.
+   * \param xmlFile the WiredXml object to write in.
+   */
   void		AddReferences(SaveElementsHashMap &saveElements, 
 			      WiredXml *xmlFile);
 
-  bool		ReadXml();
-
+  /** Returns an unused project name, based on the content of the current working
+   * directory.
+   * \param cwd The currentWorkingDirectory.
+   * \return A project name.
+   */
   wxString	GetDefaultProjectName(wxFileName cwd);
+
+  /** Returns the project name, based on the project path.
+   * The project name is the name of the last directory of the path.
+   * \param path The path to the current working directory.
+   * \return The project name.
+   */
   wxString	GetProjectNameFromProjectPath(wxFileName path);
 
+  /** Returns a path to an xml file, relative to the project root, 
+   * based on a wxString.
+   * \param tag The wxString to build the path from.
+   * \return The relative path.
+   */
   wxFileName	getPathFromRelativeTag(wxString tag);
 
  private:
   
+  /** Dumps a SaveElementArrayHashMap.
+   * As this structure is quite complicated, this function is mainly used for debug.
+   * \param The SaveElementArrayHashMap to dump.
+   */
   void			DumpSaveElementArrayHashMap(SaveElementArrayHashMap dataLoaded);
+
+  /** Dumps a WiredDocumentArrayHashMap.
+   * As this structure is quite complicated, this function is mainly used for debug.
+   * \param The WireDocumentArrayHashMap to dump.
+   */
   void			DumpWiredDocumentArrayHashMap(WiredDocumentArrayHashMap toProcess);
 
+  /** Redistributes a SaveElementArrayHashMap to the right WiredDocuments.
+   * This method is the second part of the project loading.
+   * \param dataLoaded The data to redistribute.
+   */
   void			RedistributeHash(SaveElementArrayHashMap dataLoaded);
 
+  /** The path to the project. */
   wxFileName		_projectPath;
+
+  /** The name of the project. 
+   * It is only stored to avoid recalculating it each time.*/
   wxString		_projectName;
+
+  /** The path to the audio directory. 
+   * This one would rather be in the settings. It is here to smooth 
+   * the suppression of WiredSessionXml.
+   */ 
   wxFileName		_audioDir;
-  //store if the project has already been saved once (else, we'll act like a saveAs) 
+  //
+
+  /** Stores if the project has already been saved once.
+   * When it is set to false, we will act like a "Save As".
+   */ 
   bool			_saved;
 };
 
