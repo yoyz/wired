@@ -115,8 +115,15 @@ class OptionPanel : public wxPanel, public WiredDocument
 
 
  //WiredDocument implementation
-  void					Save();
-  void					Load(SaveElementArray data);
+  void				Save();
+  void				Load(SaveElementArray data);
+
+ private:
+  //Setters
+  void				SetTitle(const wxString& title);
+  void				SetListToolBtn(bool isDown);
+  void				SetDetachToolBtn(bool isDown);
+  void				SetCloseToolBtn(bool isDown);
 
 
  protected:
@@ -142,6 +149,6 @@ class OptionPanel : public wxPanel, public WiredDocument
   DECLARE_EVENT_TABLE()
 };
 
-extern OptionPanel		*OptPanel;
+extern OptionPanel*		OptPanel;
 
 #endif

@@ -386,12 +386,101 @@ void				OptionPanel::ClosePlug(Plugin *p)
 
 void				OptionPanel::Save()
 {
+  std::cerr << "[OptionPanel] Save()" << std::endl;
+  SaveElement	*savedElem;
+
+  //Title
+  savedElem = new SaveElement(wxT("title"), this->Title->GetLabel());
+  saveDocData(savedElem);
+
+  //ListToolBtn
+  savedElem = new SaveElement(wxT("listToolBtn"), this->ListToolBtn->GetOn());
+  saveDocData(savedElem);
+
+  //DetachToolBtn
+  savedElem = new SaveElement(wxT("detachToolBtn"), this->DetachToolBtn->GetOn());
+  saveDocData(savedElem);
+
+  //CloseToolBtn
+  savedElem = new SaveElement(wxT("closeToolBtn"), this->CloseToolBtn->GetOn());
+  saveDocData(savedElem);
+
+  //ToolsList
+  //vector of wiredTools
 
 }
 
 void				OptionPanel::Load(SaveElementArray data)
 {
+  wxString	s;
+  int		dataCompt;
 
+  std::cerr << "[OptionPanel Load()" << std::endl;
+  for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
+    {
+      std::cerr << "[OptionPanel] key = " << data[dataCompt]->getKey() << std::endl;
+      std::cerr << "[OptionPanel] value = " << data[dataCompt]->getValue() << std::endl;
+
+      if (data[dataCompt]->getKey() == wxT("title"))
+	{
+	  this->SetTitle(data[dataCompt]->getValue());
+	}
+      else if (data[dataCompt]->getKey() == wxT("listToolBtn"))
+	{
+	  if (data[dataCompt]->getValueInt())
+	    this->SetListToolBtn(true);
+	  else
+	    this->SetListToolBtn(false);
+	}
+      else if (data[dataCompt]->getKey() == wxT("detachToolBtn"))
+	{
+	  if (data[dataCompt]->getValueInt())
+	    this->SetDetachToolBtn(true);
+	  else
+	    this->SetDetachToolBtn(false);
+	}
+      else if (data[dataCompt]->getKey() == wxT("closeToolBtn"))
+	{
+	  if (data[dataCompt]->getValueInt())
+	    this->SetCloseToolBtn(true);
+	  else
+	    this->SetCloseToolBtn(false);
+	}
+
+      //ToolsList
+      //vector of wiredTools
+
+    }
+}
+
+//Setters
+void		OptionPanel::SetTitle(const wxString& title)
+{
+  this->Title->SetLabel(title);
+}
+
+void		OptionPanel::SetListToolBtn(bool isDown)
+{
+  if (isDown)
+    this->ListToolBtn->SetOn();
+  else
+    this->ListToolBtn->SetOff();
+}
+
+void		OptionPanel::SetDetachToolBtn(bool isDown)
+{
+  if (isDown)
+    this->DetachToolBtn->SetOn();
+  else
+    this->DetachToolBtn->SetOff();
+}
+
+void		OptionPanel::SetCloseToolBtn(bool isDown)
+{
+  if (isDown)
+    this->CloseToolBtn->SetOn();
+  else
+    this->CloseToolBtn->SetOff();
 }
 
 

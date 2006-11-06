@@ -48,18 +48,6 @@ class					ChannelGui : public wxPanel, public WiredDocument
   void					Save();
   void					Load(SaveElementArray data);
 
-  //Setters
-  void					SetStereo(bool stereo);
-  void					SetLock(bool lock);
-  void					SetMuteLeftButton(bool isDown);
-  void					SetMuteRightButton(bool isDown);
-  void					SetLockButton(bool isDown);
-  void					SetLabel(const wxString& label);
-  void					SetVolumeLeft(wxString& level);
-  void					SetVolumeRight(wxString& level);
-
-
-
   SeqTrack				*ConnectedSeqTrack;
   FaderCtrl				*FaderLeft;
   FaderCtrl				*FaderRight;
@@ -67,6 +55,17 @@ class					ChannelGui : public wxPanel, public WiredDocument
   VUMCtrl				*VumRight;
   Channel				*Chan;
   bool					Stereo;
+
+  void					SetLabel(const wxString& label);
+
+ private:
+  //Setters
+  void					SetStereo(bool stereo);
+  void					SetLock(bool lock);
+  void					SetMuteLeftButton(bool isDown);
+  void					SetMuteRightButton(bool isDown);
+  void					SetLockButton(bool isDown);
+
 
  protected:
   bool					Lock;

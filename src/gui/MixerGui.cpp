@@ -73,7 +73,7 @@ void MixerGui::AddMasterChannel(Channel *channel)
 					       ImgFaderFg, this, -1,
 					       wxPoint(0, 0),
 					       wxSize(CHANNELGUI_WIDTH,
-						      CHANNELGUI_HEIGHT), (WiredDocument *)this);
+						      CHANNELGUI_HEIGHT), this);
 
   SetVirtualSize(CHANNELGUI_WIDTH, CHANNELGUI_HEIGHT);
   ChannelGuiVector.push_back(gui);
