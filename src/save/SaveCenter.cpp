@@ -140,13 +140,10 @@ void	SaveCenter::AddReferences(SaveElementsHashMap &saveElements,
       }
 
   delete ref;
-  std::cerr << "[SaveCenter] END AddReferences" << std::endl;
 }
 
 void	SaveCenter::WriteElement(SaveElement *elem, WiredXml *xmlFile)
 {
-  std::cerr << "[SaveCenter] WriteElement" << std::endl;
-
   int				i;
   AttributesHashMap		attributes;
   AttributesHashMap::iterator	attributesIt;
@@ -359,7 +356,9 @@ void	SaveCenter::LoadProject()
   wxString	filename;
   wxString	nodeName;
   int		nodeType;
-
+  
+  int		lastWiredDocDepth;
+  
   //the things we are storing (code readability)
   //It's just used as a reference. No new, no delete on this pointer.
   SaveElement		*currentSaveElem = NULL;
@@ -369,7 +368,7 @@ void	SaveCenter::LoadProject()
   //used only to make the code readable
   wxString		currentDoc;
   SaveElementArray	*currentArray;
-  
+
   //a big hashmap to store everything
   SaveElementArrayHashMap	dataLoaded;
 
@@ -380,38 +379,38 @@ void	SaveCenter::LoadProject()
   filename << getProjectPath().GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
   filename << wxT("wired.xml");
 
-  std::cerr << "[SaveCenter] Load file : " << filename.mb_str() << std::endl;
-
   //read the xml file and fill in a big hash map
   xmlFile->OpenDocument(filename);
   
-  while(xmlFile->Read())
+  while (xmlFile->Read())
     {
       nodeType = xmlFile->GetNodeType();
 
-      if(nodeType == XML_READER_TYPE_ELEMENT)
+      if (nodeType == XML_READER_TYPE_ELEMENT)
 	{
 	  nodeName = xmlFile->GetNodeName();
 
-	  if(nodeName == WIRED_TAG_WIREDDOC)
+	  if (nodeName == WIRED_TAG_WIREDDOC)
 	    {
+	      lastWiredDocDepth = xmlFile->GetDepth();
+
 	      currentDoc = xmlFile->GetAttribute(wxT("id"));
 	      pathToCurrentDoc.Add(currentDoc);
 	      //if it is the first doc of this type
-	      if(dataLoaded.find(currentDoc) == dataLoaded.end())
+	      if (dataLoaded.find(currentDoc) == dataLoaded.end())
 		{
 		  //we add create the key and its array
 		  dataLoaded[currentDoc] = new SaveElementArrayArray();
 		}
 	      //we add a new array to it
-	      dataLoaded[currentDoc]->Add(new SaveElementArray());
+	      currentArray = new SaveElementArray();
+	      dataLoaded[currentDoc]->Add(currentArray);
 	      //may look hazardous, but last() returns the last item we added...
-	      currentArray = dataLoaded[currentDoc]->Last();
 	    }
 	  else
 	    {
 	      currentSaveElem = new SaveElement();
-	      if(xmlFile->GetDepth() <= 2)
+	      if (xmlFile->GetDepth() == lastWiredDocDepth + 1)
 		currentArray->Add(currentSaveElem);
 	      else
 		history.Add(currentSaveElem);
@@ -419,21 +418,21 @@ void	SaveCenter::LoadProject()
 	      currentSaveElem->setKey(nodeName);
 
 	      //attributes handling
-	      for(int i = 0; i < xmlFile->GetAttributeCount(); i++)
+	      for (int i = 0; i < xmlFile->GetAttributeCount(); i++)
 		currentSaveElem->addAttribute(xmlFile->GetAttributeName(i),
 					      xmlFile->GetAttributeValue(i));
 
 	    }
 	}
-      else if(nodeType == XML_READER_TYPE_TEXT)
+      else if (nodeType == XML_READER_TYPE_TEXT)
 	{
 	  currentSaveElem->setValue(xmlFile->GetNodeValue());
 	}
-      else if(nodeType == XML_READER_TYPE_END_ELEMENT)
+      else if (nodeType == XML_READER_TYPE_END_ELEMENT)
 	{
 	  pathToCurrentDoc.Remove(nodeName);
 	  currentDoc = pathToCurrentDoc.Last();
-	  if(history.GetCount() > 1)
+	  if (history.GetCount() > 1)
 	    history.RemoveAt(history.GetCount() - 1);
 	}
     }
@@ -456,7 +455,7 @@ void		SaveCenter::DumpSaveElementArrayHashMap(SaveElementArrayHashMap dataLoaded
       //iterate on the elements of the Array
       for(int y = 0; y < myIt->second->Item(z)->GetCount(); y++)
 	{
-	  std::cerr << "SaveElementArrayHashMap[" << myIt->first << "]";
+	  std::cerr << "SaveElementArrayHashMap[" << myIt->first.mb_str() << "]";
 	  std::cerr << "[" << z << "][" << y << "]->getKey() = ";
 	  std::cerr << dataLoaded[myIt->first]->Item(z)->Item(y)->getKey().mb_str() << std::endl;
 	}
@@ -469,7 +468,7 @@ void		SaveCenter::DumpWiredDocumentArrayHashMap(WiredDocumentArrayHashMap toProc
       it ++)
     for(int i = 0; i < it->second->GetCount(); i++)
       {
-	std::cerr << "WiredDocumentArrayHashMap[" << it->first << "]";
+	std::cerr << "WiredDocumentArrayHashMap[" << it->first.mb_str() << "]";
 	std::cerr << "[" << i << "]->getName() = ";
 	std::cerr << toProcess[it->first]->Item(i)->getName().mb_str() << std::endl;
       }

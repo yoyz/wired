@@ -59,7 +59,7 @@ class WiredDocument
    */
   void				Register(WiredDocument *children);
   
-  /** Retuns the data stored in _dataSave.
+  /** Returns the data stored in _dataSave.
    * \return The data stored in _dataSave.
    */
   SaveElementsHashMap		getDocData();
