@@ -13,7 +13,7 @@
 extern Mixer			*Mix;
 wxMutex				MixMutex(wxMUTEX_RECURSIVE);
 
-Mixer::Mixer()
+Mixer::Mixer(WiredDocument* docParent) : WiredDocument(wxT("Mixer"), docParent)
 {
   VolumeLeft = 1.f;
   VolumeRight = 1.f;
@@ -62,6 +62,7 @@ Mixer::~Mixer()
     }
 }
 
+/*
 Mixer 	Mixer::operator=(const Mixer& right)
 {
   cerr << "WARNING : Soon, Wired will miserably fail" << endl;
@@ -75,12 +76,13 @@ Mixer 	Mixer::operator=(const Mixer& right)
 		VolumeLeft = right.VolumeLeft;
 		VolumeRight = right.VolumeLeft;
 		MuteL = right.MuteL;
-		MuteR = right.MuteR;  
+		MuteR = right.MuteR;
 		OutChannels = right.OutChannels;
-		InChannels = right.InChannels;  
+		InChannels = right.InChannels;
 	}
 	return *this;
 }
+*/
 
 void				Mixer::Dump()
 {
@@ -114,12 +116,12 @@ Channel*    	Mixer::AddChannel(list<Channel*>& list, bool stereo, bool visible)
 }
 
 Channel				*Mixer::AddMonoInputChannel()
-{ 
+{
   return (AddChannel(InChannels, false));
 }
 
 Channel				*Mixer::AddStereoInputChannel()
-{ 
+{
   return (AddChannel(InChannels, true));
 }
 
@@ -178,10 +180,10 @@ bool				Mixer::InitOutputBuffers(void)
       cout << "[MIXER] insufficient memory"<< endl;
       return false;
     }
-  for (list<Channel*>::iterator c = OutChannels.begin(); 
+  for (list<Channel*>::iterator c = OutChannels.begin();
        c != OutChannels.end(); c++)
     (*c)->ClearAllBuffers();
-  for (list<Channel*>::iterator c = InChannels.begin(); 
+  for (list<Channel*>::iterator c = InChannels.begin();
        c != InChannels.end(); c++)
     (*c)->ClearAllBuffers();
   return true;
@@ -195,12 +197,12 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
   unsigned int			i;
 
   t.tv_sec = 0;
-  t.tv_nsec = 100;       
+  t.tv_nsec = 100;
   memset(OutputLeft, 0, Audio->SamplesPerBuffer * sizeof(float));
   memset(OutputRight, 0, Audio->SamplesPerBuffer * sizeof(float));
-  
+
   //MixMutex.Lock();
-  for (list<Channel*>::iterator c = OutChannels.begin(); 
+  for (list<Channel*>::iterator c = OutChannels.begin();
        c != OutChannels.end(); c++)
     {
       //if (!(*c)->Mute)
@@ -212,9 +214,9 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 	      for (i = 0; i < Audio->SamplesPerBuffer; i++)
 		{
 		  // Les Volumes sont appliques lors de PushBuffer
-		  OutputLeft[i]  += 
+		  OutputLeft[i]  +=
 		    ((*c)->StereoBuffers[0])[0][i];// * (*c)->VolumeLeft;
-		  OutputRight[i] += 
+		  OutputRight[i] +=
 		    ((*c)->StereoBuffers[0])[1][i];// * (*c)->VolumeRight;
 		}
 	    }
@@ -235,9 +237,9 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 	    	if ((*c)->StereoBuffers[0])
 	      for (i = 0; i < Audio->SamplesPerBuffer; i++)
 		{
-		  OutputLeft[i]  += 
+		  OutputLeft[i]  +=
 		    ((*c)->StereoBuffers[0])[0][i];// * (*c)->VolumeLeft;
-		  OutputRight[i] += 
+		  OutputRight[i] +=
 		    ((*c)->StereoBuffers[0])[1][i];// * (*c)->VolumeRight;
 		}
 	    }
@@ -246,7 +248,7 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 	    	if ((*c)->MonoBuffers[0])
 	      for (i = 0; i < Audio->SamplesPerBuffer; i++)
 		{
-		  OutputLeft[i]  += 
+		  OutputLeft[i]  +=
 		    ((*c)->MonoBuffers[0])[i];// * (*c)->VolumeLeft;
 		  OutputRight[i] +=
 		    ((*c)->MonoBuffers[0])[i];// * (*c)->VolumeRight;
@@ -254,7 +256,7 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 	    }
 	}
     }
-  
+
   // additional stuff
   float				lvol;
   float				rvol;
@@ -269,7 +271,7 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
   else
     rvol = VolumeRight;
   MixMutex.Unlock();
-  
+
   for (i = 0; i < Audio->SamplesPerBuffer; i++)
     {
       OutputLeft[i]  *= lvol;
@@ -299,8 +301,8 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
       float			*tmp;
       i = 0;
 
-      for (vector<RingBuffer<float>*>::iterator chan = 
-	     Audio->UserData->OutFIFOVector.begin(); 
+      for (vector<RingBuffer<float>*>::iterator chan =
+	     Audio->UserData->OutFIFOVector.begin();
 	   chan !=  Audio->UserData->OutFIFOVector.end(); chan++, i++)
 	{
 	  bytes_written = 0;
@@ -310,10 +312,10 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 	  //cout << "[MIXER] blocking write BEGIN" << endl;
 	  for (long spb = Audio->SamplesPerBuffer; spb > 0 && (*chan); )
 	    {
-	      bytes_written = (*chan)->Write(tmp, spb); 
+	      bytes_written = (*chan)->Write(tmp, spb);
 	      spb -= bytes_written;
 	      tmp += bytes_written;
-	      // worker thread must NOT call wxMilliSleep 
+	      // worker thread must NOT call wxMilliSleep
 	      if (caller)
 		caller->Sleep(1);
 	      else
@@ -322,13 +324,13 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 	  //cout << "[MIXER] blocking write END" << endl;
 	}
     }
-  /* 
-     Suppressing first buffer of each channel and allocating new buffers in 
+  /*
+     Suppressing first buffer of each channel and allocating new buffers in
      RemoveFirstBuffer()
-     function already Lock MixMutex because of rms value reset 
+     function already Lock MixMutex because of rms value reset
   */
   long				spb = 0;
-  for (list<Channel*>::iterator ch = OutChannels.begin(); 
+  for (list<Channel*>::iterator ch = OutChannels.begin();
        ch != OutChannels.end(); ch++)
     (*ch)->RemoveFirstBuffer();
 }
@@ -336,7 +338,7 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 Channel				*Mixer::OpenInput(long num)
 {
   bool exist = false;
-  for (vector<long>::iterator i = WiredSettings->InputChannels.begin(); 
+  for (vector<long>::iterator i = WiredSettings->InputChannels.begin();
        i != WiredSettings->InputChannels.end(); i++)
     {
       if ((*i) == num)
@@ -359,15 +361,15 @@ void				Mixer::FlushInput(long num)
   long				bytes = 0;
   vector<long>::iterator	chan = WiredSettings->InputChannels.begin();
 
-  for (vector<RingBuffer<float>*>::iterator c = 
+  for (vector<RingBuffer<float>*>::iterator c =
 	 Audio->UserData->InFIFOVector.begin();
        c != Audio->UserData->InFIFOVector.end(); c++, chan++)
     {
       if (num == (*chan))
-	{ 
+	{
 	  // memset(Input, 0, Audio->SamplesPerBuffer * sizeof(float)); pas necessaire
 	  for (bytes = (*c)->Read(Input[0], Audio->SamplesPerBuffer);
-	       bytes > 0;// Audio->SamplesPerBuffer; 
+	       bytes > 0;// Audio->SamplesPerBuffer;
 	       bytes = (*c)->Read(Input[0], Audio->SamplesPerBuffer));
 	  break;
 	}
@@ -380,12 +382,12 @@ void				Mixer::MixInput(void)
   vector<long>::iterator	chan = WiredSettings->InputChannels.begin();
   int				cpt = 0;
 
-  for (vector<RingBuffer<float>*>::iterator c = 
+  for (vector<RingBuffer<float>*>::iterator c =
 	 Audio->UserData->InFIFOVector.begin();
        c != Audio->UserData->InFIFOVector.end(); c++, chan++)
     {
       /*
-	cout << "in mixinput chan:" << *chan 
+	cout << "in mixinput chan:" << *chan
 	   << ", which is connected to FIFO:"
 	   << cpt++ << endl;
       */
@@ -399,7 +401,7 @@ void				Mixer::MixInput(void)
 	    {
 	      if ( (*chan) == (*mix_chan)->InputNum )
 		{
-		  
+
 		  (*mix_chan)->CurBuf = i;
 		  //cout << "push buffer from input "
 		  //   <<  << endl;
@@ -411,5 +413,61 @@ void				Mixer::MixInput(void)
 	    //	    cout << "MIX INPUT ERROR\n";
 	}
       //cout << << endl;
+    }
+}
+
+
+void			Mixer::Save()
+{
+  SaveElement	*savedElem;
+
+  std::cerr << "[Mixer] Save()" << std::endl;
+
+  //VolumeLeft
+  savedElem = new SaveElement(wxT("volumeLeft"), this->VolumeLeft);
+  saveDocData(savedElem);
+
+  //VolumeRight
+  savedElem = new SaveElement(wxT("volumeRight"), this->VolumeRight);
+  saveDocData(savedElem);
+
+  //MuteL
+  savedElem = new SaveElement(wxT("muteL"), this->MuteL);
+  saveDocData(savedElem);
+
+  //MuteR
+  savedElem = new SaveElement(wxT("muteR"), this->MuteR);
+  saveDocData(savedElem);
+
+}
+
+void			Mixer::Load(SaveElementArray data)
+{
+  int		dataCompt;
+
+  std::cerr << "[Mixer] Load()" << std::endl;
+  for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
+    {
+      std::cerr << "[Mixer] key = " << data[dataCompt]->getKey() << std::endl;
+      std::cerr << "[Mixer] value = " << data[dataCompt]->getValue() << std::endl;
+
+      if (data[dataCompt]->getKey() == wxT("volumeLeft"))
+	this->VolumeLeft = data[dataCompt]->getValueFloat();
+      else if (data[dataCompt]->getKey() == wxT("volumeRight"))
+	this->VolumeRight = data[dataCompt]->getValueFloat();
+      else if (data[dataCompt]->getKey() == wxT("muteL"))
+	{
+	  if (data[dataCompt]->getValue())
+	    this->MuteL = true;
+	  else
+	    this->MuteL = false;
+	}
+      else if (data[dataCompt]->getKey() == wxT("muteR"))
+	{
+	  if (data[dataCompt]->getValue())
+	    this->MuteR = true;
+	  else
+	    this->MuteR = false;
+	}
     }
 }

@@ -7,52 +7,63 @@
 using namespace std;
 
 #include <list>
-
+#include "WiredDocument.h"
 
 #define PREBUF_NUM 6
 
 class Sequencer;
 class Channel;
 
-class Mixer
+class Mixer : public WiredDocument
 {
  public:
-  Mixer();
-  Mixer(const Mixer& copy){*this = copy;}
-  Mixer operator=(const Mixer& right);
+  Mixer(WiredDocument* docParent = NULL);
+  // Mixer(const Mixer& copy){*this = copy;}
+  //Mixer operator=(const Mixer& right);
   ~Mixer();
-  
+
   void			Dump();
 
   Channel*		AddMonoInputChannel(void);
   Channel*		AddStereoInputChannel(void);
   Channel*              OpenInput(long num);
-  
+
   Channel*		AddMonoOutputChannel(bool visible = true);
   Channel*		AddStereoOutputChannel(bool visible = true);
-  
+
   bool			RemoveChannel(Channel*);
   bool			InitOutputBuffers(void);
-  
- /* mixes the first buffer 
+
+ /* mixes the first buffer
     of each output channels
     blocks until it writes the
-    result in each output 
-    ringbuffers 
+    result in each output
+    ringbuffers
  */
 
   void			MixOutput(bool soundcard, wxThread* caller = NULL);
 
-  void			FlushInput(long num); 
+  void			FlushInput(long num);
   void			MixInput(void);
 
   float			VolumeLeft;
   float			VolumeRight;
   bool			MuteL;
   bool			MuteR;
-  
+
   list<Channel*>	OutChannels;
   list<Channel*>	InChannels;
+
+  /**
+   * WiredDocument implementation
+   */
+  void			Save();
+
+  /**
+   * WiredDocument implementation
+   */
+  void			Load(SaveElementArray data);
+
 
  private:
   Channel*		AddChannel(list<Channel*>& listm,

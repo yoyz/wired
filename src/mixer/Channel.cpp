@@ -346,21 +346,13 @@ void			Channel::Load(SaveElementArray data)
 	    this->Stereo = false;
 	}
       else if (data[dataCompt]->getKey() == wxT("volumeLeft"))
-	{
-	  this->VolumeLeft = data[dataCompt]->getValueFloat();
-	}
+	this->VolumeLeft = data[dataCompt]->getValueFloat();
       else if (data[dataCompt]->getKey() == wxT("volumeRight"))
-	{
-	  this->VolumeRight = data[dataCompt]->getValueFloat();
-	}
+	this->VolumeRight = data[dataCompt]->getValueFloat();
       else if (data[dataCompt]->getKey() == wxT("InputNum"))
-	{
-	  this->InputNum = (long)data[dataCompt]->getValueInt();
-	}
+	this->InputNum = (long)data[dataCompt]->getValueInt();
       else if (data[dataCompt]->getKey() == wxT("Label"))
-	{
-	  this->Label = data[dataCompt]->getValue();
-	}
+	this->Label = data[dataCompt]->getValue();
       else if (data[dataCompt]->getKey() == wxT("visible"))
 	{
 	   if (data[dataCompt]->getValue())
@@ -369,17 +361,11 @@ void			Channel::Load(SaveElementArray data)
 	    this->Visible = false;
 	}
       else if (data[dataCompt]->getKey() == wxT("lrms"))
-	{
-	  this->Lrms = data[dataCompt]->getValueFloat();
-	}
+	this->Lrms = data[dataCompt]->getValueFloat();
       else if (data[dataCompt]->getKey() == wxT("rrms"))
-	{
-	  this->Rrms = data[dataCompt]->getValueFloat();
-	}
+	this->Rrms = data[dataCompt]->getValueFloat();
       else if (data[dataCompt]->getKey() == wxT("curBuf"))
-	{
-	  this->CurBuf = data[dataCompt]->getValueInt();
-	}
+	this->CurBuf = data[dataCompt]->getValueInt();
       else if (data[dataCompt]->getKey() == wxT("filled"))
 	{
 	  if (data[dataCompt]->getValue())

@@ -165,10 +165,32 @@ void MixerGui::SetLabelByChan(Channel *channel, const wxString& label)
 
 void		MixerGui::Save()
 {
+  SaveElement	*savedElem;
 
+  std::cerr << "[MixerGui] Save()" << std::endl;
+
+  //MasterLeft
+  savedElem = new SaveElement(wxT("masterLeft"), this->MasterLeft);
+  saveDocData(savedElem);
+
+  //MasterRight
+  savedElem = new SaveElement(wxT("masterRight"), this->MasterRight);
+  saveDocData(savedElem);
 }
 
 void		MixerGui::Load(SaveElementArray data)
 {
+  int		dataCompt;
 
+  std::cerr << "[MixerGui] Load()" << std::endl;
+  for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
+    {
+      std::cerr << "[MixerGui] key = " << data[dataCompt]->getKey() << std::endl;
+      std::cerr << "[MixerGui] value = " << data[dataCompt]->getValue() << std::endl;
+
+      if (data[dataCompt]->getKey() == wxT("masterLeft"))
+	this->MasterLeft = data[dataCompt]->getValueFloat();
+      else if (data[dataCompt]->getKey() == wxT("masterRight"))
+	this->MasterRight = data[dataCompt]->getValueFloat();
+    }
 }
