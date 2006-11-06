@@ -199,7 +199,7 @@ void		SaveCenter::WriteFile(wxString givenFileName,
   WiredXml	*xmlFile = new WiredXml();
   int		i;
 
-  if(givenFilename.StartsWith('/'))
+  if(givenFileName.StartsWith(wxT("/")))
     filename.Assign(givenFileName);
   else
     {
