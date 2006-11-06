@@ -23,9 +23,6 @@ ChannelGui::ChannelGui(Channel* channel, wxImage* img_bg, wxImage* img_fg,
 		       const wxString& label, WiredDocument* docParent)
   : wxPanel(parent, id, pos, size), WiredDocument(wxT("ChannelGui"), docParent)
 {
-
-  std::cout << "ChannelGui: " << label << std::endl;
-
   ConnectedSeqTrack = 0x0;
   SetBackgroundColour(*wxBLACK);//CL_RULER_BACKGROUND);
   bg = new wxImage(wxString(WiredSettings->DataDir + wxString(BG)), wxBITMAP_TYPE_PNG);
@@ -191,7 +188,6 @@ void				ChannelGui::UpdateScreen()
 
 void				ChannelGui::Save()
 {
-  wxString	s;
   SaveElement	*savedElem;
 
   std::cerr << "[ChannelGui] Save()" << std::endl;
@@ -219,51 +215,45 @@ void				ChannelGui::Save()
 
 void				ChannelGui::Load(SaveElementArray data)
 {
-  wxString	s;
   int		dataCompt;
 
   std::cerr << "[ChannelGui] Load()" << std::endl;
-  for ( dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
+  for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
     {
       std::cerr << "[ChannelGui] key = " << data[dataCompt]->getKey() << std::endl;
       std::cerr << "[ChannelGui] value = " << data[dataCompt]->getValue() << std::endl;
 
-      if ( data[dataCompt]->getKey() == wxT("stereo"))
+      if (data[dataCompt]->getKey() == wxT("stereo"))
 	{
-	  s = data[dataCompt]->getValue();
-	  if (s == wxT("1"))
+	  if (data[dataCompt]->getValue())
 	    SetStereo(true);
 	  else
 	    SetStereo(false);
 	}
-      else if ( data[dataCompt]->getKey() == wxT("lock"))
+      else if (data[dataCompt]->getKey() == wxT("lock"))
 	{
-	  s = data[dataCompt]->getValue();
-	  if (s == wxT("1"))
+	  if (data[dataCompt]->getValue())
 	    SetLock(true);
 	  else
 	    SetLock(false);
 	}
       else if (data[dataCompt]->getKey() == wxT("muteLeftButton"))
 	{
-	  s = data[dataCompt]->getValue();
-	  if(s == wxT("1"))
+	  if(data[dataCompt]->getValue())
 	    SetMuteLeftButton(true);
 	  else
 	    SetMuteLeftButton(false);
 	}
       else if (data[dataCompt]->getKey() == wxT("muteRightButton"))
 	{
-	  s = data[dataCompt]->getValue();
-	  if (s == wxT("1"))
+	  if (data[dataCompt]->getValue())
 	    SetMuteRightButton(true);
 	  else
 	    SetMuteRightButton(false);
 	}
       else if (data[dataCompt]->getKey() == wxT("lockButton"))
 	{
-	  s = data[dataCompt]->getValue();
-	  if (s == wxT("1"))
+	  if (data[dataCompt]->getValue())
 	    SetLockButton(true);
 	  else
 	    SetLockButton(false);

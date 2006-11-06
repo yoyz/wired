@@ -5,7 +5,8 @@
 #include "Channel.h"
 #include "Mixer.h"
 
-Channel::Channel(bool stereo, bool visible)
+Channel::Channel(bool stereo, bool visible, WiredDocument* docParent) :
+  WiredDocument(wxT("Channel"), docParent)
 {
   Stereo = stereo;
   VolumeLeft = 100.f;
@@ -34,7 +35,9 @@ Channel::~Channel()
   ClearAllBuffers(false);
 }
 
-Channel		Channel::operator=(const Channel& right)
+/*
+Channel		Channel::operator=(const Channel& right) :
+  WiredDocument(wxT("Channel"), right.docParent)
 {
   cerr << "WARNING : Soon, Wired will fail" << endl;
 
@@ -58,6 +61,7 @@ Channel		Channel::operator=(const Channel& right)
     }
   return *this;
 }
+*/
 
 void		Channel::Dump()
 {
@@ -274,5 +278,114 @@ void Channel::ClearAllBuffers(bool renew)
 	AddBuffers(PREBUF_NUM);
       else
 	AddBuffers(NUM_BUFFERS);
+    }
+}
+
+void			Channel::Save()
+{
+  SaveElement	*savedElem;
+
+  std::cerr << "[Channel] Save()" << std::endl;
+
+  //Stereo
+  savedElem = new SaveElement(wxT("stereo"), this->Stereo);
+  saveDocData(savedElem);
+
+  //VolumeLeft
+  savedElem = new SaveElement(wxT("volumeLeft"), this->VolumeLeft);
+  saveDocData(savedElem);
+
+  //VolumeRight
+  savedElem = new SaveElement(wxT("volumeRight"), this->VolumeRight);
+  saveDocData(savedElem);
+
+  //InputNum
+  savedElem = new SaveElement(wxT("inputNum"), (int)this->InputNum);
+  saveDocData(savedElem);
+
+  //Label
+  savedElem = new SaveElement(wxT("label"), this->Label);
+  saveDocData(savedElem);
+
+  //Visible
+  savedElem = new SaveElement(wxT("visible"), this->Visible);
+  saveDocData(savedElem);
+
+  //Lrms
+  savedElem = new SaveElement(wxT("lrms"), this->Lrms);
+  saveDocData(savedElem);
+
+  //Rrms
+  savedElem = new SaveElement(wxT("rrms"), this->Rrms);
+  saveDocData(savedElem);
+
+  //CurBuf
+  savedElem = new SaveElement(wxT("curBuf"), this->CurBuf);
+  saveDocData(savedElem);
+
+  //CurBuf
+  savedElem = new SaveElement(wxT("filled"), this->Filled);
+  saveDocData(savedElem);
+}
+
+void			Channel::Load(SaveElementArray data)
+{
+  int		dataCompt;
+
+  std::cerr << "[ChannelGui] Load()" << std::endl;
+  for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
+    {
+      std::cerr << "[ChannelGui] key = " << data[dataCompt]->getKey() << std::endl;
+      std::cerr << "[ChannelGui] value = " << data[dataCompt]->getValue() << std::endl;
+
+      if (data[dataCompt]->getKey() == wxT("stereo"))
+	{
+	  if (data[dataCompt]->getValue())
+	    this->Stereo = true;
+	  else
+	    this->Stereo = false;
+	}
+      else if (data[dataCompt]->getKey() == wxT("volumeLeft"))
+	{
+	  this->VolumeLeft = data[dataCompt]->getValueFloat();
+	}
+      else if (data[dataCompt]->getKey() == wxT("volumeRight"))
+	{
+	  this->VolumeRight = data[dataCompt]->getValueFloat();
+	}
+      else if (data[dataCompt]->getKey() == wxT("InputNum"))
+	{
+	  this->InputNum = (long)data[dataCompt]->getValueInt();
+	}
+      else if (data[dataCompt]->getKey() == wxT("Label"))
+	{
+	  this->Label = data[dataCompt]->getValue();
+	}
+      else if (data[dataCompt]->getKey() == wxT("visible"))
+	{
+	   if (data[dataCompt]->getValue())
+	    this->Visible = true;
+	  else
+	    this->Visible = false;
+	}
+      else if (data[dataCompt]->getKey() == wxT("lrms"))
+	{
+	  this->Lrms = data[dataCompt]->getValueFloat();
+	}
+      else if (data[dataCompt]->getKey() == wxT("rrms"))
+	{
+	  this->Rrms = data[dataCompt]->getValueFloat();
+	}
+      else if (data[dataCompt]->getKey() == wxT("curBuf"))
+	{
+	  this->CurBuf = data[dataCompt]->getValueInt();
+	}
+      else if (data[dataCompt]->getKey() == wxT("filled"))
+	{
+	  if (data[dataCompt]->getValue())
+	    this->Filled = true;
+	  else
+	    this->Filled = false;
+	}
     }
 }

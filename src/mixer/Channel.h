@@ -7,6 +7,7 @@
 #include <vector>
 #include <iostream>
 #include "AudioEngine.h"
+#include "WiredDocument.h"
 
 #define  NUM_BUFFERS  1
 
@@ -17,21 +18,21 @@
  * on them.
 */
 
-class Channel
+class Channel : public WiredDocument
 {
  public:
 
 /**
  * Ctor setting volumes for each channel
 */
-  Channel(bool stereo, bool visible = true);
+  Channel(bool stereo, bool visible = true, WiredDocument* docParent = NULL);
 
 /**
  * Copy Ctor
 */
 
-  Channel(const Channel& copy){*this = copy;}
-  Channel	operator=(const Channel& right);
+//  Channel(const Channel& copy) {*this = copy;}
+//  Channel	operator=(const Channel& right);
 
 /**
  * DCtor cleaning all channels
@@ -188,6 +189,19 @@ class Channel
 
   inline void	SetMuteRight(bool muted)
     { MuteRight = muted; };
+
+
+  /**
+   * WiredDocument implementation
+   */
+  void					Save();
+
+  /**
+   * WiredDocument implementation
+   */
+  void					Load(SaveElementArray data);
+
+
 
  private:
 

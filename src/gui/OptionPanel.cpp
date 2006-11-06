@@ -412,7 +412,6 @@ void				OptionPanel::Save()
 
 void				OptionPanel::Load(SaveElementArray data)
 {
-  wxString	s;
   int		dataCompt;
 
   std::cerr << "[OptionPanel Load()" << std::endl;
