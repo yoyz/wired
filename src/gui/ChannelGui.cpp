@@ -17,11 +17,11 @@
 #include "../mixer/Channel.h"
 #include "../mixer/Mixer.h"
 
-ChannelGui::ChannelGui(Channel *channel, wxImage *img_bg, wxImage *img_fg,
+ChannelGui::ChannelGui(Channel* channel, wxImage* img_bg, wxImage* img_fg,
 		       wxWindow* parent, wxWindowID id,
 		       const wxPoint& pos, const wxSize& size,
-		       const wxString& label)
-  : wxPanel( parent, id, pos, size )
+		       const wxString& label, WiredDocument* docParent)
+  : wxPanel(parent, id, pos, size), WiredDocument(wxT("ChannelGui"), docParent)
 {
 
   ConnectedSeqTrack = 0x0;
@@ -89,8 +89,8 @@ void				ChannelGui::OnPaint(wxPaintEvent& WXUNUSED(event))
   wxMemoryDC			memDC;
   wxPaintDC			dc(this);
   wxRegionIterator		upd(GetUpdateRegion());
-  memDC.SelectObject(*MixerBmp);
 
+  memDC.SelectObject(*MixerBmp);
   while (upd)
     {
       dc.Blit(upd.GetX(), upd.GetY(), upd.GetW(), upd.GetH(), &memDC,
@@ -186,6 +186,204 @@ void				ChannelGui::UpdateScreen()
     }
 }
 
+
+void				ChannelGui::Save()
+{
+  wxString	s;
+
+  std::cerr << "[Save] ChannelGui::Save()" << std::endl;
+
+  std::cerr << "[Save] ChannelGui::Save() Stereo: " << Stereo << std::endl;
+  //Stereo
+  SaveElement	*stereo = new SaveElement();
+  s.clear();
+  s << Stereo;
+  stereo->setKey(wxT("stereo"));
+  stereo->setValue(s);
+  saveDocData(stereo);
+
+  std::cerr << "[Save] ChannelGui::Save() Lock: " << Lock << std::endl;
+  //Lock
+  SaveElement	*lock = new SaveElement();
+  s.clear();
+  s << Lock;
+  lock->setKey(wxT("lock"));
+  lock->setValue(s);
+  saveDocData(lock);
+
+  std::cerr << "[Save] ChannelGui::Save() MuteLeftButton: " << MuteLeftButton->GetOn() << std::endl;
+  //MuteLeftButton
+  SaveElement	*muteLeftButton = new SaveElement();
+  s.clear();
+  s << MuteLeftButton->GetOn();
+  muteLeftButton->setKey(wxT("muteLeftButton"));
+  muteLeftButton->setValue(s);
+  saveDocData(muteLeftButton);
+
+  std::cerr << "[Save] ChannelGui::Save() MuteRightButton: " << MuteRightButton->GetOn() << std::endl;
+  //MuteRightButton
+  SaveElement	*muteRightButton = new SaveElement();
+  s.clear();
+  s << MuteRightButton->GetOn();
+  muteRightButton->setKey(wxT("muteRightButton"));
+  muteRightButton->setValue(s);
+  saveDocData(muteRightButton);
+
+  std::cerr << "[Save] ChannelGui::Save() LockButton: " << LockButton->GetOn() << std::endl;
+ //LockButton
+  SaveElement	*lockButton = new SaveElement();
+  s.clear();
+  s << LockButton->GetOn();
+  lockButton->setKey(wxT("lockButton"));
+  lockButton->setValue(s);
+  saveDocData(lockButton);
+
+
+  std::cerr << "[Save] ChannelGui::Save() Label: " << Label->GetLabel().c_str() << std::endl;
+  //Label
+  SaveElement	*label = new SaveElement();
+  s.clear();
+  s << Label->GetLabel().c_str();
+  label->setKey(wxT("label"));
+  label->setValue(s);
+  saveDocData(label);
+
+  std::cerr << "[Save] ChannelGui::Save() VolumeLeft: " << VolumeLeft->GetLabel().c_str() << std::endl;
+ //VolumeLeft
+  SaveElement	*volumeLeft = new SaveElement();
+  s.clear();
+  s << VolumeLeft->GetLabel().c_str();
+  label->setKey(wxT("volumeLeft"));
+  label->setValue(s);
+  saveDocData(volumeLeft);
+
+  std::cerr << "[Save] ChannelGui::Save() VolumeRight: " << VolumeRight->GetLabel().c_str() << std::endl;
+  //Label
+  SaveElement	*volumeRight = new SaveElement();
+  s.clear();
+  s << VolumeRight->GetLabel().c_str();
+  label->setKey(wxT("volumeRight"));
+  label->setValue(s);
+  saveDocData(volumeRight);
+
+}
+
+void				ChannelGui::Load(SaveElementArray data)
+{
+  wxString	s;
+  int		dataCompt;
+
+  std::cerr << "[ChannelGui] Load()" << std::endl;
+  for(dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
+    {
+      std::cerr << "[ChannelGui] key = " << data[dataCompt]->getKey() << std::endl;
+      std::cerr << "[ChannelGui] value = " << data[dataCompt]->getValue() << std::endl;
+
+      if(data[dataCompt]->getKey() == wxT("stereo"))
+	{
+	  s = data[dataCompt]->getValue();
+	  if (s == wxT("1"))
+	    SetStereo(true);
+	  else
+	    SetStereo(false);
+	}
+      else if(data[dataCompt]->getKey() == wxT("lock"))
+	{
+	  s = data[dataCompt]->getValue();
+	  if (s == wxT("1"))
+	    SetLock(true);
+	  else
+	    SetLock(false);
+	}
+      else if(data[dataCompt]->getKey() == wxT("muteLeftButton"))
+	{
+	  s = data[dataCompt]->getValue();
+	  if(s == wxT("1"))
+	    SetMuteLeftButton(true);
+	  else
+	    SetMuteLeftButton(false);
+	}
+      else if(data[dataCompt]->getKey() == wxT("muteRightButton"))
+	{
+	  s = data[dataCompt]->getValue();
+	  if(s == wxT("1"))
+	    SetMuteRightButton(true);
+	  else
+	    SetMuteRightButton(false);
+	}
+      else if(data[dataCompt]->getKey() == wxT("lockButton"))
+	{
+	  s = data[dataCompt]->getValue();
+	  if(s == wxT("1"))
+	    SetLockButton(true);
+	  else
+	    SetLockButton(false);
+	}
+      else if(data[dataCompt]->getKey() == wxT("label"))
+	{
+	  s = data[dataCompt]->getValue();
+	  SetLabel(s);
+	}
+
+      else if(data[dataCompt]->getKey() == wxT("volumeLeft"))
+	{
+	  s = data[dataCompt]->getValue();
+	  SetVolumeLeft(s);
+	}
+      else if(data[dataCompt]->getKey() == wxT("volumeRight"))
+	{
+	  s = data[dataCompt]->getValue();
+	  SetVolumeRight(s);
+	}
+    }
+}
+
+
+void				ChannelGui::SetStereo(bool stereo)
+{
+  this->Stereo = stereo;
+}
+
+void				ChannelGui::SetLock(bool lock)
+{
+  this->Lock = lock;
+}
+
+void				ChannelGui::SetMuteLeftButton(bool isDown)
+{
+  if (isDown)
+    this->MuteLeftButton->SetOn();
+  else
+    this->MuteLeftButton->SetOff();
+}
+
+void				ChannelGui::SetMuteRightButton(bool isDown)
+{
+  if (isDown)
+    this->MuteRightButton->SetOn();
+  else
+    this->MuteRightButton->SetOff();
+}
+
+void				ChannelGui::SetLockButton(bool isDown)
+{
+  if (isDown)
+    this->LockButton->SetOn();
+  else
+    this->LockButton->SetOff();
+}
+
+void				ChannelGui::SetVolumeLeft(wxString& level)
+{
+  this->VolumeLeft->SetLabel(level);
+}
+
+void				ChannelGui::SetVolumeRight(wxString& level)
+{
+  this->VolumeRight->SetLabel(level);
+}
+
+
 void				ChannelGui::OnMuteLeft(wxCommandEvent& WXUNUSED(e))
 {
   bool				m = MuteLeftButton->GetOn();
@@ -241,11 +439,11 @@ void				ChannelGui::OnLock(wxCommandEvent& WXUNUSED(e))
     LockButton->SetOff();
 }
 
-MasterChannelGui::MasterChannelGui( Channel *channel, wxImage *img_bg,
-				    wxImage *img_fg, wxWindow* parent,
-				    wxWindowID id, const wxPoint& pos,
-				    const wxSize& size )
-  : ChannelGui(channel, img_bg, img_fg, parent, id, pos, size, _("MASTER"))
+MasterChannelGui::MasterChannelGui(Channel* channel, wxImage* img_bg,
+				   wxImage* img_fg, wxWindow* parent,
+				   wxWindowID id, const wxPoint& pos,
+				   const wxSize& size, WiredDocument* docParent)
+  : ChannelGui(channel, img_bg, img_fg, parent, id, pos, size, _("MASTER"), docParent)
 {
   //  Label = new wxStaticText(this, -1, "MASTER", wxPoint(20, 0));
 }
@@ -255,10 +453,10 @@ MasterChannelGui::~MasterChannelGui()
 
 }
 
-void				MasterChannelGui::OnFaderLeft(wxScrollEvent &e)
+void				MasterChannelGui::OnFaderLeft(wxScrollEvent& e)
 {
-  //float				res = static_cast<float>(FaderLeft->GetValue() / 100.f);
-  //wxString			s;
+  //float		res = static_cast<float>(FaderLeft->GetValue() / 100.f);
+  //wxString		s;
 
   //s.Printf("%d", FaderLeft->GetValue());
   if (Lock)
@@ -280,7 +478,7 @@ void				MasterChannelGui::OnFaderLeft(wxScrollEvent &e)
   //VolumeLeft->SetLabel(s);
 }
 
-void				MasterChannelGui::OnFaderRight(wxScrollEvent &e)
+void				MasterChannelGui::OnFaderRight(wxScrollEvent& e)
 {
   //float				res = static_cast<float>(FaderRight->GetValue() / 100.f);
   //wxString			s;

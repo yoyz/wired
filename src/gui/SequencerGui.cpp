@@ -48,7 +48,7 @@ const struct s_combo_choice		ComboChoices[NB_COMBO_CHOICES + 1] =
   { wxT("")	,	4242	}
 };
 
-SequencerView::SequencerView(wxWindow *parent, const wxPoint &pos, 
+SequencerView::SequencerView(wxWindow *parent, const wxPoint &pos,
 			     const wxSize &size)
   : wxWindow(parent, -1, pos, size, wxSUNKEN_BORDER)
 {
@@ -176,7 +176,7 @@ void					SequencerView::AutoXScroll(double xmove)
 void					SequencerView::AutoXScrollBackward(long accel_type)
 {
   long					x;
-  
+
   HAxl->SetAccelType(accel_type);
   SeqPanel->HorizScrollBar->SetThumbPosition(((x = SeqPanel->HorizScrollBar->GetThumbPosition()
 					       - (long) floor(HAxl->ForwardAccel())) < 0) ? 0 : x);
@@ -186,7 +186,7 @@ void					SequencerView::AutoXScrollBackward(long accel_type)
 void					SequencerView::AutoXScrollForward(long accel_type)
 {
   long					x;
-  
+
   HAxl->SetAccelType(accel_type);
   if ((x = (long) floor(HAxl->ForwardAccel()) + SeqPanel->HorizScrollBar->GetThumbPosition())
       < (SeqPanel->HorizScrollBar->GetRange() - HSCROLL_THUMB_WIDTH))
@@ -380,8 +380,8 @@ void					SequencerView::DrawTrackLines(wxDC &dc)
 {
   vector<Track *>::iterator		i;
   long					h;
-  
-  for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)  
+
+  for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)
     if ((*i)->GetTrackPattern())
       {
 	if ((h = (*i)->GetTrackOpt()->GetPosition().y + (*i)->GetTrackOpt()->GetSize().y) > 0)
@@ -404,7 +404,7 @@ SequencerGui::SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &s
   : wxPanel(parent, -1, pos, size, wxSIMPLE_BORDER | wxWS_EX_PROCESS_IDLE),
     WiredDocument(wxT("SequencerGui"), docParent)
 {
- wxSize				s;
+  wxSize				s;
   wxSize				v;
   wxBoxSizer				*zer_1;
   wxBoxSizer				*zer_2;
@@ -417,7 +417,7 @@ SequencerGui::SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &s
 
   //Floating = false;
   CurrentXScrollPos = 0;
-  CurrentYScrollPos = 0;  
+  CurrentYScrollPos = 0;
   Tool = ID_TOOL_MOVE_SEQUENCER;
   HoriZoomFactor = 1.0f;
   VertZoomFactor = 1.0f;
@@ -454,14 +454,14 @@ SequencerGui::SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &s
   Toolbar->AddCheckTool(ID_SEQ_MAGNET, _("Magnet"), wxBitmap(WiredSettings->DataDir + MAGN_UP, wxBITMAP_TYPE_PNG), wxBitmap(WiredSettings->DataDir + MAGN_DOWN, wxBITMAP_TYPE_PNG), _("Magnetize"), _("Magnetize"), NULL);
   for (c = 0; c < NB_COMBO_CHOICES; c++)
     combo_choices[c] = ComboChoices[c].s;
-  MagnetQuant = new wxComboBox(Toolbar, ID_SEQ_COMBO_MAGNET, DEFAULT_MAGNETISM_COMBO_VALUE, 
+  MagnetQuant = new wxComboBox(Toolbar, ID_SEQ_COMBO_MAGNET, DEFAULT_MAGNETISM_COMBO_VALUE,
 			       wxPoint(-1, -1), wxSize(72, -1), 9, combo_choices, wxCB_READONLY);
   Toolbar->AddControl(MagnetQuant);
   Toolbar->AddSeparator();
   Toolbar->Realize();
   Toolbar->ToggleTool(ID_SEQ_MAGNET, MAGNETISM);
 //   SetToolBar(Toolbar);
-  VertScrollBar = new wxScrollBar(this, ID_SEQ_SCROLLING, wxPoint(-1, 0), 
+  VertScrollBar = new wxScrollBar(this, ID_SEQ_SCROLLING, wxPoint(-1, 0),
 			      wxSize(-1, -1), wxSB_VERTICAL);
   s = GetClientSize();
   v = VertScrollBar->GetSize();
@@ -521,7 +521,7 @@ SequencerGui::SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &s
   // evenement draw evenement midi
   Connect(ID_SEQ_DRAWMIDI, TYPE_SEQ_DRAWMIDI, (wxObjectEventFunction)&SequencerGui::OnDrawMidi);
   // Cr?ation du popup menu
-  PopMenu = new wxMenu();  
+  PopMenu = new wxMenu();
   PopMenu->Append(ID_POPUP_MOVE_TO_CURSOR, _("Move to cursor"));
   PopMenu->Append(ID_POPUP_DELETE, _("Delete"));
   PopMenu->AppendSeparator();
@@ -629,7 +629,7 @@ void					SequencerGui::UpdateMidiPattern(MidiPattern *m)
 void					SequencerGui::SetScrolling()
 {
   long					z;
-  
+
   SeqView->SetTotalHeight((unsigned long) (z = (long) floor(Seq->Tracks.size() * TRACK_HEIGHT * VertZoomFactor)));
   if (z < (SeqView->GetYScroll() + SeqView->GetClientSize().y))
     SeqView->SetTotalHeight(z);
@@ -653,7 +653,7 @@ void					SequencerGui::AdjustHScrolling()
   long					thumb_pos;
   long					range;
   double				pos_tmp;
-  
+
   if ((long) (floor(CurrentXScrollPos) - floor((pos_tmp = ((range = HorizScrollBar->GetRange() - HSCROLL_THUMB_WIDTH)) ?
     (((double) (SeqView->GetTotalWidth() - SeqView->GetClientSize().x)
       * (double) (thumb_pos = (HorizScrollBar->GetThumbPosition() >= range) ?
@@ -677,7 +677,7 @@ void					SequencerGui::AdjustVScrolling()
   long					thumb_pos;
   long					range;
   double				pos_tmp;
-  
+
   if ((long) (floor(CurrentYScrollPos) - floor((pos_tmp = ((range = VertScrollBar->GetRange() - VSCROLL_THUMB_WIDTH)) ?
     (((double) (SeqView->GetTotalHeight() - SeqView->GetClientSize().y)
       * (double) (thumb_pos = (VertScrollBar->GetThumbPosition() >= range) ?
@@ -701,7 +701,7 @@ void					SequencerGui::OnScroll(wxScrollEvent &event)
       AdjustHScrolling();
     }
   else
-    {       
+    {
       VertNowPos = VertScrollBar->GetThumbPosition();
       AdjustVScrolling();
     }
@@ -712,12 +712,12 @@ void					SequencerGui::UpdateTracks()
   vector<Track *>::iterator		i;
   long					z;
   long					h;
-  
+
   h = (long) floor(VertZoomFactor * TRACK_HEIGHT);
   for (z = -SeqView->GetYScroll(), i = Seq->Tracks.begin(); i != Seq->Tracks.end(); z += h)
     {
       (*i)->GetTrackOpt()->SetPosition(wxPoint(0, z));
-      (*i)->GetTrackOpt()->SetSize(wxSize(TRACK_WIDTH, h)); 
+      (*i)->GetTrackOpt()->SetSize(wxSize(TRACK_WIDTH, h));
       (*i++)->GetTrackOpt()->Refresh();
     }
   UpdateMeasures();
@@ -726,7 +726,7 @@ void					SequencerGui::UpdateTracks()
 void					SequencerGui::UpdateTrackList(vector<Track *> *track_list)
 {
   vector<Track *>::iterator		t;
-  
+
   for (t = track_list->begin(); t != track_list->end(); t++)
     (*t)->RefreshFullTrack();
 }
@@ -762,7 +762,7 @@ void					SequencerGui::UpdateMeasures()
       //      (*t)->GetTrackPattern()->Update();
       for (p = (*t)->GetTrackPattern()->Patterns.begin(); p != (*t)->GetTrackPattern()->Patterns.end(); p++)
 	(*p)->Update();
-    }  
+    }
 }
 
 void					SequencerGui::OnPaint(wxPaintEvent &event)
@@ -836,7 +836,7 @@ void					SequencerGui::SelectTrack(long trackindex)
 void					SequencerGui::SwapTracksPos(Track *t1, Track *t2)
 {
   long					z;
-  
+
   z = t1->GetTrackOpt()->GetPosition().y;
   t1->GetTrackOpt()->SetPosition(wxPoint(0, t2->GetTrackOpt()->GetPosition().y));
   t2->GetTrackOpt()->SetPosition(wxPoint(0, z));
@@ -888,7 +888,7 @@ void					SequencerGui::ScrollTrackList(long track_delta)
 {
   long					z;
   long					h;
-  
+
   z = track_delta * (h = (long) floor(TRACK_HEIGHT * VertZoomFactor));
   if (track_delta > 0)
     VertScrollBar->SetThumbPosition(((z += VertScrollBar->GetThumbPosition()) > (SeqView->GetTotalHeight() - SeqView->GetClientSize().y - h)) ?
@@ -920,8 +920,8 @@ void					SequencerGui::RefreshConnectMenu()
 void					SequencerGui::DeleteAllTracks()
 {
   vector<Track *>::iterator		i;
-  
-  for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)  
+
+  for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)
     {
       if ((*i)->GetTrackOpt()->ChanGui)
 	MixerPanel->RemoveChannel((*i)->GetTrackOpt()->ChanGui);
@@ -937,7 +937,7 @@ void					SequencerGui::DeleteSelectedTrack()
   vector<Track *>::iterator		iterTrack;
   vector<Pattern *>::iterator		iterPattern;
   long							j;
-  
+
 #ifdef __DEBUG__
   printf("SequencerGui::DeleteSelectedTrack()\n");
 #endif
@@ -1040,7 +1040,7 @@ void					SequencerGui::PasteItems()
       /* TODO : correct this */
       /* We move end's cursor if the end of the pattern is above it */
       /* if (EndCursor->GetPos() < pattern->GetEndPosition())
-	{	  	  
+	{
 	  EndCursor->SetPos(pattern->GetEndPosition());
 	  RedrawCursors();
 	  AdjustHScrolling();
@@ -1049,14 +1049,14 @@ void					SequencerGui::PasteItems()
     }
   if (DoCut)
     DeleteSelectedPatterns();
-  
+
 }
 
 void					SequencerGui::DeleteSelectedPatterns()
 {
   vector<Pattern *>::iterator		i;
   vector<Pattern *>::iterator		j;
-  
+
   for (i = SelectedItems.begin(); i != SelectedItems.end(); i++)
     {
       for (j = CopyItems.begin(); j != CopyItems.end(); j++)
@@ -1073,7 +1073,7 @@ void					SequencerGui::DeleteSelectedPatterns()
 void					SequencerGui::DeletePattern(Pattern *p)
 {
   vector<Pattern *>::iterator		i;
-  
+
   for (i = SelectedItems.begin(); i != SelectedItems.end(); i++)
     if (*i == p)
       {
@@ -1166,7 +1166,7 @@ void					SequencerGui::OnSetPosition(CursorEvent &event)
 void					SequencerGui::SetCurrentPos(double pos)
 {
   PlayCursor->SetPos(pos);
-  TransportPanel->SetPlayPosition(pos);  
+  TransportPanel->SetPlayPosition(pos);
 }
 
 void					SequencerGui::ChangeMouseCursor(wxCursor c)
@@ -1196,10 +1196,10 @@ void					SequencerGui::OnDrawMidi(wxCommandEvent &event)
 {
   MidiPattern				*p;
 
-  p = (MidiPattern *)event.GetEventObject();  
+  p = (MidiPattern *)event.GetEventObject();
   if (p)
   {
-      p->DrawMidi();  
+      p->DrawMidi();
       p->Update();
   }
 }
@@ -1344,7 +1344,7 @@ void					SequencerGui::Drop(int x, int y, wxString file)
 {
 
   SeqView->Drop(x, y, file);
-  
+
 }
 
 // WiredDocument implementation

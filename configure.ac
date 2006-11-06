@@ -197,21 +197,6 @@ if [[ $exec_prefix = "NONE" ]] ; then
 exec_prefix=`eval echo ${prefix}`
 fi
 
-echo
-echo
-echo
-echo
-echo
-echo
-
-echo "EXEC PREFIX : $exec_prefix"
-echo " PREFIX : $prefix"
-echo
-echo
-echo
-echo
-echo
-
 # For include
 includedir="`eval echo ${includedir}/wired`"
 INCLUDE_DIR="${includedir}"
@@ -227,7 +212,8 @@ SYSCONF_DIR="${sysconfdir}"
 AC_DEFINE_UNQUOTED(SYSCONF_DIR, "$SYSCONF_DIR", [define as sysconf dir])
 
 # For share
-DATA_DIR="`eval echo ${datadir}`"
+#${datadir}
+DATA_DIR="`eval echo ${prefix}/share`"
 AC_DEFINE_UNQUOTED(DATA_DIR, "$DATA_DIR", [define as datas dir])
 
 # for locale

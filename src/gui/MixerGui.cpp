@@ -13,13 +13,14 @@
 #include "../mixer/Mixer.h"
 #include "../engine/Settings.h"
 
+
 MixerGui				*MixerPanel = NULL;
 
 BEGIN_EVENT_TABLE(MixerGui, wxScrolledWindow)
 END_EVENT_TABLE()
 
-MixerGui::MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size)
-  : wxScrolledWindow(parent, -1, pos, size, wxNO_BORDER)//SUNKEN_BORDER)
+MixerGui::MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size, WiredDocument* docParent)
+: wxScrolledWindow(parent, -1, pos, size, wxNO_BORDER)/*SUNKEN_BORDER)*/ , WiredDocument(wxT("MixerGui"), docParent)
 {
   SetScrollRate(10, 0);
   SetVirtualSize(300, 131);
@@ -69,29 +70,29 @@ void MixerGui::OnMasterChange(wxCommandEvent &event)
 void MixerGui::AddMasterChannel(Channel *channel)
 {
   MasterChannelGui *gui = new MasterChannelGui(channel, ImgFaderBg,
-					       ImgFaderFg, this, -1, 
+					       ImgFaderFg, this, -1,
 					       wxPoint(0, 0),
-					       wxSize(CHANNELGUI_WIDTH, 
-						      CHANNELGUI_HEIGHT));
-  
+					       wxSize(CHANNELGUI_WIDTH,
+						      CHANNELGUI_HEIGHT), (WiredDocument *)this);
+
   SetVirtualSize(CHANNELGUI_WIDTH, CHANNELGUI_HEIGHT);
   ChannelGuiVector.push_back(gui);
-  
+
   vuMasterLeft = gui->VumLeft;
   vuMasterRight = gui->VumRight;
 }
 
 ChannelGui* MixerGui::AddChannel(Channel *channel, const wxString& label)
 {
-  int x = /* CHANNELGUI_WIDTH +*/ 
+  int x = /* CHANNELGUI_WIDTH +*/
     ChannelGuiVector.size() * CHANNELGUI_WIDTH;
-  ChannelGui *gui = new ChannelGui(channel, ImgFaderBg, ImgFaderFg, 
+  ChannelGui *gui = new ChannelGui(channel, ImgFaderBg, ImgFaderFg,
 				   this, -1, wxPoint(x, 0),
-				   wxSize(CHANNELGUI_WIDTH, 
+				   wxSize(CHANNELGUI_WIDTH,
 					  CHANNELGUI_HEIGHT),
-				   label);
-  
-  
+				   label, this);
+
+
   ChannelGuiVector.push_back(gui);
   UpdateChannelsPos();
   return gui;
@@ -125,7 +126,7 @@ void MixerGui::RemoveChannel(ChannelGui *gui)
 
 void MixerGui::UpdateChannelsPos()
 {
-  SetVirtualSize((CHANNELGUI_WIDTH * ChannelGuiVector.size()), 
+  SetVirtualSize((CHANNELGUI_WIDTH * ChannelGuiVector.size()),
 		 CHANNELGUI_HEIGHT);
   int xpos, ypos, x = 0, y = 0;
   for (vector<ChannelGui*>::iterator cg = ChannelGuiVector.begin();
@@ -143,7 +144,7 @@ ChannelGui* MixerGui::GetGuiByChan(Channel *c)
        cg != ChannelGuiVector.end(); cg++)
     if ((*cg)->Chan == c)
       return *cg;
-  return (0x0); 
+  return (0x0);
 }
 
 void MixerGui::SetLabelByChan(Channel *channel, const wxString& label)
@@ -161,3 +162,13 @@ void MixerGui::SetLabelByChan(Channel *channel, const wxString& label)
   cg->SetOpt(tr);
   }
 */
+
+void		MixerGui::Save()
+{
+
+}
+
+void		MixerGui::Load(SaveElementArray data)
+{
+
+}

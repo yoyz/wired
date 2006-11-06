@@ -12,6 +12,8 @@ using namespace			std;
 #include <vector>
 #include <wx/wx.h>
 #include <wx/string.h>
+#include "WiredDocument.h"
+
 
 #define OPT_TOOLBAR_HEIGHT	(17)
 #define OPT_TOOLBAR_BORDER	(2)
@@ -60,7 +62,7 @@ class				WiredFrame: public wxFrame
  public:
   WiredFrame(WiredTool *t, wxString s) :
     wxFrame(0x0, -1, s, wxDefaultPosition, wxSize(400, 200)),
-    Tool(t) 
+    Tool(t)
     {
       em = NULL;
       Connect(GetId(), wxEVT_CLOSE_WINDOW, (wxObjectEventFunction)(wxEventFunction)
@@ -90,10 +92,10 @@ class WiredTool
   void				*Data;
 };
 
-class OptionPanel : public wxPanel
+class OptionPanel : public wxPanel, public WiredDocument
 {
  public:
-  OptionPanel(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style);
+  OptionPanel(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style, WiredDocument* docParent);
   ~OptionPanel();
 
   void				AddAudioTool(AudioPattern *p);
@@ -110,6 +112,12 @@ class OptionPanel : public wxPanel
   void				ClosePlug(Plugin *p);
   void				DeleteTools();
   void				DeleteTools(void *DataPointer);		//Delete tool(s) associated with some data, for example delete editor for a pattern
+
+
+ //WiredDocument implementation
+  void					Save();
+  void					Load(SaveElementArray data);
+
 
  protected:
   wxPanel			*ToolbarPanel;

@@ -86,7 +86,7 @@ class				Transport : public wxPanel, WiredDocument
  protected:
   friend class			MainWindow;
 
-  wxGauge				*vum;
+  wxGauge			*vum;
   DownButton			*PlayBtn;
   DownButton			*StopBtn;
   DownButton			*RecordBtn;
@@ -101,7 +101,7 @@ class				Transport : public wxPanel, WiredDocument
   HoldButton			*SigNumDownBtn;
   HoldButton			*SigDenUpBtn;
   HoldButton			*SigDenDownBtn;
-  
+
   wxBitmap			*TrBmp;
   wxBitmap			*TrLoopBmp;
 
@@ -113,7 +113,7 @@ class				Transport : public wxPanel, WiredDocument
   wxStaticText			*SigDenLabel;
 
   wxTextCtrl			*BpmText;
-  
+
   DECLARE_EVENT_TABLE()
 };
 
