@@ -23,10 +23,16 @@ class SaveElement
    * \param value The value.
    */
   inline SaveElement(wxString key, wxString value)
-    { 
-      _key = key;
-      _value = value;
-    }
+    { setPair(key, value); }
+
+  inline SaveElement(wxString key, int value)
+    { setPair(key, value); }
+
+  inline SaveElement(wxString key, float value)
+    { setPair(key, value); }
+
+  inline SaveElement(wxString key, double value)
+    { setPair(key, value); }
 
   /** Copy constructor.
    * Duplicates the copy SaveElement into the new one.
@@ -52,14 +58,33 @@ class SaveElement
   /** Value setter.
    * \param value The new value.
    */
-  inline void		setValue(wxString value) { _value = value; }
+  inline void		setValue(wxString value) 
+    { _value = value; }
+
+  inline void		setValue(int value)
+    { wxString s; s << value; setValue(s); }
+
+  inline void		setValue(float value)
+    { wxString s; s << value; setValue(s); }
+
+  inline void		setValue(double value)
+    { wxString s; s << value; setValue(s); }
 
   /** Pair setter.
    * \param key The new key.
    * \param value The new value.
    */
   inline void		setPair(wxString key, wxString value) 
-    { _key = key; _value = value; }
+    { setKey(key); setValue(value); }
+
+  inline void		setPair(wxString key, int  value) 
+    { setKey(key); setValue(value); }
+
+  inline void		setPair(wxString key, float value) 
+    { setKey(key); setValue(value); }
+
+  inline void		setPair(wxString key, double value) 
+    { setKey(key); setValue(value); }
 
   /** Adds an attribute.
    * \param key the key of the attribute.
@@ -67,6 +92,15 @@ class SaveElement
    */
   inline void		addAttribute(wxString key, wxString value) 
     { _attributes[key] = value; }
+
+  inline void		addAttribute(wxString key, int value) 
+    { wxString s; s << value; _attributes[key] = s; }
+
+  inline void		addAttribute(wxString key, float value) 
+    { wxString s; s << value; _attributes[key] = s; }
+
+  inline void		addAttribute(wxString key, double value) 
+    { wxString s; s << value; _attributes[key] = s; }
   
   /** Adds a child.
    * \param children The SaveElement to be added as a child.
@@ -90,6 +124,15 @@ class SaveElement
    */
   inline wxString	getValue() { return _value; }
 
+  inline int		getValueInt() 
+    { long ret; _value.ToLong(&ret); return (int)ret; }
+
+  inline float		getValueFloat() 
+    { double ret; _value.ToDouble(&ret); return (float)ret; }
+
+  inline double		getValueDouble() 
+    { double ret; _value.ToDouble(&ret); return ret; }
+
   /** Children getter.
    * \return The clhildren of the SaveElement.
    */
@@ -105,6 +148,30 @@ class SaveElement
 	return _attributes[key];
       else
 	return wxT("");
+    }
+  
+  inline int		getAttributeInt(wxString key)
+    {
+      if (_attributes.find(key) != _attributes.end())
+	{ long ret; _attributes[key].ToLong(&ret); return (int)ret; }
+      else
+	return 0;
+    }
+  
+  inline float		getAttributeFloat(wxString key)
+    {
+      if (_attributes.find(key) != _attributes.end())
+	{ double ret; _attributes[key].ToDouble(&ret); return (float)ret; }
+      else
+	return 0.f;
+    }
+
+  inline double		getAttributeDouble(wxString key)
+    {
+      if (_attributes.find(key) != _attributes.end())
+	{ double ret; _attributes[key].ToDouble(&ret); return ret; }
+      else
+	return 0.f;
     }
   
   /** Returns if an attribute with such key exists.
