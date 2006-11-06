@@ -472,35 +472,35 @@ void				Transport::Save()
   s << Seq->BPM;
   BPM->setKey(wxT("BPM"));
   BPM->setValue(s);
-  saveDocData(WIRED_PROJECT_FILE, BPM);
+  saveDocData(BPM);
   
   SaveElement	*SigNum = new SaveElement();
   s.clear();
   s << Seq->SigNumerator;
   SigNum->setKey(wxT("SigNumerator"));
   SigNum->setValue(s);
-  saveDocData(WIRED_PROJECT_FILE, SigNum);
+  saveDocData(SigNum);
 
   SaveElement	*SigDen = new SaveElement();
   s.clear();
   s << Seq->SigDenominator;
   SigDen->setKey(wxT("SigDenominator"));
   SigDen->setValue(s);
-  saveDocData(WIRED_PROJECT_FILE, SigDen);
+  saveDocData(SigDen);
 
   SaveElement	*Click = new SaveElement();
   s.clear();
   s << Seq->Click;
   Click->setKey(wxT("Click"));
   Click->setValue(s);
-  saveDocData(WIRED_PROJECT_FILE, Click);
+  saveDocData(Click);
 
   SaveElement	*Loop = new SaveElement();
   s.clear();
   s << Seq->Loop;
   Loop->setKey(wxT("Loop"));
   Loop->setValue(s);
-  saveDocData(WIRED_PROJECT_FILE, Loop);
+  saveDocData(Loop);
 }
 
 void				Transport::Load(SaveElementArray data)

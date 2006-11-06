@@ -167,7 +167,7 @@ void				MLTree::Save()
   
   SaveTree(GetRootItem(), rootTreeSaveElem);
 
-  saveDocData(wxT("MediaLibrary/MLTree"), rootTreeSaveElem);
+  saveDocData(rootTreeSaveElem, wxT("MediaLibrary/MLTree"));
 }
 
 void				MLTree::Load(SaveElementArray data)

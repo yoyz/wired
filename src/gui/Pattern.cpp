@@ -284,12 +284,7 @@ double					Pattern::GetEndPos()
 
 void				Pattern::Save()
 {
-  SaveElement*			saved;
-
-  saved = new SaveElement();
-  saved->setPair(wxT("xdrag"), Name);
-  saveDocData(WIRED_PROJECT_FILE, saved);
-
+  saveDocData(new SaveElement(wxT("Name"), Name));
 }
 
 void				Pattern::Load(SaveElementArray data)

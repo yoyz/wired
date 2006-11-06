@@ -25,7 +25,7 @@ class WiredDocument
    * \param noParent For internal use only and should NEVER be set to true. Else,
    * the WiredDocument will never be saved.
    */
-  WiredDocument(wxString docName, WiredDocument *parent = NULL, 
+  WiredDocument(wxString docName, WiredDocument *parent = NULL,
 		bool noParent = false);
 
   /** Main save function.
@@ -105,7 +105,7 @@ class WiredDocument
    * WIRED_PROJECT_FILE, the data will be written in an external file.
    * \param data The SaveElement to write.
   */
-  void				saveDocData(wxString file, SaveElement *data);
+  void				saveDocData(SaveElement *data, wxString file = WIRED_PROJECT_FILE);
   
   /** Removes all the data previously stored. */
   void				clearDocData();

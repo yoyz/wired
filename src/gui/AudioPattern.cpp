@@ -450,7 +450,7 @@ void				AudioPattern::Save()
   SaveElement*			saved;
 
   saved = new SaveElement(wxT("filename"), FileName);
-  saveDocData(WIRED_PROJECT_FILE, saved);
+  saveDocData(saved);
 }
 
 void				AudioPattern::Load(SaveElementArray data)

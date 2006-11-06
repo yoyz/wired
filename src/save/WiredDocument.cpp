@@ -36,7 +36,7 @@ void		WiredDocument::SaveMe()
   Save();
 }
 
-void		WiredDocument::saveDocData(wxString file, SaveElement *data)
+void		WiredDocument::saveDocData(SaveElement *data, wxString file)
 {
   SaveElementsHashMap::iterator	it;
 
