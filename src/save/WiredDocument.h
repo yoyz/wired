@@ -77,6 +77,18 @@ class WiredDocument
 
  protected:
 
+  /** Saves an external file only.
+   * When implementing a WiredDocument, this is handy if you want the SaveCenter
+   * to write an external file without saving the whole project.<br>
+   * In this state of mind, it also allows to choose an arbitrary filename.
+   * \param file The key in the HashMap of the file to save.
+   * \param path The path to use when writing the file. If none is specified, 
+   * it will be written in the project folder.
+   */
+
+  void				SavePatch(wxString file, wxString path);
+
+
   /** Gets data from an external xml file.
    * When implementing a WiredDocument, you can the path to those files in the
    * "reference" SaveElements passed to Load().

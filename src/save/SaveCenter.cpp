@@ -42,10 +42,14 @@ void	SaveCenter::SaveProject()
   delete xmlFile;
 }
 
-void	SaveCenter::SaveFile(WiredDocument *doc, wxString file)
+void	SaveCenter::SaveFile(WiredDocument *doc, wxString file, wxString path)
 {
   doc->SaveMe();
-  WriteFile(file, doc->getDocFile(file)); 
+
+  if (path == wxT(""))
+    path = file;
+
+  WriteFile(path, doc->getDocFile(file)); 
 }
 
 void	SaveCenter::SaveDocument(WiredDocument *currentNode, WiredXml *xmlFile)
@@ -184,7 +188,7 @@ wxFileName	SaveCenter::getPathFromRelativeTag(wxString tag)
   return ret;
 }
 
-void		SaveCenter::WriteFile(wxString relativeFileName, 
+void		SaveCenter::WriteFile(wxString givenFileName, 
 				      SaveElementArray *elements)
 {
   wxFileName	filename;
@@ -194,19 +198,24 @@ void		SaveCenter::WriteFile(wxString relativeFileName,
 
   WiredXml	*xmlFile = new WiredXml();
   int		i;
-  
-  filename.Assign(getProjectPath());
-  relativePath = getPathFromRelativeTag(relativeFileName);
-  dirs = relativePath.GetDirs();
 
-  for(int j = 0; j < dirs.GetCount(); j++)
-    filename.AppendDir(dirs[j]);
+  if(givenFilename.StartsWith('/'))
+    filename.Assign(givenFileName);
+  else
+    {
+      filename.Assign(getProjectPath());
+      relativePath = getPathFromRelativeTag(givenFileName);
+      dirs = relativePath.GetDirs();
+      
+      for(int j = 0; j < dirs.GetCount(); j++)
+	filename.AppendDir(dirs[j]);
+      
+      filename.SetName(relativePath.GetName());
+      filename.SetExt(relativePath.GetExt());
+      
+      filename.MakeAbsolute();
+    }
 
-  filename.SetName(relativePath.GetName());
-  filename.SetExt(relativePath.GetExt());
-  
-  filename.MakeAbsolute();
-  
   if(!wxFileName::DirExists(filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME)))
     wxFileName::Mkdir(filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME),
 		      0777, wxPATH_MKDIR_FULL);

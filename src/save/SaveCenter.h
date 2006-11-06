@@ -84,11 +84,17 @@ class SaveCenter : public WiredDocument
   
   /** Only saves the file designated by file of the WiredDocument designated by doc.
    * This method should be used, for example, to save a plugin patch.<br>
-   * It only calls Save() on the WiredDocument and then writes the file with WriteFile.
+   * It only calls Save() on the WiredDocument and then writes the file with 
+   * WriteFile. As it allows to write a file that will be stored independently from
+   * the project, there is also a filename to specify a path. This path HAS TO be 
+   * absolute or it will be made relative to the project root.
+   * If no path is specified, the file will be saved as if it was a part of the 
+   * project.
    * \param doc The WiredDocument containing the file we want to save.
    * \param file The name of the file we want to save
+   * \param path The path to the file to write.
    */
-  void		SaveFile(WiredDocument *doc, wxString file);
+  void		SaveFile(WiredDocument *doc, wxString file, wxString path = wxT(""));
 
   /** Main function to call when loading a saved project.
    * It loads the project designated by getProjectPath().
