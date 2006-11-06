@@ -24,11 +24,13 @@
 int				AudioTrackCount = 0;
 int				MidiTrackCount = 0;
 
-SeqTrack::SeqTrack(long index, wxWindow *parent, 
+SeqTrack::SeqTrack(long index, wxWindow *winParent, 
 		   const wxPoint& pos = wxDefaultPosition, 
 		   const wxSize& size = wxDefaultSize,
-		   trackType type = eAudioTrack)
-  : wxControl(parent, -1, pos, size)
+		   trackType type = eAudioTrack,
+		   WiredDocument* docParent = NULL)
+  : wxControl(winParent, -1, pos, size),
+    WiredDocument(wxT("SeqTrack"), docParent)
 {
   wxString	str;
 
@@ -502,6 +504,34 @@ void					SeqTrack::SetDeviceId(long devid)
 	    DeviceBox->SetSelection(k);
 	    return;
 	  }
+    }
+}
+
+// WiredDocument implementation
+void					SeqTrack::Save()
+{
+  saveDocData(new SaveElement(wxT("TrackName"), Text->GetValue()));
+  saveDocData(new SaveElement(wxT("VuValue"), VuValue));
+  saveDocData(new SaveElement(wxT("Record"), Record));
+  saveDocData(new SaveElement(wxT("Mute"), Mute));
+  saveDocData(new SaveElement(wxT("Selected"), Selected));
+}
+
+void					SeqTrack::Load(SaveElementArray data)
+{
+  int					i;
+
+  for (i = 0; i < data.GetCount(); i++)
+    {
+      if (data[i]->getKey() == wxT("TrackName")) SetName(data[i]->getValue());
+      if (data[i]->getKey() == wxT("VuValue")) SetVuValue(data[i]->getValueInt());
+      if (data[i]->getKey() == wxT("Record")) SetRecording(data[i]->getValueInt());
+      if (data[i]->getKey() == wxT("Mute")) SetMute(data[i]->getValueInt());
+      if (data[i]->getKey() == wxT("Selected"))
+	{
+	  if (data[i]->getValueInt() == true)
+	    SelectTrack();
+	}
     }
 }
 

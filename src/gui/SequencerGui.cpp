@@ -560,7 +560,7 @@ Track					*SequencerGui::AddTrack(trackType type)
 		    (long) floor(CurrentYScrollPos));
   wxSize	size(TRACK_WIDTH, (long) floor(TRACK_HEIGHT * VertZoomFactor));
 
-  newTrack = new Track(this, type, pos, size, TrackView);
+  newTrack = new Track((WiredDocument*)Seq, type, pos, size, TrackView);
 
   UpdateTracks();
   SeqPanel->SetScrolling();
@@ -946,10 +946,11 @@ void					SequencerGui::DeleteSelectedTrack()
     ;
   if (iterTrack == Seq->Tracks.end())
     return;
+
+  // we should stop recording or something else instead return
   if ((*iterTrack)->GetTrackOpt()->Record && Seq->Recording)
     return;
-  if ((*iterTrack)->GetTrackOpt()->ChanGui)
-    MixerPanel->RemoveChannel((*iterTrack)->GetTrackOpt()->ChanGui);
+
   for (iterPattern = SelectedItems.begin(); iterPattern != SelectedItems.end(); )
     {
       if (((*iterTrack)->GetIndex() == (*iterPattern)->GetTrackIndex()) && (*iterPattern)->IsSelected())
@@ -957,13 +958,17 @@ void					SequencerGui::DeleteSelectedTrack()
       else
 	iterPattern++;
     }
+
+  // Block sequencer with locking mutex
   SeqMutex.Lock();
-  delete (*iterTrack);
   Seq->Tracks.erase(iterTrack);
+  delete (*iterTrack); 
+  // Change track index for each still existing tracks. Sort of reindexing.
   for (iterTrack = Seq->Tracks.begin(), j = 0; iterTrack != Seq->Tracks.end(); iterTrack++)
     (*iterTrack)->UpdateIndex(j++);
-  UpdateTracks();
   SeqMutex.Unlock();
+
+  UpdateTracks();
   SetScrolling();
   AdjustVScrolling();
 }
@@ -1350,12 +1355,46 @@ void					SequencerGui::Drop(int x, int y, wxString file)
 // WiredDocument implementation
 void					SequencerGui::Save()
 {
-
+  saveDocData(new SaveElement(wxT("CurrentPos"), CurrentPos));
+  saveDocData(new SaveElement(wxT("HoriZoomFactor"), HoriZoomFactor));
+  saveDocData(new SaveElement(wxT("VertZoomFactor"), VertZoomFactor));
+  saveDocData(new SaveElement(wxT("Tool"), Tool));
+  saveDocData(new SaveElement(wxT("CurrentXScrollPos"), CurrentXScrollPos));
+  saveDocData(new SaveElement(wxT("CurrentYScrollPos"), CurrentYScrollPos));
+  saveDocData(new SaveElement(wxT("FirstMeasure"), FirstMeasure));
+  saveDocData(new SaveElement(wxT("LastMeasure"),LastMeasure ));
+  saveDocData(new SaveElement(wxT("FollowPlayCursor"), FollowPlayCursor));
+  saveDocData(new SaveElement(wxT("Magnetism"), Magnetism));
+  saveDocData(new SaveElement(wxT("CursorMagnetism"), CursorMagnetism));
+  saveDocData(new SaveElement(wxT("PatternMagnetism"), PatternMagnetism));
+  saveDocData(new SaveElement(wxT("VertNowPos"), (int)VertNowPos));
+  saveDocData(new SaveElement(wxT("HorizNowPos"), (int)HorizNowPos));
+  saveDocData(new SaveElement(wxT("DoCut"), DoCut));
 }
 
 void					SequencerGui::Load(SaveElementArray data)
 {
+  int					i;
 
+  for (i = 0; i < data.GetCount(); i++)
+    {
+      if (data[i]->getKey() == wxT("CurrentPos"))
+	CurrentPos = data[i]->getValueDouble();
+      else if (data[i]->getKey() == wxT("HoriZoomFactor"))	HoriZoomFactor = data[i]->getValueFloat();
+      else if (data[i]->getKey() == wxT("VertZoomFactor"))	VertZoomFactor = data[i]->getValueFloat();
+      else if (data[i]->getKey() == wxT("Tool"))		Tool = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("CurrentXScrollPos"))	CurrentXScrollPos = data[i]->getValueDouble();
+      else if (data[i]->getKey() == wxT("CurrentYScrollPos"))	CurrentYScrollPos = data[i]->getValueDouble();
+      else if (data[i]->getKey() == wxT("FirstMeasure"))	FirstMeasure = data[i]->getValueDouble();
+      else if (data[i]->getKey() == wxT("LastMeasure"))		LastMeasure = data[i]->getValueDouble();
+      else if (data[i]->getKey() == wxT("FollowPlayCursor"))	FollowPlayCursor = (char)data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("Magnetism"))		Magnetism = (char)data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("CursorMagnetism"))	CursorMagnetism = (unsigned short)data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("PatternMagnetism"))	PatternMagnetism = (unsigned short)data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("VertNowPos"))		VertNowPos = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("HorizNowPos"))		HorizNowPos = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("DoCut"))		DoCut = data[i]->getValueInt();
+    }
 }
 
 /*

@@ -63,7 +63,7 @@ MediaLibrary		*MediaLibraryPanel = NULL;
 FileConversion		*FileConverter = NULL;
 SettingWindow		*SettingsWin = NULL;
 
-wxMutex			AudioMutex;
+wxMutex			AudioMutex(wxMUTEX_RECURSIVE);
 wxCondition		*SeqStopped = NULL;
 
 MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size)
@@ -204,9 +204,9 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
 
   /* Creation Panel */
   RackPanel = new Rack(split, -1, wxPoint(0, 0), wxSize(800, 250));
-  SeqPanel = new SequencerGui(split, wxPoint(0, 0), wxSize(800, 200), NULL);
+  SeqPanel = new SequencerGui(split, wxPoint(0, 0), wxSize(800, 200), this, (WiredDocument*)Seq);
   OptPanel = new OptionPanel(this, wxPoint(306, 452), wxSize(470, 120), wxSIMPLE_BORDER, (WiredDocument *)saveCenter);
-  TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER, (WiredDocument *)saveCenter);
+  TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER, NULL);
 
   MediaLibraryPanel = new MediaLibrary(splitVert);
 
@@ -628,8 +628,7 @@ void					MainWindow::OnNew(wxCommandEvent &event)
 
 bool					MainWindow::NewSession()
 {
-  // une session existe d?ja, demande de confirmation d'enregistrement
-
+  // an existing session is opened, we'll ask for confirmation
   wxMessageDialog			msg(this, _("Save current session ?"), wxT("Wired"),
 					    wxYES_NO | wxCANCEL | wxICON_QUESTION);
   int					res;
@@ -647,10 +646,9 @@ bool					MainWindow::NewSession()
 
   Seq->Stop();
 
-  SeqMutex.Lock();
-
+  // do some clean up
+  wxMutexLocker	locker(SeqMutex);
   WaveCenter.Clear();
-
   UpdatePlugins.clear();
   Seq->PatternsToRefresh.clear();
   Seq->PatternsToResize.clear();
@@ -658,7 +656,6 @@ bool					MainWindow::NewSession()
   SeqPanel->DeleteAllTracks();
   RackPanel->DeleteAllRacks();
   OptPanel->DeleteTools();
-  SeqMutex.Unlock();
   return (true);
 }
 
@@ -1653,8 +1650,7 @@ void					MainWindow::OnTimer(wxTimerEvent &event)
   list<MidiPattern *>::iterator		midiPatternIt;
   list<Plugin *>::iterator		pluginIt;
   list<Track *>::iterator		trackIt;
-
-  SeqMutex.Lock();
+  wxMutexLocker				locker(SeqMutex);
 
   MixerPanel->OnMasterChange(commandEvt);
   if (Seq->Playing)
@@ -1685,8 +1681,6 @@ void					MainWindow::OnTimer(wxTimerEvent &event)
   for (trackIt = Seq->TracksToRefresh.begin(); trackIt != Seq->TracksToRefresh.end(); trackIt++)
     (*trackIt)->GetTrackOpt()->SetVuValue();
   Seq->TracksToRefresh.clear();
-
-  SeqMutex.Unlock();
 }
 
 void					MainWindow::AddUpdatePlugin(Plugin *p)

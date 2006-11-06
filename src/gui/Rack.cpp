@@ -1,9 +1,6 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
-
 #include			"SeqTrack.h"
 #include			"Track.h"
 #include			"Rack.h"
@@ -19,7 +16,6 @@
 #include			"../redist/Plugin.h"
 #include			"../plugins/PluginLoader.h"
 
-extern wxMutex		SeqMutex;
 int					RackCount = 0;
 
 

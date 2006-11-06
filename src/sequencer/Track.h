@@ -22,6 +22,7 @@ enum trackType
 #include "Pattern.h"
 #include "SequencerGui.h"
 #include "ChannelGui.h"
+#include "WiredDocument.h"
 
 #define MAX_AUTO_COLOURS		(16)		
 
@@ -42,12 +43,14 @@ class					Track : public WiredDocument
   long					Index;
   trackType				Type;
 
-  SeqTrack				*TrackOpt;
-  SeqTrackPattern			*TrackPattern;
-  AudioPattern				*Wave;
-  MidiPattern				*Midi;
-  Channel				*Output;
+  SeqTrack*				TrackOpt;
+  SeqTrackPattern*			TrackPattern;
+  Channel*				Output;
   ChannelGui*				ChanGui;
+
+  // they MUST be pointer to another Patterns, they DONT need to be deleted.
+  AudioPattern*				Wave;
+  MidiPattern*				Midi;
 
  public:
   Track(WiredDocument* parentDoc, trackType type, wxPoint& pos, wxSize& size,
@@ -61,13 +64,13 @@ class					Track : public WiredDocument
   MidiPattern				*AddPattern(MidiTrack *t);
   void					AddPattern(Pattern *p);
   void					DelPattern(Pattern *p);
-  void					AddColoredPattern(Pattern *p);
 
   void					UpdateIndex(long trackindex);
   void					RefreshFullTrack();
   void					ChangeTrackColour(wxColour &c);
   bool					IsAudioTrack() { return ((Type == eAudioTrack) ? (true) : (false)); }
   bool					IsMidiTrack() { return ((Type == eMidiTrack) ? (true) : (false)); }
+  trackType				GetType() { return (Type); }
 
   inline long				GetIndex() { return (Index); };
 

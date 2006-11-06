@@ -241,7 +241,7 @@ class				SequencerGui: public wxPanel, public WiredDocument
 
  public:
   SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size,
-	       wxWindow *mainwindow = NULL, WiredDocument* docParent = NULL);
+	       wxWindow *mainwindow, WiredDocument* docParent);
   ~SequencerGui();
 
   Track				*AddTrack(trackType type = eAudioTrack);

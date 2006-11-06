@@ -8,8 +8,8 @@
 #include "MidiInDevice.h"
 #include "../gui/Threads.h"
 
-wxMutex					MidiMutex;
-wxMutex					MidiDeviceMutex;
+wxMutex					MidiMutex(wxMUTEX_RECURSIVE);
+wxMutex					MidiDeviceMutex(wxMUTEX_RECURSIVE);
 MidiThread				*MidiEngine;
 
 MidiThread::MidiThread()

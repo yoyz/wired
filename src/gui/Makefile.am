@@ -11,6 +11,7 @@ noinst_LIBRARIES = libgui.a
 libgui_a_SOURCES = 			\
 		AccelCenter.h		\
 		AccelCenter.cpp		\
+		AudioPattern.cpp	\
 		ChannelGui.cpp		\
 		ChannelGui.h		\
 		ColoredLine.cpp		\

@@ -40,11 +40,20 @@ Pattern::Pattern(WiredDocument *parent, wxString name, double pos, double endpos
 #ifdef __DEBUG__
   printf(">> NEW PATTERN from pos %f to %f (length=%f) on TRACK %d\n", Position, EndPosition, Length, TrackIndex);
 #endif
+
+  // add itself in track's array
+  SeqMutex.Lock();
+  Seq->Tracks[trackindex]->AddPattern(this);
+  SeqMutex.Unlock();
 }
 
 Pattern::~Pattern()
 {
-
+  // remove itself in track's array
+  SeqMutex.Lock();
+  if (Seq->Tracks[TrackIndex])
+    Seq->Tracks[TrackIndex]->DelPattern(this);
+  SeqMutex.Unlock();
 }
 
 void					Pattern::Modify(double newpos, double newendpos, 

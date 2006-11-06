@@ -53,7 +53,7 @@ void					AudioPattern::Init(WaveFile* w, WiredDocument* parent)
   Pattern::PenColor = CL_PATTERN_NORM;
   Pattern::BrushColor = CL_WAVEDRAWER_BRUSH;
   Name = wxString::Format(wxT("T%d A%d"), TrackIndex + 1, audio_pattern_count++);
-  LastBlock = -1;  
+  LastBlock = -1;
   RecordWave = 0;
   InputChan = NULL;
   RecordWave = NULL;
@@ -316,7 +316,6 @@ Pattern					*AudioPattern::CreateCopy(double pos)
   p->SetDrawColour(WaveDrawer::PenColor);
   p->Update();
   SeqMutex.Unlock();
-  Seq->Tracks[TrackIndex]->AddColoredPattern((Pattern *) p);
 
 #ifdef __DEBUG__
   printf(" [  END  ] AudioPattern::CreateCopy(%f) on track %d\n", pos, TrackIndex);
@@ -349,7 +348,6 @@ void					AudioPattern::Split(double pos)
  
   if ((Position < pos) && (pos < EndPosition))
     {
-      SeqMutex.Lock();
 #ifdef __DEBUG__
       cout << " >>> HERE OLD:\n\t Position = " << Position << "\n\t Length = " << Length << "\n\t EndPosition = " << EndPosition << endl;
       cout << "new pos: " << pos << endl;
@@ -358,6 +356,7 @@ void					AudioPattern::Split(double pos)
 #ifdef __DEBUG__
       cout << " >>> HERE NEW :\n\t p->Position = " << p->Position << "\n\t p->Length = " << p->Length << "\n\t p->EndPosition = " << p->EndPosition << endl;
 #endif
+      SeqMutex.Lock();
       p->StartWavePos = StartWavePos + (long) floor((pos - Position) * Seq->SamplesPerMeasure);
       p->EndWavePos = p->StartWavePos + (long) floor(p->Length * Seq->SamplesPerMeasure);
       
@@ -373,7 +372,6 @@ void					AudioPattern::Split(double pos)
       SetDrawing();
       Update();
       SeqMutex.Unlock();
-      Seq->Tracks[TrackIndex]->AddColoredPattern((Pattern *) p);
     }
   else
     cout << "C QUOI CE DELIRE DE POS ?? " << pos << endl;
@@ -446,11 +444,7 @@ void					AudioPattern::SetSize(wxSize s)
 
 void				AudioPattern::Save()
 {
-  cout << "Audio PATTERN SAVING" << endl;
-  SaveElement*			saved;
-
-  saved = new SaveElement(wxT("filename"), FileName);
-  saveDocData(saved);
+  saveDocData(new SaveElement(wxT("filename"), FileName));
 }
 
 void				AudioPattern::Load(SaveElementArray data)

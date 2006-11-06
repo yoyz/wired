@@ -10,6 +10,7 @@
 #endif
 
 #include "Track.h"
+#include "WiredDocument.h"
 
 #define NONE_SELECTED_ID		(999)
 
@@ -30,11 +31,12 @@ class					ChoiceButton;
 class					DownButton;
 class					VUMCtrl;
 
-class					SeqTrack: public wxControl
+class					SeqTrack: public wxControl,
+						  public WiredDocument
 {
  public:
-  SeqTrack(long index, wxWindow *parent, const wxPoint& pos, 
-	   const wxSize& size, trackType type);
+  SeqTrack(long index, wxWindow *winParent, const wxPoint& pos, 
+	   const wxSize& size, trackType type, WiredDocument* docParent);
   ~SeqTrack();
 
   inline void				SetChannelGui(ChannelGui* chan)
@@ -63,6 +65,10 @@ class					SeqTrack: public wxControl
   void					SetDeviceId(long devid);
   void					OnNameChange(wxCommandEvent& event);
   void					SetName(const wxString&);
+
+  // WiredDocument implementation
+  void					Save();
+  void					Load(SaveElementArray data);
 
   long					DeviceId;
   long					Index;

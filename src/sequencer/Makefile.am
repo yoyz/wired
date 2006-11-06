@@ -12,7 +12,6 @@ noinst_LIBRARIES = libsequencer.a
 libsequencer_a_SOURCES = 		\
 		Sequencer.cpp		\
 		Sequencer.h		\
-		../gui/AudioPattern.cpp \
 		Track.cpp		\
 		Track.h			\
 		SeqTrackPattern.cpp	\

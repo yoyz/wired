@@ -11,7 +11,7 @@
 #include "../engine/AudioEngine.h"
 
 extern Mixer			*Mix;
-wxMutex				MixMutex;
+wxMutex				MixMutex(wxMUTEX_RECURSIVE);
 
 Mixer::Mixer()
 {

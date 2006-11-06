@@ -494,23 +494,24 @@ void					Sequencer::PrepareTrackForRecording(Track *T)
   type = Audio->GetLibSndFileFormat();
   if (T->IsAudioTrack())
     {
-      T->SetAudioPattern(new AudioPattern((WiredDocument*)T, CurrentPos,
-					  CurrentPos + 0.1, T->GetIndex()));
-      if (!T->GetAudioPattern()->PrepareRecord(type))
+      AudioPattern*	created;
+
+      created = new AudioPattern((WiredDocument*)T, CurrentPos,
+				 CurrentPos + 0.1, T->GetIndex());
+      if (!created->PrepareRecord(type))
 	{
-	  T->SetAudioPattern(NULL);
+	  // if we cant record in this pattern, we give up
+	  delete created;
 	  T->GetTrackOpt()->SetRecording(false);
 	  return;
 	}
-      else
-	T->GetTrackPattern()->Patterns.push_back(T->GetAudioPattern());	      
-
+      // else we set the audio pattern ready to record
+      T->SetAudioPattern(created);
     }
   else if (T->IsMidiTrack())
     {
       T->SetMidiPattern(new MidiPattern((WiredDocument*)T, CurrentPos,
 					CurrentPos + 0.1, T->GetIndex()));
-      T->GetTrackPattern()->Patterns.push_back(T->GetMidiPattern());
     }  
 }
 
@@ -850,7 +851,7 @@ void					Sequencer::AddMidiPattern(list<SeqCreateEvent *> *l,
   vector<Track *>::iterator		i;
   list<SeqCreateEvent *>::iterator	j;
   Track					*t = 0x0;
-  MidiPattern				*p;
+  MidiPattern				*pattern;
   MidiEvent				*e;
   double				max_end = 0.0;
 
@@ -865,7 +866,7 @@ void					Sequencer::AddMidiPattern(list<SeqCreateEvent *> *l,
       t = SeqPanel->AddTrack(eMidiTrack);
       t->GetTrackOpt()->ConnectTo(plug);
     }
-  p = new MidiPattern((WiredDocument*)t, CurrentPos, CurrentPos, t->GetTrackOpt()->Index - 1);
+  pattern = new MidiPattern((WiredDocument*)t, CurrentPos, CurrentPos, t->GetTrackOpt()->Index - 1);
   for (j = l->begin(); j != l->end(); j++)
     {
       e = new MidiEvent(0, (*j)->Position, (*j)->MidiMsg);
@@ -873,11 +874,10 @@ void					Sequencer::AddMidiPattern(list<SeqCreateEvent *> *l,
       if (max_end < e->EndPosition)
 	max_end = e->EndPosition;
       //      cout << "adding event: " << e->Position << " ; end: " << e->EndPosition << ", midimsg: " << e->Msg << endl;
-      p->AddEvent(e);
+      pattern->AddEvent(e);
     }
-  p->Modify(-1, -1, -1, max_end);
-  p->Update();
-  t->AddPattern(p);
+  pattern->Modify(-1, -1, -1, max_end);
+  pattern->Update();
 }
 
 bool					Sequencer::ExportToWave(wxString &filename)
@@ -1054,10 +1054,34 @@ void                    Sequencer::OnExit()
 
 void			Sequencer::Load(SaveElementArray data)
 {
+  int			i;
+  int			n;
+  int			nbTracks;
 
+  for (i = 0; i < data.GetCount(); i++)
+    {
+      if (data[i]->getKey() == wxT("TracksNumber"))
+	nbTracks = data[i]->getValueInt();
+    }
+  n = 0;
+  for (i = 0; i < data.GetCount(); i++)
+    {
+      if (data[i]->getKey() == (wxString(wxT("Track_")) << n))
+	{
+	  SeqPanel->AddTrack((trackType)data[i]->getValueInt());
+	  n++;
+	}
+    }
+  if (n != nbTracks)
+    cerr << "Bad number of tracks, maybe some things will crash.... " << endl;
 }
 
 void			Sequencer::Save()
 {
+  int			i;
 
+  saveDocData(new SaveElement(wxT("TracksNumber"), (int)Tracks.size()));
+  for (i = 0; i < Tracks.size(); i++)
+    saveDocData(new SaveElement(wxString(wxT("Track_")) << i,
+				(int)Tracks[i]->GetType()));
 }

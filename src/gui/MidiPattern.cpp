@@ -142,7 +142,6 @@ void					MidiPattern::Split(double pos)
 
   if ((Position < pos) && (pos < EndPosition))
     {
-      SeqMutex.Lock();
 #ifdef __DEBUG__
       cout << " >>> HERE OLD:\n\t Position = " << Position << "\n\t Length = " << Length << "\n\t EndPosition = " << EndPosition << endl;
       cout << "new pos: " << pos << endl;
@@ -151,6 +150,8 @@ void					MidiPattern::Split(double pos)
 #ifdef __DEBUG__
       cout << " >>> HERE NEW :\n\t p->Position = " << p->Position << "\n\t p->Length = " << p->Length << "\n\t p->EndPosition = " << p->EndPosition << endl;
 #endif
+
+      SeqMutex.Lock();
       Length = (EndPosition = pos) - Position;
       for (o = Events.begin(), pos -= Position; o != Events.end(); )
 	if ((*o)->Position >= pos)
@@ -188,7 +189,6 @@ void					MidiPattern::Split(double pos)
       p->Update();
       Update();
       SeqMutex.Unlock();
-      Seq->Tracks[TrackIndex]->AddColoredPattern((Pattern *) p);
     }
   else
     cout << "C QUOI CE DELIRE DE POS ?? " << pos << " MAIS mpos.x ? " << Pattern::GetMPosition().x << endl;
