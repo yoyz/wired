@@ -1,4 +1,9 @@
+// Copyright (C) 2004-2006 by Wired Team
+// Under the GNU General Public License Version 2, June 1991
+
 #include "SaveCenter.h"
+
+SaveCenter		*saveCenter = NULL;
 
 SaveCenter::SaveCenter(wxFileName  projectPath)
   : WiredDocument(wxT("savecenter"), NULL, true)

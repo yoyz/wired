@@ -63,8 +63,6 @@ MediaLibrary		*MediaLibraryPanel = NULL;
 FileConversion		*FileConverter = NULL;
 SettingWindow		*SettingsWin = NULL;
 
-SaveCenter		*saveCenter = NULL;
-
 wxMutex			AudioMutex;
 wxCondition		*SeqStopped = NULL;
 

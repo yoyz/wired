@@ -1,3 +1,6 @@
+// Copyright (C) 2004-2006 by Wired Team
+// Under the GNU General Public License Version 2, June 1991
+
 #ifndef _SAVECENTER_H_
 #define _SAVECENTER_H_
 
@@ -197,5 +200,7 @@ class SaveCenter : public WiredDocument
    */ 
   bool			_saved;
 };
+
+extern SaveCenter*	saveCenter;
 
 #endif /*_SAVECENTER_H_ */
