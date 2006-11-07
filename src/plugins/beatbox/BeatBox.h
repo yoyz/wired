@@ -140,7 +140,15 @@ class WiredBeatBox : public Plugin, public WiredDocument
 /*   long		Save(int fd); */
   void		Save();
   void		Load(SaveElementArray data);
+
+  void		LoadPatch(wxString filename);
+  void		LoadChannel(SaveElement *channelData);
+  void		LoadBank(SaveElement *bankData);
+  void		LoadPattern(SaveElement *patternData, int bank);
   
+  void		StringToIntArray(wxString s, int *i);
+  wxString	IntArrayToString(int *vect);
+
   void		SetBufferSize(long size);
   void		SetSamplingRate(long rate) { SamplingRate = rate; }
   void		Process(float **input, float **output, long sample_length);
@@ -257,6 +265,7 @@ class WiredBeatBox : public Plugin, public WiredDocument
   
   wxStaticText**	BeatLabels;
   wxStaticText*		StepsLabel;
+  wxStaticText*		PatchLabel;
   
   StaticPosKnob*	BankKnob;    
   CycleKnob*		StepsKnob;

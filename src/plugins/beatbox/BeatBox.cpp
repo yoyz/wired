@@ -212,7 +212,7 @@ WiredBeatBox::WiredBeatBox(PlugStartInfo &startinfo, PlugInitInfo *initinfo,
       new DownButton(this, BB_OnLoadPatch, wxPoint(23, 149), wxSize(17,18), 
 		     tmp_img, tmp_img2, true);
   
-  wxStaticText* PatchLabel =
+  PatchLabel =
     new wxStaticText(this, -1, wxT("p31kit"), wxPoint(24,190), wxSize(30, 10), 
 		     wxALIGN_RIGHT);
   
@@ -1571,15 +1571,8 @@ void WiredBeatBox::AddBeatNote(BeatNote* note, BeatBoxChannel* c,
 			       unsigned int bank, unsigned int track)
 {
   
-  if (c->Rythms[bank][track].empty())
-    {
-      PatternMutex.Lock();
-      c->Rythms[bank][track].push_back(note);
-      PatternMutex.Unlock();
-      SetPatternList();
-      return;
-    }
-  if (note->Position > c->Rythms[bank][track].back()->Position)
+  if (c->Rythms[bank][track].empty() ||
+      note->Position > c->Rythms[bank][track].back()->Position)
     {
       PatternMutex.Lock();
       c->Rythms[bank][track].push_back(note);
@@ -1740,343 +1733,232 @@ void WiredBeatBox::OnSavePatch(wxCommandEvent& WXUNUSED(e))
 void WiredBeatBox::OnLoadPatch(wxCommandEvent& WXUNUSED(e))
 {
   vector<wxString> exts;
-  exts.push_back(_("drm\tDRM-31 patch file (*.drm)"));
+  // exts.push_back(_("drm\tDRM-31 patch file (*.drm)"));
+  exts.push_back(_("xml\tDRM-31 xml patch file (*.xml)"));
   
   wxString selfile = OpenFileLoader(_("Load Patch"), &exts);
   if (!selfile.empty())
     {
-      int fd = open(selfile.mb_str(*wxConvCurrent), O_RDONLY);
-      if (fd < 0)
-	{
-	  cout << "OnLoadPatch: Couldnt open( " << selfile << " )" << endl;
-	  return;
-	}
       PatternMutex.Lock();
       OnLoading = true;
       PatternMutex.Unlock();
       
+
       for (int chan = 0; chan < NB_CHAN; chan++)
 	Channels[chan]->Reset();
-      
-      struct stat st;
-      fstat(fd, &st);
-      cout << "[DRM31] load patch: file size: " << st.st_size 
-	   << endl;
-      
+
       wxProgressDialog *Progress = 
 	new wxProgressDialog(_("Loading patch file"), _("Please wait..."), 
 			     100, this, wxPD_AUTO_HIDE | wxPD_CAN_ABORT
 			     | wxPD_REMAINING_TIME);
       Progress->Update(1);
       Progress->Update(55);
-      //      Load();
-      //      Load(fd, st.st_size);
+
+      LoadPatch(selfile);
+      std::cerr << "[BeatBox] Out of LoadPatch" << std::endl;
+
       Progress->Update(75);
       Progress->Update(100);
-      close(fd);
+
       delete Progress;
+
+      std::cerr << "[BeatBox] Out of if" << std::endl;
+      
+
+      EditedPattern = 0;
+      SelectedPattern = 0;
+      EditedBank = 0;
+      SelectedBank = 0;
+      
+      SelectedChannel = Channels[0];
+      Channels[0]->Select();
+      ReCalcStepsSigCoef();
+      UpdateSteps(0,0);
+      SetPatternList();
+
+      PatternMutex.Lock();
+      OnLoading = false;
+      PatternMutex.Unlock();
     }
   else
     cout << "[DRM31] Could not load file" << endl;
-  
-  EditedPattern = SelectedPattern = EditedBank = SelectedBank = 0;
-  
+
+}
+
+void	WiredBeatBox::LoadPatch(wxString filename)
+{
+  SaveElementArray	data;
+  int			dataIt;
+  wxString		patchName;
+
+  patchName = filename.AfterLast('/');
+  patchName = patchName.BeforeFirst('.');
+
+  PatchLabel->SetLabel(patchName);
+
+  data = AskData(filename);
+
+  std::cerr << "[BeatBox] loading : " << filename.mb_str() << std::endl;
+
+  for(dataIt = 0; dataIt < data.GetCount(); dataIt++)
+    {
+      if(data[dataIt]->getKey() == wxT("MidiVolume"))
+	StringToIntArray(data[dataIt]->getValue(), MidiVolume);
+      else if(data[dataIt]->getKey() == wxT("MidiSteps"))
+	StringToIntArray(data[dataIt]->getValue(), MidiSteps);
+      else if(data[dataIt]->getKey() == wxT("MasterLevel"))
+	{
+	  MLevel = data[dataIt]->getValueFloat();
+	  std::cerr << "[BeatBox] MLevel = " << MLevel << std::endl;
+	  Pool->SetVolume(MLevel);
+	  MVol->SetValue((int)floor(MLevel*100));
+	}
+      else if(data[dataIt]->getKey() == wxT("channel"))
+	LoadChannel(data[dataIt]);
+      else if(data[dataIt]->getKey().Matches(wxT("bank")))
+	LoadBank(data[dataIt]);
+    }
+
+  SetVoices();
   SelectedChannel = Channels[0];
   Channels[0]->Select();
+  EditedPattern = SelectedPattern = EditedBank = SelectedBank = 0;
+  for (int i = 0; i < NUM_PATTERNS; i++)
+    PatternSelectors[i]->SetOff();
+  PatternSelectors[0]->SetOn();
+  BankKnob->SetValue(1);
+  
   ReCalcStepsSigCoef();
   UpdateSteps(0,0);
   SetPatternList();
-  
-  PatternMutex.Lock();
-  OnLoading = false;
-  PatternMutex.Unlock();
-  
+
+  Update();
 }
 
-wxString	IntVectorToString(int *vect)
+void	WiredBeatBox::LoadChannel(SaveElement *channelData)
 {
-  wxString ret;
-
-  ret << vect[0] << wxT(" ") << vect[1] << wxT(" ") << vect[2];
-
-  return ret;
-}
-
-void	WiredBeatBox::Save()
-{
-  //The old save function has been taken back and adapted for time effiency.
-  //However, it would be a good idea to migrate the infos about the channels
-  //in the BeatBoxChannel class and to save them separately.
-  //Unfortunately, this involves taking back the whole Drum-31 structure and
-  //there is no time to do this.
-  
-  std::cerr << "_____SAVE______" << std::endl;
-
-  SaveElement	*saveElem, *bank, *pattern, *channel, *note;
   wxString	s;
+  int		i;
+  int		vect[3];
+  float paramVal;
+  
+  i = channelData->getAttributeInt(wxT("id"));  
 
-  //saving midi params
-  //MidiVolume
-  saveElem = new SaveElement(wxT("MidiVolume"), IntVectorToString(MidiVolume));
-  saveDocData(saveElem, wxT("beatbox/patch"));
+  s.clear();
+  s = channelData->getValue();
 
-  //MidiSteps
-  saveElem = new SaveElement(wxT("MidiSteps"), IntVectorToString(MidiSteps));
-  saveDocData(saveElem, wxT("beatbox/patch"));
+  s.Trim();
+  s.Trim(false);
 
-  //Channels  
-  for(int i = 0; i < NB_CHAN; i++)
+  if(s != wxT(""))
+  {
+    WaveFile *w = new WaveFile(s);
+    Channels[i]->SetWaveFile(w);
+  }
+
+  for(int j = 0; j < NB_PARAMS; j++)
     {
-      saveElem = new SaveElement();
-      saveElem->setKey(wxString(wxT("channel_")) << i);
-
-      if(Channels[i]->Wave)
-	saveElem->setValue(Channels[i]->Wave->Filename);
-
-      saveElem->addAttribute(wxT("MidiVolume"), 
-			     IntVectorToString(Channels[i]->MidiVolume));
-      saveElem->addAttribute(wxT("MidiVel"), 
-			     IntVectorToString(Channels[i]->MidiVel));
-      saveElem->addAttribute(wxT("MidiPitch"), 
-			     IntVectorToString(Channels[i]->MidiPitch));
-      saveElem->addAttribute(wxT("MidiPan"), 
-			     IntVectorToString(Channels[i]->MidiPan));
-      saveElem->addAttribute(wxT("MidiStart"), 
-			     IntVectorToString(Channels[i]->MidiStart));
-      saveElem->addAttribute(wxT("MidiVel"), 
-			     IntVectorToString(Channels[i]->MidiEnd));
-      //params
-      for(int j = 0; j < NB_PARAMS; j++)
-	{
-	  s.clear();
-	  s << Channels[i]->Params[j];
-	  saveElem->addAttribute(wxString(wxT("param_")) << j, s);
-	}
-
-      //muted, solo, reverse
-      if(Channels[i]->Muted)
-	saveElem->addAttribute(wxT("mute"), wxT("true"));
-      else
-	saveElem->addAttribute(wxT("mute"), wxT("false"));
-
-      if(Channels[i]->IsSolo)
-	saveElem->addAttribute(wxT("solo"), wxT("true"));
-      else
-	saveElem->addAttribute(wxT("solo"), wxT("false"));
-
-      if(Channels[i]->Reversed)
-	saveElem->addAttribute(wxT("reverse"), wxT("true"));
-      else
-	saveElem->addAttribute(wxT("reverse"), wxT("false"));
-
-      //Voices
+      
       s.clear();
-      s << Channels[i]->Voices;
-      saveElem->addAttribute(wxT("voices"), s);
+      s << wxT("param_") << j;
+      paramVal = channelData->getAttributeFloat(s);
 
-
-      saveDocData(saveElem, wxT("beatbox/patch"));
+      if(j == LEV)
+	Channels[i]->SetLev((int)floor(paramVal * 100.0f));
+      else if(j == VEL)
+	Channels[i]->SetVel((int)floor(paramVal * 100.0f));
+      else if(j == PIT)
+	Channels[i]->SetPitch((int)floor(paramVal * 100.0f));
+      else if(j == PAN)
+	Channels[i]->SetPan((int)floor(paramVal * 100.0f));
+      else if(j == STA)
+	Channels[i]->SetStart((int)floor(paramVal * 100.0f));
+      else if(j == END)
+	Channels[i]->SetEnd((int)floor(paramVal * 100.0f));
     }
 
-  //banks & patterns
-  for (int b = 0; b < 5; b++)
-    {
-      bank = new SaveElement();
-      bank->setKey(wxString(wxT("bank_")) << b);
-      for (int p = 0; p < 8; p++)
-	{
-	  pattern = new SaveElement();
-	  bank->addChildren(pattern);
-	  pattern->setKey(wxString(wxT("pattern_")) << p);
-	  pattern->addAttribute(wxT("SigIndex"), SigIndex[b][p]);
-	  pattern->addAttribute(wxT("Steps"), Steps[b][p]);
-
-	  //notes
-	  for(int c = 0; c < NB_CHAN; c++)
-	    {
-	      channel = new SaveElement();
-	      pattern->addChildren(channel);
-	      channel->setKey(wxString(wxT("channel_")) << c);	      
-	      int n = 0;
-	      for(list<BeatNote*>::iterator bn = Channels[c]->Rythms[b][p].begin();
-		  bn != Channels[c]->Rythms[b][p].end();
-		  bn++)
-		{		  
-		  s.clear();
-		  s << (*bn)->Position;
-		  note = new SaveElement();
-		  channel->addChildren(note);
-		  note->setKey(wxString(wxT("note_")) << n);
-		  s.clear();
-		  s << (*bn)->State;
-		  note->addAttribute(wxT("state"), s);
-		  note->addAttribute(wxT("position"), (*bn)->Position);
-		  note->addAttribute(wxT("reversed"), (*bn)->Reversed);
-		  for(int p = 0; p < NB_PARAMS; p++)
-		    note->addAttribute(wxString(wxT("param_")) << p,
-				       (*bn)->Params[p]);
-				     
-		  n++;
-		}
-	    }
-	}
-      saveDocData(bank, wxT("beatbox/patch"));
-    }
+  Channels[i]->Muted = channelData->getAttributeInt(wxT("mute"));
+  Channels[i]->IsSolo = channelData->getAttributeInt(wxT("solo"));
+  Channels[i]->Reversed = channelData->getAttributeInt(wxT("reverse"));
   
+  s.clear();
+  s = channelData->getAttribute(wxT("voices"));
+  s.ToULong((unsigned long *) &(Channels[i]->Voices));
+
+  Channels[i]->UpdateGui();
 
 }
 
-void	WiredBeatBox::Load(SaveElementArray data)
+void	WiredBeatBox::LoadBank(SaveElement *bankData)
 {
+  int			b;
+  SaveElementArray	patterns;
 
+  bankData->getKey().AfterLast('_').ToLong((long *)&b);
+  b = bankData->getAttributeInt(wxT("id"));
+
+  patterns = bankData->getChildren();
+
+  for(int i = 0; i < patterns.GetCount(); i++)
+    LoadPattern(patterns[i], b);
 }
 
-// long WiredBeatBox::Save(int fd)
-// {
-//   long len, size = 0;
-//   int steps, sig_index = 0;
-//   int bank, ps, res, m;
-  
-//   PatternMutex.Lock();
-//   OnLoading = true;
-//   PatternMutex.Unlock();
-  
-//   // writing midi params
-//   for (m = 0; m < 2; m++)
-//     if ((res = write(fd, &(MidiVolume[m]), sizeof(int))) != sizeof (int))
-//       return (-1);
-//     else
-//       size += res;
-//   for (m = 0; m < 2; m++)
-//     if ((res = write(fd, &(MidiSteps[m]), sizeof(int))) != sizeof (int))
-//       return (-1);
-//     else
-//       size += res;
-//   for (int i = 0; i < NB_CHAN; i++)
-//     {
-//       for (m = 0; m < 2; m++)
-// 	if ((res = write(fd, &(Channels[i]->MidiVolume[m]), sizeof(int)) )
-// 	    != sizeof (int))
-// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
-// 	else
-// 	  size += res;
-//       for (m = 0; m < 2; m++)
-// 	if ((res = write(fd, &(Channels[i]->MidiVel[m]), sizeof(int)))
-// 	    != sizeof (int))
-// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
-// 	else
-// 	  size += res;
-//       for (m = 0; m < 2; m++)
-// 	if ((res = write(fd, &(Channels[i]->MidiPitch[m]), sizeof(int))) 
-// 	    != sizeof (int))
-// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
-// 	else
-// 	  size += res;
-//       for (m = 0; m < 2; m++)
-// 	if ((res = write(fd, &(Channels[i]->MidiPan[m]), sizeof(int))) 
-// 	    != sizeof (int))
-// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
-// 	else
-// 	  size += res;
-//       for (m = 0; m < 2; m++)
-// 	if ((res = write(fd, &(Channels[i]->MidiStart[m]), sizeof(int))) 
-// 	    != sizeof (int))
-// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
-// 	else
-// 	  size += res;
-//       for (m = 0; m < 2; m++)
-// 	if ((res = write(fd, &(Channels[i]->MidiEnd[m]), sizeof(int))) 
-// 	    != sizeof (int))
-// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
-// 	else
-// 	  size += res;
-      
-//     }
-  
-//   //writing steps/signatures params
-//   for (bank = 0; bank < 5; bank++)
-//     for (ps = 0; ps < 8; ps++)
-//       {
-// 	if ((res = write(fd, &(SigIndex[bank][ps]), sizeof (int))) 
-// 	    != sizeof (int))
-// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
-// 	else
-// 	  size += res;
-// 	if ((res = write(fd, &(Steps[bank][ps]), sizeof (int))) 
-// 	    != sizeof (int))
-// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
-// 	else
-// 	  size += res;
-//       }
-  
-//   //master Level
-//   if ((res = write(fd, &MLevel, sizeof (float))) 
-//       != sizeof (float))
-//     { cout << "[DRM31] Save: write() error" << endl; return (-1); }
-//   else
-//     size += res;
-  
-  
-//   for (int i = 0; i < NB_CHAN; i++)
-//     {
-//       if (Channels[i]->Wave)
-// 	{
-// 	  len = Channels[i]->Wave->Filename.size();
-// 	  size += write(fd, &len, sizeof(long));
-// 	  size +=
-// 	    write(fd, Channels[i]->Wave->Filename.c_str(), len * sizeof(char));
-// 	}
-//       else
-// 	{
-// 	  len = 0;
-// 	  size += write(fd, &len, sizeof(long));
-// 	}
-      
-       //writing params
-// int p;
-// for (p = 0; p < NB_PARAMS; p++)
-//   size += write(fd, &(Channels[i]->Params[p]), sizeof(float));
-// p = (Channels[i]->Muted ? 1 : 0);
-// size += write(fd, &p, sizeof(int));
-// p = (Channels[i]->IsSolo ? 1 : 0);
-// size += write(fd, &p, sizeof(int));
-// p = (Channels[i]->Reversed ? 1 : 0);
-// size += write(fd, &p, sizeof(int));
-// size += write(fd, &(Channels[i]->Voices), sizeof(unsigned int));
+void	WiredBeatBox::LoadPattern(SaveElement *patternData, int bank)
+{
+  int			p, channelNum;
+  SaveElementArray	channels, notes;
+  SaveElement		*note;
 
-//       //writing notes
-//       for (bank = 0; bank < 5; bank++)
-// 	for (ps = 0; ps < 8; ps++)
-// 	  {
-// 	    len = Channels[i]->Rythms[bank][ps].size();
-// 	    size += write(fd, &len, sizeof(long));
-// 	    for (list<BeatNote*>::iterator bn = 
-// 		   Channels[i]->Rythms[bank][ps].begin();
-// 		 bn != Channels[i]->Rythms[bank][ps].end(); bn++)
-// 	      {
-// 		//cout << "note pos: " << (*bn)->Position;
-// 		/*
-// 		  printf("note pos=%f; state=%d\n", 
-// 		       (*bn)->Position,(*bn)->State);
-// 		*/
-// 		size += write(fd, &((*bn)->State), sizeof(unsigned int));
-// 		size += 
-// 		  write(fd, &((*bn)->Position), sizeof (double));
-// 		for (p = 0; p < NB_PARAMS; p++ )
-// 		  size +=
-// 		    write(fd, &((*bn)->Params[p]), sizeof (float));
-// 		p = (*bn)->Reversed ? 1 : 0;
-// 		size += write(fd, &p, sizeof(int));
-// 	      }
-// 	  }
-//     }
-//   PatternMutex.Lock();
-//   OnLoading = false;
-//   PatternMutex.Unlock();
-  
-//   cout << "[DRM31] saved size " << size << endl;
-//   return size;
-// }
+  BeatNote		*beatnote;
+  double		notePos;
+  unsigned int		noteState;
+
+  p = patternData->getAttributeInt(wxT("id"));
+
+  SigIndex[bank][p] = patternData->getAttributeInt(wxT("SigIndex"));
+  SignatureDen[bank][p] = SigDen[SigIndex[bank][p]];
+  Signature[bank][p] = Signatures[SigIndex[bank][p]];
+  Steps[bank][p] = patternData->getAttributeInt(wxT("Steps"));
+
+  channels = patternData->getChildren();
+  for (int i = 0; i < channels.GetCount(); i++)
+    {
+      channels[i]->getKey().AfterLast('_').ToLong((long *)&channelNum);
+      notes = channels[i]->getChildren();
+      for(int j = 0; j < notes.GetCount(); j++)
+	{
+	  note = notes[j];
+	  note->getAttribute(wxT("state")).ToULong((unsigned long *)&noteState);
+	  notePos = note->getAttributeDouble(wxT("position"));
+	  beatnote = new BeatNote(i, notePos, noteState, 0.0);
+
+// 	  for(int param = 0; param < NB_PARAMS; param++)
+// 	      beatnote->Params[param] = 
+// 		note->getAttributeFloat(wxString(wxT("param_")) << param);
+	  beatnote->Reversed = note->getAttributeInt(wxT("reversed"));
+	  
+	  AddBeatNote(beatnote, Channels[i], (unsigned int)bank, (unsigned int)p);
+	}
+    }
+}
+
+void	WiredBeatBox::StringToIntArray(wxString s, int *i)
+{
+  wxString	remaining;
+  int		tmp;
+
+  s.BeforeFirst(' ').ToLong((long *)&tmp);
+  i[0] = tmp;
+  remaining = s.AfterFirst(' ');
+
+  remaining.BeforeFirst(' ').ToLong((long *)(&tmp));
+  i[1] = tmp;
+  remaining = remaining.AfterFirst(' ');
+
+  remaining.ToLong((long *)&tmp);
+  i[2] = tmp;
+
+}
 
 // void WiredBeatBox::Load(int fd, long size)
 // {
@@ -2282,6 +2164,286 @@ void	WiredBeatBox::Load(SaveElementArray data)
   
 //   cout << "[DRM31] Load remaining size " <<  size << endl;
 // }
+
+wxString	WiredBeatBox::IntArrayToString(int *vect)
+{
+  wxString ret;
+
+  ret << vect[0] << wxT(" ") << vect[1] << wxT(" ") << vect[2];
+
+  return ret;
+}
+
+void	WiredBeatBox::Save()
+{
+  //The old save function has been taken back and adapted for time effiency.
+  //However, it would be a good idea to migrate the infos about the channels
+  //in the BeatBoxChannel class and to save them separately.
+  //Unfortunately, this involves taking back the whole Drum-31 structure and
+  //there is no time to do this.
+  
+  SaveElement	*saveElem, *bank, *pattern, *channel, *note;
+  wxString	s;
+
+  //saving midi params
+  //MidiVolume
+  saveElem = new SaveElement(wxT("MidiVolume"), IntArrayToString(MidiVolume));
+  saveDocData(saveElem, wxT("beatbox/patch"));
+
+  //MidiSteps
+  saveElem = new SaveElement(wxT("MidiSteps"), IntArrayToString(MidiSteps));
+  saveDocData(saveElem, wxT("beatbox/patch"));
+
+  //MasterLevel
+  saveElem = new SaveElement(wxT("MasterLevel"), MLevel);
+  saveDocData(saveElem, wxT("beatbox/patch"));
+
+  //Channels  
+  for(int i = 0; i < NB_CHAN; i++)
+    {
+      saveElem = new SaveElement();
+      saveElem->setKey(wxT("channel"));
+      saveElem->addAttribute(wxT("id"), i);
+
+      if(Channels[i]->Wave)
+	saveElem->setValue(Channels[i]->Wave->Filename);
+
+      saveElem->addAttribute(wxT("MidiVolume"), 
+			     IntArrayToString(Channels[i]->MidiVolume));
+      saveElem->addAttribute(wxT("MidiVel"), 
+			     IntArrayToString(Channels[i]->MidiVel));
+      saveElem->addAttribute(wxT("MidiPitch"), 
+			     IntArrayToString(Channels[i]->MidiPitch));
+      saveElem->addAttribute(wxT("MidiPan"), 
+			     IntArrayToString(Channels[i]->MidiPan));
+      saveElem->addAttribute(wxT("MidiStart"), 
+			     IntArrayToString(Channels[i]->MidiStart));
+      saveElem->addAttribute(wxT("MidiEnd"), 
+			     IntArrayToString(Channels[i]->MidiEnd));
+      //params
+      for(int j = 0; j < NB_PARAMS; j++)
+	{
+	  s.clear();
+	  s << Channels[i]->Params[j];
+	  saveElem->addAttribute(wxString(wxT("param_")) << j, s);
+	}
+
+      //muted, solo, reverse
+      saveElem->addAttribute(wxT("mute"), Channels[i]->Muted);
+      saveElem->addAttribute(wxT("solo"), Channels[i]->IsSolo);
+      saveElem->addAttribute(wxT("reverse"), Channels[i]->Reversed);
+
+      //Voices
+      s.clear();
+      s << Channels[i]->Voices;
+      saveElem->addAttribute(wxT("voices"), s);
+
+
+      saveDocData(saveElem, wxT("beatbox/patch"));
+    }
+
+  //banks & patterns
+  for (int b = 0; b < 5; b++)
+    {
+      bank = new SaveElement();
+      bank->setKey(wxT("bank"));
+      bank->addAttribute(wxT("id"), b);
+      for (int p = 0; p < 8; p++)
+	{
+	  pattern = new SaveElement();
+	  bank->addChildren(pattern);
+	  pattern->setKey(wxT("pattern"));
+	  pattern->addAttribute(wxT("id"), p);
+	  pattern->addAttribute(wxT("SigIndex"), SigIndex[b][p]);
+	  pattern->addAttribute(wxT("Steps"), Steps[b][p]);
+
+	  //notes
+	  for(int c = 0; c < NB_CHAN; c++)
+	    {
+	      channel = new SaveElement();
+	      pattern->addChildren(channel);
+	      channel->setKey(wxString(wxT("channel_")) << c);	      
+	      int n = 0;
+	      for(list<BeatNote*>::iterator bn = Channels[c]->Rythms[b][p].begin();
+		  bn != Channels[c]->Rythms[b][p].end();
+		  bn++)
+		{		  
+		  note = new SaveElement();
+		  channel->addChildren(note);
+		  note->setKey(wxString(wxT("note_")) << n);
+		  s.clear();
+		  s << (*bn)->State;
+		  note->addAttribute(wxT("state"), s);
+		  s.clear();
+		  s << (*bn)->Position;
+		  note->addAttribute(wxT("position"), (*bn)->Position);
+		  note->addAttribute(wxT("reversed"), (*bn)->Reversed);
+		  for(int p = 0; p < NB_PARAMS; p++)
+		    note->addAttribute(wxString(wxT("param_")) << p,
+				       (*bn)->Params[p]);
+				     
+		  n++;
+		}
+	    }
+	}
+      saveDocData(bank, wxT("beatbox/patch"));
+    }
+  
+
+}
+
+void	WiredBeatBox::Load(SaveElementArray data)
+{
+  
+}
+
+// long WiredBeatBox::Save(int fd)
+// {
+//   long len, size = 0;
+//   int steps, sig_index = 0;
+//   int bank, ps, res, m;
+  
+//   PatternMutex.Lock();
+//   OnLoading = true;
+//   PatternMutex.Unlock();
+  
+//   // writing midi params
+//   for (m = 0; m < 2; m++)
+//     if ((res = write(fd, &(MidiVolume[m]), sizeof(int))) != sizeof (int))
+//       return (-1);
+//     else
+//       size += res;
+//   for (m = 0; m < 2; m++)
+//     if ((res = write(fd, &(MidiSteps[m]), sizeof(int))) != sizeof (int))
+//       return (-1);
+//     else
+//       size += res;
+//   for (int i = 0; i < NB_CHAN; i++)
+//     {
+//       for (m = 0; m < 2; m++)
+// 	if ((res = write(fd, &(Channels[i]->MidiVolume[m]), sizeof(int)) )
+// 	    != sizeof (int))
+// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
+// 	else
+// 	  size += res;
+//       for (m = 0; m < 2; m++)
+// 	if ((res = write(fd, &(Channels[i]->MidiVel[m]), sizeof(int)))
+// 	    != sizeof (int))
+// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
+// 	else
+// 	  size += res;
+//       for (m = 0; m < 2; m++)
+// 	if ((res = write(fd, &(Channels[i]->MidiPitch[m]), sizeof(int))) 
+// 	    != sizeof (int))
+// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
+// 	else
+// 	  size += res;
+//       for (m = 0; m < 2; m++)
+// 	if ((res = write(fd, &(Channels[i]->MidiPan[m]), sizeof(int))) 
+// 	    != sizeof (int))
+// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
+// 	else
+// 	  size += res;
+//       for (m = 0; m < 2; m++)
+// 	if ((res = write(fd, &(Channels[i]->MidiStart[m]), sizeof(int))) 
+// 	    != sizeof (int))
+// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
+// 	else
+// 	  size += res;
+//       for (m = 0; m < 2; m++)
+// 	if ((res = write(fd, &(Channels[i]->MidiEnd[m]), sizeof(int))) 
+// 	    != sizeof (int))
+// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
+// 	else
+// 	  size += res;
+      
+//     }
+  
+//   //writing steps/signatures params
+//   for (bank = 0; bank < 5; bank++)
+//     for (ps = 0; ps < 8; ps++)
+//       {
+// 	if ((res = write(fd, &(SigIndex[bank][ps]), sizeof (int))) 
+// 	    != sizeof (int))
+// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
+// 	else
+// 	  size += res;
+// 	if ((res = write(fd, &(Steps[bank][ps]), sizeof (int))) 
+// 	    != sizeof (int))
+// 	  { cout << "[DRM31] Save: write() error" << endl; return (-1); }
+// 	else
+// 	  size += res;
+//       }
+  
+//   //master Level
+//   if ((res = write(fd, &MLevel, sizeof (float))) 
+//       != sizeof (float))
+//     { cout << "[DRM31] Save: write() error" << endl; return (-1); }
+//   else
+//     size += res;
+  
+  
+//   for (int i = 0; i < NB_CHAN; i++)
+//     {
+//       if (Channels[i]->Wave)
+// 	{
+// 	  len = Channels[i]->Wave->Filename.size();
+// 	  size += write(fd, &len, sizeof(long));
+// 	  size +=
+// 	    write(fd, Channels[i]->Wave->Filename.c_str(), len * sizeof(char));
+// 	}
+//       else
+// 	{
+// 	  len = 0;
+// 	  size += write(fd, &len, sizeof(long));
+// 	}
+      
+       //writing params
+// int p;
+// for (p = 0; p < NB_PARAMS; p++)
+//   size += write(fd, &(Channels[i]->Params[p]), sizeof(float));
+// p = (Channels[i]->Muted ? 1 : 0);
+// size += write(fd, &p, sizeof(int));
+// p = (Channels[i]->IsSolo ? 1 : 0);
+// size += write(fd, &p, sizeof(int));
+// p = (Channels[i]->Reversed ? 1 : 0);
+// size += write(fd, &p, sizeof(int));
+// size += write(fd, &(Channels[i]->Voices), sizeof(unsigned int));
+
+//       //writing notes
+//       for (bank = 0; bank < 5; bank++)
+// 	for (ps = 0; ps < 8; ps++)
+// 	  {
+// 	    len = Channels[i]->Rythms[bank][ps].size();
+// 	    size += write(fd, &len, sizeof(long));
+// 	    for (list<BeatNote*>::iterator bn = 
+// 		   Channels[i]->Rythms[bank][ps].begin();
+// 		 bn != Channels[i]->Rythms[bank][ps].end(); bn++)
+// 	      {
+// 		//cout << "note pos: " << (*bn)->Position;
+// 		/*
+// 		  printf("note pos=%f; state=%d\n", 
+// 		       (*bn)->Position,(*bn)->State);
+// 		*/
+// 		size += write(fd, &((*bn)->State), sizeof(unsigned int));
+// 		size += 
+// 		  write(fd, &((*bn)->Position), sizeof (double));
+// 		for (p = 0; p < NB_PARAMS; p++ )
+// 		  size +=
+// 		    write(fd, &((*bn)->Params[p]), sizeof (float));
+// 		p = (*bn)->Reversed ? 1 : 0;
+// 		size += write(fd, &p, sizeof(int));
+// 	      }
+// 	  }
+//     }
+//   PatternMutex.Lock();
+//   OnLoading = false;
+//   PatternMutex.Unlock();
+  
+//   cout << "[DRM31] saved size " << size << endl;
+//   return size;
+// }
+
 
 inline void WiredBeatBox::LockLoading()
 {

@@ -290,6 +290,7 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
   wxString		rootTag;
   SaveElementArray	ret;
   SaveElementArray	history;
+  wxString		s;
 
   wxFileName		absoluteFilename, relativeFilename;
   wxArrayString		dirs;
@@ -301,17 +302,22 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
 
 
   //Filename management
-  absoluteFilename.Assign(getProjectPath());
-  relativeFilename.Assign(filename);
+  if(!filename.StartsWith(wxT("/")))
+    {
+      absoluteFilename.Assign(getProjectPath());
+      relativeFilename.Assign(filename);
+      
+      dirs = relativeFilename.GetDirs();
+      
+      for(int i = 0; i < dirs.GetCount(); i++)
+	absoluteFilename.AppendDir(dirs.Item(i));
+      
+      absoluteFilename.SetName(relativeFilename.GetName());
+      absoluteFilename.SetExt(relativeFilename.GetExt());
+    }
+  else
+    absoluteFilename.Assign(filename);
 
-  dirs = relativeFilename.GetDirs();
-  
-  for(int i = 0; i < dirs.GetCount(); i++)
-    absoluteFilename.AppendDir(dirs.Item(i));
-
-  absoluteFilename.SetName(relativeFilename.GetName());
-  absoluteFilename.SetExt(relativeFilename.GetExt());
-  
   xmlFile->OpenDocument(absoluteFilename.GetFullPath());
 
   rootTag = absoluteFilename.GetName();
