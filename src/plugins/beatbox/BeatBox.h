@@ -136,8 +136,6 @@ class WiredBeatBox : public Plugin, public WiredDocument
   void		Play();
   void		Stop();
   
-/*   void		Load(int fd, long size); */
-/*   long		Save(int fd); */
   void		Save();
   void		Load(SaveElementArray data);
 
