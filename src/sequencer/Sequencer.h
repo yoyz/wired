@@ -22,7 +22,6 @@ typedef int				MidiType;
 class					Channel;
 class					Track;
 class					Plugin;
-class					Track;
 class					Pattern;
 class					AudioPattern;
 class					MidiPattern;
@@ -123,11 +122,11 @@ class Sequencer : public wxThread, public WiredDocument
   void					PlayFile(wxString filename, bool isakai);
   /** Stops playinf of a file.*/
   void					StopFile();
-  /** Adds a track to the sequencer.
+  /** Adds a reference to a created track to the sequencer.
    * \param t points to the track to add.
    */
-  void					AddTrack(Track *t);
-  void					RemoveTrack();
+  void					RegisterTrack(Track *t);
+  void					UnregisterTrack(Track *t);
   /** Adds a MIDI event.
    * \param id is the MIDI device id.
    * \param MidiType is the MIDI event message.
@@ -221,7 +220,7 @@ class Sequencer : public wxThread, public WiredDocument
   void					FinishRecording();
 
   AudioPattern				*GetCurrentAudioPattern(Track *t);
-  std::list<MidiPattern *>			GetCurrentMidiPatterns(Track *t);
+  std::list<MidiPattern *>		GetCurrentMidiPatterns(Track *t);
 
   float					**GetCurrentAudioBuffer(AudioPattern *p);
   /** Processes MIDI events from a MIDI pattern.*/
@@ -231,7 +230,7 @@ class Sequencer : public wxThread, public WiredDocument
   /** Start position.*/
   double				StartAudioPos;
   /** List of MidiEvents.*/
-  std::list<MidiEvent *>			MidiEvents;
+  std::list<MidiEvent *>		MidiEvents;
   /** Wavefile of the metronome sound.*/
   WaveFile				*ClickWave;
   /** Output cahannel for the metronome.*/

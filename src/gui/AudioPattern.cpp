@@ -50,8 +50,6 @@ void					AudioPattern::Init(WaveFile* w, WiredDocument* parent)
        << "; StartWavePos: " << StartWavePos << "; EndWavePos: " << EndWavePos << endl;
 #endif
 
-  Pattern::PenColor = CL_PATTERN_NORM;
-  Pattern::BrushColor = CL_WAVEDRAWER_BRUSH;
   Name = wxString::Format(wxT("T%d A%d"), TrackIndex + 1, audio_pattern_count++);
   LastBlock = -1;
   RecordWave = 0;

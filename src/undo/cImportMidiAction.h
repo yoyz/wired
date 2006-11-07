@@ -30,7 +30,8 @@ private:
    wxString				_WavePath;
    long					_trackIndex;
    bool					_ShouldAdd;
- 
+   Track*				_trackCreated;
+
 public:
   cImportWaveAction (const wxString& path, trackType kind, bool shouldAdd);
   cImportWaveAction (const cImportWaveAction& copy){*this = copy;};
@@ -58,6 +59,7 @@ class					cImportMidiAction : public cAction
 private:
    trackType				mTrackKindFlag;
    wxString				mMidiPath;
+   Track*				trackCreated;
 
 public:
   cImportMidiAction (wxString& path, trackType kind);
@@ -80,11 +82,12 @@ class					cImportAkaiAction : public cAction
 {
 private:
   trackType				mTrackKindFlag;
+  Track*				trackCreated;
   wxString				mDevice;
   int					mPart;
   wxString				mPath;
   wxString				mName;
-   
+
 public:
   cImportAkaiAction (wxString& path, trackType kind);
   cImportAkaiAction (const cImportAkaiAction& copy){*this = copy;};

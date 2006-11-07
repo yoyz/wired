@@ -1,9 +1,6 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
-
 #include <math.h>
 #include <iostream>
 #include "AccelCenter.h"
@@ -31,8 +28,6 @@
 #include "../midi/MidiDevice.h"
 #include "../engine/Settings.h"
 #include "../audio/WriteWaveFile.h"
-
-SequencerGui				*SeqGui;
 
 const struct s_combo_choice		ComboChoices[NB_COMBO_CHOICES + 1] =
 {
@@ -351,15 +346,15 @@ void					SequencerView::Drop(int x, int y, wxString file)
 	    {
 	      wave = WaveCenter.AddWaveFile(file);
 	      wave->SetChannelToRead(nb_channel);
-	      (*i)->AddPattern(wave, last_pos);
+	      (*i)->CreateAudioPattern(wave, last_pos);
 	      i++;
 	    }
 	  for (;nb_channel < wave->GetNumberOfChannels(); nb_channel++)
 	    {
-	      track_to_add = SeqPanel->AddTrack(eAudioTrack);
+	      track_to_add = SeqPanel->CreateTrack(eAudioTrack);
 	      wave = WaveCenter.AddWaveFile(file);
 	      wave->SetChannelToRead(nb_channel);
-	      track_to_add->AddPattern(wave, 0);
+	      track_to_add->CreateAudioPattern(wave, 0);
 	    }
 	}
       else
@@ -367,10 +362,10 @@ void					SequencerView::Drop(int x, int y, wxString file)
 	  wave = WaveCenter.AddWaveFile(file);
 	  for (nb_channel = 0; nb_channel < wave->GetNumberOfChannels(); nb_channel++)
 	    {
-	      track_to_add = SeqPanel->AddTrack(eAudioTrack);
+	      track_to_add = SeqPanel->CreateTrack(eAudioTrack);
 	      wave = WaveCenter.AddWaveFile(file);
 	      wave->SetChannelToRead(nb_channel);
-	      track_to_add->AddPattern(wave, 0);
+	      track_to_add->CreateAudioPattern(wave, 0);
 	    }
 	}
     }
@@ -550,9 +545,10 @@ SequencerGui::SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &s
 
 SequencerGui::~SequencerGui()
 {
+  DeleteAllTracks();
 }
 
-Track					*SequencerGui::AddTrack(trackType type)
+Track					*SequencerGui::CreateTrack(trackType type)
 {
   // create a new track
   Track*	newTrack;
@@ -575,11 +571,36 @@ Track					*SequencerGui::AddTrack(trackType type)
   return (newTrack);
 }
 
-void					SequencerGui::RemoveTrack()
+void					SequencerGui::DeleteTrack(Track* track)
 {
-  Seq->RemoveTrack();
-  UpdateTracks();
-  SetScrolling();
+  // We need to keep SeqMutex locked until re-indexation is done
+  wxMutexLocker				locker(SeqMutex);
+
+  if (track)
+    {
+      // we should stop recording or something else instead return
+      if (track->GetTrackOpt()->Record && Seq->Recording)
+	return;
+
+      delete track;
+      ReindexTrackArray();
+
+      // Refresh things
+      UpdateTracks();
+      SetScrolling();
+      AdjustVScrolling();
+    }
+}
+
+void					SequencerGui::ReindexTrackArray()
+{
+  // Change track index for each still existing tracks. Sort of reindexing.
+  vector<Track *>::iterator		iterTrack;
+  int					j;
+
+  j = 0;
+  for (iterTrack = Seq->Tracks.begin(); iterTrack != Seq->Tracks.end(); iterTrack++)
+    (*iterTrack)->UpdateIndex(j++);
 }
 
 void					SequencerGui::PutCursorsOnTop()
@@ -793,24 +814,15 @@ void					SequencerGui::UnselectTracks()
       (*i)->GetTrackOpt()->SetSelected(false);
 }
 
-void					SequencerGui::AddPattern(Pattern *p, long trackindex)
+void					SequencerGui::MovePattern(Pattern *p,
+								  long oldTrackIndex,
+								  long newTrackIndex)
 {
-  vector<Track *>::iterator		iter;
-
-  UnselectTracks();
-  for (iter = Seq->Tracks.begin(); iter != Seq->Tracks.end(); iter++)
-    if ((*iter)->GetIndex() == trackindex)
-      (*iter)->AddPattern(p);
-}
-
-void					SequencerGui::DelPattern(Pattern *p, long trackindex)
-{
-  vector<Track *>::iterator		iter;
-
-  UnselectTracks();
-  for (iter = Seq->Tracks.begin(); iter != Seq->Tracks.end(); iter++)
-    if ((*iter)->GetIndex() == trackindex)
-      (*iter)->DelPattern(p);
+  if (oldTrackIndex < Seq->Tracks.size() && newTrackIndex < Seq->Tracks.size())
+    {
+      Seq->Tracks[newTrackIndex]->AddPattern(p);
+      Seq->Tracks[oldTrackIndex]->DelPattern(p);
+    }
 }
 
 bool					SequencerGui::IsAudioTrack(long trackindex)
@@ -922,11 +934,7 @@ void					SequencerGui::DeleteAllTracks()
   vector<Track *>::iterator		i;
 
   for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)
-    {
-      if ((*i)->GetTrackOpt()->ChanGui)
-	MixerPanel->RemoveChannel((*i)->GetTrackOpt()->ChanGui);
-      delete (*i);
-    }
+    delete (*i);
   Seq->Tracks.clear();
   UpdateTracks();
   SetScrolling();
@@ -935,7 +943,6 @@ void					SequencerGui::DeleteAllTracks()
 void					SequencerGui::DeleteSelectedTrack()
 {
   vector<Track *>::iterator		iterTrack;
-  vector<Pattern *>::iterator		iterPattern;
   long							j;
 
 #ifdef __DEBUG__
@@ -946,31 +953,7 @@ void					SequencerGui::DeleteSelectedTrack()
     ;
   if (iterTrack == Seq->Tracks.end())
     return;
-
-  // we should stop recording or something else instead return
-  if ((*iterTrack)->GetTrackOpt()->Record && Seq->Recording)
-    return;
-
-  for (iterPattern = SelectedItems.begin(); iterPattern != SelectedItems.end(); )
-    {
-      if (((*iterTrack)->GetIndex() == (*iterPattern)->GetTrackIndex()) && (*iterPattern)->IsSelected())
-	SelectedItems.erase(iterPattern);
-      else
-	iterPattern++;
-    }
-
-  // Block sequencer with locking mutex
-  SeqMutex.Lock();
-  Seq->Tracks.erase(iterTrack);
-  delete (*iterTrack); 
-  // Change track index for each still existing tracks. Sort of reindexing.
-  for (iterTrack = Seq->Tracks.begin(), j = 0; iterTrack != Seq->Tracks.end(); iterTrack++)
-    (*iterTrack)->UpdateIndex(j++);
-  SeqMutex.Unlock();
-
-  UpdateTracks();
-  SetScrolling();
-  AdjustVScrolling();
+  DeleteTrack(*iterTrack);
 }
 
 void					SequencerGui::SelectItem(Pattern *p, bool shift)
@@ -1059,20 +1042,16 @@ void					SequencerGui::PasteItems()
 
 void					SequencerGui::DeleteSelectedPatterns()
 {
-  vector<Pattern *>::iterator		i;
-  vector<Pattern *>::iterator		j;
+  vector<Pattern *>			Patterns;
+  vector<Pattern *>::iterator		itPattern;
 
-  for (i = SelectedItems.begin(); i != SelectedItems.end(); i++)
-    {
-      for (j = CopyItems.begin(); j != CopyItems.end(); j++)
-	if ((*j) == (*i))
-	  {
-	    CopyItems.erase(j);
-	    break;
-	  }
-      Seq->DeletePattern(*i);
-    }
-  SelectedItems.clear();
+  // we made a copy before deleting some items of SelectedItems vector.
+  Patterns = SelectedItems;
+  for (itPattern = Patterns.begin(); itPattern != Patterns.end(); itPattern++)
+    DeletePattern(*itPattern);
+
+  // we don't need to clear SelectedItems,
+  // because each iteration are deleted in DeletePattern
 }
 
 void					SequencerGui::DeletePattern(Pattern *p)
@@ -1091,14 +1070,13 @@ void					SequencerGui::DeletePattern(Pattern *p)
 	i = CopyItems.erase(i);
 	break;
       }
-  Seq->DeletePattern(p);
+  delete p;
 }
 
 void					SequencerGui::MoveToCursor()
 {
  vector<Pattern *>::iterator		i, j;
  wxMutexLocker				m(SeqMutex);
-
 
  for (i = SelectedItems.begin(); i != SelectedItems.end(); i++)
    {

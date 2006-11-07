@@ -48,7 +48,8 @@ class					Track : public WiredDocument
   Channel*				Output;
   ChannelGui*				ChanGui;
 
-  // they MUST be pointer to another Patterns, they DONT need to be deleted.
+  // They ARE elements in TrackPattern vector, they DONT need to be deleted.
+  // These pointers are used when we record on this Track.
   AudioPattern*				Wave;
   MidiPattern*				Midi;
 
@@ -60,8 +61,10 @@ class					Track : public WiredDocument
 
   void					Dump();
 
-  AudioPattern				*AddPattern(WaveFile *w, double pos = 0);
-  MidiPattern				*AddPattern(MidiTrack *t);
+  AudioPattern				*CreateAudioPattern(WaveFile *w, double pos = 0);
+  MidiPattern				*CreateMidiPattern(MidiTrack *t);
+
+  // this function should be used ONLY in Pattern constructor/destructor
   void					AddPattern(Pattern *p);
   void					DelPattern(Pattern *p);
 
@@ -80,6 +83,7 @@ class					Track : public WiredDocument
   inline SeqTrackPattern*		GetTrackPattern() { return (TrackPattern); };
   inline Channel*			GetOutputChannel() { return (Output); };
 
+  // used to set the newly created pattern where Record will be done
   void					SetMidiPattern(MidiPattern* mp);
   void					SetAudioPattern(AudioPattern* ap);
 
@@ -96,7 +100,7 @@ class					Track : public WiredDocument
   inline void				SetIndex(long trackindex) { Index = trackindex; };
 
  protected:
-  char					ColourIndex;
+  unsigned char				ColourIndex;
 };
 
 #endif

@@ -383,7 +383,9 @@ void					Sequencer::Play()
   list<RackTrack *>::iterator		RacksTrack;
   list<Plugin *>::iterator		Plug;
 
-  SeqMutex.Lock();
+  // don't forget to lock mutex:
+  wxMutexLocker				locker(SeqMutex);
+
   for (RacksTrack = RackPanel->RackTracks.begin(); 
        RacksTrack != RackPanel->RackTracks.end(); RacksTrack++)
     for (Plug = (*RacksTrack)->Racks.begin(); Plug != (*RacksTrack)->Racks.end();
@@ -396,7 +398,6 @@ void					Sequencer::Play()
   if (Recording)
     PrepareRecording();
   //if (WiredVideoObject->asFile == true) WiredVideoObject->PlayFile();
-  SeqMutex.Unlock();
 }
 
 void					Sequencer::Stop()
@@ -405,7 +406,8 @@ void					Sequencer::Stop()
   list<Plugin *>::iterator		Plug;
   vector<Track *>::iterator		T;
 
-  SeqMutex.Lock();
+  // don't forget to lock mutex:
+  wxMutexLocker				locker(SeqMutex);
 
   for (RacksTrack = RackPanel->RackTracks.begin(); 
        RacksTrack != RackPanel->RackTracks.end(); RacksTrack++)
@@ -431,16 +433,15 @@ void					Sequencer::Stop()
       SeqMutex.Lock(); 
     }
   Recording = false;    
-  SeqMutex.Unlock();
 }
 
 void					Sequencer::Record()
 {
-  SeqMutex.Lock();
+  wxMutexLocker				locker(SeqMutex);
+
   Recording = true;
   if (Playing)
     PrepareRecording();
-  SeqMutex.Unlock();
 }
 
 void					Sequencer::StopRecord()
@@ -452,22 +453,25 @@ void					Sequencer::StopRecord()
   FinishRecording();
 }
 
-void					Sequencer::AddTrack(Track *t)
+void					Sequencer::RegisterTrack(Track *t)
 {
-  SeqMutex.Lock();
+  wxMutexLocker				locker(SeqMutex);
+
   t->SetIndex(Tracks.size());
   Tracks.push_back(t);
-  SeqMutex.Unlock();
 }
 
-void					Sequencer::RemoveTrack()
+void					Sequencer::UnregisterTrack(Track *track)
 {
-  SeqMutex.Lock();  
-  Track* track = Tracks.back();
-  Tracks.pop_back();
-  if (track)
-    delete track;
-  SeqMutex.Unlock();
+  wxMutexLocker				locker(SeqMutex);
+  vector<Track *>::iterator		iterTrack;
+
+  for (iterTrack = Tracks.begin(); iterTrack != Tracks.end(); iterTrack++)
+    if (*iterTrack == track)
+      {
+	Tracks.erase(iterTrack);
+	return ;
+      }
 }
 
 void					Sequencer::PrepareRecording()
@@ -787,30 +791,6 @@ void					Sequencer::ProcessCurrentMidiEvents(Track *T, MidiPattern *p)
     }
 }
 
-void					Sequencer::DeletePattern(Pattern *p)
-{
-  SeqTrackPattern			*t;
-  vector<Pattern *>::iterator		k;
-
-  if (p->GetTrackIndex() < Tracks.size())
-    {
-      t = Tracks[p->GetTrackIndex()]->GetTrackPattern();
-      for (k = t->Patterns.begin(); k != t->Patterns.end(); k++)
-	if ((*k) == p)
-	  {
-	    SeqMutex.Lock();
-	    t->Patterns.erase(k);
-	    SeqMutex.Unlock();
-	    if (p)
-	      {
-		//RemoveWaveFile(p->Wave);
-		delete (p);
-	      }
-	    break;
-	  }
-    }
-}
-
 void					Sequencer::DeleteBuffer(float** &Buffer, unsigned int NbChannels)
 {
   if (NbChannels == 0)
@@ -863,7 +843,7 @@ void					Sequencer::AddMidiPattern(list<SeqCreateEvent *> *l,
       }
   if (!t)
     {
-      t = SeqPanel->AddTrack(eMidiTrack);
+      t = SeqPanel->CreateTrack(eMidiTrack);
       t->GetTrackOpt()->ConnectTo(plug);
     }
   pattern = new MidiPattern((WiredDocument*)t, CurrentPos, CurrentPos, t->GetTrackOpt()->Index - 1);
@@ -1029,15 +1009,12 @@ void					Sequencer::PlayFile(wxString filename, bool isakai)
 
 void					Sequencer::StopFile()
 {
+  wxMutexLocker				locker(SeqMutex);
+
   if (PlayWave)
     {
-      WaveFile *w = PlayWave;
-
-      SeqMutex.Lock();
+      delete PlayWave;
       PlayWave = 0x0;
-      SeqMutex.Unlock();
-      if (w)
-	delete w;
     }
 }
 
@@ -1068,7 +1045,7 @@ void			Sequencer::Load(SaveElementArray data)
     {
       if (data[i]->getKey() == (wxString(wxT("Track_")) << n))
 	{
-	  SeqPanel->AddTrack((trackType)data[i]->getValueInt());
+	  SeqPanel->CreateTrack((trackType)data[i]->getValueInt());
 	  n++;
 	}
     }

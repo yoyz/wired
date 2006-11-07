@@ -7,8 +7,6 @@
 #ifndef __SEQUENCERGUI_H__
 #define __SEQUENCERGUI_H__
 
-using namespace std;
-
 #include <vector>
 
 #include <wx/wx.h>
@@ -225,9 +223,9 @@ class				SequencerGui: public wxPanel, public WiredDocument
   wxScrollBar			*HorizScrollBar;
   wxSlider			*VertZoomSlider;
   wxSlider			*HoriZoomSlider;
-  vector<wxStaticLine *>	Measures;
-  vector<Pattern *>		SelectedItems;
-  vector<Pattern *>		CopyItems;
+  std::vector<wxStaticLine *>	Measures;
+  std::vector<Pattern *>	SelectedItems;
+  std::vector<Pattern *>	CopyItems;
   Cursor			*PlayCursor;
   Cursor			*EndCursor;
   Cursor			*BeginLoopCursor;
@@ -244,12 +242,19 @@ class				SequencerGui: public wxPanel, public WiredDocument
 	       wxWindow *mainwindow, WiredDocument* docParent);
   ~SequencerGui();
 
-  Track				*AddTrack(trackType type = eAudioTrack);
-  void				RemoveTrack();
+ private:
+
+  void				ReindexTrackArray();
+
+ public:
+
+  // track creation and deletion
+  Track				*CreateTrack(trackType type = eAudioTrack);
+  void				DeleteTrack(Track* track);
+
   void				UnselectTracks();
   void				SelectTrack(long trackindex);
-  void				AddPattern(Pattern *p, long trackindex);
-  void				DelPattern(Pattern *p, long trackindex);
+  void				MovePattern(Pattern *p, long oldTrackIndex, long newTrackIndex);
   bool				IsAudioTrack(long trackindex);
   void				ChangeSelectedTrackIndex(long trackindex);
   void				ScrollTrackList(long track_delta);
@@ -316,7 +321,7 @@ class				SequencerGui: public wxPanel, public WiredDocument
  protected:
   void				UpdateTracks();
   void				SwapTracksPos(Track *t1, Track *t2);
-  void				UpdateTrackList(vector<Track *> *track_list);
+  void				UpdateTrackList(std::vector<Track *> *track_list);
   void				UpdateMeasures();
   void				DrawMeasures();
   

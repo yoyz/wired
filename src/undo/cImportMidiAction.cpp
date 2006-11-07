@@ -33,18 +33,16 @@ void cImportWaveAction::AddWaveTrack()
 {
   WaveFile *w = WaveCenter.AddWaveFile(_WavePath);
   long		nb_channel;
-  Track *t;
 
-	  
   if (w) 
     {
       for (nb_channel = 0; nb_channel < w->GetNumberOfChannels(); nb_channel++)
 	{ 
-	  t = SeqPanel->AddTrack(_TrackKindFlag);
+	  _trackCreated = SeqPanel->CreateTrack(_TrackKindFlag);
 	  w = WaveCenter.AddWaveFile(_WavePath);
 	  w->SetChannelToRead(nb_channel);
-	  t->AddPattern(w);
-	  _trackIndex = t->GetIndex();
+	  _trackCreated->CreateAudioPattern(w);
+	  _trackIndex = _trackCreated->GetIndex();
 	  NotifyActionManager();
 	}
     }
@@ -55,16 +53,15 @@ void cImportWaveAction::AddWaveToEditor()
   WaveFile *w = WaveCenter.AddWaveFile(_WavePath);
   long	   nb_channel;
 
-
   if (w) 
     {
-      Track *t = SeqPanel->AddTrack(_TrackKindFlag);
+      _trackCreated = SeqPanel->CreateTrack(_TrackKindFlag);
       for (nb_channel = 0; nb_channel < w->GetNumberOfChannels(); nb_channel++)
 	{
-	  AudioPattern  *pattern = t->AddPattern(w);
+	  AudioPattern  *pattern = _trackCreated->CreateAudioPattern(w);
 	  pattern->OnDirectEdit();
-	  
-	  _trackIndex = t->GetIndex();
+
+	  _trackIndex = _trackCreated->GetIndex();
 	  NotifyActionManager();
 	}
     }
@@ -73,8 +70,9 @@ void cImportWaveAction::AddWaveToEditor()
 void cImportWaveAction::RemoveWaveTrack(bool selectFromIndex)
 {
   if (selectFromIndex == true)
-    SeqPanel->SelectTrack(_trackIndex);
-  SeqPanel->DeleteSelectedTrack();
+    SeqPanel->DeleteTrack(_trackCreated);
+  else
+    SeqPanel->DeleteSelectedTrack();
 }
 
 void cImportWaveAction::Redo ()
@@ -109,6 +107,7 @@ cImportMidiAction::cImportMidiAction (wxString& path, trackType kind)
 {
   mTrackKindFlag = kind;
   mMidiPath = path;
+  trackCreated = NULL;
 }
 
 void cImportMidiAction::Do ()
@@ -121,8 +120,8 @@ void cImportMidiAction::Do ()
 	{
 	  if (m->GetTrack(i)->GetMaxPos() > 0)
 	  {
-		Track *t = SeqPanel->AddTrack(mTrackKindFlag);
-		t->AddPattern(m->GetTrack(i));
+		trackCreated = SeqPanel->CreateTrack(mTrackKindFlag);
+		trackCreated->CreateMidiPattern(m->GetTrack(i));
 	  }
 	}
   }
@@ -136,7 +135,7 @@ void cImportMidiAction::Redo ()
 
 void cImportMidiAction::Undo ()
 { 
-  SeqPanel->RemoveTrack(); 
+  SeqPanel->DeleteTrack(trackCreated); 
 }
 
 cImportMidiAction			cImportMidiAction::operator=(const cImportMidiAction& right)
@@ -168,6 +167,7 @@ cImportAkaiAction::cImportAkaiAction (wxString& path, trackType kind)
   mPath = mPath.substr(1, opos - 2);
   cout << "device: " << mDevice.mb_str() << "; part: " << mPart 
        << "; name: " << mName.mb_str() << "; path: " << mPath.mb_str() << endl;
+  trackCreated = NULL;
 }
 
 void cImportAkaiAction::Do ()
@@ -180,8 +180,8 @@ void cImportAkaiAction::Do ()
     try
       {
 	WaveFile *w = new WaveFile(sample->buffer, sample->size, 2, sample->rate);
-	Track *t = SeqPanel->AddTrack(eAudioTrack);
-	t->AddPattern(w);
+	trackCreated = SeqPanel->CreateTrack(eAudioTrack);
+	trackCreated->CreateAudioPattern(w);
       }
     catch (...)
       {	
@@ -199,7 +199,7 @@ void cImportAkaiAction::Redo ()
 
 void cImportAkaiAction::Undo ()
 { 
-  SeqPanel->RemoveTrack(); 
+  SeqPanel->DeleteTrack(trackCreated); 
 }
 
 cImportAkaiAction			cImportAkaiAction::operator=(const cImportAkaiAction& right)

@@ -21,6 +21,7 @@ class				cAddTrackAction : public cAction
 {
  private:
   trackType			mTrackKindFlag;
+  Track*			trackCreated;
   
  public:
   cAddTrackAction (trackType kind)
@@ -31,15 +32,14 @@ class				cAddTrackAction : public cAction
     {};
   
   virtual void			Do ()
-    { SeqPanel->AddTrack(mTrackKindFlag); NotifyActionManager(); };
+    { trackCreated = SeqPanel->CreateTrack(mTrackKindFlag); NotifyActionManager(); };
   
   virtual void			Redo ()
-    { SeqPanel->AddTrack(mTrackKindFlag); };
+    { trackCreated = SeqPanel->CreateTrack(mTrackKindFlag); };
   
   virtual void			Undo ()
     { 
-    	SeqPanel->RemoveTrack();
-    	//SeqPanel->DeleteSelectedTrack();
+      SeqPanel->DeleteTrack(trackCreated);
     };
   
   virtual void			Accept (cActionVisitor& visitor)

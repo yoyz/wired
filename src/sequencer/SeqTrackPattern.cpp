@@ -2,6 +2,7 @@
 // Under the GNU General Public License Version 2, June 1991
 
 #include "SeqTrackPattern.h"
+#include "SequencerGui.h"
 
 SeqTrackPattern::SeqTrackPattern()
 {
@@ -10,8 +11,11 @@ SeqTrackPattern::SeqTrackPattern()
 
 SeqTrackPattern::~SeqTrackPattern()
 {
+  std::vector<Pattern *>		vectorCopy;
   std::vector<Pattern *>::iterator	it;
 
-  for (it = Patterns.begin(); it != Patterns.end(); it++)
-    delete *it;
+  // we must copy vector, because DeletePattern will delete some iterators
+  vectorCopy = Patterns;
+  for (it = vectorCopy.begin(); it != vectorCopy.end(); it++)
+    SeqPanel->DeletePattern(*it);
 }

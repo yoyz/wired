@@ -760,8 +760,8 @@ void					MainWindow::OnImportMIDI(wxCommandEvent &event)
 	{
 	if (m->GetTrack(i)->GetMaxPos() > 0)
 	{
-	Track *t = SeqPanel->AddTrack(false);
-	t->AddPattern(m->GetTrack(i));
+	Track *t = SeqPanel->CreateTrack(false);
+	t->CreateMidiPattern(m->GetTrack(i));
 	}
 	}
 	Progress->Update(99);
@@ -790,42 +790,40 @@ void					MainWindow::OnImportAKAI(wxCommandEvent &event)
       action->Do();
       Progress.Update(99);
       //delete Progress;
-      /*
-	cout << "[MAINWIN] Users imports AKAI sample : " << selfile << endl;
-	wstring dev = selfile.substr(0, selfile.find(":", 0));
-	selfile = selfile.substr(selfile.find(":", 0) + 1, selfile.size() - selfile.find(":", 0));
-	wstring path = selfile.substr(10, selfile.size() - 10);
-	unsigned int pos = path.find("/", 0);
-	int part = path.substr(0, pos).c_str()[0] - 64;
-	path = path.substr(pos, path.size() - pos);
-	int opos = 0;
-	while ((pos = path.find("/", opos)) != wstring::npos)
-	opos = pos + 1;
-	wstring name = path.substr(opos, path.size() - opos);
-	path = path.substr(1, opos - 2);
-	wxProgressDialog *Progress = new wxProgressDialog("Loading wave file", "Please wait...",
-	100, this,
-	wxPD_AUTO_HIDE | wxPD_CAN_ABORT |
-	wxPD_REMAINING_TIME);
-	t_akaiSample *sample = akaiGetSampleByName((char *)dev.c_str(), part, (char *)path.c_str(), (char *)name.c_str());
-	if (sample != NULL)
-	{
-	Progress->Update(1);
-	cout << "[MAINWIN] sample channel : " << sample->channels << endl;
-	WaveFile *w = new WaveFile(sample->buffer, sample->size, 2, sample->rate);
+// 	cout << "[MAINWIN] Users imports AKAI sample : " << selfile << endl;
+// 	wstring dev = selfile.substr(0, selfile.find(":", 0));
+// 	selfile = selfile.substr(selfile.find(":", 0) + 1, selfile.size() - selfile.find(":", 0));
+// 	wstring path = selfile.substr(10, selfile.size() - 10);
+// 	unsigned int pos = path.find("/", 0);
+// 	int part = path.substr(0, pos).c_str()[0] - 64;
+// 	path = path.substr(pos, path.size() - pos);
+// 	int opos = 0;
+// 	while ((pos = path.find("/", opos)) != wstring::npos)
+// 	opos = pos + 1;
+// 	wstring name = path.substr(opos, path.size() - opos);
+// 	path = path.substr(1, opos - 2);
+// 	wxProgressDialog *Progress = new wxProgressDialog("Loading wave file", "Please wait...",
+// 	100, this,
+// 	wxPD_AUTO_HIDE | wxPD_CAN_ABORT |
+// 	wxPD_REMAINING_TIME);
+// 	t_akaiSample *sample = akaiGetSampleByName((char *)dev.c_str(), part, (char *)path.c_str(), (char *)name.c_str());
+// 	if (sample != NULL)
+// 	{
+// 	Progress->Update(1);
+// 	cout << "[MAINWIN] sample channel : " << sample->channels << endl;
+// 	WaveFile *w = new WaveFile(sample->buffer, sample->size, 2, sample->rate);
 
-	if (!w->Error)
-	{
-	Track *t = SeqPanel->AddTrack(true);
-	Progress->Update(90);
-	t->AddPattern(w);
-	Progress->Update(99);
-	}
-	else
-	cout << "[MAINWIN] Cannot import AKAI wave file !" << endl;
-	delete Progress;
-	}
-      */
+// 	if (!w->Error)
+// 	{
+// 	Track *t = SeqPanel->CreateTrack(eAudioTrack);
+// 	Progress->Update(90);
+// 	t->CreateAudioPattern(w);
+// 	Progress->Update(99);
+// 	}
+// 	else
+// 	cout << "[MAINWIN] Cannot import AKAI wave file !" << endl;
+// 	delete Progress;
+// 	}
     }
 }
 
@@ -1104,12 +1102,12 @@ void					MainWindow::OnDeleteRack(wxCommandEvent &event)
 
 void					MainWindow::OnAddTrackAudio(wxCommandEvent &event)
 {
-  SeqPanel->AddTrack(eAudioTrack);
+  SeqPanel->CreateTrack(eAudioTrack);
 }
 
 void					MainWindow::OnAddTrackMidi(wxCommandEvent &event)
 {
-  SeqPanel->AddTrack(eMidiTrack);
+  SeqPanel->CreateTrack(eMidiTrack);
 }
 
 void					MainWindow::OnFloatTransport(wxCommandEvent &event)

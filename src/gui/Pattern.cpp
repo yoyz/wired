@@ -1,9 +1,6 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
-
 #include <math.h>
 #include <wx/font.h>
 #include "Colour.h"
@@ -42,18 +39,21 @@ Pattern::Pattern(WiredDocument *parent, wxString name, double pos, double endpos
 #endif
 
   // add itself in track's array
-  SeqMutex.Lock();
-  Seq->Tracks[trackindex]->AddPattern(this);
-  SeqMutex.Unlock();
+  wxMutexLocker		locker(SeqMutex);
+
+  if (Seq->Tracks[trackindex])
+    Seq->Tracks[trackindex]->AddPattern(this);
+  else
+    cerr << "[Pattern] oooops, bad track index!" << endl;
 }
 
 Pattern::~Pattern()
 {
   // remove itself in track's array
-  SeqMutex.Lock();
+  wxMutexLocker		locker(SeqMutex);
+
   if (Seq->Tracks[TrackIndex])
     Seq->Tracks[TrackIndex]->DelPattern(this);
-  SeqMutex.Unlock();
 }
 
 void					Pattern::Modify(double newpos, double newendpos, 
@@ -227,8 +227,7 @@ void					Pattern::OnMotion(wxMouseEvent &e)
 	      if (SeqPanel->IsAudioTrack(TrackIndex) == SeqPanel->IsAudioTrack(trackto))
 		{
 		  SeqPanel->ChangeMouseCursor(wxCursor(wxCURSOR_HAND));
-		  SeqPanel->AddPattern(this, trackto);
-		  SeqPanel->DelPattern(this, TrackIndex);
+		  SeqPanel->MovePattern(this, TrackIndex, trackto);
 		  TrackIndex = trackto;
 		  XMove(z);
 		}
