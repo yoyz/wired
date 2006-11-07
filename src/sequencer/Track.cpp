@@ -39,7 +39,7 @@ wxColour				PatternColours[MAX_AUTO_COLOURS] =
 
 Track::Track(WiredDocument* parentDoc, trackType type,
 	     wxPoint& pos, wxSize& size, wxWindow* TrackView) : 
-  WiredDocument(wxT("track"), parentDoc)
+  WiredDocument(wxT("Track"), parentDoc)
 {
   // basic initialization
   Wave = 0x0;

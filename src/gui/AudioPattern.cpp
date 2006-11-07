@@ -439,7 +439,7 @@ void					AudioPattern::SetSize(wxSize s)
 
 void				AudioPattern::Save()
 {
-  saveDocData(new SaveElement(wxT("filename"), FileName));
+  saveDocData(new SaveElement(wxT("FileName"), FileName));
   Pattern::Save();
 }
 
@@ -449,13 +449,11 @@ void				AudioPattern::Load(SaveElementArray data)
 
   for (i = 0; i < data.GetCount(); i++)
     {
-      if (data[i]->getKey() == wxT("filename"))
+      if (data[i]->getKey() == wxT("FileName"))
 	{
 	  FileName = data[i]->getValue();
 	  WaveFile*		newWave = new WaveFile(FileName, false);
 
-	  cout << "create wavefile " << newWave << " from " <<
-	    FileName.mb_str() << endl;
 	  Init(newWave, _documentParent);
 	  Pattern::Load(data);
 	}
