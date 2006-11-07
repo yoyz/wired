@@ -931,11 +931,14 @@ void					SequencerGui::RefreshConnectMenu()
 
 void					SequencerGui::DeleteAllTracks()
 {
-  vector<Track *>::iterator		i;
+  vector<Track *>			tracks;
+  vector<Track *>::iterator		itTrack;
 
-  for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)
-    delete (*i);
-  Seq->Tracks.clear();
+  // we need to copy vector, because delete iterator delete itself from it.
+  // its in this way, useless to clear tracks vector.
+  tracks = Seq->Tracks;
+  for (itTrack = tracks.begin(); itTrack != tracks.end(); itTrack++)
+    delete (*itTrack);
   UpdateTracks();
   SetScrolling();
 }
