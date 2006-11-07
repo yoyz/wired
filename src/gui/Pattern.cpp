@@ -315,13 +315,12 @@ void				Pattern::Load(SaveElementArray data)
       if (data[i]->getKey() == wxT("Name"))
 	Name = data[i]->getValue();
       else if (data[i]->getKey() == wxT("Position"))
-        pos= data[i]->getValueDouble();
+        pos = data[i]->getValueDouble();
       else if (data[i]->getKey() == wxT("EndPosition"))
 	endpos = data[i]->getValueDouble();
       else if (data[i]->getKey() == wxT("Length"))
 	length = data[i]->getValueDouble();
     }
-
-  if (pos > 0 && endpos > 0 && length > 0)
-    Modify(pos, endpos, TrackIndex, length);
+  Modify(pos, endpos, TrackIndex, length);
+  Update();
 }

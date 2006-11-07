@@ -454,9 +454,10 @@ void				AudioPattern::Load(SaveElementArray data)
 	  FileName = data[i]->getValue();
 	  WaveFile*		newWave = new WaveFile(FileName, false);
 
-	  cout << "create wavefile " << newWave << " from " << FileName << endl;
-	  Pattern::Load(data);
+	  cout << "create wavefile " << newWave << " from " <<
+	    FileName.mb_str() << endl;
 	  Init(newWave, _documentParent);
+	  Pattern::Load(data);
 	}
     }
 }
