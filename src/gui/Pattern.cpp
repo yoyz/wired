@@ -59,7 +59,9 @@ Pattern::~Pattern()
 void					Pattern::Modify(double newpos, double newendpos, 
 							long newtrackindex,  double newlength)
 {
-  //printf("Pattern::Modify(%f, %f, %d, %f)\n", newpos, newendpos, newtrackindex, newlength);
+#ifdef __DEBUG__
+  printf("Pattern::Modify(%f, %f, %d, %f)\n", newpos, newendpos, newtrackindex, newlength);
+#endif
   if (newpos != -1)
     {
       if (newpos < 0.0)
@@ -85,7 +87,9 @@ void					Pattern::Modify(double newpos, double newendpos,
       TrackIndex = newtrackindex;
       m_pos.y = (int) floor(TRACK_HEIGHT * SeqPanel->VertZoomFactor * newtrackindex);
     }
-  //  printf("MOD PATTERN (pos=%f) (endpos=%f) (length=%f) (trackindex=%d)\n", Position, EndPosition, Length, TrackIndex);
+#ifdef __DEBUG__
+  printf("MOD PATTERN (pos=%f) (endpos=%f) (length=%f) (trackindex=%d)\n", Position, EndPosition, Length, TrackIndex);
+#endif
 }
 
 void					Pattern::Update()
@@ -294,9 +298,30 @@ double					Pattern::GetEndPos()
 void				Pattern::Save()
 {
   saveDocData(new SaveElement(wxT("Name"), Name));
+  saveDocData(new SaveElement(wxT("Position"), Position));
+  saveDocData(new SaveElement(wxT("EndPosition"), EndPosition));
+  saveDocData(new SaveElement(wxT("Length"), Length));
 }
 
 void				Pattern::Load(SaveElementArray data)
 {
+  int				i;
+  double			pos = -1.f;
+  double			endpos = -1.f;
+  double			length = -1.f;
 
+  for (i = 0; i < data.GetCount(); i++)
+    {
+      if (data[i]->getKey() == wxT("Name"))
+	Name = data[i]->getValue();
+      else if (data[i]->getKey() == wxT("Position"))
+        pos= data[i]->getValueDouble();
+      else if (data[i]->getKey() == wxT("EndPosition"))
+	endpos = data[i]->getValueDouble();
+      else if (data[i]->getKey() == wxT("Length"))
+	length = data[i]->getValueDouble();
+    }
+
+  if (pos > 0 && endpos > 0 && length > 0)
+    Modify(pos, endpos, TrackIndex, length);
 }

@@ -55,13 +55,10 @@ void					AudioPattern::Init(WaveFile* w, WiredDocument* parent)
   RecordWave = 0;
   InputChan = NULL;
   RecordWave = NULL;
-  if (w)
-    {
-      SetWave(w);
-      wxSize s = GetSize();
-      SetSize(s);
-      WaveDrawer::SetWave(w, s);
-    }
+  SetWave(w);
+  wxSize s = GetSize();
+  SetSize(s);
+  WaveDrawer::SetWave(w, s);
 
   _documentParent = parent;
 
@@ -443,6 +440,7 @@ void					AudioPattern::SetSize(wxSize s)
 void				AudioPattern::Save()
 {
   saveDocData(new SaveElement(wxT("filename"), FileName));
+  Pattern::Save();
 }
 
 void				AudioPattern::Load(SaveElementArray data)
@@ -452,6 +450,13 @@ void				AudioPattern::Load(SaveElementArray data)
   for (i = 0; i < data.GetCount(); i++)
     {
       if (data[i]->getKey() == wxT("filename"))
-	FileName = data[i]->getValue();
+	{
+	  FileName = data[i]->getValue();
+	  WaveFile*		newWave = new WaveFile(FileName, false);
+
+	  cout << "create wavefile " << newWave << " from " << FileName << endl;
+	  Pattern::Load(data);
+	  Init(newWave, _documentParent);
+	}
     }
 }

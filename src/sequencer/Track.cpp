@@ -244,6 +244,7 @@ void						Track::Save()
 {
   saveDocData(new SaveElement(wxT("Index"), (int)Index));
   saveDocData(new SaveElement(wxT("ColourIndex"), (int)ColourIndex));
+  saveDocData(new SaveElement(wxT("PatternsSize"), (int)TrackPattern->Patterns.size()));
 }
 
 void						Track::Load(SaveElementArray data)
@@ -256,5 +257,19 @@ void						Track::Load(SaveElementArray data)
 	Index = data[i]->getValueInt();
       else if (data[i]->getKey() == wxT("ColourIndex"))
 	ColourIndex = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("PatternsSize"))
+	{
+	  int					n;
+	  int					nbPattern;
+
+	  nbPattern = data[i]->getValueInt();
+	  for (n = 0; n < nbPattern; n++)
+	    {
+	      if (GetType() == eAudioTrack)
+		new AudioPattern(this, 0.f, 0.f, Index);
+	      else if (GetType() == eMidiTrack)
+		new MidiPattern(this, 0.f, 0.f, Index);
+	    }
+	}
     }
 }
