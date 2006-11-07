@@ -297,10 +297,27 @@ double					Pattern::GetEndPos()
 
 void				Pattern::Save()
 {
+  SaveElement*			saved;
+
   saveDocData(new SaveElement(wxT("Name"), Name));
   saveDocData(new SaveElement(wxT("Position"), Position));
   saveDocData(new SaveElement(wxT("EndPosition"), EndPosition));
   saveDocData(new SaveElement(wxT("Length"), Length));
+  saveDocData(new SaveElement(wxT("StateMask"), (int)StateMask));
+
+  saved = new SaveElement();
+  saved->setKey(wxT("PenColor"));
+  saved->addAttribute(wxT("red"), (int)PenColor.Red());
+  saved->addAttribute(wxT("green"), (int)PenColor.Green());
+  saved->addAttribute(wxT("blue"), (int)PenColor.Blue());
+  saveDocData(saved);
+
+  saved = new SaveElement();
+  saved->setKey(wxT("BrushColor"));
+  saved->addAttribute(wxT("red"), (int)BrushColor.Red());
+  saved->addAttribute(wxT("green"), (int)BrushColor.Green());
+  saved->addAttribute(wxT("blue"), (int)BrushColor.Blue());
+  saveDocData(saved);
 }
 
 void				Pattern::Load(SaveElementArray data)
@@ -320,7 +337,24 @@ void				Pattern::Load(SaveElementArray data)
 	endpos = data[i]->getValueDouble();
       else if (data[i]->getKey() == wxT("Length"))
 	length = data[i]->getValueDouble();
+      else if (data[i]->getKey() == wxT("StateMask"))
+	StateMask = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("PenColor"))
+	{
+	  unsigned char		red = data[i]->getAttributeInt(wxT("red"));
+	  unsigned char		green = data[i]->getAttributeInt(wxT("green"));
+	  unsigned char		blue = data[i]->getAttributeInt(wxT("blue"));
+	  SetDrawColour(wxColour(red, green, blue));
+	}
+      else if (data[i]->getKey() == wxT("BrushColor"))
+	{
+	  unsigned char		red = data[i]->getAttributeInt(wxT("red"));
+	  unsigned char		green = data[i]->getAttributeInt(wxT("green"));
+	  unsigned char		blue = data[i]->getAttributeInt(wxT("blue"));
+	  BrushColor = wxColour(red, green, blue);
+	}
     }
+  // modify update internal vars like m_pos, m_size, ...
   Modify(pos, endpos, TrackIndex, length);
   Update();
 }

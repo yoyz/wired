@@ -68,7 +68,10 @@ class					Pattern : public wxWindow, public WiredDocument
    * The Index of track.
    */
   unsigned long				TrackIndex;
-  unsigned long				TrackFrom;
+
+  /**
+   * The state of pattern, selected, dragged and/or toggled (see PATTERN_MASK_*)
+   */
   unsigned char				StateMask;
 
   /**
