@@ -57,10 +57,10 @@ MidiController::~MidiController()
 void MidiController::ProcessMidi(int midi_msg[3])
 {
   Note = false;
-  if ((STATUS(midi_msg[0]) == M_NOTEON1) ||  (STATUS(midi_msg[0]) == M_NOTEON2))    
+  if ((STATUS(midi_msg[0]) == M_NOTEON1) ||  (STATUS(midi_msg[0]) == M_NOTEON2))
     Note = true;
   ChannelCtrl->SetValue(CHANNEL(midi_msg[0]) + 1);
-  ControllerCtrl->SetValue(midi_msg[1]);   
+  ControllerCtrl->SetValue(midi_msg[1]);
   ValueCtrl->SetValue(midi_msg[2]);
   Type = midi_msg[0];
   Controller = midi_msg[1];
