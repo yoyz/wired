@@ -33,6 +33,7 @@ using namespace std;
 #include	"Plugin.h"
 #include	"../wiredvideo/WiredVideo.h"
 #include        "FloatingFrame.h"
+#include "WiredDocument.h"
 
 typedef	struct s_PlugStartInfo		PlugStartInfo;
 class					PluginLoader;
@@ -47,7 +48,7 @@ extern WiredSession		*CurrentSession;
 extern wxMutex		        AudioMutex;
 extern wxCondition*	        SeqStopped;
 
-class					MainWindow: public wxFrame
+class					MainWindow: public wxFrame, public WiredDocument
 {
  public:
   MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size);
@@ -113,6 +114,9 @@ class					MainWindow: public wxFrame
   void					SwitchRackOptView();
   void					SwitchSeqOptView();  
   void					AddUpdatePlugin(Plugin *p);
+
+  void					Save();
+  void					Load(SaveElementArray data);
 
   /* init func */
   int					Init();
