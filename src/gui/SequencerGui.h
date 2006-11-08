@@ -66,7 +66,9 @@
 #define ERASE_UP			wxT("ihm/toolbar/erase_up.png")
 #define ERASE_DOWN			wxT("ihm/toolbar/erase_down.png")
 #define SPLIT_UP			wxT("ihm/toolbar/split_up.png")
-#define SPLIT_DOWN			wxT("ihm/toolbar/split_up.png")
+#define SPLIT_DOWN			wxT("ihm/toolbar/split_down.png")
+#define MERGE_UP			wxT("ihm/toolbar/merge_up.png")
+#define MERGE_DOWN			wxT("ihm/toolbar/merge_down.png")
 #define MAGN_UP				wxT("ihm/toolbar/magn_up.png")
 #define MAGN_DOWN			wxT("ihm/toolbar/magn_down.png")
 #define COLOR_UP			wxT("ihm/toolbar/color_up.png")
@@ -80,6 +82,7 @@ enum
     ID_TOOL_DRAW_SEQUENCER,
     ID_TOOL_DELETE_SEQUENCER,
     ID_TOOL_SPLIT_SEQUENCER,
+    ID_TOOL_MERGE_SEQUENCER,
     ID_TOOL_PAINT_SEQUENCER,
   };
 
@@ -114,6 +117,7 @@ enum
     ID_SEQ_DRAW,
     ID_SEQ_DEL,
     ID_SEQ_SPLIT,
+    ID_SEQ_MERGE,
     ID_SEQ_MAGNET,
     ID_SEQ_COMBO_MAGNET,
     ID_SEQ_COLOR,
@@ -222,7 +226,7 @@ class				SequencerGui: public wxPanel, public WiredDocument
   void				SetBeginLoopPos(double pos);
   void				SetEndLoopPos(double pos);
   void				SetEndPos(double pos);
-  void				RefreshConnectMenu();
+/*   void				RefreshConnectMenu(); */
   void				RemoveReferenceTo(Plugin *plug);
   void				DeleteSelectedTrack();
   void				DeleteAllTracks();
@@ -259,6 +263,7 @@ class				SequencerGui: public wxPanel, public WiredDocument
   void				OnDrawClick(wxCommandEvent &event);
   void				OnEraseClick(wxCommandEvent &event);
   void				OnSplitClick(wxCommandEvent &event);
+  void				OnMergeClick(wxCommandEvent &event);
   void				OnMagnetismToggle(wxCommandEvent &event);
   void				OnMagnetismChange(wxCommandEvent &event);
   void				OnColorButtonClick(wxCommandEvent &event);

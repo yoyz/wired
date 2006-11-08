@@ -52,13 +52,14 @@ class					RackTrack
 	void				RemoveRack();
 	void				RemoveChannel();
 	void				DeleteAllRacks();
-
+	void				SetSelected(Plugin *plugin);
+	int				NbRacks(){return Racks.size();};
 	RackTrack			operator=(const RackTrack& right);
 
 	void				Dump();													// Debug - Shows member variables
 	void				DumpPlugins();								// Pas du tout objet, mais plus simple pour l'instant (ca permet de ne pas changer 
 																				// l'API du plugin qui va de tte maniere l'etre pour les DSSI)
-
+	Plugin*				SelectedPlugin;
 	int					Units;
 	Rack*				Parent;
 	int					Index;

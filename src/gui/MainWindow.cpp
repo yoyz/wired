@@ -146,7 +146,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   FileMenu->AppendSeparator();
   FileMenu->Append(MainWin_Quit, _("&Quit\tCtrl-Q"));
   
-  EditMenu->AppendSeparator();
+  //EditMenu->AppendSeparator();
   EditMenu->Append(MainWin_Cut, _("C&ut\tCtrl+X"));
   EditMenu->Append(MainWin_Copy, _("&Copy\tCtrl+C"));
   EditMenu->Append(MainWin_Paste, _("&Paste\tCtrl+V"));
@@ -309,7 +309,7 @@ int			MainWindow::Init()
   else
     wxGetApp().m_threads.Add(Seq);
 
-  InitUndoRedoMenuItems();
+  //InitUndoRedoMenuItems();
   //  InitVideoMenuItems();
 
   SeqTimer = new wxTimer(this, MainWin_SeqTimer);
@@ -1082,7 +1082,7 @@ void					MainWindow::OnCreateEffectClick(wxCommandEvent &event)
     {
       cout << "[MAINWIN] Creating rack for plugin: " << p->InitInfo.Name.mb_str() << endl;
       cActionManager::Global().AddEffectAction(&StartInfo, p, true);
-      CreateUndoRedoMenus(EditMenu);
+      //CreateUndoRedoMenus(EditMenu);
     }
 }
 
@@ -1853,117 +1853,117 @@ void		MainWindow::Save()
 
 void		MainWindow::Load(SaveElementArray data)
 {
-  int	i;
-  wxSize	size;
-  wxPoint	pos;  
-  std::cerr << "[MainWindow] Save()" << std::endl;
-  for (i = 0; i < data.GetCount(); i++)
-    {
-      if (data[i]->getKey() == wxT("MainWindow"))
-	{	
-	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-	  MainWin->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-			   data[i]->getAttributeInt(wxT("Height")));
-          MainWin->SetPosition(pos);          
-        }
+//   int	i;
+//   wxSize	size;
+//   wxPoint	pos;  
+//   std::cerr << "[MainWindow] Save()" << std::endl;
+//   for (i = 0; i < data.GetCount(); i++)
+//     {
+//       if (data[i]->getKey() == wxT("MainWindow"))
+// 	{	
+// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
+// 	  MainWin->SetSize(data[i]->getAttributeInt(wxT("Width")), 
+// 			   data[i]->getAttributeInt(wxT("Height")));
+//           MainWin->SetPosition(pos);          
+//         }
 
-       //it saved the locate,but Gui crash          
-      else if (data[i]->getKey() == wxT("SwitchView"))
-	{
-	  RackModeView = data[i]->getAttributeInt(wxT("RackModeView"));  
-	  SeqModeView = data[i]->getAttributeInt(wxT("SeqModeView"));  
-	}
-        else if (data[i]->getKey() == wxT("FullScreen"))
-	  {
-	    if (data[i]->getValueInt() == 1)
-	      ShowFullScreen(true);
-	    else
-	      ShowFullScreen(false);
-	  }
+//        //it saved the locate,but Gui crash          
+//       else if (data[i]->getKey() == wxT("SwitchView"))
+// 	{
+// 	  RackModeView = data[i]->getAttributeInt(wxT("RackModeView"));  
+// 	  SeqModeView = data[i]->getAttributeInt(wxT("SeqModeView"));  
+// 	}
+//         else if (data[i]->getKey() == wxT("FullScreen"))
+// 	  {
+// 	    if (data[i]->getValueInt() == 1)
+// 	      ShowFullScreen(true);
+// 	    else
+// 	      ShowFullScreen(false);
+// 	  }
 
-      //it totally doesn't work
-      else if (data[i]->getKey() == wxT("MediaLibrary"))
-	{
-          if (data[i]->getAttributeInt(wxT("Show")) == 1)
-	    MediaLibraryPanel->SetVisible();
-	  else
-	    MediaLibraryPanel->SetInvisible();
-	  if (data[i]->getAttributeInt(wxT("floating")) == 1)
-	    MediaLibraryPanel->SetFloating();
-	  else
-	    MediaLibraryPanel->SetDocked();
-	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-	  MediaLibraryPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-			   data[i]->getAttributeInt(wxT("Height")));
-          MediaLibraryPanel->SetPosition(pos);        
-	}
+//       //it totally doesn't work
+//       else if (data[i]->getKey() == wxT("MediaLibrary"))
+// 	{
+//           if (data[i]->getAttributeInt(wxT("Show")) == 1)
+// 	    MediaLibraryPanel->SetVisible();
+// 	  else
+// 	    MediaLibraryPanel->SetInvisible();
+// 	  if (data[i]->getAttributeInt(wxT("floating")) == 1)
+// 	    MediaLibraryPanel->SetFloating();
+// 	  else
+// 	    MediaLibraryPanel->SetDocked();
+// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
+// 	  MediaLibraryPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
+// 			   data[i]->getAttributeInt(wxT("Height")));
+//           MediaLibraryPanel->SetPosition(pos);        
+// 	}
 
-      //floating doesn't work
-      else if (data[i]->getKey() == wxT("Transport"))
-	{
-	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
-	    WindowMenu->Check(MainWin_FloatTransport, true);
-	  else
-	    WindowMenu->Check(MainWin_FloatTransport, false);
+//       //floating doesn't work
+//       else if (data[i]->getKey() == wxT("Transport"))
+// 	{
+// 	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
+// 	    WindowMenu->Check(MainWin_FloatTransport, true);
+// 	  else
+// 	    WindowMenu->Check(MainWin_FloatTransport, false);
 	
-	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-	  TransportPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-			   data[i]->getAttributeInt(wxT("Height")));
-          TransportPanel->SetPosition(pos);        
-	}
+// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
+// 	  TransportPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
+// 			   data[i]->getAttributeInt(wxT("Height")));
+//           TransportPanel->SetPosition(pos);        
+// 	}
 
-        //floating doesn't work    
-      else if (data[i]->getKey() == wxT("Sequencer"))
-	{
-	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
-	    WindowMenu->Check(MainWin_FloatSequencer, true);
-	  else
-	    WindowMenu->Check(MainWin_FloatSequencer, false);
+//         //floating doesn't work    
+//       else if (data[i]->getKey() == wxT("Sequencer"))
+// 	{
+// 	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
+// 	    WindowMenu->Check(MainWin_FloatSequencer, true);
+// 	  else
+// 	    WindowMenu->Check(MainWin_FloatSequencer, false);
 	
-	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-	  SeqPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-			   data[i]->getAttributeInt(wxT("Height")));
-          SeqPanel->SetPosition(pos);        
-	}
+// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
+// 	  SeqPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
+// 			   data[i]->getAttributeInt(wxT("Height")));
+//           SeqPanel->SetPosition(pos);        
+// 	}
 
-       //floating doesn't work
-      else if (data[i]->getKey() == wxT("Rack"))
-	{
-	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
-	    WindowMenu->Check(MainWin_FloatRacks, true);
-	  else
-	    WindowMenu->Check(MainWin_FloatRacks, false);
+//        //floating doesn't work
+//       else if (data[i]->getKey() == wxT("Rack"))
+// 	{
+// 	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
+// 	    WindowMenu->Check(MainWin_FloatRacks, true);
+// 	  else
+// 	    WindowMenu->Check(MainWin_FloatRacks, false);
 	
-	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-	  RackPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-			   data[i]->getAttributeInt(wxT("Height")));
-          RackPanel->SetPosition(pos);        
-	}
+// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
+// 	  RackPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
+// 			   data[i]->getAttributeInt(wxT("Height")));
+//           RackPanel->SetPosition(pos);        
+// 	}
 
-      else if (data[i]->getKey() == wxT("OptPanel"))
-	{
-      	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-	  OptPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-			   data[i]->getAttributeInt(wxT("Height")));
-          OptPanel->SetPosition(pos);   
-	}
+//       else if (data[i]->getKey() == wxT("OptPanel"))
+// 	{
+//       	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
+// 	  OptPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
+// 			   data[i]->getAttributeInt(wxT("Height")));
+//           OptPanel->SetPosition(pos);   
+// 	}
 
-      //it makes wired error
-      /*   else if (data[i]->getKey() == wxT("Sizer"))
-	{
-	  BottomSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("Bottom")));
-	  TopSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("Top")));
-	  TopLeftSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("TopLeft")));
-	  TopRightSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("TopRight")));
+//       //it makes wired error
+//       /*   else if (data[i]->getKey() == wxT("Sizer"))
+// 	{
+// 	  BottomSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("Bottom")));
+// 	  TopSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("Top")));
+// 	  TopLeftSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("TopLeft")));
+// 	  TopRightSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("TopRight")));
 	                      
-	  }*/
-    }
+// 	  }*/
+//     }
 }
 
 BEGIN_DECLARE_EVENT_TYPES()

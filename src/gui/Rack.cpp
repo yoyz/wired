@@ -96,15 +96,18 @@ Plugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, Plugin 
   return (plug);
 }
 
+void				RackTrack::SetSelected(Plugin *plugin)
+{
+  SelectedPlugin = plugin;
+}
 void				RackTrack::RemoveRack()
 {
 	//Dump();
-	Plugin* plugin = Racks.back();
-	Racks.pop_back();
+  Racks.remove(SelectedPlugin);
   	//Dump();
-	plugin->Hide();
-	SeqPanel->RemoveReferenceTo(plugin);
-       	delete plugin;
+	SelectedPlugin->Hide();
+	SeqPanel->RemoveReferenceTo(SelectedPlugin);
+       	//delete SelectedPlugin;
 	Parent->ResizeTracks();
 	Parent->SetScrolling();
 }
@@ -276,7 +279,7 @@ t_RackTrackPlugin*	Rack::AddRackAndChannel(PlugStartInfo &startinfo, PluginLoade
   	result->plugin = tmp;
   	ResizeTracks();
 	SetScrolling();
-	SeqPanel->RefreshConnectMenu();
+	//	SeqPanel->RefreshConnectMenu();
 	return (result);
 }
 
@@ -454,6 +457,7 @@ void				Rack::SetSelected(Plugin *p)
 	  if (*j == p)
 	    {
 	      selectedTrack = *i;
+	      selectedTrack->SetSelected(selectedPlugin);
 	      return;
 	    }
     }
@@ -521,9 +525,9 @@ void				Rack::HandleMouseEvent(Plugin *plug, wxMouseEvent *event)
     }
 	else if(event->LeftUp() && WasDragging)
     {
-		new_x = (event->GetPosition().x + plug->GetPosition().x);
-	    new_y = (event->GetPosition().y + plug->GetPosition().y);
-	    if(!DndGetDest(k, l, new_x, new_y, plug))
+      new_x = (event->GetPosition().x + plug->GetPosition().x);
+      new_y = (event->GetPosition().y + plug->GetPosition().y);
+	    if(plug->IsAudio() && !DndGetDest(k, l, new_x, new_y, plug))
 	    {
 			DeleteRack(plug);
 			AddTrack(plug);
@@ -590,13 +594,14 @@ bool				Rack::DndGetDest(t_ListRackTrack::iterator &k,  list<Plugin *>::iterator
 	      if((*l) == plug)
 		return true;
 	      DeleteRack(plug);
-	      if((new_y + yy) < (((*l)->InitInfo->UnitsY * UNIT_H)/ 2))
-		  DndInsert(k, l, plug);
-	      else
+	      //if((new_y + yy) < (((*l)->InitInfo->UnitsY * UNIT_H)))
+	      l++;
+	      DndInsert(k, l, plug);
+		  /*else
 		{
 		  l++;
 		  DndInsert(k, l, plug);
-		}
+		  }*/
 	      UpdateUnitXSize();
 	      return true;
 	    }
@@ -637,14 +642,19 @@ void				Rack::UpdateUnitXSize()
 inline void			Rack::OnDeleteClick()
 {
 	vector<PluginLoader *>::iterator	k;
-  
+	int					RackIndex;
 	if (selectedPlugin)
     {
     	for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
 			if (COMPARE_IDS((*k)->InitInfo.UniqueId, selectedPlugin->InitInfo->UniqueId))
 			{
 			  cout << "[MAINWIN] Destroying plugin: " << selectedPlugin->Name.mb_str() << endl;
-			  cActionManager::Global().AddEffectAction(&StartInfo, *k, false);
+			  selectedTrack->RemoveRack();
+			  
+			  RackIndex =  selectedTrack->NbRacks();
+			  if (RackIndex < 1)
+			    RackPanel->RemoveTrack(selectedTrack->Index);
+			  //cActionManager::Global().AddEffectAction(&StartInfo, *k, false);
 			  return;
 			}
     }
@@ -918,14 +928,12 @@ Plugin*				Rack::AddTrack(PlugStartInfo &startinfo, PluginLoader *p)
 
 	t = new RackTrack(this, RackTracks.size());
 	tmp = t->AddRack(startinfo, p);
-
 	ConnectPluginChangeParamEventHandler(t);
 	SeqMutex.Lock(); 
 	RackTracks.push_back(t);
 	SeqMutex.Unlock();
-	if (tmp->HasView())
-		SetScrolling();
-	SeqPanel->RefreshConnectMenu();
+	SetScrolling();
+// 	SeqPanel->RefreshConnectMenu();
 	return tmp;
 }
 

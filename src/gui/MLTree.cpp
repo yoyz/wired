@@ -5,7 +5,7 @@
 #include <wx/wx.h>
 #include <wx/file.h>
 #include <wx/treectrl.h>
-// #include <WiredSessionXml.h>
+#include <wx/defs.h>
 #include "MediaLibrary.h"
 #include "MLTree.h"
 #include "MLTreeInfos.h"
@@ -13,7 +13,6 @@
 #include "Sequencer.h"
 #include "SequencerGui.h"
 #include "Colour.h"
-// #include "WiredSession.h"
 #include "HelpPanel.h"
 #include "DownButton.h"
 #include "HoldButton.h"
@@ -28,9 +27,7 @@
 #include "delete.xpm"
 #include <SaveCenter.h>
 
-//extern WiredSession	*CurrentSession;
 extern MediaLibrary	*MediaLibraryPanel;
-//WiredSessionXml		*CurrXmlSession = NULL;
 extern SaveCenter	*saveCenter;
 
 //quite strange to have the s_nodeInfo as a return value and a parameter....
@@ -291,14 +288,14 @@ bool				MLTree::LoadKnownExtentions()
     {
       cout << "[MEDIALIBRARY] Could not open ext file" << endl;
     }
-  
+
   //   Display known extentions
   //   for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
   //     {
-  
+
   //       cout << "[MEDIALIBRARY] : " << *iter << endl;
   //     }
-  
+
   return (true);
 }
 
@@ -366,7 +363,7 @@ void				MLTree::DisplayInfos()
 {
   // cout << "[MEDIALIBRARY] DISPLAYINFOS" << endl;
   s_nodeInfo			info;
-  
+
   info = GetTreeItemStructFromId(GetSelection());
   mouse_pos.y += 50;
   mouse_pos.x += 30;
@@ -570,7 +567,7 @@ wxString			MLTree::getSelection(int flag)
       else
 	{
 	  s_nodeInfo		temp;
- 
+
 	  temp = GetTreeItemStructFromId(selection[i]);
 	  return (temp.label);
 	}
@@ -618,7 +615,7 @@ void				MLTree::ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldE
 void				MLTree::OnCollapse()
 {
   //  cout << "[MEDIALIBRARY] Expand/Collapse Tree (OnCollapse)" << endl;
-  // TODO : Find a way to get the max depth of node childs. 
+  // TODO : Find a way to get the max depth of node childs.
   // Currently using 100 as an arbitrary max depth
   if (IsTreeCollapsed() == true)
     {
@@ -656,7 +653,6 @@ void				MLTree::OnRightClick(wxMouseEvent& event)
       myMenu->Append(ML_ID_MENU_PREVIEW, wxT("Preview"), wxT("Preview"));
       myMenu->Append(ML_ID_MENU_INSERT, wxT("Insert"), wxT("Insert"));
       myMenu->Append(ML_ID_MENU_EDIT, wxT("Edit"), wxT("Edit"));
-      myMenu->Append(ML_ID_MENU_DELETE, wxT("Delete"), wxT("Delete"));
       myMenu->AppendSeparator();
     }
   else
@@ -673,15 +669,14 @@ void				MLTree::OnSelChange(wxTreeEvent &event)
 {
    wxTreeItemId		item;
    s_nodeInfo		infos;
-  
+
    item = GetSelection();
-  
+
    infos = GetTreeItemStructFromId(item);
    if (infos.extention.Cmp(wxT("")))
      {
        MediaLibraryPanel->TopToolbar->EnableTool(1, false);
        MediaLibraryPanel->TopToolbar->EnableTool(2, true);
-       MediaLibraryPanel->TopToolbar->EnableTool(3, true);
        MediaLibraryPanel->TopToolbar->EnableTool(4, true);
        MediaLibraryPanel->BottomToolbar->EnableTool(5, true);
      }
@@ -689,7 +684,6 @@ void				MLTree::OnSelChange(wxTreeEvent &event)
      {
        MediaLibraryPanel->TopToolbar->EnableTool(1, true);
        MediaLibraryPanel->TopToolbar->EnableTool(2, true);
-       MediaLibraryPanel->TopToolbar->EnableTool(3, false);
        MediaLibraryPanel->TopToolbar->EnableTool(4, false);
        MediaLibraryPanel->BottomToolbar->EnableTool(5, false);
      }
@@ -697,11 +691,10 @@ void				MLTree::OnSelChange(wxTreeEvent &event)
      {
        MediaLibraryPanel->TopToolbar->EnableTool(1, true);
        MediaLibraryPanel->TopToolbar->EnableTool(2, false);
-       MediaLibraryPanel->TopToolbar->EnableTool(3, false);
        MediaLibraryPanel->TopToolbar->EnableTool(4, false);
-       MediaLibraryPanel->BottomToolbar->EnableTool(5, false);
+       //       MediaLibraryPanel->BottomToolbar->EnableTool(5, false);
      }
-  
+
 }
 
 void				MLTree::BeginDrag(wxTreeEvent &event)
@@ -718,11 +711,11 @@ wxTreeItemId                    MLTree::Copy(wxTreeItemId item)
   wxString		selfile;
   wxTreeItemId		itemAdded;
   int			slashPos;
- 
+
 
   wxFileName	        *File = new wxFileName(selfile);
 
- 
+
   infos = GetTreeItemStructFromId(item_to_drag);
   if (infos.label != wxT(""))
     {
@@ -741,14 +734,14 @@ wxTreeItemId                    MLTree::Copy(wxTreeItemId item)
 	  return itemAdded;
 	}
     }
- 
+
 }
 void                          MLTree::DragAndDrop(wxTreeItemId item)
 {
  wxTreeItemIdValue cookie = &Tree;
  wxTreeItemId		item_to_drag_save;
  wxTreeItemId		item_save;
- 
+
 
  item = Copy(item);
  if (item_to_drag == item_begin)
@@ -766,7 +759,7 @@ void                          MLTree::DragAndDrop(wxTreeItemId item)
 	    return;
 	 DragAndDrop(item_save);
        }
-    
+
      item_to_drag = item_to_drag_save;
    }
 }
@@ -806,10 +799,27 @@ void				MLTree::OnLeftClick(wxMouseEvent &event)
   event.Skip();
 }
 
+void				MLTree::OnSuppr(wxKeyEvent &event)
+{
+
+//   if (wxGetKeyState())
+//     {
+//       cout << "yeeeee" << endl;
+//     }
+  int key = event.GetKeyCode();
+  //cout << key << endl;
+  if (key == WXK_DELETE)
+    {
+      OnRemove();
+      cout << "removing" << endl;
+    }
+}
+
 BEGIN_EVENT_TABLE(MLTree, wxTreeCtrl)
   EVT_RIGHT_UP(MLTree::OnRightClick)
   EVT_TREE_SEL_CHANGED(MLTree_Selected, MLTree::OnSelChange)
   EVT_TREE_BEGIN_DRAG(MLTree_Selected, MLTree::BeginDrag)
   EVT_TREE_END_DRAG(MLTree_Selected, MLTree::EndDrag)
   EVT_LEFT_UP(MLTree::OnLeftClick)
+  EVT_KEY_DOWN(MLTree::OnSuppr)
 END_EVENT_TABLE()

@@ -44,7 +44,6 @@ class					Track : public WiredDocument
   trackType				Type;
 
   SeqTrack*				TrackOpt;
-  SeqTrackPattern*			TrackPattern;
   Channel*				Output;
   ChannelGui*				ChanGui;
 
@@ -58,6 +57,10 @@ class					Track : public WiredDocument
 	wxWindow* trackview); 
   ~Track(); 
   Track	operator=(const Track& right);
+
+  //super degueu
+  SeqTrackPattern*			TrackPattern;
+
 
   void					Dump();
 

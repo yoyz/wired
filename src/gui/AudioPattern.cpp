@@ -15,6 +15,7 @@
 #include "../sequencer/Track.h"
 #include "../gui/SeqTrack.h"
 #include "../engine/AudioEngine.h"
+#include "../audio/WaveFile.h"
 #include "../audio/WriteWaveFile.h"
 #include "../mixer/Channel.h"
 #include "SaveCenter.h"
@@ -55,7 +56,6 @@ void					AudioPattern::Init(WaveFile* w, WiredDocument* parent)
   RecordWave = 0;
   InputChan = NULL;
   RecordWave = NULL;
-  SetWave(w);
   wxSize s = GetSize();
   SetSize(s);
   WaveDrawer::SetWave(w, s);
@@ -70,8 +70,9 @@ void					AudioPattern::Init(WaveFile* w, WiredDocument* parent)
 	  &AudioPattern::OnLeftUp);
   Connect(GetId(), wxEVT_RIGHT_DOWN, (wxObjectEventFunction)(wxEventFunction)(wxMouseEventFunction)
 	  &AudioPattern::OnRightClick);
-  Connect(GetId(), wxEVT_LEFT_DCLICK, (wxObjectEventFunction)(wxEventFunction)(wxMouseEventFunction)
-	  &AudioPattern::OnDoubleClick);
+  // Double Click action commented FOR EPITECH FORUM PURPOSE
+  //   Connect(GetId(), wxEVT_LEFT_DCLICK, (wxObjectEventFunction)(wxEventFunction)(wxMouseEventFunction)
+  // 	  &AudioPattern::OnDoubleClick);
   Connect(GetId(), wxEVT_PAINT, (wxObjectEventFunction)(wxEventFunction)(wxMouseEventFunction)
 	  &AudioPattern::OnPaint);
   Connect(GetId(), wxEVT_SIZE, (wxObjectEventFunction)(wxEventFunction)(wxMouseEventFunction)
@@ -135,7 +136,6 @@ void					AudioPattern::SetWave(WaveFile *w)
 #ifdef __DEBUG__
   cout << "WaveDrawer::StartWavePos = " << WaveDrawer::StartWavePos<< " WaveDrawer::EndWavePos = " << WaveDrawer::EndWavePos << endl;
 #endif
- 
  if (!w)
     {
       StartWavePos = 0;
@@ -169,7 +169,7 @@ float					**AudioPattern::GetBlock(long block)
     {
       buf = new float *[2];
       if (size > Audio->SamplesPerBuffer)
-	size = Audio->SamplesPerBuffer; 
+	size = Audio->SamplesPerBuffer;
       buf[0] = new float[Audio->SamplesPerBuffer];
       buf[1] = new float[Audio->SamplesPerBuffer];
       memset(buf[0], 0, sizeof(float) * sizeof(Audio->SamplesPerBuffer));
@@ -199,7 +199,7 @@ bool					AudioPattern::PrepareRecord(int type)
   bool					done = false;
   int					i = 1;
 
-  cout << "Preparing record for pattern " << this 
+  cout << "Preparing record for pattern " << this
        << " with audio dir : " << saveCenter->getAudioDir().mb_str() << endl;
   while (!done)
     {
@@ -224,7 +224,7 @@ bool					AudioPattern::PrepareRecord(int type)
 	  FileName = s;
 	  InputChan = Mix->OpenInput(Seq->Tracks[TrackIndex]->GetTrackOpt()->DeviceId);
 	  Mix->FlushInput(Seq->Tracks[TrackIndex]->GetTrackOpt()->DeviceId);
-	  cout << "[AUDIOPATTERN] Recording on input: " 
+	  cout << "[AUDIOPATTERN] Recording on input: "
 	       << Seq->Tracks[TrackIndex]->GetTrackOpt()->DeviceId << endl;
 	  return (true);
 	}
@@ -234,7 +234,7 @@ bool					AudioPattern::PrepareRecord(int type)
 	}
     }
   else
-    cout << "[AUDIOPATTERN] Error : could not create audio file" << endl;    
+    cout << "[AUDIOPATTERN] Error : could not create audio file" << endl;
   return (false);
 }
 
@@ -309,9 +309,13 @@ Pattern					*AudioPattern::CreateCopy(double pos)
   p->EndPosition = pos +  Length;
   p->Length = Length;
   p->SetDrawColour(WaveDrawer::PenColor);
+  p->Position = pos;
   p->Update();
   SeqMutex.Unlock();
 
+  //p = new AudioPattern(pos, Wave, TrackIndex);
+  //p = Seq->Tracks[TrackIndex]->AddPattern(Wave, pos);
+  //printf("AudioPattern::CreateCopy(%d) new pat %d -- OVER\n", pos, p);
 #ifdef __DEBUG__
   printf(" [  END  ] AudioPattern::CreateCopy(%f) on track %d\n", pos, TrackIndex);
 #endif
@@ -325,10 +329,12 @@ void					AudioPattern::OnClick(wxMouseEvent &e)
     {
       Split((double) ((GetMPosition().x + e.m_x)
 		      / (MEASURE_WIDTH * SeqPanel->HoriZoomFactor)));
-      }
-  else
-    if (SeqPanel->Tool == ID_TOOL_PAINT_SEQUENCER)
-      SetDrawColour(SeqPanel->ColorBox->GetColor());
+    }
+  else if (SeqPanel->Tool == ID_TOOL_MERGE_SEQUENCER)
+    {
+    }
+  else if (SeqPanel->Tool == ID_TOOL_PAINT_SEQUENCER)
+    SetDrawColour(SeqPanel->ColorBox->GetColor());
 }
 
 void					AudioPattern::OnLeftUp(wxMouseEvent &e)
@@ -340,7 +346,6 @@ void					AudioPattern::Split(double pos)
 {
   AudioPattern				*p;
 
- 
   if ((Position < pos) && (pos < EndPosition))
     {
 #ifdef __DEBUG__
@@ -354,7 +359,7 @@ void					AudioPattern::Split(double pos)
       SeqMutex.Lock();
       p->StartWavePos = StartWavePos + (long) floor((pos - Position) * Seq->SamplesPerMeasure);
       p->EndWavePos = p->StartWavePos + (long) floor(p->Length * Seq->SamplesPerMeasure);
-      
+
       p->SetWave(Wave);
       p->SetDrawColour(WaveDrawer::PenColor);
       p->SetCursor(GetCursor());
@@ -363,22 +368,21 @@ void					AudioPattern::Split(double pos)
       p->Update();
       EndWavePos = p->StartWavePos;
       Length = (EndPosition = pos) - Position;
-      
+
       SetDrawing();
       Update();
       SeqMutex.Unlock();
     }
   else
-    cout << "C QUOI CE DELIRE DE POS ?? " << pos << endl;
+    std::cout << "[AudioPattern] Can't split pattern (got incorrect position)." << pos << endl;
 }
 
 void					AudioPattern::SetDrawColour(wxColour c)
-{ 
-   Pattern::SetDrawColour(c);
-   WaveDrawer::PenColor = c;
-   RedrawBitmap(GetSize());
-   //Refresh();
-  
+{
+  Pattern::SetDrawColour(c);
+  WaveDrawer::PenColor = c;
+  RedrawBitmap(GetSize());
+  //Refresh();
 }
 
 void					AudioPattern::OnDoubleClick(wxMouseEvent &e)
@@ -420,7 +424,7 @@ void					AudioPattern::OnSize(wxSizeEvent &e)
     {
       WaveDrawer::SetDrawing(GetSize());
       Refresh();
-    }  
+    }
 }
 
 void					AudioPattern::SetSize(wxSize s)
@@ -439,8 +443,10 @@ void					AudioPattern::SetSize(wxSize s)
 
 void				AudioPattern::Save()
 {
-  saveDocData(new SaveElement(wxT("FileName"), FileName));
-  Pattern::Save();
+
+ std:cerr << "Saving Pattern filename : " << FileName.mb_str() << std::endl;
+ saveDocData(new SaveElement(wxT("FileName"), FileName));
+ Pattern::Save();
 }
 
 void				AudioPattern::Load(SaveElementArray data)
