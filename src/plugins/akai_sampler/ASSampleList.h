@@ -27,6 +27,7 @@ class ASSampleList : public ASPlugin
     void OnAddSample(wxCommandEvent &);
     void OnDelSample(wxCommandEvent &);
     void OnResize(wxSizeEvent &);
+    ASamplerSample *GetSampleById(unsigned long id);
     ASList *List;
 
   DECLARE_EVENT_TABLE()

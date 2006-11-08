@@ -78,3 +78,24 @@ void  ASSampleList::OnDelSample(wxCommandEvent &e)
     delete ass;
   }
 }
+
+ASamplerSample	*ASSampleList::GetSampleById(unsigned long askedId)
+{
+  vector<ASListEntry *>	samples;
+  ASamplerSample	*sample;
+  vector<ASListEntry *>::iterator i;
+
+  samples = List->GetEntries();
+
+  for(i = samples.begin(); 
+      i != samples.end(); 
+      i++)
+    {
+      ASamplerSample *ass = (ASamplerSample *)(*i)->GetEntry();
+      if (ass->GetID() == askedId)
+	return ass;
+    }
+  return NULL;
+
+
+}
