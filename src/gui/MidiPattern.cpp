@@ -26,18 +26,15 @@ MidiPattern::MidiPattern(WiredDocument *parent, double pos, double endpos, long 
   Init(parent);
 }
 
-MidiPattern::MidiPattern(WiredDocument *parent, double pos, MidiTrack *t, long trackindex)
-  : Pattern(parent, wxT("MidiPattern"), pos, ((double) t->GetMaxPos()) / (Seq->SigNumerator * t->GetPPQN()), trackindex)
+MidiPattern::MidiPattern(WiredDocument *parent, double pos,
+			 MidiTrack *midiTrack, long trackindex)
+  : Pattern(parent, wxT("MidiPattern"), pos,
+	    ((double) midiTrack->GetMaxPos()) / 
+	    (Seq->SigNumerator * midiTrack->GetPPQN()),
+	    trackindex)
 {
-  vector<MidiFileEvent *>		me;
-  unsigned long				i;
-
   Init(parent);
-  ppqn = t->GetPPQN();
-  temp.clear();
-  me = t->GetMidiEvents();
-  for (i = 0; i < me.size(); i++)
-    AddEvent(me[i]);    
+  SetMidiTrack(midiTrack);
 }
 
 MidiPattern::~MidiPattern()
@@ -47,12 +44,11 @@ MidiPattern::~MidiPattern()
 
 void					MidiPattern::Init(WiredDocument* parent)
 {
-  wxString	s;
-
-  s.Printf(wxT("T%d M%d"), TrackIndex + 1, midi_pattern_count++);
+  _filename.clear();
+  _noTrack = 0;
+  Name.Printf(wxT("T%d M%d"), TrackIndex + 1, midi_pattern_count++);
   PenColor = CL_MIDI_DRAW;
   BrushColor = CL_MIDIDRAWER_BRUSH;
-  Name = s.c_str();
   ppqn = 1;
   Bmp = 0x0;
   Connect(GetId(), wxEVT_MOTION, (wxObjectEventFunction)(wxEventFunction)(wxMouseEventFunction)
@@ -68,6 +64,21 @@ void					MidiPattern::Init(WiredDocument* parent)
   Connect(GetId(), wxEVT_ENTER_WINDOW, (wxObjectEventFunction)(wxEventFunction)
 	  (wxMouseEventFunction) &MidiPattern::OnHelp);
   SeqPanel->PutCursorsOnTop();
+}
+
+// we can't keep MidiTrack instance, because in MidiFile dtor, it delete them
+void					MidiPattern::SetMidiTrack(MidiTrack* midiTrack)
+{
+  vector<MidiFileEvent *>		me;
+  unsigned long				i;
+
+  _filename = midiTrack->GetFileName();
+  _noTrack = midiTrack->GetNoTrack();
+  ppqn = midiTrack->GetPPQN();
+  temp.clear();
+  me = midiTrack->GetMidiEvents();
+  for (i = 0; i < me.size(); i++)
+    AddEvent(me[i]);
 }
 
 void					MidiPattern::OnHelp(wxMouseEvent &event)
@@ -340,10 +351,31 @@ void					MidiPattern::OnPaint(wxPaintEvent &e)
 
 void				MidiPattern::Save()
 {
-  
+  SaveElement*			saved;
+
+  saved = new SaveElement(wxT("FileName"), _filename);
+  saved->addAttribute(wxT("NoTrack"), (int)_noTrack);
+  saveDocData(saved);
+  Pattern::Save();
 }
 
 void				MidiPattern::Load(SaveElementArray data)
 {
-  
+  int				i;
+
+  for (i = 0; i < data.GetCount(); i++)
+    {
+      if (data[i]->getKey() == wxT("FileName"))
+	{
+	  MidiFile*	midiFile;
+	  int		noTrack;
+
+	  midiFile = new MidiFile(data[i]->getValue());
+	  noTrack = data[i]->getAttributeInt(wxT("NoTrack"));
+	  if (noTrack < midiFile->GetNumberOfTracks())
+	    SetMidiTrack(midiFile->GetTrack(noTrack));
+	  delete midiFile;
+	  Pattern::Load(data);
+	}
+    }
 }

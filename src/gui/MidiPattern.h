@@ -18,11 +18,19 @@ class				MidiPattern : public Pattern
  private:
   WiredDocument*		_documentParent;
 
+  // only set when we add a pattern from MidiTrack class
+  wxString			_filename;
+  unsigned short		_noTrack;
+
  public:
   MidiPattern(WiredDocument *parent, double pos, double endpos, long trackindex);
   MidiPattern(WiredDocument *parent, double pos, MidiTrack *t, long trackindex);
   ~MidiPattern();
 
+ private:
+  void				SetMidiTrack(MidiTrack* midiTrack);
+
+ public:
   void				AddEvent(MidiEvent *event);
   void				AddEvent(MidiFileEvent *event);
   void				Update();
