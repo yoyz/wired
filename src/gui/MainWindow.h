@@ -102,7 +102,7 @@ class					MainWindow: public wxFrame, public WiredDocument
 
   void					MediaLibraryShow(wxCommandEvent &event);
   void					MediaLibraryHide(wxCommandEvent &event);
-
+  
   void			                OnShowDebug(wxCommandEvent &event);
 
   void					OnOpenVideo(wxCommandEvent &event);
