@@ -52,6 +52,8 @@ void					AudioPattern::Init(WaveFile* w, WiredDocument* parent)
 #endif
 
   Name = wxString::Format(wxT("T%d A%d"), TrackIndex + 1, audio_pattern_count++);
+  if (w)
+    FileName= w->Filename;
   LastBlock = -1;
   RecordWave = 0;
   InputChan = NULL;
@@ -444,7 +446,7 @@ void					AudioPattern::SetSize(wxSize s)
 void				AudioPattern::Save()
 {
 
- std:cerr << "Saving Pattern filename : " << FileName.mb_str() << std::endl;
+
  saveDocData(new SaveElement(wxT("FileName"), FileName));
  Pattern::Save();
 }
