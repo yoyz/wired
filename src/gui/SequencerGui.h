@@ -1,23 +1,31 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
-
 #ifndef __SEQUENCERGUI_H__
 #define __SEQUENCERGUI_H__
 
-#include <vector>
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+   #include <wx/wx.h>
+#endif
 
-#include <wx/wx.h>
 #include <wx/statline.h>
 
 #include <wx/toolbar.h>
 #include <wx/colordlg.h>
 
+#include <vector>
+
+#include "Ruler.h"
+#include "Cursor.h"
+#include "SelectionZone.h"
+#include "ColoredBox.h"
 #include "Track.h"
 #include "AudioPattern.h"
 #include "MidiPattern.h"
+#include "AccelCenter.h"
+
+#include "SequencerView.h"
 
 #define ID_SEQ_SETPOS			(101010)
 #define ID_SEQ_RESIZE			(101011)
@@ -48,9 +56,9 @@
 #define PATTERN_MAGNETISM		(MAGNETISM & PATTERN_MASK)
 #define PATTERN_DEFAULT_MAGNETISM	(4)
 #define DEFAULT_MAGNETISM_COMBO_VALUE	wxT("1/4")
-     
+
 #define PLAY_CURSOR_FOLLOWING		(42)
-     
+
 #define HAND_UP				wxT("ihm/toolbar/hand_up.png")
 #define HAND_DOWN			wxT("ihm/toolbar/hand_down.png")
 #define DRAW_UP				wxT("ihm/toolbar/draw_up.png")
@@ -122,60 +130,6 @@ class				Pattern;
 class				WaveFile;
 class				MidiEvent;
 class				AccelCenter;
-
-class				SequencerView: public wxWindow
-{
-  friend class			SequencerGui;
-  friend class			Pattern;
-
- private:
-  void				OnClick(wxMouseEvent &e);
-  void				OnMotion(wxMouseEvent &e);
-  void				OnLeftUp(wxMouseEvent &e);
-  void				OnRightClick(wxMouseEvent &event);
-  void				OnPaint(wxPaintEvent &event);
-  void				OnHelp(wxMouseEvent &event);
-  void				SelectZonePatterns(bool shift);
-
-  unsigned long			TotalWidth;
-  unsigned long			TotalHeight;
-  long				XScroll;
-  long				YScroll;
-  SelectionZone			*TheZone;
-  AccelCenter			*HAxl;
-  AccelCenter			*VAxl;
-
- public:
-  SequencerView(wxWindow *parent, const wxPoint &pos, const wxSize &size);
-  ~SequencerView();
-
-  void				SetXScroll(long x, long range, long seqwidth);
-  void				SetXScrollValue(long X);
-  long				GetXScroll();
-  void				SetYScroll(long y, long range, long seqwidth);
-  void				SetYScrollValue(long Y);
-  long				GetYScroll();
-  void				AutoScroll(double xmove, double ymove);
-  void				AutoXScroll(double xmove);
-  void				AutoXScrollBackward(long accel_type = 0);
-  void				AutoXScrollForward(long accel_type = 0);
-  void				AutoXScrollReset();
-  void				AutoYScroll(double ymove);
-  void				AutoYScrollBackward(long accel_type = 0);
-  void				AutoYScrollForward(long accel_type = 0);
-  void				AutoYScrollReset();
-  unsigned long			GetTotalWidth();
-  void				SetTotalWidth(unsigned long w);
-  unsigned long			GetTotalHeight();
-  void				SetTotalHeight(unsigned long h);
-  void				Drop(int x, int y, wxString file);
-
- protected:
-  void				DrawMeasures(wxDC &dc);
-  void				DrawTrackLines(wxDC &dc);
-
-  DECLARE_EVENT_TABLE()
-};
 
 class				CursorEvent: public wxEvent
 {
