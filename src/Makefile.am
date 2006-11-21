@@ -1,4 +1,5 @@
 SUBDIRS =				\
+	save				\
 	gui 				\
 	fileloader			\
 	sequencer 			\
@@ -17,8 +18,8 @@ SUBDIRS =				\
 	samplerate			\
 	codec				\
 	wiredvideo			\
-	dssi				\
-	save
+	dssi
+
 
 
 DEPS_LIBS = libs/WiredWidgets/src/.libs/libWiredWidgets.so libs/WiredAkai/src/.libs/libWiredAkai.so
