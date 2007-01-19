@@ -13,9 +13,16 @@ WiredDocument::WiredDocument(wxString name, WiredDocument *parent, bool noParent
      parent = saveCenter;
 
   if(parent)
-    parent->Register(this);
-
+    {
+      _parent = parent;
+      _parent->Register(this);
+    }
   _name = name;
+}
+
+WiredDocument::~WiredDocument()
+{
+  _parent->Unregister(this);
 }
 
 void		WiredDocument::Register(WiredDocument *child)
@@ -23,6 +30,10 @@ void		WiredDocument::Register(WiredDocument *child)
   _children.Add(child);
 }
 
+void		WiredDocument::Unregister(WiredDocument *child)
+{
+  _children.Remove(child);
+}
 
 WiredDocumentArray	WiredDocument::getChildren()
 {

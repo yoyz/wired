@@ -28,6 +28,11 @@ class WiredDocument
   WiredDocument(wxString docName, WiredDocument *parent = NULL,
 		bool noParent = false);
 
+  /** Destructor.
+   * Removes this from the parent children.
+   */
+  ~WiredDocument();
+
   /** Main save function.
    * This function will be called by the SaveCenter when a save of the document
    * is asked.
@@ -55,9 +60,14 @@ class WiredDocument
   WiredDocumentArray		getChildren();
 
   /** Adds a child to the _children array.
-   * \param children The child to add.
+   * \param child The child to add.
    */
-  void				Register(WiredDocument *children);
+  void				Register(WiredDocument *child);
+
+  /** Removes a child from the _children array.
+   * \param child The child to remove.
+   */
+  void				Unregister(WiredDocument *child);
   
   /** Returns the data stored in _dataSave.
    * \return The data stored in _dataSave.
@@ -116,6 +126,9 @@ class WiredDocument
   void				rmDocDataFile(wxString file);
 
  private:
+
+  /** A pointer to the parent. */
+  WiredDocument			*_parent;
 
   /** The list of the children of this WiredDocument. */
   WiredDocumentArray		_children;

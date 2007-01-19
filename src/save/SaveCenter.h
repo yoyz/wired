@@ -110,6 +110,17 @@ class SaveCenter : public WiredDocument
    */
   SaveElementArray	LoadFile(wxString filename);
 
+  /** Dumps the whole WiredDocument objects tree. */
+  void			DumpWiredDocumentTree();
+  
+  /** Dumps the name of a WiredDocument object and calls itself 
+   * recursively over its children. 
+   * \param currentNode The current WiredDocument.
+   * \param depth The current depth, will be the number of spaces for indentation.
+   */
+  void			DumpWiredDocumentSubTree(WiredDocument *currentNode,
+						 int depth);
+
  private:
    /** Writes an element in the xmlfile.
     * \param elem the element to write.
@@ -162,17 +173,6 @@ class SaveCenter : public WiredDocument
   wxFileName	getPathFromRelativeTag(wxString tag);
 
  private:
-
-  /** Dumps the whole WiredDocument objects tree. */
-  void			DumpWiredDocumentTree();
-  
-  /** Dumps the name of a WiredDocument object and calls itself 
-   * recursively over its children. 
-   * \param currentNode The current WiredDocument.
-   * \param depth The current depth, will be the number of spaces for indentation.
-   */
-  void			DumpWiredDocumentSubTree(WiredDocument *currentNode,
-						 int depth);
 
   /** Dumps a SaveElementArrayHashMap.
    * As this structure is quite complicated, this function is mainly used for debug.
