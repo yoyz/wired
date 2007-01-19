@@ -34,6 +34,11 @@ void	SaveCenter::SaveProject()
   wxString	fileName;
   WiredXml	*xmlFile = new WiredXml();
 
+  std::cout << "==WiredDocument tree dump==" << std::endl;
+  DumpWiredDocumentTree();
+  std::cout << "==/WiredDocument tree dump==" << std::endl;
+  
+
   if(!_projectPath.DirExists())
     _projectPath.Mkdir();
     
@@ -577,4 +582,28 @@ wxString	SaveCenter::GetProjectNameFromProjectPath(wxFileName path)
 bool		SaveCenter::getSaved()
 {
   return _saved;
+}
+
+void		SaveCenter::DumpWiredDocumentTree()
+{
+  DumpWiredDocumentSubTree(this, 0);
+}
+
+void		SaveCenter::DumpWiredDocumentSubTree(WiredDocument *currentNode,
+						     int depth)
+{
+  int	i;
+  WiredDocumentArray	children;
+
+
+  for(i = 0; i < depth; i++)
+    std::cout << " ";
+
+  std::cout << currentNode->getName() << std::endl;
+
+  children = currentNode->getChildren();
+
+  for(i = 0; i < children.size(); i++)
+    DumpWiredDocumentSubTree(children[i], depth + 1);
+
 }
