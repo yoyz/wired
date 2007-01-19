@@ -100,31 +100,18 @@ bool					WiredXml::ValidDocument()
 
 bool					WiredXml::CreateDocument(const wxString& DocName)
 {
-  std::cerr << "[WiredXml] CreateDocument" << std::endl; 
-
   CloseDocumentWriter();
-  std::cerr << "[WiredXml] CloseDocumentWriter" << std::endl; 
 
   if (DocName.Cmp(wxT("")) == 0)
     _DocumentWriterName = _DocumentFileName + TEMP_EXTENSION;
   else
     _DocumentWriterName = DocName;
 
-  std::cerr << "[WiredXml] _DocumentWriterName = " << _DocumentWriterName.mb_str() << std::endl;
   if ((_DocumentWriter = xmlNewTextWriterFilename(_DocumentWriterName.mb_str(*wxConvCurrent), 0)) != NULL)
-    {      
-      std::cerr << "[WiredXml] 1" << std::endl;
-      if (xmlTextWriterSetIndent(_DocumentWriter, 4) == 0)
-	{
-	  std::cerr << "[WiredXml] 2" << std::endl;
-	  if (xmlTextWriterStartDocument(_DocumentWriter, NULL, NULL, NULL) >= 0)
-	    {	
-	      std::cerr << "[WiredXml] 3" << std::endl;
-	      //if (xmlTextWriterWriteDTDExternalEntity(_DocumentWriter, FALSE, ) >= 0)
-	      return true;
-	    }
-	}
-    }
+    if (xmlTextWriterSetIndent(_DocumentWriter, 4) == 0)
+      if (xmlTextWriterStartDocument(_DocumentWriter, NULL, NULL, NULL) >= 0)
+	//if (xmlTextWriterWriteDTDExternalEntity(_DocumentWriter, FALSE, ) >= 0)
+	return true;
   return false;
 }
 
