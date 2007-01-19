@@ -283,7 +283,6 @@ void Channel::ClearAllBuffers(bool renew)
 
 void			Channel::Save()
 {
-  /*
   SaveElement	*savedElem;
 
   std::cerr << "[Channel] Save()" << std::endl;
@@ -327,7 +326,6 @@ void			Channel::Save()
   //CurBuf
   savedElem = new SaveElement(wxT("filled"), this->Filled);
   saveDocData(savedElem);
-  */
 }
 
 void			Channel::Load(SaveElementArray data)

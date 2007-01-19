@@ -66,21 +66,21 @@ Mixer::~Mixer()
 Mixer 	Mixer::operator=(const Mixer& right)
 {
   cerr << "WARNING : Soon, Wired will miserably fail" << endl;
-
+  
   // Ptr must NOT be copied, but content of data does.
-	if (this != &right)
-	{
-		OutputLeft = right.OutputLeft;
-		OutputRight = right.OutputRight;
-		Input = right.Input;
-		VolumeLeft = right.VolumeLeft;
-		VolumeRight = right.VolumeLeft;
-		MuteL = right.MuteL;
-		MuteR = right.MuteR;
-		OutChannels = right.OutChannels;
-		InChannels = right.InChannels;
-	}
-	return *this;
+  if (this != &right)
+    {
+      OutputLeft = right.OutputLeft;
+      OutputRight = right.OutputRight;
+      Input = right.Input;
+      VolumeLeft = right.VolumeLeft;
+      VolumeRight = right.VolumeLeft;
+      MuteL = right.MuteL;
+      MuteR = right.MuteR;
+      OutChannels = right.OutChannels;
+      InChannels = right.InChannels;
+    }
+  return *this;
 }
 */
 
@@ -105,7 +105,7 @@ Channel*    	Mixer::AddChannel(list<Channel*>& list, bool stereo, bool visible)
 
   try
     {
-      chan = new Channel(stereo);
+      chan = new Channel(stereo, visible, this);
       list.push_back(chan);
     }
   catch (std::bad_alloc)
