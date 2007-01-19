@@ -20,8 +20,8 @@
 ChannelGui::ChannelGui(Channel* channel, wxImage* img_bg, wxImage* img_fg,
 		       wxWindow* parent, wxWindowID id,
 		       const wxPoint& pos, const wxSize& size,
-		       const wxString& label, WiredDocument* docParent)
-  : wxPanel(parent, id, pos, size), WiredDocument(wxT("ChannelGui"), docParent)
+		       const wxString& label)
+  : wxPanel(parent, id, pos, size)
 {
   ConnectedSeqTrack = 0x0;
   SetBackgroundColour(*wxBLACK);//CL_RULER_BACKGROUND);
@@ -186,82 +186,6 @@ void				ChannelGui::UpdateScreen()
 }
 
 
-void				ChannelGui::Save()
-{
-  SaveElement	*savedElem;
-
-  std::cerr << "[ChannelGui] Save()" << std::endl;
-
-  //Stereo
-  savedElem = new SaveElement(wxT("stereo"), this->Stereo);
-  saveDocData(savedElem);
-
-  //Lock
-  savedElem = new SaveElement(wxT("lock"), this->Lock);
-  saveDocData(savedElem);
-
-  //MuteLeftButton
-  savedElem = new SaveElement(wxT("muteLeftButton"), this->MuteLeftButton->GetOn());
-  saveDocData(savedElem);
-
-  //MuteRightButton
-  savedElem = new SaveElement(wxT("muteRightButton"), this->MuteRightButton->GetOn());
-  saveDocData(savedElem);
-
-  //LockButton
-  savedElem = new SaveElement(wxT("lockButton"), this->LockButton->GetOn());
-  saveDocData(savedElem);
-}
-
-void				ChannelGui::Load(SaveElementArray data)
-{
-  int		dataCompt;
-
-  std::cerr << "[ChannelGui] Load()" << std::endl;
-  for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
-    {
-      std::cerr << "[ChannelGui] key = " << data[dataCompt]->getKey() << std::endl;
-      std::cerr << "[ChannelGui] value = " << data[dataCompt]->getValue() << std::endl;
-
-      if (data[dataCompt]->getKey() == wxT("stereo"))
-	{
-	  if (data[dataCompt]->getValue())
-	    SetStereo(true);
-	  else
-	    SetStereo(false);
-	}
-      else if (data[dataCompt]->getKey() == wxT("lock"))
-	{
-	  if (data[dataCompt]->getValue())
-	    SetLock(true);
-	  else
-	    SetLock(false);
-	}
-      else if (data[dataCompt]->getKey() == wxT("muteLeftButton"))
-	{
-	  if(data[dataCompt]->getValue())
-	    SetMuteLeftButton(true);
-	  else
-	    SetMuteLeftButton(false);
-	}
-      else if (data[dataCompt]->getKey() == wxT("muteRightButton"))
-	{
-	  if (data[dataCompt]->getValue())
-	    SetMuteRightButton(true);
-	  else
-	    SetMuteRightButton(false);
-	}
-      else if (data[dataCompt]->getKey() == wxT("lockButton"))
-	{
-	  if (data[dataCompt]->getValue())
-	    SetLockButton(true);
-	  else
-	    SetLockButton(false);
-	}
-    }
-}
-
-
 void				ChannelGui::SetStereo(bool stereo)
 {
   this->Stereo = stereo;
@@ -355,8 +279,8 @@ void				ChannelGui::OnLock(wxCommandEvent& WXUNUSED(e))
 MasterChannelGui::MasterChannelGui(Channel* channel, wxImage* img_bg,
 				   wxImage* img_fg, wxWindow* parent,
 				   wxWindowID id, const wxPoint& pos,
-				   const wxSize& size, WiredDocument* docParent)
-  : ChannelGui(channel, img_bg, img_fg, parent, id, pos, size, _("MASTER"), docParent)
+				   const wxSize& size)
+  : ChannelGui(channel, img_bg, img_fg, parent, id, pos, size, _("MASTER"))
 {
   //  Label = new wxStaticText(this, -1, "MASTER", wxPoint(20, 0));
 }

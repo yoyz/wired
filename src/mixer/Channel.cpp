@@ -43,9 +43,9 @@ Channel		Channel::operator=(const Channel& right) :
 
   // Ptr must NOT be copied, but content of data does.
   if (this != &right)
-    {
-      Label = right.Label;
-      Visible = right.Visible;
+   {
+  Label = right.Label;
+  Visible = right.Visible;
       Lrms = right.Lrms;
       Rrms = right.Rrms;
       MonoBuffers = right.MonoBuffers;
@@ -59,7 +59,7 @@ Channel		Channel::operator=(const Channel& right) :
       VolumeRight = right.VolumeRight;
       InputNum = right.InputNum;
     }
-  return *this;
+    return *this;
 }
 */
 
@@ -283,6 +283,7 @@ void Channel::ClearAllBuffers(bool renew)
 
 void			Channel::Save()
 {
+  /*
   SaveElement	*savedElem;
 
   std::cerr << "[Channel] Save()" << std::endl;
@@ -326,10 +327,12 @@ void			Channel::Save()
   //CurBuf
   savedElem = new SaveElement(wxT("filled"), this->Filled);
   saveDocData(savedElem);
+  */
 }
 
 void			Channel::Load(SaveElementArray data)
 {
+  /*
   int		dataCompt;
 
   std::cerr << "[ChannelGui] Load()" << std::endl;
@@ -374,4 +377,5 @@ void			Channel::Load(SaveElementArray data)
 	    this->Filled = false;
 	}
     }
+  */
 }

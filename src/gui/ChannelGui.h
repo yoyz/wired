@@ -7,7 +7,6 @@
 #include <wx/wx.h>
 #include <vector>
 #include "FaderCtrl.h"
-#include "WiredDocument.h"
 
 #define LABEL_MAXCHAR			(20)
 #define BG				L"/ihm/mixer/mixer_bg.png"
@@ -26,13 +25,13 @@ class					VUMCtrl;
 class					DownButton;
 
 
-class					ChannelGui : public wxPanel, public WiredDocument
+class					ChannelGui : public wxPanel
 {
  public:
   ChannelGui(Channel *channel, wxImage* img_bg, wxImage* img_fg,
 	     wxWindow* parent, wxWindowID id,
 	     const wxPoint& pos, const wxSize& size,
-	     const wxString& label, WiredDocument* docParent);
+	     const wxString& label);
   ~ChannelGui();
 
   void					OnFaderLeft(wxScrollEvent &e);
@@ -43,10 +42,6 @@ class					ChannelGui : public wxPanel, public WiredDocument
   void					OnPaint(wxPaintEvent& e);
   void					SetOpt(SeqTrack*);
   void					UpdateScreen();
-
-  //WiredDocument implementation
-  void					Save();
-  void					Load(SaveElementArray data);
 
   SeqTrack				*ConnectedSeqTrack;
   FaderCtrl				*FaderLeft;
@@ -94,7 +89,7 @@ class					MasterChannelGui : public ChannelGui
  public:
   MasterChannelGui(Channel* channel, wxImage* img_bg, wxImage* img_fg,
 		   wxWindow* parent, wxWindowID id,
-		   const wxPoint& pos, const wxSize& size, WiredDocument* docParent = NULL);
+		   const wxPoint& pos, const wxSize& size);
   ~MasterChannelGui();
 
   void					OnFaderLeft(wxScrollEvent& e);

@@ -19,8 +19,8 @@ MixerGui				*MixerPanel = NULL;
 BEGIN_EVENT_TABLE(MixerGui, wxScrolledWindow)
 END_EVENT_TABLE()
 
-MixerGui::MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size, WiredDocument* docParent)
-: wxScrolledWindow(parent, -1, pos, size, wxNO_BORDER)/*SUNKEN_BORDER)*/ , WiredDocument(wxT("MixerGui"), docParent)
+MixerGui::MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size)
+: wxScrolledWindow(parent, -1, pos, size, wxNO_BORDER)/*SUNKEN_BORDER)*/ 
 {
   SetScrollRate(10, 0);
   SetVirtualSize(300, 131);
@@ -73,7 +73,7 @@ void MixerGui::AddMasterChannel(Channel *channel)
 					       ImgFaderFg, this, -1,
 					       wxPoint(0, 0),
 					       wxSize(CHANNELGUI_WIDTH,
-						      CHANNELGUI_HEIGHT), this);
+						      CHANNELGUI_HEIGHT));
 
   SetVirtualSize(CHANNELGUI_WIDTH, CHANNELGUI_HEIGHT);
   ChannelGuiVector.push_back(gui);
@@ -90,7 +90,7 @@ ChannelGui* MixerGui::AddChannel(Channel *channel, const wxString& label)
 				   this, -1, wxPoint(x, 0),
 				   wxSize(CHANNELGUI_WIDTH,
 					  CHANNELGUI_HEIGHT),
-				   label, this);
+				   label);
 
 
   ChannelGuiVector.push_back(gui);
@@ -162,35 +162,3 @@ void MixerGui::SetLabelByChan(Channel *channel, const wxString& label)
   cg->SetOpt(tr);
   }
 */
-
-void		MixerGui::Save()
-{
-  SaveElement	*savedElem;
-
-  std::cerr << "[MixerGui] Save()" << std::endl;
-
-  //MasterLeft
-  savedElem = new SaveElement(wxT("masterLeft"), this->MasterLeft);
-  saveDocData(savedElem);
-
-  //MasterRight
-  savedElem = new SaveElement(wxT("masterRight"), this->MasterRight);
-  saveDocData(savedElem);
-}
-
-void		MixerGui::Load(SaveElementArray data)
-{
-  int		dataCompt;
-
-  std::cerr << "[MixerGui] Load()" << std::endl;
-  for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
-    {
-      std::cerr << "[MixerGui] key = " << data[dataCompt]->getKey() << std::endl;
-      std::cerr << "[MixerGui] value = " << data[dataCompt]->getValue() << std::endl;
-
-      if (data[dataCompt]->getKey() == wxT("masterLeft"))
-	this->MasterLeft = data[dataCompt]->getValueFloat();
-      else if (data[dataCompt]->getKey() == wxT("masterRight"))
-	this->MasterRight = data[dataCompt]->getValueFloat();
-    }
-}

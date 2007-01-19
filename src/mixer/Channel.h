@@ -194,12 +194,12 @@ class Channel : public WiredDocument
   /**
    * WiredDocument implementation
    */
-  void					Save();
+  void		Save();
 
   /**
    * WiredDocument implementation
    */
-  void					Load(SaveElementArray data);
+  void		Load(SaveElementArray data);
 
 
 
