@@ -17,12 +17,16 @@ WiredDocument::WiredDocument(wxString name, WiredDocument *parent, bool noParent
       _parent = parent;
       _parent->Register(this);
     }
+  else
+    _parent = NULL;
+
   _name = name;
 }
 
 WiredDocument::~WiredDocument()
 {
-  _parent->Unregister(this);
+  if(_parent)
+    _parent->Unregister(this);
 }
 
 void		WiredDocument::Register(WiredDocument *child)
