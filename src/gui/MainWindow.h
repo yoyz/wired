@@ -130,6 +130,8 @@ class					MainWindow: public wxFrame, public WiredDocument
   int					PluginMenuIndexCount;			
   bool					RackModeView;
   bool					SeqModeView;
+  wxSize				WindowSize;
+  wxPoint				WindowPos;
   void					OnIdle(wxIdleEvent &event);
 
   /**

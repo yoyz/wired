@@ -249,7 +249,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
 
   RackModeView = true;
   SeqModeView = true;
-
+ 
   // Minimum size of the window
   SetSizeHints(400, 300);
 
@@ -314,6 +314,9 @@ int			MainWindow::Init()
 
   SeqTimer = new wxTimer(this, MainWin_SeqTimer);
   SeqTimer->Start(40);
+
+  WindowSize = MainWin->GetSize();
+  WindowPos = MainWin->GetPosition();
 
   return (0);
 }
@@ -1609,6 +1612,8 @@ void					MainWindow::OnSelectAll(wxCommandEvent &event)
 
 void					MainWindow::OnFullScreen(wxCommandEvent &event)
 {
+  WindowSize = MainWin->GetSize();
+  WindowPos = MainWin->GetPosition();  
   ShowFullScreen(!IsFullScreen(), wxFULLSCREEN_NOBORDER|wxFULLSCREEN_NOCAPTION );
 }
 
@@ -1778,10 +1783,20 @@ void		MainWindow::Save()
   saveElem = new SaveElement(wxT("MainWindow"), wxT(""));
   size = MainWin->GetSize();
   pos = MainWin->GetPosition();
-  saveElem->addAttribute(wxT("Width"), size.GetWidth());
-  saveElem->addAttribute(wxT("Height"), size.GetHeight());
-  saveElem->addAttribute(wxT("Pos_x"), pos.x);
-  saveElem->addAttribute(wxT("Pos_y"), pos.y);
+  if (IsFullScreen())
+    {
+      saveElem->addAttribute(wxT("Width"), WindowSize.GetWidth());
+      saveElem->addAttribute(wxT("Height"), WindowSize.GetHeight());
+      saveElem->addAttribute(wxT("Pos_x"), WindowPos.x);
+      saveElem->addAttribute(wxT("Pos_y"), WindowPos.y);
+    }
+  else
+    {
+      saveElem->addAttribute(wxT("Width"), size.GetWidth());
+      saveElem->addAttribute(wxT("Height"), size.GetHeight());
+      saveElem->addAttribute(wxT("Pos_x"), pos.x);
+      saveElem->addAttribute(wxT("Pos_y"), pos.y);
+    }
   saveDocData(saveElem); 
 
   saveElem = new SaveElement(wxT("SwitchView"), wxT(""));
@@ -1853,52 +1868,50 @@ void		MainWindow::Save()
 
 void		MainWindow::Load(SaveElementArray data)
 {
-//   int	i;
-//   wxSize	size;
-//   wxPoint	pos;  
-//   std::cerr << "[MainWindow] Save()" << std::endl;
-//   for (i = 0; i < data.GetCount(); i++)
-//     {
-//       if (data[i]->getKey() == wxT("MainWindow"))
-// 	{	
-// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-// 	  MainWin->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-// 			   data[i]->getAttributeInt(wxT("Height")));
-//           MainWin->SetPosition(pos);          
-//         }
+   int	i;
+   wxSize	size;
+   wxPoint	pos;  
 
-//        //it saved the locate,but Gui crash          
-//       else if (data[i]->getKey() == wxT("SwitchView"))
-// 	{
-// 	  RackModeView = data[i]->getAttributeInt(wxT("RackModeView"));  
-// 	  SeqModeView = data[i]->getAttributeInt(wxT("SeqModeView"));  
-// 	}
-//         else if (data[i]->getKey() == wxT("FullScreen"))
-// 	  {
-// 	    if (data[i]->getValueInt() == 1)
-// 	      ShowFullScreen(true);
-// 	    else
-// 	      ShowFullScreen(false);
-// 	  }
+   std::cerr << "[MainWindow] Load()" << std::endl;
+   for (i = 0; i < data.GetCount(); i++)
+     {
+       if (data[i]->getKey() == wxT("MainWindow"))
+	 {
+	   pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+	   pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
+	   MainWin->SetSize(data[i]->getAttributeInt(wxT("Width")), 
+			    data[i]->getAttributeInt(wxT("Height")));
+           MainWin->SetPosition(pos);          
+         }
 
-//       //it totally doesn't work
-//       else if (data[i]->getKey() == wxT("MediaLibrary"))
-// 	{
-//           if (data[i]->getAttributeInt(wxT("Show")) == 1)
-// 	    MediaLibraryPanel->SetVisible();
-// 	  else
-// 	    MediaLibraryPanel->SetInvisible();
-// 	  if (data[i]->getAttributeInt(wxT("floating")) == 1)
-// 	    MediaLibraryPanel->SetFloating();
-// 	  else
-// 	    MediaLibraryPanel->SetDocked();
-// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-// 	  MediaLibraryPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-// 			   data[i]->getAttributeInt(wxT("Height")));
-//           MediaLibraryPanel->SetPosition(pos);        
-// 	}
+       else if (data[i]->getKey() == wxT("SwitchView"))
+	 {
+	   if (!(data[i]->getAttributeInt(wxT("RackModeView"))))
+	     MainWin->SwitchRackOptView();
+	   if (!(data[i]->getAttributeInt(wxT("SeqModeView"))))
+	     MainWin->SwitchSeqOptView();
+	 }
+       else if (data[i]->getKey() == wxT("FullScreen"))
+	 {
+	   if (data[i]->getValueInt() == 1)
+	     ShowFullScreen(!IsFullScreen(), wxFULLSCREEN_NOBORDER|wxFULLSCREEN_NOCAPTION );
+	 }
+       else if (data[i]->getKey() == wxT("MediaLibrary"))
+	 {
+           if (data[i]->getAttributeInt(wxT("Show")) == 1)
+	     ShowMediaLibrary(panelShow);
+	   else
+	     ShowMediaLibrary(panelHide);
+	   //	   if (data[i]->getAttributeInt(wxT("floating")) == 1)
+	   //	     MediaLibraryPanel->SetFloating();
+	   //	   else
+	   //	     MediaLibraryPanel->SetDocked();
+	   //	   pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+	   //	   pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
+	   //	   MediaLibraryPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
+	   //				      data[i]->getAttributeInt(wxT("Height")));
+	   //	   MediaLibraryPanel->SetPosition(pos);        
+	 }
 
 //       //floating doesn't work
 //       else if (data[i]->getKey() == wxT("Transport"))
@@ -1963,7 +1976,7 @@ void		MainWindow::Load(SaveElementArray data)
 // 	  TopRightSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("TopRight")));
 	                      
 // 	  }*/
-//     }
+     }
 }
 
 BEGIN_DECLARE_EVENT_TYPES()
