@@ -98,110 +98,109 @@ class		Rack: public wxScrolledWindow
   Plugin*		AddSelectedRackAndChannel(PlugStartInfo &startinfo,
 						  PluginLoader *p);
   
-  void				DeleteRack(Plugin *plug);
-  void				DeleteAllRacks();
-  RackTrack*			GetRackTrack(Plugin *plug);
-  int				GetXPos(int index);
+  void			DeleteRack(Plugin *plug);
+  void			DeleteAllRacks();
+  RackTrack*		GetRackTrack(Plugin *plug);
+  int			GetXPos(int index);
   
   // Applies scrolling on all racks
-  void				SetScrolling();
+  void			SetScrolling();
   
   // Resizes racks positions from index with scrolling
-  void				ResizeTracks();
+  void			ResizeTracks();
   
   // Seems to select a rack
-  void				SetSelected(Plugin *p);
+  void			SetSelected(Plugin *p);
   
   // Kept for compatibility but shouldn't be used anymore
-  void				RemoveFromSelectedTrack();
+  void			RemoveFromSelectedTrack();
   // Should be used instead of RemoveFromSelectedTrack
-  bool				RemoveSelectedRackAndChannel();
+  bool			RemoveSelectedRackAndChannel();
 
   // Removes the selected rack and the attached channel
   // Kept for compatibility but shouldn't be used anymore
-  void				RemoveTrack();
+  void			RemoveTrack();
   // Should be used instead of RemoveTrack
-  bool				RemoveTrack(int index);
+  bool			RemoveTrack(int index);
  
   // Removes a rack and a channel from index
   // RemoveRack() ? Not RemoveAllRackTracks() ?
   // Should be used instead of RemoveTrack
-  bool				RemoveTrack(const RackTrack* rackTrack);
+  bool			RemoveTrack(const RackTrack* rackTrack);
 
   // Debug - Shows member variables
-  void				Dump();
+  void			Dump();
 
   // Adds subMenuItems (Instruments or effects in Add menuItem)
-  void				AddPlugToMenu();
+  void			AddPlugToMenu();
 
   //  bool ProcessEvent(wxEvent& event);  
 
   // Handles all mouse events
-  void				HandleMouseEvent(Plugin *plug, wxMouseEvent *event);
+  void			HandleMouseEvent(Plugin *plug, wxMouseEvent *event);
   // Handles key events
-  void				HandleKeyEvent(Plugin *plug, wxKeyEvent *event);
+  void			HandleKeyEvent(Plugin *plug, wxKeyEvent *event);
   // Handles all paint events like onPaint ???
-  void				HandlePaintEvent(Plugin *plug, wxPaintEvent *event);
+  void			HandlePaintEvent(Plugin *plug, wxPaintEvent *event);
   // Draws the selection rectangle
 
-  Rack				operator=(const Rack& right);
+  Rack			operator=(const Rack& right);
 	  
-  t_ListRackTrack		RackTracks;
+  t_ListRackTrack	RackTracks;
 
-  RackTrack*			selectedTrack;
-  Plugin*			selectedPlugin;
+  RackTrack*		selectedTrack;
+  Plugin*		selectedPlugin;
   
  protected:  
   
-  int				OldX;
-  int				OldY;
-  int				new_x;
-  int				new_y;		
-  int				fd_size;
+  int			OldX;
+  int			OldY;
+  int			new_x;
+  int			new_y;		
+  int			fd_size;
 
-  bool				is_cut;
-  Plugin*			copy_plug;
-  wxFile			tmpFile;
-  wxMenu*			menu;
-  wxMenu*			submenu;
-  wxMenu*			instr_menu;
-  wxMenu*			effects_menu;
-  wxString			filePath;
-  bool				WasDragging;
+  bool			is_cut;
+  Plugin*		copy_plug;
+  wxFile		tmpFile;
+  wxMenu*		menu;
+  wxMenu*		submenu;
+  wxMenu*		instr_menu;
+  wxMenu*		effects_menu;
+  wxString		filePath;
+  bool			WasDragging;
 	
   // Not used ...
-  virtual void			OnPaint(wxPaintEvent &event);
+  virtual void		OnPaint(wxPaintEvent &event);
   // Event : Help handling
-  void				OnHelp(wxMouseEvent &event);
+  void			OnHelp(wxMouseEvent &event);
   // Event : Click on rack : Sets unselect rack and plugin
-  void				OnClick(wxMouseEvent &event);
+  void			OnClick(wxMouseEvent &event);
   // Event : onContextMenuClick("Delete") ; new methode
-  void				OnDeleteClick();
+  void			OnDeleteClick();
   // Event : From contextMenu, Cuts a rack
-  void				OnCutClick();
+  void			OnCutClick();
   // Event : From contextMenu, Copy a rack
-  void				OnCopyClick();
+  void			OnCopyClick();
   // Event : From contextMenu, Pastes a rack
-  void				OnPasteClick();
+  void			OnPasteClick();
   // Event : Calls AddChangeParamsEffectAction while a plugin's param is changed
-  void				OnPluginParamChange(wxMouseEvent &event);
-  bool 				DndGetDest(t_ListRackTrack::iterator &k, 
-					   list<Plugin *>::iterator &l, int &new_x, 
-					   int &new_y , Plugin *plug);
-  void				DndInsert(t_ListRackTrack::iterator &k, 
-					  list<Plugin *>::iterator &l, Plugin *plug);
-  void				UpdateUnitXSize();
+  void			OnPluginParamChange(wxMouseEvent &event);
+  bool 			DndGetDest(t_ListRackTrack::iterator &k, 
+				   list<Plugin *>::iterator &l, int &new_x, 
+				   int &new_y , Plugin *plug);
+  void			DndInsert(t_ListRackTrack::iterator &k, 
+				  list<Plugin *>::iterator &l, Plugin *plug);
+  void			UpdateUnitXSize();
   
  private:
   
   // Removes a rack and a channel
-  void				RemoveRackAndChannel(t_ListRackTrack::const_iterator
+  void			RemoveRackAndChannel(t_ListRackTrack::const_iterator
 						     iter);
   
   // Be careful : Freezes if delete rack from contextMenu
   // Initializes contextMenu
-  void				InitContextMenu();
-  void				ConnectPluginChangeParamEventHandler(RackTrack *rackTrack);
+  void			InitContextMenu();
   DECLARE_EVENT_TABLE();
 };
 

@@ -1,33 +1,34 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-#include			"SeqTrack.h"
-#include			"Track.h"
-#include			"Rack.h"
-#include			"SequencerGui.h"
-#include			"HelpPanel.h"
-#include			"AudioEngine.h"
-#include			"OptionPanel.h"
-#include			"MixerGui.h"
-#include			"MainWindow.h"
-#include			"cImportMidiAction.h"
-#include			"../sequencer/Sequencer.h"
-#include			"../mixer/Mixer.h"
-#include			"../redist/Plugin.h"
-#include			"../plugins/PluginLoader.h"
+#include	"SeqTrack.h"
+#include	"Track.h"
+#include	"Rack.h"
+#include	"SequencerGui.h"
+#include	"HelpPanel.h"
+#include	"AudioEngine.h"
+#include	"OptionPanel.h"
+#include	"MixerGui.h"
+#include	"MainWindow.h"
+#include	"cImportMidiAction.h"
+#include	"../sequencer/Sequencer.h"
+#include	"../mixer/Mixer.h"
+#include	"../redist/Plugin.h"
+#include	"../plugins/PluginLoader.h"
 
-int					RackCount = 0;
-
+int		RackCount = 0;
 
 /********************   Class RackTrack   ********************/
 
 RackTrack::RackTrack(Rack *parent, int index)
   : Parent(parent), Index(index)
 {
+  wxString s;
+
   Units = 0;
   CurrentBuffer = 0x0;
-  wxString s;
   s.Printf(_("Rack %d"), index + 1);
+
   Output = Mix->AddStereoOutputChannel(true);
   ChanGui = MixerPanel->AddChannel(Output, s);
 }
@@ -35,18 +36,10 @@ RackTrack::RackTrack(Rack *parent, int index)
 RackTrack::~RackTrack()
 {
   RemoveChannel();
-//  if (Parent) delete Parent;
-//  list<Plugin *>::iterator	iter;
-//  for (iter = Racks.begin(); iter != Racks.end(); iter++)
-//  	delete *iter;
-//  if (Output) delete Output;
-//  if (ChanGui) delete ChanGui;
-  //TODO delete CurrentBuffer
 }
 
 void				RackTrack::RemoveChannel()
 {
-  //cout << "removing changui" << endl;
   MixerPanel->RemoveChannel(ChanGui);
   Mix->RemoveChannel(Output);
 }
@@ -60,14 +53,6 @@ Plugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, Plugin 
   xpos = Parent->GetXPos(Index);
   ypos = GetYPos();
 
-  /*  if (connect_to)
-    {
-      if (Units - connect_to->GetUnitsX() >= plug->GetUnitsX())
-	{
-	  xpos += connect_to->GetUnitsX() * UNIT_W + UNIT_S;
-	  ypos -= connect_to->GetUnitsY() * UNIT_H + UNIT_S;
-	}
-	}*/
   Parent->CalcScrolledPosition(xpos, ypos, &xx, &yy);
   startinfo.Pos = wxPoint(xx, yy);  
   startinfo.Size = wxSize(p->InitInfo.UnitsX * UNIT_W, p->InitInfo.UnitsY * UNIT_H); 
@@ -102,14 +87,13 @@ void				RackTrack::SetSelected(Plugin *plugin)
 }
 void				RackTrack::RemoveRack()
 {
-	//Dump();
   Racks.remove(SelectedPlugin);
-  	//Dump();
-	SelectedPlugin->Hide();
-	SeqPanel->RemoveReferenceTo(SelectedPlugin);
-       	//delete SelectedPlugin;
-	Parent->ResizeTracks();
-	Parent->SetScrolling();
+
+  SelectedPlugin->Hide();
+  SeqPanel->RemoveReferenceTo(SelectedPlugin);
+
+  Parent->ResizeTracks();
+  Parent->SetScrolling();
 }
 
 void				RackTrack::DeleteAllRacks()
@@ -138,45 +122,45 @@ int					RackTrack::GetYPos()
 
 RackTrack			RackTrack::operator=(const RackTrack& right)
 {
-	if (this != &right)
-	{
-		Units = right.Units;
-		Parent = right.Parent;
-		Index = right.Index;
-		Racks = right.Racks;
-		Output = right.Output;
-		ChanGui = right.ChanGui;
-		CurrentBuffer = right.CurrentBuffer;
-	}
-	return *this;
+  if (this != &right)
+    {
+      Units = right.Units;
+      Parent = right.Parent;
+      Index = right.Index;
+      Racks = right.Racks;
+      Output = right.Output;
+      ChanGui = right.ChanGui;
+      CurrentBuffer = right.CurrentBuffer;
+    }
+  return *this;
 }
 
 void				RackTrack::Dump()
 {
-	cout << "  Dumping RackTrack at adress " << this << endl;
-	cout << "    int Units : " << Units << endl;
-	cout << "    Rack* Parent : " << Parent << endl;
-	cout << "    int index : " << Index << endl;
-	cout << "    Channel Output : " << Output << endl;
-	cout << "    ChannelGui* ChanGui : " << ChanGui << endl;
-	cout << "    float **CurrentBuffer : " << CurrentBuffer << endl;
-	DumpPlugins();
-	cout << "  End Dumping RackTrack" << endl;
+  cout << "  Dumping RackTrack at adress " << this << endl;
+  cout << "    int Units : " << Units << endl;
+  cout << "    Rack* Parent : " << Parent << endl;
+  cout << "    int index : " << Index << endl;
+  cout << "    Channel Output : " << Output << endl;
+  cout << "    ChannelGui* ChanGui : " << ChanGui << endl;
+  cout << "    float **CurrentBuffer : " << CurrentBuffer << endl;
+  DumpPlugins();
+  cout << "  End Dumping RackTrack" << endl;
 }
 
 void				RackTrack::DumpPlugins()
 {
-	list<Plugin *>::iterator iterRack;
+  list<Plugin *>::iterator iterRack;
 	
-	for (iterRack = Racks.begin(); iterRack != Racks.end(); iterRack++)
-	{
-		cout << "    Dumping Plugin at adress " << (*iterRack) << endl;
-		cout << "      Position x : "  << (*iterRack)->GetPosition().x << endl;
-		cout << "      Position y : "  << (*iterRack)->GetPosition().y << endl;
-		cout << "      Virtual size x : " << (*iterRack)->GetVirtualSize().x << endl;
-		cout << "      Virtual size y : " << (*iterRack)->GetVirtualSize().y << endl;
-		cout << "    End dumping Plugin" << endl;
-	}
+  for (iterRack = Racks.begin(); iterRack != Racks.end(); iterRack++)
+    {
+      cout << "    Dumping Plugin at adress " << (*iterRack) << endl;
+      cout << "      Position x : "  << (*iterRack)->GetPosition().x << endl;
+      cout << "      Position y : "  << (*iterRack)->GetPosition().y << endl;
+      cout << "      Virtual size x : " << (*iterRack)->GetVirtualSize().x << endl;
+      cout << "      Virtual size y : " << (*iterRack)->GetVirtualSize().y << endl;
+      cout << "    End dumping Plugin" << endl;
+    }
 }
 
 /********************   Class Rack   ********************/
@@ -185,14 +169,14 @@ Rack::Rack(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 	   const wxSize& size) :
   wxScrolledWindow(parent, id, pos, size, wxSUNKEN_BORDER), WasDragging(false)
 {
-	SetScrollRate(10, 10);
-	SetVirtualSize(760, 180);  
-	selectedPlugin = 0x0;
-	selectedTrack = 0x0;
-	is_cut = false;
-	InitContextMenu();
-	copy_plug = NULL;
-	filePath.Printf(wxT("/tmp/.tmpccp"));
+  SetScrollRate(10, 10);
+  SetVirtualSize(760, 180);  
+  selectedPlugin = 0x0;
+  selectedTrack = 0x0;
+  is_cut = false;
+  InitContextMenu();
+  copy_plug = NULL;
+  filePath.Printf(wxT("/tmp/.tmpccp"));
 }
 
 Rack::~Rack()
@@ -220,142 +204,130 @@ Rack::~Rack()
 
 void				Rack::InitContextMenu()
 {
-	menu = new wxMenu();
-	submenu = new wxMenu();
-	instr_menu = new wxMenu();
-	effects_menu  = new wxMenu();
+  menu = new wxMenu();
+  submenu = new wxMenu();
+  instr_menu = new wxMenu();
+  effects_menu  = new wxMenu();
 
-	menu->Append(ID_MENU_ADD, _("Add"), submenu);
-	submenu->Append(ID_INSTR_MENU, _("&Instruments"), instr_menu);
-	submenu->Append(ID_EFFECTS_MENU, _("&Effects"), effects_menu);
-	menu->Append(ID_MENU_CUT, _("Cut"));
-	menu->Append(ID_MENU_COPY, _("Copy"));
-	menu->Append(ID_MENU_PASTE, _("Paste"), false);
-	menu->AppendSeparator();
-	menu->Append(ID_MENU_DELETE, _("Delete"));
-	menu->Enable(ID_MENU_PASTE, false);
+  menu->Append(ID_MENU_ADD, _("Add"), submenu);
+  submenu->Append(ID_INSTR_MENU, _("&Instruments"), instr_menu);
+  submenu->Append(ID_EFFECTS_MENU, _("&Effects"), effects_menu);
+  menu->Append(ID_MENU_CUT, _("Cut"));
+  menu->Append(ID_MENU_COPY, _("Copy"));
+  menu->Append(ID_MENU_PASTE, _("Paste"), false);
+  menu->AppendSeparator();
+  menu->Append(ID_MENU_DELETE, _("Delete"));
+  menu->Enable(ID_MENU_PASTE, false);
 
-	AddPlugToMenu();
+  AddPlugToMenu();
 
-	Connect(ID_MENU_CUT, wxEVT_COMMAND_MENU_SELECTED, 
-		(wxObjectEventFunction)(wxEventFunction)
-		(wxCommandEventFunction)&Rack::OnCutClick);
-	Connect(ID_MENU_COPY, wxEVT_COMMAND_MENU_SELECTED, 
-		(wxObjectEventFunction)(wxEventFunction)
-		(wxCommandEventFunction)&Rack::OnCopyClick);
-	Connect(ID_MENU_PASTE, wxEVT_COMMAND_MENU_SELECTED, 
-		(wxObjectEventFunction)(wxEventFunction)
-		(wxCommandEventFunction)&Rack::OnPasteClick);
-	Connect(ID_MENU_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
-		(wxObjectEventFunction)(wxEventFunction)
-		(wxCommandEventFunction)&Rack::OnDeleteClick);	
-}
-
-void				Rack::ConnectPluginChangeParamEventHandler(RackTrack *rackTrack)
-{
-	t_ListPluginIterator	iter;
-	
-	for (iter = rackTrack->Racks.begin(); iter != rackTrack->Racks.end(); iter++)
-	{
-//		(*iter)->Connect(wxID_ANY, wxEVT_LEFT_UP, (wxObjectEventFunction) (wxEventFunction) 
-//			(wxMouseEventFunction)&Rack::OnPluginParamChange);
-	}
+  Connect(ID_MENU_CUT, wxEVT_COMMAND_MENU_SELECTED, 
+	  (wxObjectEventFunction)(wxEventFunction)
+	  (wxCommandEventFunction)&Rack::OnCutClick);
+  Connect(ID_MENU_COPY, wxEVT_COMMAND_MENU_SELECTED, 
+	  (wxObjectEventFunction)(wxEventFunction)
+	  (wxCommandEventFunction)&Rack::OnCopyClick);
+  Connect(ID_MENU_PASTE, wxEVT_COMMAND_MENU_SELECTED, 
+	  (wxObjectEventFunction)(wxEventFunction)
+	  (wxCommandEventFunction)&Rack::OnPasteClick);
+  Connect(ID_MENU_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
+	  (wxObjectEventFunction)(wxEventFunction)
+	  (wxCommandEventFunction)&Rack::OnDeleteClick);	
 }
 
 t_RackTrackPlugin*	Rack::AddRackAndChannel(PlugStartInfo &startinfo, PluginLoader *p)
 {
-	t_RackTrackPlugin	*result;
-	RackTrack			*t;
-	Plugin				*tmp;
+  t_RackTrackPlugin	*result;
+  RackTrack			*t;
+  Plugin				*tmp;
 
-	result = new t_RackTrackPlugin();
-	t = new RackTrack(this, RackTracks.size());
-	tmp = t->AddRack(startinfo, p);
- 	ConnectPluginChangeParamEventHandler(t);
-	SeqMutex.Lock(); 
-	RackTracks.push_back(t);
-	SeqMutex.Unlock();
-  	result->rackTrack = t;
-  	result->plugin = tmp;
-  	ResizeTracks();
-	SetScrolling();
-	//	SeqPanel->RefreshConnectMenu();
-	return (result);
+  result = new t_RackTrackPlugin();
+  t = new RackTrack(this, RackTracks.size());
+  tmp = t->AddRack(startinfo, p);
+  SeqMutex.Lock(); 
+  RackTracks.push_back(t);
+  SeqMutex.Unlock();
+  result->rackTrack = t;
+  result->plugin = tmp;
+  ResizeTracks();
+  SetScrolling();
+  //	SeqPanel->RefreshConnectMenu();
+  return (result);
 }
 
 Plugin*				Rack::AddSelectedRackAndChannel(PlugStartInfo &startinfo, PluginLoader *p)
 {
-	t_RackTrackPlugin*	rackTrackPlugin;
+  t_RackTrackPlugin*	rackTrackPlugin;
 	
-	rackTrackPlugin = AddRackAndChannel(startinfo, p);
-	selectedTrack = rackTrackPlugin->rackTrack;
-	selectedPlugin = rackTrackPlugin->plugin;
-	delete rackTrackPlugin;
+  rackTrackPlugin = AddRackAndChannel(startinfo, p);
+  selectedTrack = rackTrackPlugin->rackTrack;
+  selectedPlugin = rackTrackPlugin->plugin;
+  delete rackTrackPlugin;
 }
 
 bool				Rack::RemoveTrack(int index)
 {
-	t_ListRackTrack::const_iterator		iter;
-	int									cptRacks;
+  t_ListRackTrack::const_iterator		iter;
+  int									cptRacks;
 
-	if (index > (RackTracks.size() - 1) || index < 0) return false;					//TODO: Exception handling
-	for (iter = RackTracks.begin(), cptRacks = 0; cptRacks < index; iter++, cptRacks++) ;
-	RemoveRackAndChannel(iter);
-	return true;
+  if (index > (RackTracks.size() - 1) || index < 0) return false;					//TODO: Exception handling
+  for (iter = RackTracks.begin(), cptRacks = 0; cptRacks < index; iter++, cptRacks++) ;
+  RemoveRackAndChannel(iter);
+  return true;
 }
 
 bool				Rack::RemoveTrack(const RackTrack* rackTrack)
 {
-	t_ListRackTrack::const_iterator	iter;
-	unsigned int					cpt;
+  t_ListRackTrack::const_iterator	iter;
+  unsigned int					cpt;
 
-	for (iter = RackTracks.begin(), cpt = 0; (*iter) != rackTrack && iter != RackTracks.end(); iter++, cpt++) ;
-	if (iter == RackTracks.end())
-		return false;										//TODO Exception handling
-	RemoveRackAndChannel(iter);
-	return true;
+  for (iter = RackTracks.begin(), cpt = 0; (*iter) != rackTrack && iter != RackTracks.end(); iter++, cpt++) ;
+  if (iter == RackTracks.end())
+    return false;										//TODO Exception handling
+  RemoveRackAndChannel(iter);
+  return true;
 }
 
 void				Rack::RemoveRackAndChannel(t_ListRackTrack::const_iterator iter)
 {
-	//wxMutexLocker lock(SeqMutex);
-	SeqMutex.Lock();
-	(*iter)->RemoveRack();
-	(*iter)->RemoveChannel();
-	RackTracks.remove(*iter);
-	ResizeTracks();
-	SetScrolling();
-	SeqMutex.Unlock();
+  //wxMutexLocker lock(SeqMutex);
+  SeqMutex.Lock();
+  (*iter)->RemoveRack();
+  (*iter)->RemoveChannel();
+  RackTracks.remove(*iter);
+  ResizeTracks();
+  SetScrolling();
+  SeqMutex.Unlock();
 }
 
 bool				Rack::RemoveSelectedRackAndChannel()
 {
-	if (selectedTrack)
-		if (RemoveTrack(selectedTrack) == true)
-		{
-			selectedTrack = 0;
-			selectedPlugin = 0;
-			return true;
-		}
-	return false;
+  if (selectedTrack)
+    if (RemoveTrack(selectedTrack) == true)
+      {
+	selectedTrack = 0;
+	selectedPlugin = 0;
+	return true;
+      }
+  return false;
 }
 
 void				Rack::SetScrolling()
 {
-	int x, y;
-	t_ListRackTrack::iterator i;
+  int x, y;
+  t_ListRackTrack::iterator i;
 
-	x = 0; //GetXPos(RackTracks.size());
-	y = 0;  
-	for (i = RackTracks.begin(); i != RackTracks.end(); i++)
+  x = 0; //GetXPos(RackTracks.size());
+  y = 0;  
+  for (i = RackTracks.begin(); i != RackTracks.end(); i++)
     {
-    	x += (*i)->Units;
-	    if ((*i)->GetYPos() > y)
-			y = (*i)->GetYPos();
+      x += (*i)->Units;
+      if ((*i)->GetYPos() > y)
+	y = (*i)->GetYPos();
     }
-	x *= UNIT_W + UNIT_S;
-	SetVirtualSize(x, y);
-	//Dump();
+  x *= UNIT_W + UNIT_S;
+  SetVirtualSize(x, y);
+  //Dump();
 }
 
 int					Rack::GetXPos(int index)
@@ -374,20 +346,7 @@ void				Rack::DeleteAllRacks()
   t_ListRackTrack::iterator i;
   list<Plugin *>::iterator j;
   
-  /*  while (!RackTracks.empty())
-    {
-      for (i = RackTracks.begin(); i != RackTracks.end(); i++)
-	{
-	  for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
-	    {
-	      DeleteRack(*j);
-	      break;
-	    }
-	  break;
-	}
-	}
-  */
-  
+ 
   for (i = RackTracks.begin(); i != RackTracks.end(); i++)
     {
       (*i)->DeleteAllRacks();
@@ -397,46 +356,39 @@ void				Rack::DeleteAllRacks()
   ResizeTracks();
   SetScrolling();
 
-  /*  for (i = RackTracks.begin(); i != RackTracks.end(); i++)  
-    {
-      for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
-	delete *j;
-      delete *i;
-    }
-    RackTracks.clear(); */
-  selectedTrack = 0x0;
-  selectedPlugin = 0x0;
+  selectedTrack = NULL;
+  selectedPlugin = NULL;
 }
 
 void				Rack::DeleteRack(Plugin *plug)
 {
-	t_ListRackTrack::iterator i;
-	list<Plugin *>::iterator j, k;
+  t_ListRackTrack::iterator i;
+  list<Plugin *>::iterator j, k;
 
-	for (i = RackTracks.begin(); i != RackTracks.end(); i++)  
-		for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
-		    if (*j == plug)
-			{
-				OptPanel->ClosePlug(plug);
-				(*i)->Racks.erase(j);
-				(*i)->Units = 0;
-				for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
-			    {
-					if ((*j)->InitInfo->UnitsX > (*i)->Units)
-						(*i)->Units = (*j)->InitInfo->UnitsX;
-			    }
-				if ((*i)->Racks.size() == 0)
-			    {
-					delete (*i);
-					RackTracks.erase(i);
-					selectedTrack = 0x0;
-			    }
-				selectedPlugin = 0x0;
-				ResizeTracks();
-				SetScrolling();
-				SeqPanel->RemoveReferenceTo(plug);
-				return;
-			}
+  for (i = RackTracks.begin(); i != RackTracks.end(); i++)  
+    for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
+      if (*j == plug)
+	{
+	  OptPanel->ClosePlug(plug);
+	  (*i)->Racks.erase(j);
+	  (*i)->Units = 0;
+	  for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
+	    {
+	      if ((*j)->InitInfo->UnitsX > (*i)->Units)
+		(*i)->Units = (*j)->InitInfo->UnitsX;
+	    }
+	  if ((*i)->Racks.size() == 0)
+	    {
+	      delete (*i);
+	      RackTracks.erase(i);
+	      selectedTrack = 0x0;
+	    }
+	  selectedPlugin = 0x0;
+	  ResizeTracks();
+	  SetScrolling();
+	  SeqPanel->RemoveReferenceTo(plug);
+	  return;
+	}
 }
 
 void				Rack::SetSelected(Plugin *p)
@@ -465,95 +417,95 @@ void				Rack::SetSelected(Plugin *p)
 
 void				Rack::HandleMouseEvent(Plugin *plug, wxMouseEvent *event)
 {
-	t_ListRackTrack::iterator i;
-	t_ListRackTrack::iterator k;
-	list<Plugin *>::iterator j;
-	list<Plugin *>::iterator l;
-	new_x = 0;
-	new_y = 0;
-	int tmp_x = 0;
-	int tmp_y = 0;
-	int x , y = 0;
-	int xx, yy = 0;
+  t_ListRackTrack::iterator i;
+  t_ListRackTrack::iterator k;
+  list<Plugin *>::iterator j;
+  list<Plugin *>::iterator l;
+  new_x = 0;
+  new_y = 0;
+  int tmp_x = 0;
+  int tmp_y = 0;
+  int x , y = 0;
+  int xx, yy = 0;
 
-	if (event->GetEventType() == wxEVT_MOUSEWHEEL)
+  if (event->GetEventType() == wxEVT_MOUSEWHEEL)
     {
-	    int x, y, y1, y2, y3;
+      int x, y, y1, y2, y3;
      
-	    GetVirtualSize(0x0, &y1);
-	    GetSize(0x0, &y2);
-	    GetViewStart(&x, &y3);
-	    if (y1 > y2)
-		{	  
-			if (event->GetWheelRotation() > 0)
-			    y = -1;
-			else
-			    y = 1;
-			Scroll(x, y3 + y);
-		}
+      GetVirtualSize(0x0, &y1);
+      GetSize(0x0, &y2);
+      GetViewStart(&x, &y3);
+      if (y1 > y2)
+	{	  
+	  if (event->GetWheelRotation() > 0)
+	    y = -1;
+	  else
+	    y = 1;
+	  Scroll(x, y3 + y);
+	}
     }
-	else if (event->Dragging() && event->LeftIsDown())
+  else if (event->Dragging() && event->LeftIsDown())
     {
-    	tmp_x = event->GetPosition().x + plug->GetPosition().x - OldX;
-	    tmp_y = event->GetPosition().y + plug->GetPosition().y - OldY;
-	    if(tmp_x < 0)
-			tmp_x = 0;
-	    if(tmp_y < 0)
-			tmp_y = 0;
-	    plug->Move(wxPoint(tmp_x, tmp_y));
-	    WasDragging = true;
+      tmp_x = event->GetPosition().x + plug->GetPosition().x - OldX;
+      tmp_y = event->GetPosition().y + plug->GetPosition().y - OldY;
+      if(tmp_x < 0)
+	tmp_x = 0;
+      if(tmp_y < 0)
+	tmp_y = 0;
+      plug->Move(wxPoint(tmp_x, tmp_y));
+      WasDragging = true;
     }
   
-	if(event->LeftDown())
-	{
-    	OldX = event->GetPosition().x;
-	    OldY = event->GetPosition().y;
-
-    	Plugin *oldplug = selectedPlugin;	 
-	    SetSelected(plug);
-	    if (oldplug)
-			oldplug->Refresh();
-       
-	    new_x = (event->GetPosition().x + plug->GetPosition().x);
-    	new_y = (event->GetPosition().y + plug->GetPosition().y);
-    }
-	if(event->RightDown())
+  if(event->LeftDown())
     {
-    	SetSelected(plug);
-	    wxPoint p(event->GetPosition().x + plug->GetPosition().x, event->GetPosition().y + plug->GetPosition().y);
-	    PopupMenu(menu, p.x, p.y);
+      OldX = event->GetPosition().x;
+      OldY = event->GetPosition().y;
+
+      Plugin *oldplug = selectedPlugin;	 
+      SetSelected(plug);
+      if (oldplug)
+	oldplug->Refresh();
+       
+      new_x = (event->GetPosition().x + plug->GetPosition().x);
+      new_y = (event->GetPosition().y + plug->GetPosition().y);
     }
-	else if(event->LeftUp() && WasDragging)
+  if(event->RightDown())
+    {
+      SetSelected(plug);
+      wxPoint p(event->GetPosition().x + plug->GetPosition().x, event->GetPosition().y + plug->GetPosition().y);
+      PopupMenu(menu, p.x, p.y);
+    }
+  else if(event->LeftUp() && WasDragging)
     {
       new_x = (event->GetPosition().x + plug->GetPosition().x);
       new_y = (event->GetPosition().y + plug->GetPosition().y);
-	    if(plug->IsAudio() && !DndGetDest(k, l, new_x, new_y, plug))
-	    {
-			DeleteRack(plug);
-			AddTrack(plug);
-	    }
-	    ResizeTracks();
-	    WasDragging = false;
+      if(plug->IsAudio() && !DndGetDest(k, l, new_x, new_y, plug))
+	{
+	  DeleteRack(plug);
+	  AddTrack(plug);
+	}
+      ResizeTracks();
+      WasDragging = false;
     }   
 }
 
 void				Rack::AddPlugToMenu()
 {
-	vector<PluginLoader *>::iterator i;
-	int Id = 20100;
+  vector<PluginLoader *>::iterator i;
+  int Id = 20100;
 	
-	for(i = LoadedPluginsList.begin(); i != LoadedPluginsList.end() ; i++)
+  for(i = LoadedPluginsList.begin(); i != LoadedPluginsList.end() ; i++)
     {
-    	if ((*i)->InitInfo.Type == ePlugTypeInstrument)
-		{
-			Id++;
-			instr_menu->Append((*i)->Id, ((*i)->InitInfo.Name).c_str());
-		}
-    	else if ((*i)->InitInfo.Type == ePlugTypeEffect)
-		{
-			Id++;
-			effects_menu->Append((*i)->Id, ((*i)->InitInfo.Name).c_str());
-		}
+      if ((*i)->InitInfo.Type == ePlugTypeInstrument)
+	{
+	  Id++;
+	  instr_menu->Append((*i)->Id, ((*i)->InitInfo.Name).c_str());
+	}
+      else if ((*i)->InitInfo.Type == ePlugTypeEffect)
+	{
+	  Id++;
+	  effects_menu->Append((*i)->Id, ((*i)->InitInfo.Name).c_str());
+	}
     }
 }
 
@@ -594,14 +546,8 @@ bool				Rack::DndGetDest(t_ListRackTrack::iterator &k,  list<Plugin *>::iterator
 	      if((*l) == plug)
 		return true;
 	      DeleteRack(plug);
-	      //if((new_y + yy) < (((*l)->InitInfo->UnitsY * UNIT_H)))
 	      l++;
 	      DndInsert(k, l, plug);
-		  /*else
-		{
-		  l++;
-		  DndInsert(k, l, plug);
-		  }*/
 	      UpdateUnitXSize();
 	      return true;
 	    }
@@ -641,22 +587,22 @@ void				Rack::UpdateUnitXSize()
 
 inline void			Rack::OnDeleteClick()
 {
-	vector<PluginLoader *>::iterator	k;
-	int					RackIndex;
-	if (selectedPlugin)
+  vector<PluginLoader *>::iterator	k;
+  int					RackIndex;
+  if (selectedPlugin)
     {
-    	for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
-			if (COMPARE_IDS((*k)->InitInfo.UniqueId, selectedPlugin->InitInfo->UniqueId))
-			{
-			  cout << "[MAINWIN] Destroying plugin: " << selectedPlugin->Name.mb_str() << endl;
-			  selectedTrack->RemoveRack();
+      for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
+	if (COMPARE_IDS((*k)->InitInfo.UniqueId, selectedPlugin->InitInfo->UniqueId))
+	  {
+	    cout << "[MAINWIN] Destroying plugin: " << selectedPlugin->Name.mb_str() << endl;
+	    selectedTrack->RemoveRack();
 			  
-			  RackIndex =  selectedTrack->NbRacks();
-			  if (RackIndex < 1)
-			    RackPanel->RemoveTrack(selectedTrack->Index);
-			  //cActionManager::Global().AddEffectAction(&StartInfo, *k, false);
-			  return;
-			}
+	    RackIndex =  selectedTrack->NbRacks();
+	    if (RackIndex < 1)
+	      RackPanel->RemoveTrack(selectedTrack->Index);
+	    //cActionManager::Global().AddEffectAction(&StartInfo, *k, false);
+	    return;
+	  }
     }
 }
 
@@ -745,12 +691,7 @@ inline void			Rack::OnPasteClick()
 	    }
 	}       
     }
-
-   if (is_cut && copy_plug)
-    {
-      //RemoveChild(copy_plug);
-    }
-  
+ 
 }
 
 void				Rack::HandleKeyEvent(Plugin *plug, wxKeyEvent *event)
@@ -763,25 +704,22 @@ void				Rack::HandleKeyEvent(Plugin *plug, wxKeyEvent *event)
 
 inline void			Rack::ResizeTracks()
 {
-	int xx, yy, xpos, ypos, k;
-	t_ListRackTrack::iterator i;
-	list<Plugin *>::iterator j;
+  int xx, yy, xpos, ypos, k;
+  t_ListRackTrack::iterator i;
+  list<Plugin *>::iterator j;
 
-	xx = 0;
-	for (k = 0, i = RackTracks.begin(); i != RackTracks.end(); i++, k++)
+  xx = 0;
+  for (k = 0, i = RackTracks.begin(); i != RackTracks.end(); i++, k++)
     {
-    	yy = 0;
-	    (*i)->Index = k;
-	    for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
-		{
-//			if ((*j)->HasView())
-//			{
-				CalcScrolledPosition(xx * (UNIT_W + UNIT_S), yy * (UNIT_H + UNIT_S), &xpos, &ypos);
-				(*j)->SetPosition(wxPoint(xpos, ypos));
-				yy += (*j)->InitInfo->UnitsY;
-//			}
-		}
-    	xx += (*i)->Units;
+      yy = 0;
+      (*i)->Index = k;
+      for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
+	{
+	  CalcScrolledPosition(xx * (UNIT_W + UNIT_S), yy * (UNIT_H + UNIT_S), &xpos, &ypos);
+	  (*j)->SetPosition(wxPoint(xpos, ypos));
+	  yy += (*j)->InitInfo->UnitsY;
+	}
+      xx += (*i)->Units;
     }
 }
 
@@ -808,42 +746,41 @@ void				Rack::OnHelp(wxMouseEvent &event)
 {
   if (HelpWin->IsShown())
     {
-    	//cout << "In OnHelp" << endl;
-    	if (selectedPlugin)
+      //cout << "In OnHelp" << endl;
+      if (selectedPlugin)
     	{
-    		wxString s(selectedPlugin->GetHelpString());
-     		HelpWin->SetText(s);	
+	  wxString s(selectedPlugin->GetHelpString());
+	  HelpWin->SetText(s);	
     	}
-    	else
+      else
     	{
-      		wxString s(_("This is the Rack view of Wired, where you can add plugins. Plugins are organized into tracks vertically, meaning the first plugin in a column will send its output signal to the plugin below it. You can connect sequencer tracks to plugins"));
-     		HelpWin->SetText(s);
+	  wxString s(_("This is the Rack view of Wired, where you can add plugins. Plugins are organized into tracks vertically, meaning the first plugin in a column will send its output signal to the plugin below it. You can connect sequencer tracks to plugins"));
+	  HelpWin->SetText(s);
     	}
     }
 }
 
 void				Rack::OnClick(wxMouseEvent &event)
 {
-	//selectedTrack = 0x0;
-	//selectedPlugin = 0x0;
+
 }
 
 void				Rack::Dump()
 {
-	t_ListRackTrack::const_iterator	iter;
+  t_ListRackTrack::const_iterator	iter;
 		
-	cout << "Dumping Rack" << endl;
-	for (iter = RackTracks.begin(); iter != RackTracks.end(); iter++)
-		if (*iter != 0)
-			(*iter)->Dump();
-	if (selectedTrack)
-		selectedTrack->Dump();
-	cout << "  selectedPlugin at adress " << selectedPlugin << endl;
-	cout << "  Virtual size x : " << m_virtualSize.x << endl;
-	cout << "  Virtual size y : " << m_virtualSize.y << endl;
-	cout << "  height : " << m_height << endl;
-	cout << "  width : " << m_width << endl;
-	cout << "End dumping Rack" << endl;
+  cout << "Dumping Rack" << endl;
+  for (iter = RackTracks.begin(); iter != RackTracks.end(); iter++)
+    if (*iter != 0)
+      (*iter)->Dump();
+  if (selectedTrack)
+    selectedTrack->Dump();
+  cout << "  selectedPlugin at adress " << selectedPlugin << endl;
+  cout << "  Virtual size x : " << m_virtualSize.x << endl;
+  cout << "  Virtual size y : " << m_virtualSize.y << endl;
+  cout << "  height : " << m_height << endl;
+  cout << "  width : " << m_width << endl;
+  cout << "End dumping Rack" << endl;
 }	
 
 // Don't know if this methodes should be used
@@ -866,32 +803,30 @@ void				Rack::OnPaint(wxPaintEvent &event)
 
 void				Rack::RemoveFromSelectedTrack()
 {
-	if (selectedTrack)
+  if (selectedTrack)
     {
-    	// ??? RemoveRack is enougth ??? What about RemoveChannel ??? And RackTracks.pop ???
-    	SeqMutex.Lock();
-	    selectedTrack->RemoveRack();
-    	SeqMutex.Unlock();
+      // ??? RemoveRack is enougth ??? What about RemoveChannel ??? And RackTracks.pop ???
+      SeqMutex.Lock();
+      selectedTrack->RemoveRack();
+      SeqMutex.Unlock();
     }
-	else
-		RemoveTrack();
+  else
+    RemoveTrack();
 }
 
 void 				Rack::RemoveTrack()
 {
-	SeqMutex.Lock();
-	RackTrack* rackTrack = RackTracks.back();
-	rackTrack->RemoveRack();
-	rackTrack->RemoveChannel();
-	RackTracks.pop_back();
-	SeqMutex.Unlock();
-	SetScrolling();
+  SeqMutex.Lock();
+  RackTrack* rackTrack = RackTracks.back();
+  rackTrack->RemoveRack();
+  rackTrack->RemoveChannel();
+  RackTracks.pop_back();
+  SeqMutex.Unlock();
+  SetScrolling();
 }
 
 Plugin*				Rack::AddToSelectedTrack(PlugStartInfo &startinfo, PluginLoader *p)
 {
-  //if (!selectedTrack && (RackTracks.size() > 0))
-  //  selectedTrack = *(RackTracks.begin());
   Plugin *tmp;
   if (selectedTrack)
     {
@@ -913,7 +848,7 @@ void 				Rack::AddTrack(Plugin *p)
   SeqMutex.Lock(); 
 
   t->Racks.insert(t->Racks.begin(),p);
- 	ConnectPluginChangeParamEventHandler(t);
+
   RackTracks.push_back(t);
 
   SeqMutex.Unlock();      
@@ -923,29 +858,27 @@ void 				Rack::AddTrack(Plugin *p)
 
 Plugin*				Rack::AddTrack(PlugStartInfo &startinfo, PluginLoader *p)
 {
-	RackTrack *t;
-	Plugin *tmp;
+  RackTrack *t;
+  Plugin *tmp;
 
-	t = new RackTrack(this, RackTracks.size());
-	tmp = t->AddRack(startinfo, p);
-	ConnectPluginChangeParamEventHandler(t);
-	SeqMutex.Lock(); 
-	RackTracks.push_back(t);
-	SeqMutex.Unlock();
-	SetScrolling();
-// 	SeqPanel->RefreshConnectMenu();
-	return tmp;
+  t = new RackTrack(this, RackTracks.size());
+  tmp = t->AddRack(startinfo, p);
+  SeqMutex.Lock(); 
+  RackTracks.push_back(t);
+  SeqMutex.Unlock();
+  SetScrolling();
+  return tmp;
 }
 
 Rack				Rack::operator=(const Rack& right)
 {
-	if (this != &right)
-	{
-		RackTracks = right.RackTracks;
-		selectedTrack = right.selectedTrack;
-		selectedPlugin = right.selectedPlugin;
-	}
-	return *this;
+  if (this != &right)
+    {
+      RackTracks = right.RackTracks;
+      selectedTrack = right.selectedTrack;
+      selectedPlugin = right.selectedPlugin;
+    }
+  return *this;
 }
 
 // Events loop (Static events)
