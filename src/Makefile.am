@@ -37,7 +37,7 @@ bin_PROGRAMS = wired
 wired_SOURCES =
 
 wired_LDADD =					\
-	save/libsave.a				\
+	save/libsave.la				\
 	gui/libgui.a				\
 	sequencer/libsequencer.a		\
 	audio/libaudio.a			\
@@ -55,5 +55,4 @@ wired_LDADD =					\
 	samplerate/libwiredsamplerate.a		\
 	codec/libwiredCodec.a			\
 	wiredvideo/libwiredvideo.a		\
-	dssi/libwireddssi.a			\
-	save/libsave.la
+	dssi/libwireddssi.a			
