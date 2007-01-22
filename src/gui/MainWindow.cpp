@@ -1259,6 +1259,9 @@ void					MainWindow::ShowMediaLibrary(panelState show)
 	  // disable Show and Hide menu actions
 	  ItemShowMediaLibrary->Enable(false);
 	}
+      
+      if (show == panelHide)
+	MediaLibraryPanel->SetInvisible();
     }
   else if (show == panelHideFromWindow || show == panelShow)
     {
@@ -1280,11 +1283,11 @@ void					MainWindow::ShowMediaLibrary(panelState show)
 	  // show panel
 	  MediaLibraryPanel->Show();
 	  MediaLibraryPanel->SetVisible();
-	  MediaLibraryPanel->SetDocked();
 	}
 
       // enable Show and Hide menu actions
       ItemShowMediaLibrary->Enable();
+      MediaLibraryPanel->SetDocked();
     }
 }
 
@@ -1303,7 +1306,8 @@ void					MainWindow::OnFloatMediaLibrary(wxCommandEvent &event)
 // must be called only when medialibrary is docked
 void					MainWindow::MediaLibraryShow(wxCommandEvent &event)
 {
-  if (MediaLibraryMenu->IsChecked(MainWin_MediaLibraryShow))
+  //  if (MediaLibraryMenu->IsChecked(MainWin_MediaLibraryShow))
+  if (!MediaLibraryPanel->IsVisible())
     ShowMediaLibrary(panelShow);
   else
     ShowMediaLibrary(panelHide);
@@ -1803,8 +1807,9 @@ void		MainWindow::Save()
   saveElem = new SaveElement(wxT("FullScreen"), IsFullScreen());
   saveDocData(saveElem); 
  
-  size = MediaLibraryPanel->GetSize();  
-  pos = MediaLibraryPanel->GetPosition(); 
+  size = MediaLibraryPanel->GetSize();
+  if (MediaLibraryFrame)
+    pos = MediaLibraryFrame->GetPosition(); 
   saveElem = new SaveElement(wxT("MediaLibrary"), wxT(""));
   saveElem->addAttribute(wxT("Show"), MediaLibraryPanel->IsVisible());
   saveElem->addAttribute(wxT("floating"), MediaLibraryPanel->IsFloating());
@@ -1812,10 +1817,12 @@ void		MainWindow::Save()
   saveElem->addAttribute(wxT("Height"), size.GetHeight());
   saveElem->addAttribute(wxT("Pos_x"), pos.x);
   saveElem->addAttribute(wxT("Pos_y"), pos.y);
+  saveElem->addAttribute(wxT("SashPos"), splitVert->GetSashPosition());
   saveDocData(saveElem);
 
   size = TransportPanel->GetSize();
-  pos = TransportPanel->GetPosition();  
+  if (TransportFrame)
+    pos = TransportFrame->GetPosition();  
   saveElem = new SaveElement(wxT("Transport"), wxT(""));
   saveElem->addAttribute(wxT("Floating"), (WindowMenu->IsChecked(MainWin_FloatTransport)));
   saveElem->addAttribute(wxT("Width"), size.GetWidth());
@@ -1825,17 +1832,20 @@ void		MainWindow::Save()
   saveDocData(saveElem);
 
   size = SeqPanel->GetSize(); 
-  pos = SeqPanel->GetPosition();
+  if (SequencerFrame)
+    pos = SequencerFrame->GetPosition();
   saveElem = new SaveElement(wxT("Sequencer"), wxT(""));
   saveElem->addAttribute(wxT("Floating"), (WindowMenu->IsChecked(MainWin_FloatSequencer))); 
   saveElem->addAttribute(wxT("Width"), size.GetWidth());
   saveElem->addAttribute(wxT("Height"), size.GetHeight());
   saveElem->addAttribute(wxT("Pos_x"), pos.x);
   saveElem->addAttribute(wxT("Pos_y"), pos.y);
+  saveElem->addAttribute(wxT("SashPos"), split->GetSashPosition());
   saveDocData(saveElem);
   
   size = RackPanel->GetSize(); 
-  pos = RackPanel->GetPosition();
+  if (RackFrame)
+    pos = RackFrame->GetPosition();
   saveElem = new SaveElement(wxT("Rack"), wxT(""));
   saveElem->addAttribute(wxT("Floating"), (WindowMenu->IsChecked(MainWin_FloatRacks)));
   saveElem->addAttribute(wxT("Width"), size.GetWidth());
@@ -1844,29 +1854,34 @@ void		MainWindow::Save()
   saveElem->addAttribute(wxT("Pos_y"), pos.y);
   saveDocData(saveElem);
   
-  size = OptPanel->GetSize();
-  pos = OptPanel->GetPosition();
-  saveElem = new SaveElement(wxT("OptPanel"),wxT(""));
-  saveElem->addAttribute(wxT("Width"), size.GetWidth());
-  saveElem->addAttribute(wxT("Height"), size.GetHeight());
-  saveElem->addAttribute(wxT("Pos_x"), pos.x);
-  saveElem->addAttribute(wxT("Pos_y"), pos.y);
-  saveDocData(saveElem);
- 
-  /*saveElem = new SaveElement(wxT("Sizer"), wxT(""));
-  saveElem->addAttribute(wxT("Bottom"), BottomSizer->GetOrientation());
-  saveElem->addAttribute(wxT("Top"), TopSizer->GetOrientation());
-  saveElem->addAttribute(wxT("TopLeft"), TopLeftSizer->GetOrientation());
-  saveElem->addAttribute(wxT("TopRight"), TopRightSizer->GetOrientation());
-  saveDocData(saveElem);*/
- 
+  /*
+    size = OptPanel->GetSize();
+    pos = OptPanel->GetPosition();
+    saveElem = new SaveElement(wxT("OptPanel"),wxT(""));
+    saveElem->addAttribute(wxT("Width"), size.GetWidth());
+    saveElem->addAttribute(wxT("Height"), size.GetHeight());
+    saveElem->addAttribute(wxT("Pos_x"), pos.x);
+    saveElem->addAttribute(wxT("Pos_y"), pos.y);
+  */
+
+  /*
+    saveElem = new SaveElement(wxT("Sizer"), wxT(""));
+    saveElem->addAttribute(wxT("Bottom"), BottomSizer->GetOrientation());
+    saveElem->addAttribute(wxT("Top"), TopSizer->GetOrientation());
+    saveElem->addAttribute(wxT("TopLeft"), TopLeftSizer->GetOrientation());
+    saveElem->addAttribute(wxT("TopRight"), TopRightSizer->GetOrientation());
+    saveDocData(saveElem);
+  */
+  saveDocData(saveElem); 
 }
 
 void		MainWindow::Load(SaveElementArray data)
 {
-   int	i;
+   int		i;
    wxSize	size;
-   wxPoint	pos;  
+   wxPoint	pos;
+   bool		isFloating;
+   wxCommandEvent	event;
 
    std::cerr << "[MainWindow] Load()" << std::endl;
    for (i = 0; i < data.GetCount(); i++)
@@ -1882,96 +1897,112 @@ void		MainWindow::Load(SaveElementArray data)
 
        else if (data[i]->getKey() == wxT("SwitchView"))
 	 {
-	   if (!(data[i]->getAttributeInt(wxT("RackModeView"))))
+	   if (!(data[i]->getAttributeInt(wxT("RackModeView")) == RackModeView))
 	     MainWin->SwitchRackOptView();
-	   if (!(data[i]->getAttributeInt(wxT("SeqModeView"))))
+	   if (!(data[i]->getAttributeInt(wxT("SeqModeView")) == SeqModeView))
 	     MainWin->SwitchSeqOptView();
 	 }
+
        else if (data[i]->getKey() == wxT("FullScreen"))
 	 {
 	   if (data[i]->getValueInt() == 1)
 	     ShowFullScreen(!IsFullScreen(), wxFULLSCREEN_NOBORDER|wxFULLSCREEN_NOCAPTION );
 	 }
+
        else if (data[i]->getKey() == wxT("MediaLibrary"))
 	 {
+	   isFloating = MediaLibraryPanel->IsFloating();
            if (data[i]->getAttributeInt(wxT("Show")) == 1)
-	     ShowMediaLibrary(panelShow);
+	     {
+	       ShowMediaLibrary(panelShow);
+	       ItemShowMediaLibrary->Check(true);
+	     }
 	   else
-	     ShowMediaLibrary(panelHide);
-	   //	   if (data[i]->getAttributeInt(wxT("floating")) == 1)
-	   //	     MediaLibraryPanel->SetFloating();
-	   //	   else
-	   //	     MediaLibraryPanel->SetDocked();
-	   //	   pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	   //	   pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-	   //	   MediaLibraryPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-	   //				      data[i]->getAttributeInt(wxT("Height")));
-	   //	   MediaLibraryPanel->SetPosition(pos);        
+	     {
+	       ShowMediaLibrary(panelHide);
+	       ItemShowMediaLibrary->Check(false);
+	     }
+	   if (data[i]->getAttributeInt(wxT("floating")) == 1)
+	     {
+	       ShowMediaLibrary(panelShowInWindow);
+	       ItemFloatingMediaLibrary->Check(true);
+	       pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+	       pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
+	       MediaLibraryFrame->SetPosition(pos);
+	       MediaLibraryFrame->SetSize(data[i]->getAttributeInt(wxT("Width")),
+					  data[i]->getAttributeInt(wxT("Height")));
+	     }
+	   else
+	     {
+	       if (isFloating)
+		 {
+		   ShowMediaLibrary(panelHideFromWindow);
+		   ItemFloatingMediaLibrary->Check(false);
+		   splitVert->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
+		 }
+	     }
+	 }
+       else if (data[i]->getKey() == wxT("Transport"))
+	 {
+	   if (data[i]->getAttributeInt(wxT("Floating")) == 1)
+	     {
+	       if (!WindowMenu->IsChecked(MainWin_FloatTransport))
+		 {
+		   //		   std::cerr << "[MainWindow] Load() setting floating transport" << std::endl;
+		   //		   OnFloatTransport(event);
+		   //		   WindowMenu->Check(MainWin_FloatTransport, true);
+		 }
+	       //	       std::cerr << "[MainWindow] Load() setting floating transport pos" << std::endl;
+	       //	       pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+	       //	       pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
+	       //TransportFrame->SetPosition(pos);
+	       //	       std::cerr << "[MainWindow] Load() setting floating transport size" << std::endl;
+	       //TransportFrame->SetSize(data[i]->getAttributeInt(wxT("Width")),
+	       //				       data[i]->getAttributeInt(wxT("Height")));
+	     }
+	   else
+	     {
+	       if (WindowMenu->IsChecked(MainWin_FloatTransport))
+		 {
+		   //		   std::cerr << "[MainWindow] Load() setting docked transport" << std::endl;
+		   //		   OnFloatTransport(event);
+		   //		   WindowMenu->Check(MainWin_FloatTransport, false);
+		 }
+	     }
 	 }
 
-//       //floating doesn't work
-//       else if (data[i]->getKey() == wxT("Transport"))
-// 	{
-// 	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
-// 	    WindowMenu->Check(MainWin_FloatTransport, true);
-// 	  else
-// 	    WindowMenu->Check(MainWin_FloatTransport, false);
-	
-// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-// 	  TransportPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-// 			   data[i]->getAttributeInt(wxT("Height")));
-//           TransportPanel->SetPosition(pos);        
-// 	}
+       else if (data[i]->getKey() == wxT("Sequencer"))
+	 {
+	   // 	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
+	   //        {
+	   // 	    WindowMenu->Check(MainWin_FloatSequencer, true);
+	   //           pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+	   //           pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
+	   //           SeqPanel->SetPosition(pos);
+	   //           SeqPanel->SetSize(data[i]->getAttributeInt(wxT("Width")),
+	   //				   data[i]->getAttributeInt(wxT("Height")));
+	   //        }
+	   // 	  else
+	   //        {
+	   // 	    WindowMenu->Check(MainWin_FloatSequencer, false);
+	   //         split->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
+	   //        }
+	 }
 
-//         //floating doesn't work    
-//       else if (data[i]->getKey() == wxT("Sequencer"))
-// 	{
-// 	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
-// 	    WindowMenu->Check(MainWin_FloatSequencer, true);
-// 	  else
-// 	    WindowMenu->Check(MainWin_FloatSequencer, false);
-	
-// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-// 	  SeqPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-// 			   data[i]->getAttributeInt(wxT("Height")));
-//           SeqPanel->SetPosition(pos);        
-// 	}
-
-//        //floating doesn't work
-//       else if (data[i]->getKey() == wxT("Rack"))
-// 	{
-// 	  if (data[i]->getAttributeInt(wxT("Floating")) == 1)
-// 	    WindowMenu->Check(MainWin_FloatRacks, true);
-// 	  else
-// 	    WindowMenu->Check(MainWin_FloatRacks, false);
-	
-// 	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-// 	  RackPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-// 			   data[i]->getAttributeInt(wxT("Height")));
-//           RackPanel->SetPosition(pos);        
-// 	}
-
-//       else if (data[i]->getKey() == wxT("OptPanel"))
-// 	{
-//       	  pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-// 	  pos.y = data[i]->getAttributeInt(wxT("Pos_y"));         
-// 	  OptPanel->SetSize(data[i]->getAttributeInt(wxT("Width")), 
-// 			   data[i]->getAttributeInt(wxT("Height")));
-//           OptPanel->SetPosition(pos);   
-// 	}
-
-//       //it makes wired error
-//       /*   else if (data[i]->getKey() == wxT("Sizer"))
-// 	{
-// 	  BottomSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("Bottom")));
-// 	  TopSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("Top")));
-// 	  TopLeftSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("TopLeft")));
-// 	  TopRightSizer = new wxBoxSizer(data[i]->getAttributeInt(wxT("TopRight")));
-	                      
-// 	  }*/
+       else if (data[i]->getKey() == wxT("Rack"))
+	 {
+	   //	   if (data[i]->getAttributeInt(wxT("Floating")) == 1)
+	   //        {
+	   //	        WindowMenu->Check(MainWin_FloatRacks, true);
+	   //           pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
+	   //           pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
+	   //           RackPanel->SetPosition(pos);
+	   //           RackPanel->SetSize(data[i]->getAttributeInt(wxT("Width")),
+	   //				   data[i]->getAttributeInt(wxT("Height")));
+	   //        }
+	   // 	  else
+	   // 	    WindowMenu->Check(MainWin_FloatTransport, false);
+	 }
      }
 }
 
