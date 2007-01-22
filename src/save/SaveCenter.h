@@ -48,6 +48,12 @@ class SaveCenter : public WiredDocument
    */
   void		Load(SaveElementArray data);
   
+  /** Cleans the WiredDocument tree.
+   * This method is used to restore the initial state of the tree before a load.
+   * It calls the DeleteChildren() method of every WiredDocument.
+   */
+  void		CleanTree();
+
   /** Returns the project path. */
   wxFileName	getProjectPath();
 

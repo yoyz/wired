@@ -1062,3 +1062,21 @@ void			Sequencer::Save()
     saveDocData(new SaveElement(wxString(wxT("Track_")) << i,
 				(int)Tracks[i]->GetType()));
 }
+
+void			Sequencer::CleanChildren()
+{
+  vector<Track *>::iterator	it;
+  Track				*toDelete = NULL;
+
+  std::cout << "Sequencer::CleanChildren started" << std::endl;
+  std::cout << "Tracks.size() = " << Tracks.size() << std::endl;
+
+  while(!Tracks.empty())
+    {
+      std::cout << "a" << std::endl;
+      delete (*Tracks.begin());
+    }
+  
+  std::cout << endl << "Sequencer::CleanChildren finished" << std::endl;
+
+}

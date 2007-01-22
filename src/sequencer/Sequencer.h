@@ -93,6 +93,7 @@ class Sequencer : public wxThread, public WiredDocument
    */
   void					Load(SaveElementArray data);
   void					Save();
+  void					CleanChildren();
   
   /** Init basic vars */
   void					Init();

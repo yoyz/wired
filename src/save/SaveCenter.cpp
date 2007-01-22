@@ -29,6 +29,33 @@ void	SaveCenter::Load(SaveElementArray)
   //load project specific infos ?
 }
 
+void	SaveCenter::CleanTree()
+{
+  WiredDocumentArray		toProcess;
+  WiredDocumentArray		toMergeInToProcess;
+  int				toProcessIt = 0;
+
+  //Initialization of the WiredDocuments to be processed.
+  toProcess = this->getChildren();
+
+  while(toProcessIt != toProcess.GetCount())
+    {
+      std::cout << "toProcessIt = " << toProcessIt << std::endl;
+      std::cout << "toProcess.GetCount() = " << toProcess.GetCount() << std::endl;
+      std::cout << "toProcess[toProcessIt]->GetName() = " << toProcess[toProcessIt]->getName() << std::endl;
+      
+      //Clean the WiredDocument
+      toProcess[toProcessIt]->CleanChildren();
+      //Retrieve its remaining children 
+      toMergeInToProcess = toProcess[toProcessIt]->getChildren();
+      //Merge them into the toProcessArray
+      WX_APPEND_ARRAY(toProcess, toMergeInToProcess);      
+
+      toProcessIt++;
+    }
+
+}
+
 void	SaveCenter::SaveProject()
 {
   wxString	fileName;
@@ -395,6 +422,9 @@ void	SaveCenter::LoadProject()
   wxArrayString			pathToCurrentDoc;
   SaveElementArray		history;
 
+  //We start by cleaning the WiredDocument tree to restore its initial state.
+  //  CleanTree();
+
   filename.Clear();
   filename << getProjectPath().GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
   filename << wxT("wired.xml");
@@ -603,7 +633,7 @@ void		SaveCenter::DumpWiredDocumentSubTree(WiredDocument *currentNode,
   for(i = 0; i < depth; i++)
     std::cout << " ";
 
-  std::cout << currentNode->getName() << std::endl;
+  std::cout << currentNode->getName().mb_str() << std::endl;
 
   children = currentNode->getChildren();
 

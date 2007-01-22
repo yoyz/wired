@@ -22,8 +22,9 @@ class WiredDocument
    * (not for an instance of course...).
    * \param parent The parent WiredDocument. If left to NULL, it will be defaulted 
    * to the SaveCenter.
-   * \param noParent For internal use only and should NEVER be set to true. Else,
-   * the WiredDocument will never be saved.
+   * \param noParent For specific use only and should usually not be set to true. Else,
+   * the WiredDocument will not be saved with the session. Is used by the SaveCenter
+   * and could be used for the settings for example.
    */
   WiredDocument(wxString docName, WiredDocument *parent = NULL,
 		bool noParent = false);
@@ -50,6 +51,17 @@ class WiredDocument
    * \param data The data stored in the project file.
    */
   virtual void	Load(SaveElementArray data) = 0;
+
+  /** Cleaning function.
+   * It will be called before a Load to initialize the WiredDocument with
+   * no unneeded children.
+   * Every children created during a session should be deleted by this method.
+   * In other words, it should restore the state of the direct subtree to what
+   * it was at the first instanciation of the WiredDocument.
+   * Default values should not be handled by this method, a Load() will occur
+   * with them soon after the call to DeleteChildren().
+   */
+  virtual void	CleanChildren() {}
 
   /** Properly calls save. */
   void		SaveMe();

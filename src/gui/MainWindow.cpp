@@ -644,10 +644,10 @@ bool					MainWindow::NewSession()
     }
   else if (res == wxID_CANCEL)
     return (false);
-  delete saveCenter;
-  saveCenter = new SaveCenter(wxString(wxT("wired_save")));
 
   Seq->Stop();
+
+  saveCenter->CleanTree();
 
   // do some clean up
   wxMutexLocker	locker(SeqMutex);
