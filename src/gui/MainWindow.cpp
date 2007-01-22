@@ -108,10 +108,11 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   
   FileConverter = NULL;
 
-  TransportFrame = 0x0;
-  OptFrame = 0x0;
-  SequencerFrame = 0x0;
-  RackFrame = 0x0;
+  TransportFrame = NULL;
+  OptFrame = NULL;
+  SequencerFrame = NULL;
+  RackFrame = NULL;
+  MediaLibraryFrame = NULL;
   
   MenuBar = new wxMenuBar;
   FileMenu = new wxMenu;
