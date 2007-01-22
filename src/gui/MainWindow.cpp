@@ -1942,6 +1942,7 @@ void		MainWindow::Load(SaveElementArray data)
 		 }
 	     }
 	 }
+
        else if (data[i]->getKey() == wxT("Transport"))
 	 {
 	   if (data[i]->getAttributeInt(wxT("Floating")) == 1)
