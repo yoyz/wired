@@ -79,4 +79,4 @@ libgui_a_SOURCES = 			\
 		../save/WiredDocument.cpp	\
 		../save/SaveCenter.cpp
 
-libgui_a_LIBADD = ../save/libsave.a
+libgui_a_LIBADD = ../save/libsave.la
