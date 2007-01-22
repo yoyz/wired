@@ -75,4 +75,8 @@ libgui_a_SOURCES = 			\
 		FileConversion.h	\
 		FileConversion.cpp	\
 		FloatingFrame.h		\
-		FloatingFrame.cpp
+		FloatingFrame.cpp	\
+		../save/WiredDocument.cpp	\
+		../save/SaveCenter.cpp
+
+libgui_a_LIBADD = ../save/libsave.a

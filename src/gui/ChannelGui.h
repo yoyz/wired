@@ -79,7 +79,6 @@ class					ChannelGui : public wxPanel
   wxImage				*ImgFaderBg;
   wxImage				*ImgFaderFg;
   wxBitmap				*MixerBmp;
-  wxImage				*bg;
 
   DECLARE_EVENT_TABLE()
 };

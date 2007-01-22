@@ -82,7 +82,7 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
 
   BottomToolbar = new wxToolBar(this, -1, wxPoint(-1, this->GetSize().y - 50), wxSize(1000, 46), wxTB_3DBUTTONS);
   BottomToolbar->AddTool(MediaLibrary_Start_Preview, _("Start Preview"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_PREVIEWUP_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_PREVIEWDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Preview file"), _("Preview a file"), NULL);
-  BottomToolbar->AddTool(MediaLibrary_Stop_Preview, _("Stop Preview"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_PREVIEWDO_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_PREVIEWDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Stop Preview"), _("Stop Preview"), NULL);  
+  BottomToolbar->AddTool(MediaLibrary_Stop_Preview, _("Stop Preview"), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_PREVIEWDO_IMG)), wxBITMAP_TYPE_PNG), wxBitmap(wxString(WiredSettings->DataDir + wxString(MEDIALIBRARY_PREVIEWDO_IMG)), wxBITMAP_TYPE_PNG), wxITEM_NORMAL, _("Stop Preview"), _("Stop Preview"), NULL);
   for (c = 0; c < NB_SORTSELECT_CHOICES; c++)
     sortselect_choices[c] = SortSelectChoices[c].s;
   SortSelect = new wxComboBox(BottomToolbar, MediaLibrary_SortSelect, DEFAULT_SORTSELECT_VALUE, wxPoint(-1, -1), wxSize(100, -1), 4, sortselect_choices, wxCB_READONLY);
@@ -153,27 +153,13 @@ void				MediaLibrary::SetDocked()
 
 void				MediaLibrary::OnAdd(wxCommandEvent &WXUNUSED(event))
 {
-
-  FileLoader				dlg(this, MainWin_FileLoader, _("Loading sound file"), false, false, FileConverter->GetCodecsExtensions(), true);
-  int					res;
+  FileLoader		dlg(this, MainWin_FileLoader, _("Loading sound file"), false, false, FileConverter->GetCodecsExtensions(), true);
+  int			res;
 
   if (dlg.ShowModal() == wxID_OK)
     {
       wxString 	selfile = dlg.GetSelectedFile();
 
-      if (saveCenter->getAudioDir().empty() == false)
-	res = wxID_OK;
-      else
-	{
-	  wxDirDialog dir(this, _("Choose the Audio file directory"), wxFileName::GetCwd());
-	  if (dir.ShowModal() == wxID_OK)
-	    {
-	      saveCenter->setAudioDir(dir.GetPath());
-	      res = wxID_OK;
-	    }
-	  else
-	    res = wxID_CANCEL;
-	}
       MLTreeView->OnAdd(selfile);
     }
 }
@@ -208,7 +194,7 @@ void				MediaLibrary::OnEdit(wxCommandEvent &WXUNUSED(event))
   item = MLTreeView->GetSelection();
   infos = MLTreeView->GetTreeItemStructFromId(item);
   // Test the selfile content HERE
-  if (item == MLTreeView->GetRootItem() || selfile == wxT("")  || infos.extention == wxT(""))
+  if (item == MLTreeView->GetRootItem() || selfile == wxT("")  || infos.extension == wxT(""))
     return ;
   MidiMutex.Lock();
   MidiDeviceMutex.Lock();
@@ -231,7 +217,7 @@ void				MediaLibrary::OnInsert(wxCommandEvent &WXUNUSED(event))
   selfile = MLTreeView->getSelection(1);
   item = MLTreeView->GetSelection();
   infos = MLTreeView->GetTreeItemStructFromId(item);
-  if (item == MLTreeView->GetRootItem() || selfile == wxT("")  || infos.extention == wxT(""))
+  if (item == MLTreeView->GetRootItem() || selfile == wxT("")  || infos.extension == wxT(""))
     return ;
   // Test the selfile content HERE
   //  cout << "[MEDIALIBRARY] Insert File (OnInsert)" << selfile << endl;
@@ -289,23 +275,6 @@ void				MediaLibrary::OnPreview(wxCommandEvent &WXUNUSED(event))
       BottomToolbar->EnableTool(6, false);
       Seq->StopFile();
     }
-  //   WaveFile *w = new WaveFile(_("/usr/share/sounds/shutdown1.wav"), false);
-  //   SeqMutex.Lock();
-  //	  PlayWavePos = 0;
-  //	  PlayWave = w;
-  //   SeqMutex.Unlock();
-  //   if (infos.extention.Cmp(wxT("")))
-  //     {
-  //  Seq->PlayFile(selfile, true);
-  //     }
-
-  //  FileLoader				dlg(this, MainWin_FileLoader, _("Loading sound file"), false, false, FileConverter->GetCodecsExtensions(), true);
-
-
-
-//   wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, Preview_Start);
-//   event.SetEventObject();
-//   wxPostEvent(GetParent(), event);
 }
 
 void				MediaLibrary::OnSortToggle(wxCommandEvent &WXUNUSED(event))
@@ -316,9 +285,7 @@ void				MediaLibrary::OnSortToggle(wxCommandEvent &WXUNUSED(event))
 }
 void				MediaLibrary::OnLeftClick(wxMouseEvent &event)
 {
-  cout << "[MEDIALIBRARY] Test" << endl;
   SetFocus();
-  cout << "popo" << endl;
 }
 
 BEGIN_EVENT_TABLE(MediaLibrary, wxPanel)

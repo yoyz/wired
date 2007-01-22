@@ -4,7 +4,11 @@ CPPFLAGS = $(shell wx-config --cflags) -I../../gui -I../../plugins -I../../filel
 
 pkglib_LTLIBRARIES = libWiredSynth.la
 
+libWiredSynth_la_LDFLAGS = -avoid-version
 libWiredSynth_la_SOURCES =				\
+			Adsr.cpp		\
+			Lfo.cpp		\
+			Osc.cpp		\
 			SynthPlug.cpp		\
 			../../redist/Plugin.cpp
 

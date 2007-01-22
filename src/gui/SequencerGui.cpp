@@ -1022,6 +1022,11 @@ void					SequencerGui::Drop(int x, int y, wxString file)
 
 }
 
+void					SequencerGui::HideAllPatterns(wxMouseEvent &e)
+{
+  SeqPanel->SelectItem(0x0, e.ShiftDown());
+}
+
 // WiredDocument implementation
 void					SequencerGui::Save()
 {
@@ -1067,22 +1072,6 @@ void					SequencerGui::Load(SaveElementArray data)
     }
 }
 
-/*
-
-TODO :
-
-Learn how to declare custom event types with wx,
-it's quite weird tbh ...
-
-this is the beginning :)
-
-DEFINE_EVENT_TYPE(wxSetCursorPos)
-DEFINE_EVENT_TYPE(wxResizePattern)
-DEFINE_EVENT_TYPE(wxDrawMidi)
-DEFINE_EVENT_TYPE(wxON_COLOREDBOX_CLICK)
-
-*/
-
 BEGIN_EVENT_TABLE(SequencerGui, wxPanel)
   EVT_BUTTON(ID_CURSOR_PLAY, SequencerGui::OnPlayCursorMove)
   EVT_BUTTON(ID_CURSOR_BEGIN, SequencerGui::OnBeginLCursorMove)
@@ -1102,13 +1091,3 @@ BEGIN_EVENT_TABLE(SequencerGui, wxPanel)
   EVT_SIZE(SequencerGui::OnSize)
   EVT_MOUSEWHEEL(SequencerGui::OnWheelMove)
 END_EVENT_TABLE()
-
-BEGIN_EVENT_TABLE(SequencerView, wxWindow)
-  EVT_PAINT(SequencerView::OnPaint)
-  EVT_LEFT_DOWN(SequencerView::OnClick)
-  EVT_LEFT_UP(SequencerView::OnLeftUp)
-  EVT_MOTION(SequencerView::OnMotion)
-  EVT_RIGHT_DOWN(SequencerView::OnRightClick)
-  EVT_ENTER_WINDOW(SequencerView::OnHelp)
-END_EVENT_TABLE()
-

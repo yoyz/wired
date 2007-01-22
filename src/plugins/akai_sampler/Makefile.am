@@ -15,6 +15,7 @@ endif
 
 pkglib_LTLIBRARIES = libWiredSampler.la
 
+libWiredSampler_la_LDFLAGS = -avoid-version
 libWiredSampler_la_SOURCES =				\
 			AkaiSampler.cpp			\
 			ASClavier.cpp    		\

@@ -25,9 +25,10 @@ ChannelGui::ChannelGui(Channel* channel, wxImage* img_bg, wxImage* img_fg,
 {
   ConnectedSeqTrack = 0x0;
   SetBackgroundColour(*wxBLACK);//CL_RULER_BACKGROUND);
-  bg = new wxImage(wxString(WiredSettings->DataDir + wxString(BG)), wxBITMAP_TYPE_PNG);
+
+  wxImage	bg(wxString(WiredSettings->DataDir + wxString(BG)), wxBITMAP_TYPE_PNG);
   MixerBmp = new wxBitmap(bg);
-  //cout << bg->GetWidth() << " " << bg->GetHeight() << endl;
+
   Chan = channel;
   ImgFaderBg = img_bg;
   ImgFaderFg = img_fg;
@@ -51,7 +52,8 @@ ChannelGui::ChannelGui(Channel* channel, wxImage* img_bg, wxImage* img_fg,
       Label = new wxStaticText(this, -1, label, wxPoint(25, 0));
       Label->SetForegroundColour(*wxWHITE);
       Label->SetForegroundColour(*wxBLACK);
-      Label->SetFont(wxFont(8, wxBOLD, wxBOLD, wxBOLD));//wxNORMAL, wxNORMAL));
+      Label->SetFont(wxFont(8, wxFONTFAMILY_DEFAULT,
+			    wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
       //cout << "Chan->VolumeGui : " << Chan->VolumeLeft << endl;
       FaderLeft->SetValue((int)(Chan->VolumeLeft * 100));
       FaderRight->SetValue((int)(Chan->VolumeRight * 100));
@@ -76,7 +78,6 @@ ChannelGui::ChannelGui(Channel* channel, wxImage* img_bg, wxImage* img_fg,
 ChannelGui::~ChannelGui()
 {
   delete MixerBmp;
-  delete bg;
   delete hp_up;
   delete hp_dn;
   delete lock_up;

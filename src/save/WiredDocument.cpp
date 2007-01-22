@@ -12,13 +12,9 @@ WiredDocument::WiredDocument(wxString name, WiredDocument *parent, bool noParent
    if (!parent && !noParent)
      parent = saveCenter;
 
+   _parent = parent;
   if(parent)
-    {
-      _parent = parent;
-      _parent->Register(this);
-    }
-  else
-    _parent = NULL;
+    _parent->Register(this);
 
   _name = name;
 }
@@ -72,21 +68,21 @@ void		WiredDocument::clearDocData()
 //        dataSaveIt++)
 //     if(dataSaveIt->second)
 //       rmDocDataFile(dataSaveIt->first);
-//   std::cerr << "prout -> GetName : " << this->_name.mb_str() << std::endl;
+//   std::cerr << "clearDocData -> GetName : " << this->_name.mb_str() << std::endl;
 
   _dataSave.clear();
 }
 
 void		WiredDocument::rmDocDataFile(wxString file)
 {
-  int	i;
+//   int	i;
   
-  if(_dataSave.find(file) != _dataSave.end())
-    for (i = 0; i < _dataSave[file]->GetCount(); i++)
-      if(_dataSave[file]->Item(i) != NULL)
-	delete(_dataSave[file]->Item(i));
+//   if(_dataSave.find(file) != _dataSave.end())
+//     for (i = 0; i < _dataSave[file]->GetCount(); i++)
+//       if(_dataSave[file]->Item(i) != NULL)
+// 	delete(_dataSave[file]->Item(i));
 
-  _dataSave.erase(file);
+//   _dataSave.erase(file);
 }
 
 SaveElementsHashMap	WiredDocument::getDocData()

@@ -58,6 +58,7 @@ PlugStartInfo		StartInfo;
 vector<PluginLoader *>	LoadedPluginsList;
 WiredSession		*CurrentSession = NULL;
 WiredSessionXml		*CurrentXmlSession = NULL;
+//SaveCenter		*saveCenter = NULL;
 WiredExternalPluginMgr	*LoadedExternalPlugins = NULL;
 MediaLibrary		*MediaLibraryPanel = NULL;
 FileConversion		*FileConverter = NULL;
@@ -80,6 +81,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   WiredSettings = new Settings();
   saveCenter = new SaveCenter();
   saveCenter->Register(this);
+  saveCenter = new SaveCenter(wxGetCwd());
   LoadedExternalPlugins = new WiredExternalPluginMgr();
   LogWin = new wxLogWindow(this, wxT("Wired log"), false);
 
@@ -94,15 +96,8 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
       cout << "Critical error" << endl;
       exit(1);
     }
-  // from GetDevices
-  catch (Error::NoDevice)
-    {
-      cout << "[MAINWIN] No Device :\nPlease check if your soundcard is not busy" << endl;
-      AlertDialog(_("Critical error"), _("You have no soundcard or it's busy, Wired will exit."));
-      exit(1);
-    }
 
-  // Mixer must be declared after AudioEngine
+  // Mixer must be declared after AudioEngine 
   Mix = new Mixer();
   Seq = new Sequencer(NULL);
   MidiEngine = new MidiThread();
@@ -168,6 +163,9 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   HelpMenu->Append(MainWin_About, _("&About..."));
 
   MediaLibraryMenu->Append(MainWin_MediaLibraryBeta, _("This feature is currently in alpha stage"))->Enable(false);
+  MediaLibraryMenu->Append(MainWin_SaveML, _("Save Media Library"));
+  MediaLibraryMenu->Append(MainWin_LoadML, _("Load Media Library"));
+  MediaLibraryMenu->AppendSeparator();
   ItemShowMediaLibrary = MediaLibraryMenu->AppendCheckItem(MainWin_MediaLibraryShow, _("&Show/Hide\tCtrl-M"));
   ItemFloatingMediaLibrary = MediaLibraryMenu->AppendCheckItem(MainWin_FloatMediaLibrary, _("&Floating"));
 
@@ -595,11 +593,11 @@ void					MainWindow::OnClose(wxCloseEvent &event)
 
   cout << "[MAINWIN] Closing all audio devices and streams..." << endl;
   // if we have to do something with already dead threads, it's here.
-  delete Mix;
-
   if (Audio)
     delete Audio;
   Audio = NULL; // for handling event of Transport::OnIdle
+
+  delete Mix;
 
   cout << "[MAINWIN] Unloading logging manager..." << endl;
   delete LogWin;
@@ -1679,8 +1677,6 @@ void					MainWindow::OnTimer(wxTimerEvent &event)
 	}
     }
 
-  for (pluginIt = UpdatePlugins.begin(); pluginIt != UpdatePlugins.end(); pluginIt++)
-    (*pluginIt)->Update();
   UpdatePlugins.clear();
 
   for (trackIt = Seq->TracksToRefresh.begin(); trackIt != Seq->TracksToRefresh.end(); trackIt++)
@@ -1979,6 +1975,33 @@ void		MainWindow::Load(SaveElementArray data)
      }
 }
 
+void		MainWindow::OnLoadML(wxCommandEvent &WXUNUSED(event))
+{
+  vector<wxString> exts;
+  exts.push_back(_("xml\tMedia Library file (*.xml)"));
+  
+  FileLoader	dlg(this, MainWin_FileLoader, _("Load Media Library"), false, false, &exts);
+  if (dlg.ShowModal() == wxID_OK)
+    {
+      wxString filename = dlg.GetSelectedFile();    
+      MediaLibraryPanel->MLTreeView->LoadPatch(filename);
+    }
+}
+
+void		MainWindow::OnSaveML(wxCommandEvent &WXUNUSED(event))
+{
+  vector<wxString> exts;
+  exts.push_back(_("xml\tMedia Library file (*.xml)"));
+  
+  FileLoader	dlg(this, MainWin_FileLoader, _("Save Media Library"), false, true, &exts);
+  if (dlg.ShowModal() == wxID_OK)
+    {
+      wxString filename = dlg.GetSelectedFile();    
+      MediaLibraryPanel->MLTreeView->OnSave(filename);
+    }
+}
+
+
 BEGIN_DECLARE_EVENT_TYPES()
   DECLARE_EVENT_TYPE(wxSetCursorPos, 313131)
   END_DECLARE_EVENT_TYPES()
@@ -2008,7 +2031,9 @@ BEGIN_DECLARE_EVENT_TYPES()
   EVT_MENU(MainWin_FloatRacks, MainWindow::OnFloatRack)
   EVT_MENU(MainWin_FloatMediaLibrary, MainWindow::OnFloatMediaLibrary)
   EVT_MENU(MainWin_MediaLibraryShow, MainWindow::MediaLibraryShow)
-  EVT_MENU(MainWin_Undo, MainWindow::OnUndo)
+  EVT_MENU(MainWin_SaveML, MainWindow::OnSaveML)
+  EVT_MENU(MainWin_LoadML, MainWindow::OnLoadML)
+  EVT_MENU(MainWin_Undo, MainWindow::OnUndo) 
   EVT_MENU(MainWin_Redo, MainWindow::OnRedo)
   //EVT_MENU(MainWin_History, MainWindow::OnHistory)
   EVT_MENU(MainWin_Copy, MainWindow::OnCopy)
@@ -2036,4 +2061,4 @@ BEGIN_DECLARE_EVENT_TYPES()
   //  EVT_MENU(MainWin_SeekVideo, MainWindow::OnSeekVideo)
   //EVT_TEXT_MAXLEN(101010, MainWindow::OnSetPosition)
   //EVT_PLAYPOSITION(313131, MainWindow::OnSetPosition)
-  END_EVENT_TABLE()
+END_EVENT_TABLE()

@@ -25,10 +25,12 @@ MainWindow			*MainWin;
 
 bool				MainApp::OnInit()
 {
+#if wxUSE_ON_FATAL_EXCEPTION
   wxHandleFatalExceptions();
-	//std::set_new_handler(&AllocationErrorHandler);
+#endif
+
   wxBitmap			bitmap;
-  wxSplashScreen*		splash;
+  wxSplashScreen*		splash = NULL;
 
 
 #if wxUSE_LIBPNG
@@ -50,9 +52,10 @@ bool				MainApp::OnInit()
   // splash screen
   if (bitmap.LoadFile(wxString(DATA_DIR, *wxConvCurrent) + wxString(wxT("/wired/ihm/splash/splash.png")), wxBITMAP_TYPE_PNG))
     {
+      // we keep time-out very high for low cpu
       splash = new wxSplashScreen(bitmap,
 				  wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT,
-				  6000, NULL, -1, wxDefaultPosition, wxDefaultSize,
+				  120000, NULL, -1, wxDefaultPosition, wxDefaultSize,
 				  wxSIMPLE_BORDER|wxSTAY_ON_TOP);
       splash->Update();
       splash->Refresh();
@@ -77,7 +80,8 @@ bool				MainApp::OnInit()
   SetTopWindow(Frame);
 
   // Wired crash if loading main frame is more than splash timeout
-  splash->Hide();
+  if (splash)
+    splash->Hide();
 
   // now error dialog are based on mainframe 
   MainWin = Frame;
@@ -108,20 +112,20 @@ void	MainApp::ShowWelcome()
   msg.ShowModal();
 }
 
+#if wxUSE_ON_FATAL_EXCEPTION
 void              MainApp::OnFatalException()
 {
-#if wxUSE_DEBUGREPORT
-	wxDebugReportCompress Report;
-    Report.AddAll();
-    if (wxDebugReportPreviewStd().Show(Report))
-//	if (ReportPreview->Show(*Report))
-	{
-		Report.Process();
-		Report.Reset();
-        //send a mail
-	}
-#endif
+# if wxUSE_DEBUGREPORT
+  wxDebugReportCompress Report;
+  Report.AddAll();
+  if (wxDebugReportPreviewStd().Show(Report))
+    {
+      Report.Process();
+      Report.Reset();
+    }
+# endif
 }
+#endif
 
 void				MainApp::OnUnhandledException()
 {

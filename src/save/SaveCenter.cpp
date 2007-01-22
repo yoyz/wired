@@ -59,6 +59,9 @@ void	SaveCenter::SaveFile(WiredDocument *doc, wxString file, wxString path)
   if (path == wxT(""))
     path = file;
 
+  if (doc->getDocFile(file) == NULL)
+    std::cerr << "[SaveCenter] trying to save a key not found..." << std::endl;
+
   WriteFile(path, doc->getDocFile(file)); 
 }
 
@@ -222,6 +225,7 @@ void		SaveCenter::WriteFile(wxString givenFileName,
       
       filename.MakeAbsolute();
     }
+  std::cerr << "[SaveCenter] filename to write : " << filename.GetFullPath().mb_str() << std::endl;
 
   if(!wxFileName::DirExists(filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME)))
     wxFileName::Mkdir(filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME),

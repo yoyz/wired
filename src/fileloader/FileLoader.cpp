@@ -1,23 +1,6 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-/*
-** Copyright (C) 2004-2006 by Wired Team
-**  
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU Lesser General Public License version 2.1
-** as published by the Free Software Foundation.
-** 
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU Lesser General Public License for more details.
-** 
-** You should have received a copy of the GNU Lesser General Public License
-** along with this program; if not, write to the Free Software 
-** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-
 #include <iostream>
 #include <fstream>
 #include <sys/types.h>
@@ -26,12 +9,13 @@
 #include <wx/file.h>
 #include <wx/filename.h>
 #include <wx/dir.h>
+#include <wx/imaglist.h>
 
 using namespace std;
 
 #include "FileLoader.h"
-#include "icon5.xpm"
-#include "icon3.xpm"
+#include "folder.xpm"
+#include "folder-open.xpm"
 #include "file.xpm"
 #include "audio.xpm"
 #include "delete.xpm"
@@ -125,8 +109,8 @@ wxDialog(parent, id, title, wxDefaultPosition, wxSize(F_WIDTH, F_HEIGHT))
   FileInfo = new wxStaticText(this, -1, wxT(""), 
           wxPoint(10, F_HEIGHT - 105), wxSize(-1, -1), wxALIGN_LEFT);
   wxImageList *images = new wxImageList(16, 16, TRUE);
-  AddIcon(images, wxIcon(icon3_xpm));
-  AddIcon(images, wxIcon(icon5_xpm));
+  AddIcon(images, wxIcon(folder_xpm));
+  AddIcon(images, wxIcon(folder_open_xpm));
   folder->AssignImageList(images);
 
   wxImageList *imgs = new wxImageList(16, 16, TRUE);

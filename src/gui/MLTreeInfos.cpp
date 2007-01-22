@@ -14,15 +14,15 @@ MLTreeInfos::MLTreeInfos(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long 
   this->SetBackgroundColour(wxColour(206, 200, 200));
   new wxString(textContent);
   textContent.Append(infos.label);
-  textContent.Append(_("\nExtention : "));
-  textContent.Append(infos.extention);
+  textContent.Append(_("\nExtension : "));
+  textContent.Append(infos.extension);
   textContent.Append(_("\nLength : "));
   textContent.Append(infos.length);
   textContent.Append(_("\nBitrate"));
   textContent.Append(_("\nSize : "));
   textContent.Append(_("\nCodec : "));
   Text = new MywxStaticText((wxWindow*)this, (wxWindowID)-1, (const wxString&)textContent, wxPoint(2, 2),
-		   wxSize(200, 100), wxALIGN_LEFT| wxST_NO_AUTORESIZE, _(""));
+		   wxSize(200, 100), wxALIGN_LEFT| wxST_NO_AUTORESIZE, wxT(""));
   Text->SetFont(wxFont(7, wxSWISS , wxNORMAL, wxNORMAL, false, _("Arial")));
   Show(true);
 }

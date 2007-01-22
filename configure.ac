@@ -2,14 +2,16 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([Wired], [0.3.1], [wired@bloodshed.net])
+AC_INIT([Wired], [0.4alpha], [wired@bloodshed.net])
 
 
 # Auxiliary files.
 AC_CONFIG_AUX_DIR([config])
 
 # Needed for plugins
-AM_PROG_LIBTOOL
+AC_DISABLE_STATIC
+AC_ENABLE_SHARED
+AC_PROG_LIBTOOL
 
 # Automake.
 AM_INIT_AUTOMAKE([1.8.2 foreign check-news dist-bzip2 no-dist-gzip])
@@ -56,9 +58,9 @@ AM_CONDITIONAL(PLUGINS, test x$enable_plugins = xyes)
 
 # can enable or disable Wired codecs
 AC_ARG_ENABLE(codecs,
-	[  --enable-codecs Enable or disable Wired codecs (default enabled)],
+	[  --enable-codecs Enable or disable Wired codecs (default disabled)],
 	[enable_codecs="$enableval"],
-	[enable_codecs="yes"])
+	[enable_codecs="no"])
 AM_CONDITIONAL(CODECS, test x$enable_codecs = xyes)
 
 AC_ARG_ENABLE(optimize,
@@ -267,6 +269,7 @@ AC_CONFIG_FILES([src/plugins/beatbox/Makefile
 		po/Makefile.in
 		intl/Makefile
 		src/Makefile
+		src/save/Makefile
 		src/audio/Makefile
 		src/editmidi/Makefile
 		src/engine/Makefile
@@ -316,8 +319,7 @@ AC_CONFIG_FILES([src/plugins/beatbox/Makefile
 		src/codec/wiredcodec/mpeg/Makefile
 		src/codec/wiredcodec/flac/Makefile
 		src/codec/wiredcodec/vorbis/Makefile
-		src/wiredvideo/Makefile
-		src/save/Makefile])
+		src/wiredvideo/Makefile])
 
 AC_OUTPUT
 

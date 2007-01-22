@@ -270,7 +270,7 @@ class				SequencerGui: public wxPanel, public WiredDocument
   void				OnColoredBoxClick(wxCommandEvent &event);
   void				Drop(int x, int y, wxString file);
   //bool				Floating;
-
+  void				HideAllPatterns(wxMouseEvent &e);
   // WiredDocument things
   void				Save();
   void				Load(SaveElementArray data);

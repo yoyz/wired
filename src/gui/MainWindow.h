@@ -8,10 +8,6 @@ using namespace std;
 
 #include <iostream>
 #include <vector>
-//#include <stdlib.h>
-
-//a enlever
-//#include <sndfile.h>
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -102,7 +98,10 @@ class					MainWindow: public wxFrame, public WiredDocument
 
   void					MediaLibraryShow(wxCommandEvent &event);
   void					MediaLibraryHide(wxCommandEvent &event);
-  
+
+  void					OnSaveML(wxCommandEvent &e);
+  void					OnLoadML(wxCommandEvent &e);
+ 
   void			                OnShowDebug(wxCommandEvent &event);
 
   void					OnOpenVideo(wxCommandEvent &event);
@@ -283,6 +282,8 @@ enum
   MainWin_MediaLibraryBeta,
   MainWin_MediaLibraryShow,
   MainWin_MediaLibraryHide,
+  MainWin_SaveML,
+  MainWin_LoadML,
   MainWin_SeekVideo,
   MainWin_ShowLog
 };

@@ -60,9 +60,9 @@ class WiredDocument
   WiredDocumentArray		getChildren();
 
   /** Adds a child to the _children array.
-   * \param child The child to add.
+   * \param children The child to add.
    */
-  void				Register(WiredDocument *child);
+  void				Register(WiredDocument *children);
 
   /** Removes a child from the _children array.
    * \param child The child to remove.

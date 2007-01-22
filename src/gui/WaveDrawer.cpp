@@ -74,8 +74,8 @@ void					WaveDrawer::SetWave(WaveFile *w, wxSize s)
       NumberOfChannels = w->GetNumberOfChannels();
       StartWavePos = 0;
       EndWavePos = w->GetNumberOfFrames();
+      SetDrawing(s);
     }
-  SetDrawing(s);
 #ifdef __DEBUG__
   printf(" [  END  ] WaveDrawer::SetWave(%d)\n", w);
 #endif
@@ -101,8 +101,8 @@ void					WaveDrawer::SetWave(WaveFile *w, wxSize s, long wstart, long wend)
       NumberOfChannels = w->GetNumberOfChannels();
       StartWavePos = wstart;
       EndWavePos = (wend <= w->GetNumberOfFrames()) ? wend : w->GetNumberOfFrames();
+      SetDrawing(s);
     }
-  SetDrawing(s);
 #ifdef __DEBUG__
   printf(" [  END  ] WaveDrawer::SetWave(%x)\n", w);
 #endif
@@ -132,12 +132,16 @@ void					WaveDrawer::SetDrawing(wxSize s)
     delete [] DrawData;
   }
   DrawData = new long[size_x];
+  memset(DrawData, 0, size_x);
+
   // Coefficient d'incr?mentation
   inc = (EndWavePos - StartWavePos) / size_x;
-  channel_to_read = Wave->GetChannelToRead();
+
+  if (Wave)
+    channel_to_read = Wave->GetChannelToRead();
   if (UseSettings && WiredSettings->dbWaveRender)
     {
-      if (!Data) // Wave sur disque
+      if (Wave) // Wave on hdd
 	{
 	  for (i = 0, pos = StartWavePos; (i < size_x) && (pos < end); i++)
 	    {
@@ -159,7 +163,7 @@ void					WaveDrawer::SetDrawing(wxSize s)
 	      DrawData[i] = (long)(val * coeff);
 	    }	  
 	}
-      else // Wave loade? en memoire
+      else if (Data) // Wave loaded in memory
 	{
 	  for (i = 0, pos = StartWavePos; (i < size_x) && (pos < end); i++)
 	    {
@@ -177,13 +181,15 @@ void					WaveDrawer::SetDrawing(wxSize s)
 	      DrawData[i] = (long)(val * coeff);
 	    }
 	}
+      else
+	cerr << "[WaveDrawer] Trying to draw an empty wave" << endl;
     }
   else
     {
     if (!UseSettings || !WiredSettings->QuickWaveRender)
       {
 	// Coefficient d'incr?mentation
-	if (!Data) // Wave sur disque
+	if (Wave) // Wave on hdd
 	  {
 #define WAVEVIEW_TEMP_BUF_SIZE	4096
 	    float		**TempBuf;
@@ -208,12 +214,12 @@ void					WaveDrawer::SetDrawing(wxSize s)
 	      }
 	    if (TempBuf[0])
 		    delete TempBuf[0];
-      	if (TempBuf[1])
+	    if (TempBuf[1])
 		    delete TempBuf[1];
 	    if (TempBuf)
 		    delete TempBuf;
 	  }	  
-	else // Wave loade? en memoire
+	else if (Data) // Wave loaded in memory
 	  {
      	    for (i = 0, pos = StartWavePos; (i < size_x) && (pos < end); i++)
 	      {
@@ -223,10 +229,12 @@ void					WaveDrawer::SetDrawing(wxSize s)
 		DrawData[i] = (long)(((cur / (NumberOfChannels + inc) * coeff) + 0.5));
 	      }      
 	  }
+	else
+	  cerr << "[WaveDrawer] Trying to draw an empty wave" << endl;
       }
     else 
       {
-	if (!Data) // Wave sur disque
+	if (Wave) // Wave on hdd
 	  {
 	    for (i = 0, pos = StartWavePos; (i < size_x) && (pos < end); i++)
 	      {
@@ -237,7 +245,7 @@ void					WaveDrawer::SetDrawing(wxSize s)
 		pos += inc;
 	      }
 	  }
-	else
+	else if (Data) // Wave loaded in memory
 	  {
 	    for (i = 0, pos = StartWavePos; (i < size_x) && (pos < end); i++)
 	      {
@@ -247,6 +255,8 @@ void					WaveDrawer::SetDrawing(wxSize s)
 		pos += inc;
 	      }
 	  }
+	else
+	  cerr << "[WaveDrawer] Trying to draw an empty wave" << endl;
       }
     }
   RedrawBitmap(s);
