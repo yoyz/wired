@@ -27,4 +27,4 @@ libWiredBeatBox_la_SOURCES =				\
 			../../engine/Settings.cpp	\
 			../../audio/WaveFile.cpp	
 
-libWiredBeatBox_la_LIBADD = $(DEPS_LIBS) ../../save/libsave.a
+libWiredBeatBox_la_LIBADD = $(DEPS_LIBS) ../../save/libsave.la

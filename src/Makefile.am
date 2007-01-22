@@ -55,4 +55,4 @@ wired_LDADD =					\
 	codec/libwiredCodec.a			\
 	wiredvideo/libwiredvideo.a		\
 	dssi/libwireddssi.a			\
-	save/libsave.a
+	save/libsave.la
