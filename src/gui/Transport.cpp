@@ -460,91 +460,18 @@ void				Transport::OnIdle(wxIdleEvent &WXUNUSED(event))
 
 void				Transport::Save()
 {
-  wxString	s;
-
-  std::cerr << "[Transport] Save()" << std::endl;
-
-  SaveElement	*BPM = new SaveElement();
-  s.clear();
-  s << Seq->BPM;
-  BPM->setKey(wxT("BPM"));
-  BPM->setValue(s);
-  saveDocData(BPM);
-  
-  SaveElement	*SigNum = new SaveElement();
-  s.clear();
-  s << Seq->SigNumerator;
-  SigNum->setKey(wxT("SigNumerator"));
-  SigNum->setValue(s);
-  saveDocData(SigNum);
-
-  SaveElement	*SigDen = new SaveElement();
-  s.clear();
-  s << Seq->SigDenominator;
-  SigDen->setKey(wxT("SigDenominator"));
-  SigDen->setValue(s);
-  saveDocData(SigDen);
-
-  SaveElement	*Click = new SaveElement();
-  s.clear();
-  s << Seq->Click;
-  Click->setKey(wxT("Click"));
-  Click->setValue(s);
-  saveDocData(Click);
-
-  SaveElement	*Loop = new SaveElement();
-  s.clear();
-  s << Seq->Loop;
-  Loop->setKey(wxT("Loop"));
-  Loop->setValue(s);
-  saveDocData(Loop);
 }
 
 void				Transport::Load(SaveElementArray data)
 {
-  int		i;
-  wxString	s;
-  double	bpm;
-  long		sig;
+  wxMutexLocker			m(SeqMutex);
 
-  std::cerr << "[Transport] Load()" << std::endl; 
-  for(i = 0; i < data.GetCount(); i++)
-    {
-      if(data[i]->getKey() == wxT("BPM"))
-	{
-	  s = data[i]->getValue();
-	  s.ToDouble(&bpm);
-	  SetBpm((float)bpm);	  
-	}
-      else if(data[i]->getKey() == wxT("SigNumerator"))
-	{
-	  s = data[i]->getValue();
-	  s.ToLong(&sig);
-	  SetSigNumerator((int)sig);
-	} 
-      else if(data[i]->getKey() == wxT("SigDenominator"))
-	{
-	  s = data[i]->getValue();
-	  s.ToLong(&sig);
-	  SetSigDenominator((int)sig);
-	} 
-      else if(data[i]->getKey() == wxT("Click"))
-	{
-	  s = data[i]->getValue();
-	  if(s == wxT("1"))
-	    SetClick(true);
-	  else
-	    SetClick(false);
-	} 
-      else if(data[i]->getKey() == wxT("Loop"))
-	{
-	  s = data[i]->getValue();
-	  if(s == wxT("1"))
-	    SetLoop(true);
-	  else
-	    SetLoop(false);
-	}
-    }
+  cerr << "bpm : " << Seq->BPM << endl;
+  SetBpm(Seq->BPM);
+  SetSigNumerator(Seq->SigNumerator);
+  SetSigDenominator(Seq->SigDenominator);
+  SetLoop(Seq->Loop);
+  SetClick(Seq->Click);
 }
 
 BEGIN_EVENT_TABLE(Transport, wxPanel)

@@ -435,22 +435,18 @@ void					Sequencer::Stop()
   Recording = false;    
 }
 
-void					Sequencer::Record()
+void					Sequencer::Record(bool bRecording)
 {
   wxMutexLocker				locker(SeqMutex);
 
-  Recording = true;
-  if (Playing)
-    PrepareRecording();
-}
-
-void					Sequencer::StopRecord()
-{
-  SeqMutex.Lock();
-  Recording = false;
-  SeqMutex.Unlock();
-
-  FinishRecording();
+  Recording = bRecording;
+  if (Recording)
+    {
+      if (Playing)
+	PrepareRecording();
+    }
+  else
+    FinishRecording();    
 }
 
 void					Sequencer::RegisterTrack(Track *t)
@@ -1039,6 +1035,16 @@ void			Sequencer::Load(SaveElementArray data)
     {
       if (data[i]->getKey() == wxT("TracksNumber"))
 	nbTracks = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("Recording")) Record(data[i]->getValueInt());
+      else if (data[i]->getKey() == wxT("BPM")) SetBPM(data[i]->getValueFloat());
+      else if (data[i]->getKey() == wxT("SigNumerator")) SetSigNumerator(data[i]->getValueInt());
+      else if (data[i]->getKey() == wxT("SigDenomiator")) SetSigDenominator(data[i]->getValueInt());
+      else if (data[i]->getKey() == wxT("Loop")) Loop = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("Click")) Click = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("CurrentPos")) SetCurrentPos(data[i]->getValueFloat());
+      else if (data[i]->getKey() == wxT("BeginLoopPos")) BeginLoopPos = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("EndLoopPos")) EndLoopPos = data[i]->getValueInt();
+      else if (data[i]->getKey() == wxT("EndPos")) EndPos = data[i]->getValueInt();
     }
   n = 0;
   for (i = 0; i < data.GetCount(); i++)
@@ -1057,10 +1063,24 @@ void			Sequencer::Save()
 {
   int			i;
 
+  // save tracks
   saveDocData(new SaveElement(wxT("TracksNumber"), (int)Tracks.size()));
   for (i = 0; i < Tracks.size(); i++)
     saveDocData(new SaveElement(wxString(wxT("Track_")) << i,
 				(int)Tracks[i]->GetType()));
+
+  // save states of elements (current position, bpm, ...)
+  saveDocData(new SaveElement(wxT("Recording"), Recording));
+  saveDocData(new SaveElement(wxT("BPM"), BPM));
+  saveDocData(new SaveElement(wxT("SigNumerator"), SigNumerator));
+  saveDocData(new SaveElement(wxT("SigDenominator"), SigDenominator));
+  saveDocData(new SaveElement(wxT("Loop"), Loop));
+  saveDocData(new SaveElement(wxT("Click"), Click));
+  saveDocData(new SaveElement(wxT("CurrentPos"), CurrentPos));
+  saveDocData(new SaveElement(wxT("BeginLoopPos"), BeginLoopPos));
+  saveDocData(new SaveElement(wxT("EndLoopPos"), EndLoopPos));
+  saveDocData(new SaveElement(wxT("EndPos"), EndPos));
+
 }
 
 void			Sequencer::CleanChildren()

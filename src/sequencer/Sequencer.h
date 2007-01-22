@@ -107,9 +107,9 @@ class Sequencer : public wxThread, public WiredDocument
   /** Stops.*/
   void					Stop();
   /** Records.*/
-  void					Record();
+  void					Record(bool bRecording = true);
   /** Stops recording.*/
-  void					StopRecord();
+  void					StopRecord() { Record(false); }
   /** Exports project to a wave file.
    * \param filename is the filename (wxString) given to the file.
    */
@@ -168,7 +168,7 @@ class Sequencer : public wxThread, public WiredDocument
   void					DeleteBuffer(float** &Buffer, unsigned int NbChannels = 2);
 
   /** Flag indicating if in playing state.*/
-  bool					Playing;
+  bool					Playing;	// no need
   /** Flag indicating if in recording state.*/
   bool					Recording;
   /** Number of beats per minute.*/
@@ -202,9 +202,9 @@ class Sequencer : public wxThread, public WiredDocument
   /** List of patterns to resize.*/
   std::list<Pattern *>			PatternsToResize;
   /** List of patterns to refresh.*/
-  std::list<MidiPattern *>			PatternsToRefresh;
+  std::list<MidiPattern *>		PatternsToRefresh;
   /** List of tracks to refresh.*/
-  std::list<Track *>				TracksToRefresh;
+  std::list<Track *>			TracksToRefresh;
 
  protected:
 

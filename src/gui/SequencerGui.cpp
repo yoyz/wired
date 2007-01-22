@@ -1030,7 +1030,6 @@ void					SequencerGui::HideAllPatterns(wxMouseEvent &e)
 // WiredDocument implementation
 void					SequencerGui::Save()
 {
-  saveDocData(new SaveElement(wxT("CurrentPos"), CurrentPos));
   saveDocData(new SaveElement(wxT("HoriZoomFactor"), HoriZoomFactor));
   saveDocData(new SaveElement(wxT("VertZoomFactor"), VertZoomFactor));
   saveDocData(new SaveElement(wxT("Tool"), Tool));
@@ -1049,13 +1048,13 @@ void					SequencerGui::Save()
 
 void					SequencerGui::Load(SaveElementArray data)
 {
+  wxMutexLocker				m(SeqMutex);
   int					i;
 
+  SetCurrentPos(Seq->CurrentPos);
   for (i = 0; i < data.GetCount(); i++)
     {
-      if (data[i]->getKey() == wxT("CurrentPos"))
-	CurrentPos = data[i]->getValueDouble();
-      else if (data[i]->getKey() == wxT("HoriZoomFactor"))	HoriZoomFactor = data[i]->getValueFloat();
+      if (data[i]->getKey() == wxT("HoriZoomFactor"))		HoriZoomFactor = data[i]->getValueFloat();
       else if (data[i]->getKey() == wxT("VertZoomFactor"))	VertZoomFactor = data[i]->getValueFloat();
       else if (data[i]->getKey() == wxT("Tool"))		Tool = data[i]->getValueInt();
       else if (data[i]->getKey() == wxT("CurrentXScrollPos"))	CurrentXScrollPos = data[i]->getValueDouble();
