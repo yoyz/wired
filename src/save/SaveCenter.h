@@ -27,11 +27,8 @@ WX_DECLARE_STRING_HASH_MAP(WiredDocumentArray*, WiredDocumentArrayHashMap);
 class SaveCenter : public WiredDocument
 {
  public:
-  /** Constructor.
-   * \param projectPath The path to the project. If none is set, a default one will 
-   * be assigned.
-   */
-  SaveCenter(wxFileName projectPath = wxString(wxT("")));
+  /** Constructor. */
+  SaveCenter();
 
   /** Destructor. */
   ~SaveCenter();
@@ -57,7 +54,8 @@ class SaveCenter : public WiredDocument
   /** Returns the project path. */
   wxFileName	getProjectPath();
 
-  /** Sets the project path
+  /** Sets the project path.
+   * As soon as the project path is set, every needed folder is created.
    * \param projectPath the new project path.
    */
   void		setProjectPath(wxFileName projectPath);
@@ -76,8 +74,6 @@ class SaveCenter : public WiredDocument
    * \param audioDir The new path to the audio directory.
    */
   void		setAudioDir(wxString audioDir);
-
-  bool		getSaved();
 
   /** Sets the project name
    * \param projectName the new project name.
@@ -180,6 +176,13 @@ class SaveCenter : public WiredDocument
 
  private:
 
+  /** Checks if the path is the path to a valid project.
+   * A path is a valid project path if it contains a wired.xml file.
+   * TODO : Add deeper checks.
+   * \param path The path to the folder to check.
+   */
+  bool			IsProject(wxFileName path);
+
   /** Dumps a SaveElementArrayHashMap.
    * As this structure is quite complicated, this function is mainly used for debug.
    * \param dataLoaded The SaveElementArrayHashMap to dump.
@@ -210,12 +213,6 @@ class SaveCenter : public WiredDocument
    * the suppression of WiredSessionXml.
    */ 
   wxFileName		_audioDir;
-  //
-
-  /** Stores if the project has already been saved once.
-   * When it is set to false, we will act like a "Save As".
-   */ 
-  bool			_saved;
 };
 
 extern SaveCenter*	saveCenter;

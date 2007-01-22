@@ -5,12 +5,9 @@
 
 SaveCenter		*saveCenter = NULL;
 
-SaveCenter::SaveCenter(wxFileName  projectPath)
+SaveCenter::SaveCenter()
   : WiredDocument(wxT("savecenter"), NULL, true)
 {
-  setProjectPath(projectPath);
-  _audioDir = _projectPath;
-  _audioDir.AppendDir(wxT("audio"));
 }
 
 SaveCenter::~SaveCenter()
@@ -291,18 +288,26 @@ void		SaveCenter::setProjectPath(wxFileName projectPath)
 {
   if(!projectPath.IsOk())
     {
-      _saved = false;
       _projectPath.AssignDir(wxGetCwd());
       _projectName = GetDefaultProjectName(projectPath);
       _projectPath.AppendDir(_projectName);
     }
   else
-    {
-      _saved = true;
-      _projectPath.AssignDir(projectPath.GetFullPath());
-      
-      _projectName = GetProjectNameFromProjectPath(_projectPath);
-    }
+    _projectPath.AssignDir(projectPath.GetFullPath());      
+ 
+  _projectName = GetProjectNameFromProjectPath(_projectPath);
+
+  _audioDir = _projectPath;
+  _audioDir.AppendDir(wxT("audio"));
+
+  if(!_projectPath.DirExists())
+    _projectPath.Mkdir();
+
+  if(!_audioDir.DirExists())
+    _audioDir.Mkdir();
+
+  if(IsProject(_projectPath))
+     LoadProject();
 
 }
 
@@ -613,11 +618,6 @@ wxString	SaveCenter::GetProjectNameFromProjectPath(wxFileName path)
   return ret;
 }
 
-bool		SaveCenter::getSaved()
-{
-  return _saved;
-}
-
 void		SaveCenter::DumpWiredDocumentTree()
 {
   DumpWiredDocumentSubTree(this, 0);
@@ -640,4 +640,19 @@ void		SaveCenter::DumpWiredDocumentSubTree(WiredDocument *currentNode,
   for(i = 0; i < children.size(); i++)
     DumpWiredDocumentSubTree(children[i], depth + 1);
 
+}
+
+bool		SaveCenter::IsProject(wxFileName path)
+{
+  wxFileName	test;
+
+  test = path;
+
+  test.SetName(wxT("wired"));
+  test.SetExt(wxT("xml"));
+
+  if(test.FileExists())
+    return true;
+  else
+    return false;
 }

@@ -19,6 +19,8 @@ using namespace std;
 #include <wx/splash.h>
 #include <wx/splitter.h>
 #include <wx/log.h>
+#include <wx/filename.h>
+
 
 #include "version.h"
 
@@ -47,7 +49,7 @@ extern wxCondition*	        SeqStopped;
 class					MainWindow: public wxFrame, public WiredDocument
 {
  public:
-  MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size);
+  MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size, WiredDocument *parent);
   void					OnClose(wxCloseEvent &event);
   void					OnQuit(wxCommandEvent &event);
   void					OnOpen(wxCommandEvent &event);
@@ -119,6 +121,7 @@ class					MainWindow: public wxFrame, public WiredDocument
 
   /* init func */
   int					Init();
+
   /* can be called from SettingWindow */
   int					InitAudio(bool restart = false);
 

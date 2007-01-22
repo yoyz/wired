@@ -5,7 +5,6 @@
 
 #include <wx/splitter.h>
 #include <wx/progdlg.h>
-#include <wx/filename.h>
 #include <wx/utils.h>
 #include <algorithm>
 #include "SequencerGui.h"
@@ -44,6 +43,7 @@
 #include "MediaLibrary.h"
 #include "MLTree.h"
 #include "SaveCenter.h"
+
 //Isn't it bullshit to declare things here ?
 
 Rack			*RackPanel = NULL;
@@ -58,7 +58,7 @@ PlugStartInfo		StartInfo;
 vector<PluginLoader *>	LoadedPluginsList;
 WiredSession		*CurrentSession = NULL;
 WiredSessionXml		*CurrentXmlSession = NULL;
-//SaveCenter		*saveCenter = NULL;
+//SaveCenter		*saveCenter;
 WiredExternalPluginMgr	*LoadedExternalPlugins = NULL;
 MediaLibrary		*MediaLibraryPanel = NULL;
 FileConversion		*FileConverter = NULL;
@@ -67,11 +67,13 @@ SettingWindow		*SettingsWin = NULL;
 wxMutex			AudioMutex(wxMUTEX_RECURSIVE);
 wxCondition		*SeqStopped = NULL;
 
-MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size)
+MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size, WiredDocument *parent)
   : wxFrame((wxFrame *) NULL, wxID_ANY, title, pos, size,
 	    wxDEFAULT_FRAME_STYLE | wxWS_EX_PROCESS_IDLE | wxMAXIMIZE),
-    WiredDocument(wxT("MainWindow"))
+    WiredDocument(wxT("MainWindow"), parent)
 {
+  wxFileName	path;
+
   SeqTimer = NULL;
   InitLocale();
 
@@ -79,9 +81,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   CreateStatusBar(2);
 #endif
   WiredSettings = new Settings();
-  saveCenter = new SaveCenter();
-  saveCenter->Register(this);
-  saveCenter = new SaveCenter(wxGetCwd());
+  
   LoadedExternalPlugins = new WiredExternalPluginMgr();
   LogWin = new wxLogWindow(this, wxT("Wired log"), false);
 
@@ -674,26 +674,11 @@ void					MainWindow::OnOpen(wxCommandEvent &event)
       cout << "[MAINWIN] User opens " << selfile.mb_str() << endl;
 
       saveCenter->setProjectPath(selfile);
-      saveCenter->LoadProject();
     }
 }
 
 void					MainWindow::OnSave(wxCommandEvent &event)
 {
-  wxDirDialog	dirDialog(NULL, _("Select a project folder"),
-			  saveCenter->getProjectPath().GetPath());
-
-
-  if(!saveCenter->getSaved())
-    {
-      if(dirDialog.ShowModal() == wxID_OK)
-	{
-	  saveCenter->setProjectPath(dirDialog.GetPath());
-	  std::cout << "[MainWindow] Save in :" << dirDialog.GetPath() << std::endl;
-	}
-      else
-	return ;
-    }
   saveCenter->SaveProject();
 }
 

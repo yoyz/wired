@@ -7,9 +7,13 @@
 #include <wx/event.h>
 #include <wx/timer.h>
 #include <wx/splash.h>
+#include <wx/dirdlg.h>
+#include <wx/filename.h>
+
 #include "MainApp.h"
 #include "MainWindow.h"
 #include "Settings.h"
+#include "SaveCenter.h"
 
 #include <config.h>
 
@@ -31,7 +35,6 @@ bool				MainApp::OnInit()
 
   wxBitmap			bitmap;
   wxSplashScreen*		splash = NULL;
-
 
 #if wxUSE_LIBPNG
   wxImage::AddHandler(new wxPNGHandler);
@@ -75,7 +78,10 @@ bool				MainApp::OnInit()
   SetUseBestVisual(true);
   SetVendorName(L"Wired Team");
   //  Frame = new MainWindow(WIRED_TITLE, wxDefaultPosition, wxGetDisplaySize());
-  Frame = new MainWindow(WIRED_TITLE, wxDefaultPosition, wxSize(800,600));
+
+  saveCenter = new SaveCenter();
+
+  Frame = new MainWindow(WIRED_TITLE, wxDefaultPosition, wxSize(800,600), saveCenter);
   Frame->Show(true);
   SetTopWindow(Frame);
 
@@ -93,9 +99,27 @@ bool				MainApp::OnInit()
   if (WiredSettings->IsFirstLaunch())
     ShowWelcome();
 
+  OpenWizard();
+  
   // open stream, start fileconverter and co
   Frame->Init();
+
   return (true);
+}
+
+void		MainApp::OpenWizard()
+{
+  wxFileName	path;
+
+  wxDirDialog	dirDialog(NULL, _("Select a project folder"), wxGetCwd());
+
+  while(dirDialog.ShowModal() != wxID_OK)
+    MainWin->AlertDialog(_("Warning"),
+			 _("You have to select a project folder."));
+ 
+  path.AssignDir(dirDialog.GetPath());
+
+  saveCenter->setProjectPath(path);
 }
 
 void	MainApp::ShowWelcome()
