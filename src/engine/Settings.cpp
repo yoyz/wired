@@ -92,11 +92,11 @@ void Settings::SetDefault()
   ConfDeprecated = false;
 }
 
-void Settings::ReadChannels(wxString Group, vector<long>& list)
+void Settings::ReadChannels(wxString Group, vector<int>& list)
 {
   wxString			s;
-  long				l;
-  long				val;
+  int				l;
+  int				val;
 
   conf->SetPath(Group);
   for (l = 0; ; l++)
@@ -108,11 +108,11 @@ void Settings::ReadChannels(wxString Group, vector<long>& list)
     }
 }
 
-void Settings::SaveChannels(wxString Group, vector<long>& list)
+void Settings::SaveChannels(wxString Group, vector<int>& list)
 {
-  vector<long>::iterator	i;
+  vector<int>::iterator	i;
   wxString			s;
-  long				l;
+  int				l;
 
   if (list.size() == 0)
     return;

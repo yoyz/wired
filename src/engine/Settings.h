@@ -125,17 +125,17 @@ class Settings
   /**
    * Output channels.
    */
-  vector<long>	OutputChannels;
+  vector<int>	OutputChannels;
 
   /**
    * Input channels.
    */
-  vector<long>	InputChannels;
+  vector<int>	InputChannels;
 
   /**
    * The midi devices.
    */
-  vector<long>	MidiIn;
+  vector<int>	MidiIn;
 
   vector<wxString> MidiInStr;
 
@@ -207,16 +207,16 @@ class Settings
   /**
    * Saving channels.
    * \param Group a wxString,the name of title.
-   * \param list a vector<long>&,the list of channels.
+   * \param list a vector<int>&,the list of channels.
    */
-  void		SaveChannels(wxString Group, vector<long>& list);
+  void		SaveChannels(wxString Group, vector<int>& list);
 
   /**
    * Reading channels.
    * \param Group a wxString,the name of title.
-   * \param list a vector<long>&,the list of channels.
+   * \param list a vector<int>&,the list of channels.
    */
-  void		ReadChannels(wxString Group, vector<long>& list);
+  void		ReadChannels(wxString Group, vector<int>& list);
 
   /**
    * Delete deprecated entries.

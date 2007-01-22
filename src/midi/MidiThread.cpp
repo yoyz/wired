@@ -54,12 +54,12 @@ void					MidiThread::OpenDevice(int id)
 void					MidiThread::OpenDefaultDevices()
 {
   MidiDeviceList::iterator		i;
-  vector<long>:: iterator		j;
+  vector<int>:: iterator		j;
   long					k;
   
   for (j = WiredSettings->MidiIn.begin(); j != WiredSettings->MidiIn.end(); j++)
     for (k = 0, i = DeviceList.begin(); i != DeviceList.end(); i++, k++)
-	if (k == *j)
+      if (k == (long)*j)
 	  {
 	    OpenDevice((*i)->Id);       
 	    break;

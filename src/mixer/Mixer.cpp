@@ -338,7 +338,7 @@ void				Mixer::MixOutput(bool soundcard, wxThread* caller)
 Channel				*Mixer::OpenInput(long num)
 {
   bool exist = false;
-  for (vector<long>::iterator i = WiredSettings->InputChannels.begin();
+  for (vector<int>::iterator i = WiredSettings->InputChannels.begin();
        i != WiredSettings->InputChannels.end(); i++)
     {
       if ((*i) == num)
@@ -359,7 +359,7 @@ Channel				*Mixer::OpenInput(long num)
 void				Mixer::FlushInput(long num)
 {
   long				bytes = 0;
-  vector<long>::iterator	chan = WiredSettings->InputChannels.begin();
+  vector<int>::iterator		chan = WiredSettings->InputChannels.begin();
 
   for (vector<RingBuffer<float>*>::iterator c =
 	 Audio->UserData->InFIFOVector.begin();
@@ -379,7 +379,7 @@ void				Mixer::FlushInput(long num)
 void				Mixer::MixInput(void)
 {
   long				bytes = 0;
-  vector<long>::iterator	chan = WiredSettings->InputChannels.begin();
+  vector<int>::iterator	chan = WiredSettings->InputChannels.begin();
   int				cpt = 0;
 
   for (vector<RingBuffer<float>*>::iterator c =

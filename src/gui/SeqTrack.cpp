@@ -169,7 +169,7 @@ void					SeqTrack::OnDeviceHelp(wxMouseEvent &event)
 void					SeqTrack::FillChoices()
 {
   wxString				s;
-  vector<long>::iterator		i;
+  vector<int>::iterator		i;
   vector<wxString>::iterator		strIt;
   
   DeviceBox->Clear();
@@ -200,7 +200,7 @@ void					SeqTrack::RebuildConnectList()
 {
   list<RackTrack *>::iterator		itRackTrack;
   list<Plugin *>::iterator		itPlugin;
-  long					id = 1000;
+  int					id = 1000;
 
   // clear menu
   int	i = menu->GetMenuItemCount();
@@ -405,7 +405,7 @@ void					SeqTrack::OnDeviceChoice(wxCommandEvent &WXUNUSED(event))
 
   if (Type == eAudioTrack)
     {
-      vector<long>::iterator		i;
+      vector<int>::iterator		i;
 
       for (i = WiredSettings->InputChannels.begin(); i != WiredSettings->InputChannels.end(); 
 	   i++, k++)
@@ -487,7 +487,7 @@ void					SeqTrack::SetDeviceId(long devid)
   DeviceId = devid; 
   if (Type == eAudioTrack)
     {
-      vector<long>::iterator		i;
+      vector<int>::iterator		i;
 
       for (i = WiredSettings->InputChannels.begin(); i != WiredSettings->InputChannels.end(); 
 	   i++, k++)

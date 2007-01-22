@@ -145,7 +145,7 @@ static int	AudioCallback(const void *input,
 
 
   int nchan = 0;
-  vector<long>::iterator chan;
+  vector<int>::iterator chan;
 
   if (data->SampleFormat & paFloat32)
     {
