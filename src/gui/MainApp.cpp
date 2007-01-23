@@ -98,11 +98,11 @@ bool				MainApp::OnInit()
 			 _("Your configuration file is deprecated, settings need to be set"));
   if (WiredSettings->IsFirstLaunch())
     ShowWelcome();
-
-  OpenWizard();
   
   // open stream, start fileconverter and co
   Frame->Init();
+
+  OpenWizard();
 
   return (true);
 }
