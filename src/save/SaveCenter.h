@@ -20,7 +20,16 @@
 //define standard XML tags for the project file
 #define WIRED_TAG_WIREDDOC wxT("wiredDoc")
 
+typedef struct
+{
+  wxString		name;
+  int			id;
+  SaveElementArray	data;
+} loadedDocument;
+
+WX_DEFINE_SORTED_ARRAY(loadedDocument *, LoadedDocumentArray);
 WX_DEFINE_ARRAY_PTR(SaveElementArray*, SaveElementArrayArray);
+
 WX_DECLARE_STRING_HASH_MAP(SaveElementArrayArray*, SaveElementArrayHashMap);
 WX_DECLARE_STRING_HASH_MAP(WiredDocumentArray*, WiredDocumentArrayHashMap);
 
@@ -199,7 +208,7 @@ class SaveCenter : public WiredDocument
    * This method is the second part of the project loading.
    * \param dataLoaded The data to redistribute.
    */
-  void			RedistributeHash(SaveElementArrayHashMap dataLoaded);
+  void			RedistributeHash(LoadedDocumentArray dataLoaded);
 
   /** The path to the project. */
   wxFileName		_projectPath;
@@ -216,5 +225,13 @@ class SaveCenter : public WiredDocument
 };
 
 extern SaveCenter*	saveCenter;
+
+/** Used to sort the LoadedDocumentArray
+ * \param doc1 the first document.
+ * \param doc2 the second document.
+ * \return 1 if doc1>doc2, -1 if doc1<doc2, 0 else
+ */
+int		SortDataLoaded(loadedDocument *doc1, loadedDocument *doc2);
+
 
 #endif /*_SAVECENTER_H_ */

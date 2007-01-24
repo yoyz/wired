@@ -97,6 +97,27 @@ class WiredDocument
    */
   inline wxString		getName() { return _name; }
 
+  /** Returns the id of the WiredDocument.
+   * \return the id of the WiredDocument.
+   */
+  inline int			getId() { return _id; }
+
+
+  /** The unique id of the WiredDocument. This id is
+   * incremented on each new WiredDocument, therefore
+   * permitting during the load to recreate the whole 
+   * tree in the same order it was created by the user.
+   */
+  static int		id;
+
+  /** Returns the total number of WiredDocument.
+   * \return the total number of WiredDocument.
+   */
+  static int		getTotalId(){ return id; }
+
+  /** Increases the id. */
+  static void		increaseId() { id++; }
+
  protected:
 
   /** Saves an external file only.
@@ -150,6 +171,9 @@ class WiredDocument
   
   /** The data to be written by the SaveCenter. */ 
   SaveElementsHashMap		_dataSave;
+
+  /** The WiredDocument's instance of its id. */
+  int		_id;
 };
 
 #endif /*_WIREDDOCUMENT_H */

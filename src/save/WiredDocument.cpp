@@ -7,12 +7,17 @@
 
 extern SaveCenter	*saveCenter;
 
+int WiredDocument::id = 0;
+
 WiredDocument::WiredDocument(wxString name, WiredDocument *parent, bool noParent)
 {
-   if (!parent && !noParent)
-     parent = saveCenter;
+  increaseId();
+  _id = id;
 
-   _parent = parent;
+  if (!parent && !noParent)
+    parent = saveCenter;
+  
+  _parent = parent;
   if(parent)
     _parent->Register(this);
 
