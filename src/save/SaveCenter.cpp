@@ -582,36 +582,39 @@ void		SaveCenter::RedistributeHash(LoadedDocumentArray dataLoaded)
       currentLoadedDoc = dataLoaded[0];
       currentName = currentLoadedDoc->name;
 
-      std::cout << "[SaveCenter] currentName = " << currentName.mb_str() << std::endl;
-      //Take the first element with the same name of toProcess
-      currentDoc = toProcess[currentName]->Item(0);
-
-      //load the WiredDocument with data from the dataLoaded
-      currentDoc->Load(currentLoadedDoc->data);
-
-      std::cout << "[SaveCenter] loaded" << std::endl;
-
-
-      //Retrieve its children
-      children = currentDoc->getChildren();
-
-      //Add them to the list of WiredDocuments
-      for(i = 0; i < children.GetCount(); i++)
+      if (toProcess[currentName])
 	{
-	  childName = children[i]->getName();
-	  if(toProcess.find(childName) == toProcess.end())
-	    toProcess[childName] = new WiredDocumentArray();
-	  toProcess[childName]->Add(children[i]);
-	}
+	  std::cout << "[SaveCenter] currentName = " << currentName.mb_str() << std::endl;
+	  //Take the first element with the same name of toProcess
+	  currentDoc = toProcess[currentName]->Item(0);
+
+	  //load the WiredDocument with data from the dataLoaded
+	  currentDoc->Load(currentLoadedDoc->data);
+
+	  std::cout << "[SaveCenter] loaded" << std::endl;
+
+
+	  //Retrieve its children
+	  children = currentDoc->getChildren();
+
+	  //Add them to the list of WiredDocuments
+	  for(i = 0; i < children.GetCount(); i++)
+	    {
+	      childName = children[i]->getName();
+	      if(toProcess.find(childName) == toProcess.end())
+		toProcess[childName] = new WiredDocumentArray();
+	      toProcess[childName]->Add(children[i]);
+	    }
       
-      //Remove the current WiredDocument from the list to Process
-      toProcess[currentName]->Remove(currentDoc);
+	  //Remove the current WiredDocument from the list to Process
+	  toProcess[currentName]->Remove(currentDoc);
       
-      //Clear the hashmap entry if needed
-      if(toProcess[currentName]->IsEmpty())
-	{
-	  delete toProcess[currentName];
-	  toProcess.erase(currentName);
+	  //Clear the hashmap entry if needed
+	  if(toProcess[currentName]->IsEmpty())
+	    {
+	      delete toProcess[currentName];
+	      toProcess.erase(currentName);
+	    }
 	}
 
       //Remove the current loadedDocument from the dataLoaded
