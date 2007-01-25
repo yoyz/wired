@@ -58,7 +58,7 @@ Sequencer::~Sequencer()
 
 void					Sequencer::Init()
 {
-  BPM = 96;
+  SetBPM(100);
   SigNumerator = 4;
   SigDenominator = 4;
   Loop = false;
@@ -74,6 +74,12 @@ void					Sequencer::Init()
   Playing = false;
   Recording = false;
   CurAudioPos = 0;
+}
+
+void					Sequencer::AudioConfig()
+{
+  // we must re-init all numbers based on SampleRate or others audio vars
+  CalcSpeed();
 }
 
 void					*Sequencer::Entry()
@@ -587,7 +593,10 @@ void					Sequencer::CalcSpeed()
     SampleRate = sample/sec
     (mesure/sec) / (sample/sec) = mesure/sample
   */
-
+#ifdef __DEBUG__
+  printf("\tSequencer : BPM %f , Num %d , SampleRate %f\n", 
+	 BPM, SigNumerator, Audio->SampleRate);
+#endif
   MeasurePerSample = ((BPM / SigNumerator) / 60.0) / Audio->SampleRate;
   SamplesPerMeasure = 1 / MeasurePerSample;
 }
@@ -649,10 +658,11 @@ void					Sequencer::SetBPM(float bpm)
   list<RackTrack *>::iterator		RacksTrack;
   list<Plugin *>::iterator		Plug;
 
-  for (RacksTrack = RackPanel->RackTracks.begin(); 
-       RacksTrack != RackPanel->RackTracks.end(); RacksTrack++)
-    for (Plug = (*RacksTrack)->Racks.begin(); Plug != (*RacksTrack)->Racks.end(); Plug++)
-      (*Plug)->SetBPM(bpm);
+  if (RackPanel)
+    for (RacksTrack = RackPanel->RackTracks.begin(); 
+	 RacksTrack != RackPanel->RackTracks.end(); RacksTrack++)
+      for (Plug = (*RacksTrack)->Racks.begin(); Plug != (*RacksTrack)->Racks.end(); Plug++)
+	(*Plug)->SetBPM(bpm);
 }
 
 void					Sequencer::SetSigNumerator(int signum)

@@ -97,7 +97,11 @@ class Sequencer : public wxThread, public WiredDocument
   
   /** Init basic vars */
   void					Init();
-  
+
+  /** Called from main thread when Audio configurations was changed.
+   */
+  void					AudioConfig();
+
   /** Executes sequencer thread.*/
   virtual void				*Entry();
   /** Kills sequencer thread.*/

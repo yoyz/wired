@@ -334,6 +334,7 @@ int			MainWindow::InitAudio(bool restart)
 	}
     }
   wxMutexLocker	seqLock(SeqMutex);
+
   // save settings
   if (restart)
     SettingsWin->Save();
@@ -395,6 +396,9 @@ int			MainWindow::InitAudio(bool restart)
   if ( Audio->IsOk )
     {
       vector<Track *>::iterator	i;
+
+      // Sequencer refill its own vars
+      Seq->AudioConfig();
 
       // Refill tracks connections
       if (SettingsWin->AudioLoaded || SettingsWin->MidiLoaded)
