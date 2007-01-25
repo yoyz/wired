@@ -52,15 +52,19 @@ void					AudioPattern::Init(WaveFile* w, WiredDocument* parent)
 #endif
 
   Name = wxString::Format(wxT("T%d A%d"), TrackIndex + 1, audio_pattern_count++);
+  wxSize s = GetSize();
+  SetSize(s);
+  WaveDrawer::SetWave(w, s);
+
   if (w)
-    FileName= w->Filename;
+    {
+      FileName= w->Filename;
+      OnBpmChange();
+    }
   LastBlock = -1;
   RecordWave = 0;
   InputChan = NULL;
   RecordWave = NULL;
-  wxSize s = GetSize();
-  SetSize(s);
-  WaveDrawer::SetWave(w, s);
 
   _documentParent = parent;
 
@@ -115,22 +119,15 @@ void					AudioPattern::Update()
 
 void					AudioPattern::OnBpmChange()
 {
+  wxMutexLocker				m(SeqMutex);
+
+#ifdef __DEBUG__
+  printf("\tAudioPattern : MeasurePerSample %f , Frames %d\n", 
+	 Seq->MeasurePerSample, Wave->GetNumberOfFrames());
+#endif
   Length = Seq->MeasurePerSample * Wave->GetNumberOfFrames();
   EndPosition = Position + Length;
   Update();
-}
-
-void					AudioPattern::SetFullWave(WaveFile *w)
-{
-  if (!w)
-    {
-      StartWavePos = 0;
-      EndWavePos = 0;
-      NumberOfChannels = 0;
-    }
-  else
-    FileName = w->Filename;
-  WaveDrawer::SetWave(w, GetSize());
 }
 
 void					AudioPattern::SetWave(WaveFile *w)
@@ -138,14 +135,13 @@ void					AudioPattern::SetWave(WaveFile *w)
 #ifdef __DEBUG__
   cout << "WaveDrawer::StartWavePos = " << WaveDrawer::StartWavePos<< " WaveDrawer::EndWavePos = " << WaveDrawer::EndWavePos << endl;
 #endif
- if (!w)
+  if (w)
     {
-      StartWavePos = 0;
-      EndWavePos = 0;
-      NumberOfChannels = 0;
+      FileName = w->Filename;
+      wxMutexLocker  m(SeqMutex);
+
+      OnBpmChange();
     }
-  else
-    FileName = w->Filename;
   WaveDrawer::SetWave(w, GetSize(), StartWavePos, EndWavePos);
 }
 
@@ -264,7 +260,7 @@ void					AudioPattern::StopRecord()
   w = WaveCenter.AddWaveFile(rec_name);
   if (w)
     {
-      SetFullWave(w);
+      SetWave(w);
       Refresh();
     }
   /*
