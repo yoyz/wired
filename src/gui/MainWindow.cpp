@@ -1500,12 +1500,15 @@ void					MainWindow::OnRedo(wxCommandEvent &event)
 
 void					MainWindow::removeAllMenuItems(wxMenu *menu)
 {
-  wxMenuItemList						menuItemList;
-  wxMenuItemList::const_iterator		itermenuItems;
+  wxMenuItemList			menuItemList;
+  wxMenuItemList::const_iterator	itermenuItems;
 
-  menuItemList = menu->GetMenuItems();
-  for (itermenuItems = menuItemList.begin(); itermenuItems != menuItemList.end(); itermenuItems++)
-    menu->Delete(*itermenuItems);
+  if (menu)
+    {
+      menuItemList = menu->GetMenuItems();
+      for (itermenuItems = menuItemList.begin(); itermenuItems != menuItemList.end(); itermenuItems++)
+	menu->Delete(*itermenuItems);
+    }
 }
 
 void					MainWindow::CreateUndoRedoMenus(wxMenu *callingMenu)
@@ -1519,6 +1522,9 @@ void					MainWindow::CreateUndoRedoMenus(wxMenu *callingMenu)
 
   undoMenu = callingMenu->FindItemByPosition(INDEX_MENUITEM_UNDO)->GetSubMenu();
   redoMenu = callingMenu->FindItemByPosition(INDEX_MENUITEM_REDO)->GetSubMenu();
+  if (!undoMenu || !redoMenu)
+    return;
+
   removeAllMenuItems(undoMenu);
   removeAllMenuItems(redoMenu);
   historyList = cActionManager::Global().getListActions(&separatorIndex);
