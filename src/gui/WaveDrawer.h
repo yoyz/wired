@@ -40,8 +40,7 @@ class				WaveDrawer
   virtual void			SetDrawing(wxSize s);
   void							RedrawBitmap(wxSize s);
   virtual void			SetWave(float **data, unsigned long frame_length, long channel_count, wxSize s);
-  virtual void			SetWave(WaveFile *w, wxSize s, long wstart, long wend);
-  virtual void			SetWave(WaveFile *w, wxSize s);
+  virtual void			SetWave(WaveFile *w, wxSize s, long wstart = 0, long wend = 0);
   virtual void			SetSize(wxSize s);
   virtual void			SetSize(int x, int y);
   void							SetPenColor(wxColour p) { PenColor = p; }

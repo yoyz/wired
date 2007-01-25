@@ -54,33 +54,6 @@ void					WaveDrawer::SetWave(float **data, unsigned long frame_length, long chan
 #endif
 }
 
-void					WaveDrawer::SetWave(WaveFile *w, wxSize s)
-{
-#ifdef __DEBUG__
-  printf(" [ START ] WaveDrawer::SetWave(%x, sise x %d y %d)\n", w, s.x, s.y);
-#endif
-  if (!w)
-    {
-      Wave = 0;
-      Data = 0;
-      NumberOfChannels = 0;
-      StartWavePos = 0;
-      EndWavePos = 0;
-    }
-  else
-    {
-      Wave = w;
-      Data = w->Data;
-      NumberOfChannels = w->GetNumberOfChannels();
-      StartWavePos = 0;
-      EndWavePos = w->GetNumberOfFrames();
-      SetDrawing(s);
-    }
-#ifdef __DEBUG__
-  printf(" [  END  ] WaveDrawer::SetWave(%d)\n", w);
-#endif
-}
-
 void					WaveDrawer::SetWave(WaveFile *w, wxSize s, long wstart, long wend)
 {
 #ifdef __DEBUG__
@@ -100,7 +73,10 @@ void					WaveDrawer::SetWave(WaveFile *w, wxSize s, long wstart, long wend)
       Data = w->Data;
       NumberOfChannels = w->GetNumberOfChannels();
       StartWavePos = wstart;
-      EndWavePos = (wend <= w->GetNumberOfFrames()) ? wend : w->GetNumberOfFrames();
+      if (wend)
+	EndWavePos = (wend <= w->GetNumberOfFrames()) ? wend : w->GetNumberOfFrames();
+      else
+	EndWavePos = w->GetNumberOfFrames();
       SetDrawing(s);
     }
 #ifdef __DEBUG__
