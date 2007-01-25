@@ -10,6 +10,8 @@
 #include "../mixer/Channel.h"
 #include "../engine/AudioEngine.h"
 
+using namespace			std;
+
 extern Mixer			*Mix;
 wxMutex				MixMutex(wxMUTEX_RECURSIVE);
 

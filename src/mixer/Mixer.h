@@ -4,8 +4,6 @@
 #ifndef __MIXER_H__
 #define __MIXER_H__
 
-using namespace std;
-
 #include <list>
 #include "WiredDocument.h"
 
@@ -51,8 +49,8 @@ class Mixer : public WiredDocument
   bool			MuteL;
   bool			MuteR;
 
-  list<Channel*>	OutChannels;
-  list<Channel*>	InChannels;
+  std::list<Channel*>	OutChannels;
+  std::list<Channel*>	InChannels;
 
   /**
    * WiredDocument implementation
@@ -66,7 +64,7 @@ class Mixer : public WiredDocument
 
 
  private:
-  Channel*		AddChannel(list<Channel*>& listm,
+  Channel*		AddChannel(std::list<Channel*>& listm,
 				   bool stereo, bool visible = true);
 
  protected:
