@@ -42,7 +42,9 @@ bool				MainApp::OnInit()
 
   wxImage::AddHandler(new wxGIFHandler);
 
-  SetAppName(L"wired");
+  SetAppName(wxT("wired"));
+
+  // allow use of command line process provided by wxWidgets
   if (!wxApp::OnInit())
     return false;
 
@@ -66,7 +68,7 @@ bool				MainApp::OnInit()
       wxYield();
     }
 #if 0
-  const wxString		name = wxString::Format(L"wired-%s", wxGetUserId().c_str());
+  const wxString		name = wxString::Format(wxT("wired-%s"), wxGetUserId().c_str());
   Checker = new wxSingleInstanceChecker(name);
   if (Checker->IsAnotherRunning())
     {
@@ -76,7 +78,7 @@ bool				MainApp::OnInit()
   delete Checker;
 #endif  
   SetUseBestVisual(true);
-  SetVendorName(L"Wired Team");
+  SetVendorName(wxT("Wired Team"));
   //  Frame = new MainWindow(WIRED_TITLE, wxDefaultPosition, wxGetDisplaySize());
 
   saveCenter = new SaveCenter();
@@ -100,7 +102,13 @@ bool				MainApp::OnInit()
     ShowWelcome();
   
   // open stream, start fileconverter and co
-  Frame->Init();
+  if (Frame->Init() != 0)
+    {
+      cerr << "[WIRED] Critical error, initialisation failed" << endl;
+
+      // returning false segfault.. so we exit instead
+      exit(-1);
+    }
 
   OpenWizard();
 

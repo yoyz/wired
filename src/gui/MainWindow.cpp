@@ -204,12 +204,17 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   splitVert->SetMinimumPaneSize(2);
 
   /* Creation Panel */
+  cout << "[MAINWINDOW] Start creation of GUI objects";
   RackPanel = new Rack(split, -1, wxPoint(0, 0), wxSize(800, 250));
+  cout << ". ";
   SeqPanel = new SequencerGui(split, wxPoint(0, 0), wxSize(800, 200), this, (WiredDocument*)Seq);
-  OptPanel = new OptionPanel(this, wxPoint(306, 452), wxSize(470, 120), wxSIMPLE_BORDER, (WiredDocument *)saveCenter);
-  TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER, NULL);
-
+  cout << ". ";
+  OptPanel = new OptionPanel(this, wxPoint(306, 452), wxSize(470, 120), wxSIMPLE_BORDER, NULL);
+  cout << ". ";
+ TransportPanel = new Transport(this, wxPoint(0, 452), wxSize(300, 150), wxNO_BORDER, NULL);
+  cout << ". ";
   MediaLibraryPanel = new MediaLibrary(splitVert);
+  cout << " done" << endl;
 
   splitVert->SplitVertically(MediaLibraryPanel, split);
   split->SplitHorizontally(RackPanel, SeqPanel, 200);
@@ -273,11 +278,21 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
 // basicaly launch actions which are non-graphical related
 int			MainWindow::Init()
 {
+  wxThreadError		err;
+
   // start midi thread
-  if (MidiEngine->Create() != wxTHREAD_NO_ERROR)
-    cout << "[MAINWIN] Create MidiEngine thread failed !" << endl;
-  if (MidiEngine->Run() != wxTHREAD_NO_ERROR)
-    cout << "[MAINWIN] Run MidiEngine thread failed !" << endl;
+  if ((err = MidiEngine->Create()) != wxTHREAD_NO_ERROR)
+    {
+      cout << "[MAINWIN] Create MidiEngine thread failed ! (error:" 
+	   << err << ")" << endl;
+      return (-1);
+    }
+  if ((err = MidiEngine->Run()) != wxTHREAD_NO_ERROR)
+    {
+      cout << "[MAINWIN] Run MidiEngine thread failed ! (error:" 
+	   << err << ")" << endl;
+      return (-1);
+    }
   else
     wxGetApp().m_threads.Add(MidiEngine);
 
@@ -286,7 +301,7 @@ int			MainWindow::Init()
   if (!SeqStopped->IsOk())
     {
       cout << "[MAINWIN] Condition creation failed.. critical error" << endl;
-      exit(1);
+      return (-1);
     }
 
   // init audio
@@ -300,11 +315,19 @@ int			MainWindow::Init()
   InitFileConverter();
 
   // start sequencer thread (after InitAudio is a good option)
-  if (Seq->Create() != wxTHREAD_NO_ERROR)
-    cout << "[MAINWIN] Create sequencer thread failed !" << endl;
+  if ((err = Seq->Create()) != wxTHREAD_NO_ERROR)
+    {
+      cout << "[MAINWIN] Create sequencer thread failed ! (error:" 
+	   << err << ")" << endl;
+      return (-1);
+    }
   Seq->SetPriority(WXTHREAD_MAX_PRIORITY);
-  if (Seq->Run() != wxTHREAD_NO_ERROR)
-    cout << "[MAINWIN] Run sequencer thread failed !" << endl;
+  if ((err = Seq->Run()) != wxTHREAD_NO_ERROR)
+    {
+      cout << "[MAINWIN] Run sequencer thread failed ! (error:" 
+	   << err << ")" << endl;
+      return (-1);
+    }
   else
     wxGetApp().m_threads.Add(Seq);
 
