@@ -402,19 +402,7 @@ int			MainWindow::InitAudio(bool restart)
 	  (*i)->GetTrackOpt()->FillChoices();
       // Sends sample rate and buffer size modifications to plugins
       if (SettingsWin->AudioLoaded)
-	{
-	  list<RackTrack *>::iterator k;
-	  list<Plugin *>::iterator j;
-
-	  for (k = RackPanel->RackTracks.begin();
-	       k != RackPanel->RackTracks.end(); k++)
-	    for (j = (*k)->Racks.begin(); j != (*k)->Racks.end(); j++)
-	      {
-		(*j)->SetBufferSize(Audio->SamplesPerBuffer);
-		(*j)->SetSamplingRate(Audio->SampleRate);
-	      }
-	}
-
+	RackPanel->SetAudioConfig(Audio->SamplesPerBuffer, Audio->SampleRate);
       if (restart)
 	{
 	  FileConverter->SetFormat((PaSampleFormat)Audio->SampleFormat);
@@ -549,17 +537,6 @@ void					MainWindow::OnClose(wxCloseEvent &event)
 #if wxUSE_STATUSBAR
   Disconnect(wxEVT_IDLE, (wxObjectEventFunction) &MainWindow::OnIdle);
 #endif
-  //WiredVideoObject->CloseFile();
-  /* for (i = RackPanel->RackTracks.begin(); i != RackPanel->RackTracks.end(); i++)
-     for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
-     for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
-     if ((*k)->InitInfo.Id == (*j)->InitInfo->Id)
-     {
-     cout << "[MAINWIN] Destroying plugin: " << (*j)->Name << endl;
-     RackPanel->RemoveChild((*j)->Gui);
-     (*k)->Destroy(*j);
-     break;
-     }*/
   cout << "[MAINWIN] Stopping threads..."<< endl;
   wxThread *thread;
 

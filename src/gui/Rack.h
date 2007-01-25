@@ -1,9 +1,6 @@
 // Copyright (C) 2004-2006 by Wired Team
 // Under the GNU General Public License Version 2, June 1991
 
-// Copyright (C) 2004-2006 by Wired Team
-// Under the GNU General Public License
-
 #ifndef __RACK_H__
 #define __RACK_H__
 
@@ -77,7 +74,6 @@ class		Rack: public wxScrolledWindow
   Rack(wxWindow* parent, wxWindowID id = -1, 
        const wxPoint& pos = wxDefaultPosition, 
        const wxSize& size = wxDefaultSize);
-  Rack(const Rack& copy){*this = copy;};
   ~Rack();
   
   // Kept for compatibility but shouldn't be used anymore
@@ -144,7 +140,7 @@ class		Rack: public wxScrolledWindow
   void			HandlePaintEvent(Plugin *plug, wxPaintEvent *event);
   // Draws the selection rectangle
 
-  Rack			operator=(const Rack& right);
+  void			SetAudioConfig(long bufferSize, double samplingRate);
 	  
   t_ListRackTrack	RackTracks;
 

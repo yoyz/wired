@@ -870,15 +870,19 @@ Plugin*				Rack::AddTrack(PlugStartInfo &startinfo, PluginLoader *p)
   return tmp;
 }
 
-Rack				Rack::operator=(const Rack& right)
+void				Rack::SetAudioConfig(long bufferSize, double sampleRate)
 {
-  if (this != &right)
-    {
-      RackTracks = right.RackTracks;
-      selectedTrack = right.selectedTrack;
-      selectedPlugin = right.selectedPlugin;
-    }
-  return *this;
+  list<RackTrack *>::iterator	itRackTrack;
+  list<Plugin *>::iterator	itPlugin;
+
+  for (itRackTrack = RackTracks.begin();
+       itRackTrack != RackTracks.end(); itRackTrack++)
+    for (itPlugin = (*itRackTrack)->Racks.begin();
+	 itPlugin != (*itRackTrack)->Racks.end(); itPlugin++)
+      {
+	(*itPlugin)->SetBufferSize(bufferSize);
+	(*itPlugin)->SetSamplingRate(sampleRate);
+      }
 }
 
 // Events loop (Static events)
