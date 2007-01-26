@@ -12,33 +12,33 @@
 #include "SeqTrackPattern.h"
 #include "MixerGui.h"
 
-wxColour				PatternColours[MAX_AUTO_COLOURS] = 
-  {  
+wxColour				PatternColours[MAX_AUTO_COLOURS] =
+  {
     // blue
-    wxColour( 50, 166, 211),				
+    wxColour( 50, 166, 211),
     wxColour( 75, 133, 204),
     wxColour( 15,  98, 198),
     // purple
-    wxColour(134, 112, 175),				
+    wxColour(134, 112, 175),
     wxColour(133,  96, 204),
     wxColour( 96,  47, 188),
     // orange
-    wxColour(247, 186, 111),				
+    wxColour(247, 186, 111),
     wxColour(237, 134,  66),
     wxColour(239, 104,  75),
     // green
-    wxColour(182, 226,  99),				
+    wxColour(182, 226,  99),
     wxColour(130, 206,  95),
     wxColour( 97, 183, 166),
 
-    wxColour( 50, 166, 211),				
+    wxColour( 50, 166, 211),
     wxColour( 75, 133, 204),
     wxColour( 15,  98, 198),
-    wxColour( 15,  98, 198)    
+    wxColour( 15,  98, 198)
   };
 
 Track::Track(WiredDocument* parentDoc, trackType type,
-	     wxPoint& pos, wxSize& size, wxWindow* TrackView) : 
+	     wxPoint& pos, wxSize& size, wxWindow* TrackView) :
   WiredDocument(wxT("Track"), parentDoc)
 {
   // basic initialization
@@ -56,9 +56,9 @@ Track::Track(WiredDocument* parentDoc, trackType type,
   // list of patterns in the track
   TrackPattern = new SeqTrackPattern();
 
-  // mixer output 
+  // mixer output
   if (IsAudioTrack())
-    Output = Mix->AddStereoOutputChannel(true);
+    Output = Mix->AddChannel(false, true, true);
   else
     Output = 0x0;
 
@@ -77,8 +77,8 @@ Track::Track(WiredDocument* parentDoc, trackType type,
   Seq->RegisterTrack(this);
 }
 
-Track::~Track() 
-{ 
+Track::~Track()
+{
   wxMutexLocker		locker(SeqMutex);
 
   // delete track's patterns
@@ -161,7 +161,7 @@ void						Track::DelPattern(Pattern *p)
 #endif
   wxMutexLocker				locker(SeqMutex);
   vector<Pattern *>::iterator		iter;
-  
+
   for (iter = TrackPattern->Patterns.begin(); *iter != p; iter++)
     ;
   if (iter != TrackPattern->Patterns.end())
@@ -206,7 +206,7 @@ MidiPattern					*Track::CreateMidiPattern(MidiTrack *t)
 }
 
 void						Track::UpdateIndex(long trackindex)
-{  
+{
   vector<Pattern *>::iterator			k;
 
 #ifdef __DEBUG__
@@ -223,11 +223,11 @@ void						Track::UpdateIndex(long trackindex)
 void						Track::RefreshFullTrack()
 {
   vector<Pattern *>::iterator			p;
-  
+
   TrackOpt->Refresh();
   for (p = TrackPattern->Patterns.begin(); p != TrackPattern->Patterns.end(); p++)
     (*p)->Update();
-}  
+}
 
 void						Track::SetMidiPattern(MidiPattern* mp)
 {

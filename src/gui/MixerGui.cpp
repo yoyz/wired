@@ -34,7 +34,7 @@ MixerGui::MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size, Wir
   /*
     Adding Master Channel directly
    */
-  Channel *c = new Channel(true);
+  Channel *c = new Channel(true, true, this);
   AddMasterChannel(c);
   // evenement refresh master volume
   Connect(ID_MIXER_REFRESH, TYPE_MIXER_REFRESH, (wxObjectEventFunction)&MixerGui::OnMasterChange);
@@ -90,7 +90,7 @@ ChannelGui* MixerGui::AddChannel(Channel *channel, const wxString& label)
 				   this, -1, wxPoint(x, 0),
 				   wxSize(CHANNELGUI_WIDTH,
 					  CHANNELGUI_HEIGHT),
-				   label, (WiredDocument *)this);
+				   label, this);
 
 
   ChannelGuiVector.push_back(gui);

@@ -117,7 +117,7 @@ Channel*    	Mixer::AddChannel(list<Channel*>& list, bool stereo, bool visible)
   return (chan);
 }
 
-Channel*    	Mixer::AddChannel(bool input, bool stereo, bool visible)
+Channel*	    	Mixer::AddChannel(bool input, bool stereo, bool visible)
 {
   if (input)
     return (AddChannel(InChannels, stereo, visible));
