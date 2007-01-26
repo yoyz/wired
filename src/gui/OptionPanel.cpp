@@ -387,23 +387,20 @@ void				OptionPanel::ClosePlug(Plugin *p)
 void				OptionPanel::Save()
 {
   std::cerr << "[OptionPanel] Save()" << std::endl;
-  SaveElement	*savedElem;
 
   //Title
-  savedElem = new SaveElement(wxT("title"), this->Title->GetLabel());
-  saveDocData(savedElem);
+  saveDocData(new SaveElement(wxT("title"), this->Title->GetLabel()));
 
   //ListToolBtn
-  savedElem = new SaveElement(wxT("listToolBtn"), this->ListToolBtn->GetOn());
-  saveDocData(savedElem);
+  saveDocData(new SaveElement(wxT("listToolBtn"), this->ListToolBtn->GetOn()));
 
   //DetachToolBtn
-  savedElem = new SaveElement(wxT("detachToolBtn"), this->DetachToolBtn->GetOn());
-  saveDocData(savedElem);
+  saveDocData(new SaveElement(wxT("detachToolBtn"), this->DetachToolBtn->GetOn()));
 
   //CloseToolBtn
-  savedElem = new SaveElement(wxT("closeToolBtn"), this->CloseToolBtn->GetOn());
-  saveDocData(savedElem);
+  saveDocData(new SaveElement(wxT("closeToolBtn"), this->CloseToolBtn->GetOn()));
+
+  saveDocData(new SaveElement(wxT("CurrentTool"), CurrentTool->GetName()));
 
   //ToolsList
   //vector of wiredTools
@@ -445,10 +442,14 @@ void				OptionPanel::Load(SaveElementArray data)
 	  else
 	    this->SetCloseToolBtn(false);
 	}
+      else if (data[dataCompt]->getKey() == wxT("CurrentTool"))
+	{
+	  vector<WiredTool *>::iterator	it;
 
-      //ToolsList
-      //vector of wiredTools
-
+	  for (it = ToolsList.begin(); it != ToolsList.end(); it++)
+	    if (data[dataCompt]->getValue() == (*it)->GetName())
+	      ShowTool(*it);
+	}
     }
 }
 
