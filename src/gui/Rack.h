@@ -8,7 +8,7 @@
 #include <wx/file.h>
 #include <list>
 
-using namespace		std;
+#include "WiredDocument.h"
 
 #define		UNIT_W		(200)
 #define 	UNIT_H		(100)
@@ -25,9 +25,9 @@ class		Channel;
 #endif
 
 
-typedef struct s_PlugStartInfo		PlugStartInfo;
-typedef	list<RackTrack *>		t_ListRackTrack;
-typedef	list<Plugin *>::const_iterator	t_ListPluginIterator;
+typedef struct s_PlugStartInfo			PlugStartInfo;
+typedef	std::list<RackTrack *>			t_ListRackTrack;
+typedef	std::list<Plugin *>::const_iterator	t_ListPluginIterator;
 
 typedef struct	s_RackTrackPlugin
 {
@@ -35,12 +35,15 @@ typedef struct	s_RackTrackPlugin
   Plugin*	plugin;
 } t_RackTrackPlugin;
 
-class		RackTrack
+class		RackTrack : public WiredDocument
 {
  public:
   RackTrack(Rack *parent, int index);
-  RackTrack(const RackTrack& copy){*this = copy;};
   ~RackTrack();
+  
+  // WiredDocument implementation
+  void				Save();
+  void				Load(SaveElementArray data);
 
   Plugin*			AddRack(PlugStartInfo &startinfo, PluginLoader *p, 
 					Plugin *connect_to = 0x0);
@@ -62,13 +65,13 @@ class		RackTrack
   int				Units;
   Rack*				Parent;
   int				Index;
-  list<Plugin *>		Racks;
+  std::list<Plugin *>		Racks;
   Channel*			Output;
   ChannelGui*			ChanGui;
   float**			CurrentBuffer;
 };
 
-class		Rack: public wxScrolledWindow
+class		Rack: public wxScrolledWindow, WiredDocument
 {
  public:
   Rack(wxWindow* parent, wxWindowID id = -1, 
@@ -76,6 +79,10 @@ class		Rack: public wxScrolledWindow
        const wxSize& size = wxDefaultSize);
   ~Rack();
   
+  // WiredDocument implementation
+  void			Save();
+  void			Load(SaveElementArray data);
+
   // Kept for compatibility but shouldn't be used anymore
   Plugin*		AddTrack(PlugStartInfo &startinfo, PluginLoader *p);
   void			AddTrack(Plugin *p);
@@ -182,10 +189,10 @@ class		Rack: public wxScrolledWindow
   // Event : Calls AddChangeParamsEffectAction while a plugin's param is changed
   void			OnPluginParamChange(wxMouseEvent &event);
   bool 			DndGetDest(t_ListRackTrack::iterator &k, 
-				   list<Plugin *>::iterator &l, int &new_x, 
+				   std::list<Plugin *>::iterator &l, int &new_x, 
 				   int &new_y , Plugin *plug);
   void			DndInsert(t_ListRackTrack::iterator &k, 
-				  list<Plugin *>::iterator &l, Plugin *plug);
+				  std::list<Plugin *>::iterator &l, Plugin *plug);
   void			UpdateUnitXSize();
   
  private:

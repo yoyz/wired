@@ -982,7 +982,7 @@ int						MainWindow::AddPluginMenuItem(int Type, bool IsEffect, const wxString& 
 	      CreateEffectMenu->Append(Id, wxT("DSSI"), CreateDSSIEffectMenu);
 	      Id = PluginMenuIndexCount++;
 	    }
-	  NewItem = CreateDSSIEffectMenu->Append(Id, MenuName.c_str());
+	  NewItem = CreateDSSIEffectMenu->Append(Id, MenuName);
 	}
       else if (Type & TYPE_PLUGINS_LADSPA)
 	{
@@ -992,7 +992,7 @@ int						MainWindow::AddPluginMenuItem(int Type, bool IsEffect, const wxString& 
 	      CreateEffectMenu->Append(Id, wxT("LADSPA"), CreateLADSPAEffectMenu);
 	      Id = PluginMenuIndexCount++;
 	    }
-	  NewItem = CreateLADSPAEffectMenu->Append(Id, MenuName.c_str());
+	  NewItem = CreateLADSPAEffectMenu->Append(Id, MenuName);
 	}
     }
   else
@@ -1005,7 +1005,7 @@ int						MainWindow::AddPluginMenuItem(int Type, bool IsEffect, const wxString& 
 	      CreateInstrMenu->Append(Id, wxT("DSSI"), CreateDSSIInstrMenu);
 	      Id = PluginMenuIndexCount++;
 	    }
-	  NewItem = CreateDSSIInstrMenu->Append(Id, MenuName.c_str());
+	  NewItem = CreateDSSIInstrMenu->Append(Id, MenuName);
 	}
       else if (Type & TYPE_PLUGINS_LADSPA)
 	{
@@ -1015,7 +1015,7 @@ int						MainWindow::AddPluginMenuItem(int Type, bool IsEffect, const wxString& 
 	      CreateInstrMenu->Append(Id, wxT("LADSPA"), CreateLADSPAInstrMenu);
 	      Id = PluginMenuIndexCount++;
 	    }
-	  NewItem = CreateLADSPAInstrMenu->Append(Id, MenuName.c_str());
+	  NewItem = CreateLADSPAInstrMenu->Append(Id, MenuName);
 	}
     }
   if (NewItem)
@@ -1023,6 +1023,27 @@ int						MainWindow::AddPluginMenuItem(int Type, bool IsEffect, const wxString& 
 	    (wxObjectEventFunction)(wxEventFunction)
 	    (wxCommandEventFunction)&MainWindow::OnCreateExternalPlugin);
   return Id;
+}
+
+void					MainWindow::CreatePluginFromUniqueId(wxString UniqueId)
+{
+  char					Uniq[4];
+  vector<PluginLoader *>::iterator	it;
+
+  Uniq[0] = UniqueId[0];
+  Uniq[1] = UniqueId[1];
+  Uniq[2] = UniqueId[2];
+  Uniq[3] = UniqueId[3];
+  for (it = LoadedPluginsList.begin(); it != LoadedPluginsList.end(); it++)
+    if (COMPARE_IDS((*it)->InitInfo.UniqueId,Uniq))
+      {
+// 	if ((*it)->InitInfo.Type == ePlugTypeEffect)
+// 	  {
+	    wxCommandEvent evt(wxEVT_COMMAND_MENU_SELECTED, (*it)->Id);
+	    this->ProcessEvent(evt);
+// 	  }
+
+      }
 }
 
 void					MainWindow::OnCreateExternalPlugin(wxCommandEvent &event)

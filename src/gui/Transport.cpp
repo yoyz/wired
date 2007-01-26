@@ -18,7 +18,7 @@
 //extern WiredSession				*CurrentSession;
 
 Transport::Transport(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style, WiredDocument *docParent)
-  : wxPanel(parent, -1, pos, size, style), WiredDocument(wxT("transport"), docParent)
+  : wxPanel(parent, -1, pos, size, style), WiredDocument(wxT("Transport"), docParent)
 {
   SetBackgroundColour(CL_RULER_BACKGROUND);
   //wxColour(204, 199, 219));//*wxLIGHT_GREY);

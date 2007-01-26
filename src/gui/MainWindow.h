@@ -125,6 +125,9 @@ class					MainWindow: public wxFrame, public WiredDocument
   /* can be called from SettingWindow */
   int					InitAudio(bool restart = false);
 
+  /* Plugin creation */
+  void					CreatePluginFromUniqueId(wxString UniqueId);
+
  protected:
   friend class				MediaLibrary;
 
