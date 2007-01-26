@@ -19,8 +19,8 @@ MixerGui				*MixerPanel = NULL;
 BEGIN_EVENT_TABLE(MixerGui, wxScrolledWindow)
 END_EVENT_TABLE()
 
-MixerGui::MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size)
-: wxScrolledWindow(parent, -1, pos, size, wxNO_BORDER)/*SUNKEN_BORDER)*/ 
+MixerGui::MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size, WiredDocument* docParent)
+: wxScrolledWindow(parent, -1, pos, size, wxNO_BORDER)/*SUNKEN_BORDER)*/, WiredDocument(wxT("MixerGui"), docParent)
 {
   SetScrollRate(10, 0);
   SetVirtualSize(300, 131);
@@ -73,7 +73,7 @@ void MixerGui::AddMasterChannel(Channel *channel)
 					       ImgFaderFg, this, -1,
 					       wxPoint(0, 0),
 					       wxSize(CHANNELGUI_WIDTH,
-						      CHANNELGUI_HEIGHT));
+						      CHANNELGUI_HEIGHT), (WiredDocument *)this);
 
   SetVirtualSize(CHANNELGUI_WIDTH, CHANNELGUI_HEIGHT);
   ChannelGuiVector.push_back(gui);
@@ -90,7 +90,7 @@ ChannelGui* MixerGui::AddChannel(Channel *channel, const wxString& label)
 				   this, -1, wxPoint(x, 0),
 				   wxSize(CHANNELGUI_WIDTH,
 					  CHANNELGUI_HEIGHT),
-				   label);
+				   label, (WiredDocument *)this);
 
 
   ChannelGuiVector.push_back(gui);

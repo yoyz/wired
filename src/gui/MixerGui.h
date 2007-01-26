@@ -11,6 +11,7 @@ using namespace					std;
 
 #include <vector>
 #include <wx/wx.h>
+#include "WiredDocument.h"
 
 #define ID_MIXER_REFRESH			(101020)
 #define TYPE_MIXER_REFRESH			(9876600)
@@ -32,13 +33,13 @@ class						FaderCtrl;
  * The MixerGui handle the display of the mixer in wired.
  * It is derived from the wxScrolledWindow class
 */
-class						MixerGui : public wxScrolledWindow
+class						MixerGui : public wxScrolledWindow, public WiredDocument
 {
  public:
   /**
    * This is the default constructor for MixerGui class derived from wxScrolledWindow
    */
-  MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size);
+  MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size, WiredDocument* docParent = NULL);
   /**
    * This is the default destructor for MixerGui class
    */
@@ -103,6 +104,17 @@ class						MixerGui : public wxScrolledWindow
    */
   ChannelGui*					GetGuiByChan(Channel*);
 
+
+
+  /**
+   * WiredDocument implementation
+   */
+  void						Load(SaveElementArray data) { return ;};
+
+  /**
+   * WiredDocument implementation
+   */
+  void						Save() { return; };
 
 
  protected:

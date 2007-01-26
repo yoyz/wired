@@ -183,12 +183,26 @@ class Channel : public WiredDocument
   inline void	SetMuteLeft(bool muted)
     { MuteLeft = muted; };
 
-/**
- * Mute setter for right channel
-*/
+  /**
+   * Mute setter for right channel
+   */
 
   inline void	SetMuteRight(bool muted)
-    { MuteRight = muted; };
+  { MuteRight = muted; };
+
+  /**
+   * Mute getter for left channel
+   */
+
+  inline bool	GetMuteLeft()
+  { return MuteLeft; };
+
+  /**
+   * Mute getter for right channel
+   */
+
+  inline bool	GetMuteRight()
+  { return MuteRight; };
 
 
   /**
@@ -200,6 +214,12 @@ class Channel : public WiredDocument
    * WiredDocument implementation
    */
   void		Load(SaveElementArray data);
+
+
+  /**
+   * WiredDocument implementation
+   */
+  void		CleanChildren();
 
 
 

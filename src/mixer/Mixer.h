@@ -22,12 +22,9 @@ class Mixer : public WiredDocument
 
   void			Dump();
 
-  Channel*		AddMonoInputChannel(void);
-  Channel*		AddStereoInputChannel(void);
   Channel*              OpenInput(long num);
 
-  Channel*		AddMonoOutputChannel(bool visible = true);
-  Channel*		AddStereoOutputChannel(bool visible = true);
+  Channel*		AddChannel(bool input, bool stereo, bool visible = true);
 
   bool			RemoveChannel(Channel*);
   bool			InitOutputBuffers(void);
@@ -62,6 +59,10 @@ class Mixer : public WiredDocument
    */
   void			Load(SaveElementArray data);
 
+  /**
+   * WiredDocument implementation
+   */
+  void			CleanChildren();
 
  private:
   Channel*		AddChannel(std::list<Channel*>& listm,

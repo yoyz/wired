@@ -285,81 +285,124 @@ void			Channel::Save()
 {
   SaveElement	*savedElem;
 
-  std::cerr << "[Channel] Save()" << std::endl;
+  std::cerr << "Channel::Save: " << Label.mb_str() << std::endl;
 
   //Stereo
-  savedElem = new SaveElement(wxT("stereo"), this->Stereo);
+  std::cerr << "Stereo: " << this->Stereo << std::endl;
+  if (this->Stereo)
+    savedElem = new SaveElement(wxT("stereo"), 1);
+  else
+    savedElem = new SaveElement(wxT("stereo"), 0);
   saveDocData(savedElem);
 
   //VolumeLeft
+  std::cerr << "VolumeLeft: " << this->VolumeLeft << std::endl;
   savedElem = new SaveElement(wxT("volumeLeft"), this->VolumeLeft);
   saveDocData(savedElem);
 
   //VolumeRight
+  std::cerr << "VolumeRight: " << this->VolumeRight << std::endl;
   savedElem = new SaveElement(wxT("volumeRight"), this->VolumeRight);
   saveDocData(savedElem);
 
+  //MuteLeft
+  if (this->MuteLeft)
+    savedElem = new SaveElement(wxT("muteLeft"), 1);
+  else
+    savedElem = new SaveElement(wxT("muteLeft"), 0);
+  saveDocData(savedElem);
+
+  //MuteRight
+  if (this->MuteRight)
+    savedElem = new SaveElement(wxT("MuteRight"), 1);
+  else
+    savedElem = new SaveElement(wxT("MuteRight"), 0);
+  saveDocData(savedElem);
+
   //InputNum
+  std::cerr << "InputNum: " << this->InputNum << std::endl;
   savedElem = new SaveElement(wxT("inputNum"), (int)this->InputNum);
   saveDocData(savedElem);
 
   //Label
+  std::cerr << "Label: " << this->Label.mb_str() << std::endl;
   savedElem = new SaveElement(wxT("label"), this->Label);
   saveDocData(savedElem);
 
   //Visible
+  std::cerr << "Visible: " << this->Visible << std::endl;
   savedElem = new SaveElement(wxT("visible"), this->Visible);
   saveDocData(savedElem);
 
   //Lrms
+  std::cerr << "Lrms: " << this->Lrms << std::endl;
   savedElem = new SaveElement(wxT("lrms"), this->Lrms);
   saveDocData(savedElem);
 
   //Rrms
+  std::cerr << "Rrms: " << this->Rrms << std::endl;
   savedElem = new SaveElement(wxT("rrms"), this->Rrms);
   saveDocData(savedElem);
 
   //CurBuf
+  std::cerr << "CurBuf: " << this->CurBuf << std::endl;
   savedElem = new SaveElement(wxT("curBuf"), this->CurBuf);
   saveDocData(savedElem);
 
-  //CurBuf
-  savedElem = new SaveElement(wxT("filled"), this->Filled);
+  //Filled
+  std::cerr << "Filled: " << this->Filled << std::endl;
+  if (this->Filled)
+    savedElem = new SaveElement(wxT("filled"), 1);
+  else
+    savedElem = new SaveElement(wxT("filled"), 0);
   saveDocData(savedElem);
 }
 
 void			Channel::Load(SaveElementArray data)
 {
-  /*
   int		dataCompt;
 
-  std::cerr << "[ChannelGui] Load()" << std::endl;
+  std::cerr << "Channel::Load: " << Label.mb_str() << std::endl;
   for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
     {
-      std::cerr << "[ChannelGui] key = " << data[dataCompt]->getKey() << std::endl;
-      std::cerr << "[ChannelGui] value = " << data[dataCompt]->getValue() << std::endl;
+      std::cerr << "[Channel] key = " << data[dataCompt]->getKey().mb_str() << std::endl;
+      std::cerr << "[Channel] value = " << data[dataCompt]->getValue().mb_str() << std::endl;
 
       if (data[dataCompt]->getKey() == wxT("stereo"))
 	{
-	  if (data[dataCompt]->getValue())
-	    this->Stereo = true;
-	  else
+	  if (!data[dataCompt]->getValueInt())
 	    this->Stereo = false;
+	  else
+	    this->Stereo = true;
 	}
       else if (data[dataCompt]->getKey() == wxT("volumeLeft"))
 	this->VolumeLeft = data[dataCompt]->getValueFloat();
       else if (data[dataCompt]->getKey() == wxT("volumeRight"))
 	this->VolumeRight = data[dataCompt]->getValueFloat();
-      else if (data[dataCompt]->getKey() == wxT("InputNum"))
+      else if (data[dataCompt]->getKey() == wxT("muteLeft"))
+	{
+	  if (!data[dataCompt]->getValueInt())
+	    this->MuteLeft = false;
+	  else
+	    this->MuteLeft = true;
+	}
+      else if (data[dataCompt]->getKey() == wxT("muteRight"))
+	{
+	  if (!data[dataCompt]->getValueInt())
+	    this->MuteRight = false;
+	  else
+	    this->MuteRight = true;
+	}
+      else if (data[dataCompt]->getKey() == wxT("inputNum"))
 	this->InputNum = (long)data[dataCompt]->getValueInt();
-      else if (data[dataCompt]->getKey() == wxT("Label"))
+      else if (data[dataCompt]->getKey() == wxT("label"))
 	this->Label = data[dataCompt]->getValue();
       else if (data[dataCompt]->getKey() == wxT("visible"))
 	{
-	   if (data[dataCompt]->getValue())
-	    this->Visible = true;
-	  else
+	   if (!data[dataCompt]->getValueInt())
 	    this->Visible = false;
+	  else
+	    this->Visible = true;
 	}
       else if (data[dataCompt]->getKey() == wxT("lrms"))
 	this->Lrms = data[dataCompt]->getValueFloat();
@@ -369,11 +412,16 @@ void			Channel::Load(SaveElementArray data)
 	this->CurBuf = data[dataCompt]->getValueInt();
       else if (data[dataCompt]->getKey() == wxT("filled"))
 	{
-	  if (data[dataCompt]->getValue())
-	    this->Filled = true;
-	  else
+	  if (!data[dataCompt]->getValueInt())
 	    this->Filled = false;
+	  else
+	    this->Filled = true;
 	}
     }
-  */
+}
+
+void			Channel::CleanChildren()
+{
+  cout << "Channel::CleanChildren" << endl;
+
 }

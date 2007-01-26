@@ -124,7 +124,7 @@ OptionPanel::OptionPanel(wxWindow *parent, const wxPoint &pos, const wxSize &siz
   CurrentTool = 0x0;
   // Creation Mixer
   MixerPanel = new MixerGui(this, wxPoint(0, OPT_TOOLBAR_HEIGHT),
-			    wxSize(GetSize().GetWidth(), GetSize().GetHeight() - OPT_TOOLBAR_HEIGHT));
+			    wxSize(GetSize().GetWidth(), GetSize().GetHeight() - OPT_TOOLBAR_HEIGHT), (WiredDocument*)this);
   MixerTool = new WiredTool(_("Wired Mixer"), ID_TOOL_MIXER_OPTIONPANEL, MixerPanel);
 
   HelpWin = new HelpPanel(this, wxPoint(0, OPT_TOOLBAR_HEIGHT),

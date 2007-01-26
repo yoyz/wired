@@ -68,7 +68,7 @@ Mixer::~Mixer()
 Mixer 	Mixer::operator=(const Mixer& right)
 {
   cerr << "WARNING : Soon, Wired will miserably fail" << endl;
-  
+
   // Ptr must NOT be copied, but content of data does.
   if (this != &right)
     {
@@ -117,24 +117,12 @@ Channel*    	Mixer::AddChannel(list<Channel*>& list, bool stereo, bool visible)
   return (chan);
 }
 
-Channel				*Mixer::AddMonoInputChannel()
+Channel*    	Mixer::AddChannel(bool input, bool stereo, bool visible)
 {
-  return (AddChannel(InChannels, false));
-}
+  if (input)
+    return (AddChannel(InChannels, stereo, visible));
+  return (AddChannel(OutChannels, stereo, visible));
 
-Channel				*Mixer::AddStereoInputChannel()
-{
-  return (AddChannel(InChannels, true));
-}
-
-Channel				*Mixer::AddMonoOutputChannel(bool visible)
-{
-  return (AddChannel(OutChannels, false, visible));
-}
-
-Channel				*Mixer::AddStereoOutputChannel(bool visible)
-{
-  return (AddChannel(OutChannels, true, visible));
 }
 
 bool				Mixer::RemoveChannel(Channel *chan)
@@ -351,7 +339,7 @@ Channel				*Mixer::OpenInput(long num)
     }
   if (!exist)
     return 0x0;
-  Channel *c = AddMonoInputChannel();
+  Channel *c = AddChannel(true, false, true);
   if (!c)
     return 0x0;
   c->InputNum = num;
@@ -423,22 +411,32 @@ void			Mixer::Save()
 {
   SaveElement	*savedElem;
 
-  std::cerr << "[Mixer] Save()" << std::endl;
+  std::cerr << "Mixer::Save" << std::endl;
 
   //VolumeLeft
+  std::cerr << "VolumeLeft: " << this->VolumeLeft << std::endl;
   savedElem = new SaveElement(wxT("volumeLeft"), this->VolumeLeft);
   saveDocData(savedElem);
 
   //VolumeRight
+  std::cerr << "VolumeRight: " << this->VolumeRight << std::endl;
   savedElem = new SaveElement(wxT("volumeRight"), this->VolumeRight);
   saveDocData(savedElem);
 
   //MuteL
-  savedElem = new SaveElement(wxT("muteL"), this->MuteL);
+  std::cerr << "MuteL: " << this->MuteL << std::endl;
+  if (this->MuteL)
+    savedElem = new SaveElement(wxT("muteL"), 1);
+  else
+    savedElem = new SaveElement(wxT("muteL"), 0);
   saveDocData(savedElem);
 
   //MuteR
-  savedElem = new SaveElement(wxT("muteR"), this->MuteR);
+  std::cerr << "MuteR: " << this->MuteR << std::endl;
+  if (this->MuteR)
+    savedElem = new SaveElement(wxT("muteR"), 1);
+  else
+    savedElem = new SaveElement(wxT("muteR"), 0);
   saveDocData(savedElem);
 
 }
@@ -447,11 +445,11 @@ void			Mixer::Load(SaveElementArray data)
 {
   int		dataCompt;
 
-  std::cerr << "[Mixer] Load()" << std::endl;
+  std::cerr << "Mixer::Load" << std::endl;
   for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
     {
-      std::cerr << "[Mixer] key = " << data[dataCompt]->getKey() << std::endl;
-      std::cerr << "[Mixer] value = " << data[dataCompt]->getValue() << std::endl;
+      std::cerr << "[Mixer] key = " << data[dataCompt]->getKey().mb_str() << std::endl;
+      std::cerr << "[Mixer] value = " << data[dataCompt]->getValue().mb_str() << std::endl;
 
       if (data[dataCompt]->getKey() == wxT("volumeLeft"))
 	this->VolumeLeft = data[dataCompt]->getValueFloat();
@@ -459,17 +457,43 @@ void			Mixer::Load(SaveElementArray data)
 	this->VolumeRight = data[dataCompt]->getValueFloat();
       else if (data[dataCompt]->getKey() == wxT("muteL"))
 	{
-	  if (data[dataCompt]->getValue())
-	    this->MuteL = true;
-	  else
+	  if (!data[dataCompt]->getValueInt())
 	    this->MuteL = false;
+	  else
+	    this->MuteL = true;
 	}
       else if (data[dataCompt]->getKey() == wxT("muteR"))
 	{
-	  if (data[dataCompt]->getValue())
-	    this->MuteR = true;
-	  else
+	  if (!data[dataCompt]->getValueInt())
 	    this->MuteR = false;
+	  else
+	    this->MuteR = true;
 	}
     }
+}
+
+void			Mixer::CleanChildren()
+{
+  cerr << "Mixer::CleanChildren" << endl;
+
+  list<Channel*>::iterator	c;
+
+  for (c = InChannels.begin(); c != InChannels.end(); c++)
+    {
+      if (*c)
+	delete *c;
+    }
+  for (c = OutChannels.begin(); c != OutChannels.end(); c++)
+    {
+      if (*c)
+	delete *c;
+    }
+  OutChannels.clear();
+  InChannels.clear();
+
+
+  if (Input)
+    for (int i = 0; i < PREBUF_NUM; i++)
+      if (Input[i])
+	delete [] Input[i];
 }

@@ -20,8 +20,8 @@
 ChannelGui::ChannelGui(Channel* channel, wxImage* img_bg, wxImage* img_fg,
 		       wxWindow* parent, wxWindowID id,
 		       const wxPoint& pos, const wxSize& size,
-		       const wxString& label)
-  : wxPanel(parent, id, pos, size)
+		       const wxString& label, WiredDocument* docParent)
+  : wxPanel(parent, id, pos, size), WiredDocument(wxT("ChannelGui"), docParent)
 {
   ConnectedSeqTrack = 0x0;
   SetBackgroundColour(*wxBLACK);//CL_RULER_BACKGROUND);
@@ -277,11 +277,57 @@ void				ChannelGui::OnLock(wxCommandEvent& WXUNUSED(e))
     LockButton->SetOff();
 }
 
+void				ChannelGui::Load(SaveElementArray data)
+{
+  int		dataCompt;
+
+  std::cerr << "ChannelGui::Load" << std::endl;
+  for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
+    {
+      std::cerr << "ChannelGui->key = " << data[dataCompt]->getKey().mb_str() << std::endl;
+      std::cerr << "ChannelGui->value = " << data[dataCompt]->getValue().mb_str() << std::endl;
+
+
+      if (data[dataCompt]->getKey() == wxT("stereo"))
+	{
+	  if (!data[dataCompt]->getValueInt())
+	    SetStereo(false);
+	  else
+	    SetStereo(true);
+	}
+      else if (data[dataCompt]->getKey() == wxT("volumeLeft"))
+	{
+	  //VolumeLeft = data[dataCompt]->getValue();
+	  FaderLeft->SetValue((int)(data[dataCompt]->getValueFloat() * 100));
+	}
+      else if (data[dataCompt]->getKey() == wxT("volumeRight"))
+	{
+	  //VolumeRight = data[dataCompt]->getValue();
+	  FaderRight->SetValue((int)(data[dataCompt]->getValueFloat() * 100));
+	}
+      else if (data[dataCompt]->getKey() == wxT("muteLeft"))
+	{
+	  if (!data[dataCompt]->getValueInt())
+	    SetMuteLeftButton(false);
+	  else
+	    SetMuteLeftButton(true);
+	}
+      else if (data[dataCompt]->getKey() == wxT("muteRight"))
+	{
+	  if (!data[dataCompt]->getValueInt())
+	    SetMuteRightButton(false);
+	  else
+	    SetMuteRightButton(true);
+	}
+    }
+}
+
+
 MasterChannelGui::MasterChannelGui(Channel* channel, wxImage* img_bg,
 				   wxImage* img_fg, wxWindow* parent,
 				   wxWindowID id, const wxPoint& pos,
-				   const wxSize& size)
-  : ChannelGui(channel, img_bg, img_fg, parent, id, pos, size, _("MASTER"))
+				   const wxSize& size, WiredDocument* parentDoc)
+  : ChannelGui(channel, img_bg, img_fg, parent, id, pos, size, _("MASTER"), (WiredDocument *)this)
 {
   //  Label = new wxStaticText(this, -1, "MASTER", wxPoint(20, 0));
 }
