@@ -1119,6 +1119,7 @@ void					MainWindow::OnAddTrackMidi(wxCommandEvent &event)
 
 void					MainWindow::OnFloatTransport(wxCommandEvent &event)
 {
+  cout << "float trans" << endl;
   if (WindowMenu->IsChecked(MainWin_FloatTransport))
     {
       TransportPanel->Hide();
@@ -1135,6 +1136,7 @@ void					MainWindow::OnFloatTransport(wxCommandEvent &event)
   else
     {
       TransportPanel->Reparent(this);
+      TransportPanel->SetSize(wxSize(300, 150));
       BottomSizer->Insert(0, TransportPanel, 0, wxEXPAND | wxALL | wxFIXED_MINSIZE, 2);
       BottomSizer->Layout();
 
@@ -1145,7 +1147,7 @@ void					MainWindow::OnFloatTransport(wxCommandEvent &event)
 
 void					MainWindow::OnFloatSequencer(wxCommandEvent &event)
 {
-  cout << "MainWindow::OnFloatSequencer()" << endl;
+  cout << "float seq" << endl;
   if (WindowMenu->IsChecked(MainWin_FloatSequencer))
     {
       if (SeqModeView)
@@ -1189,6 +1191,7 @@ void					MainWindow::OnFloatSequencer(wxCommandEvent &event)
 
 void					MainWindow::OnFloatRack(wxCommandEvent &event)
 {
+  cout << "float rack" << endl;
   if (WindowMenu->IsChecked(MainWin_FloatRacks))
     {
       if (RackModeView)
@@ -1864,28 +1867,8 @@ void		MainWindow::Save()
   saveElem->addAttribute(wxT("Height"), size.GetHeight());
   saveElem->addAttribute(wxT("Pos_x"), pos.x);
   saveElem->addAttribute(wxT("Pos_y"), pos.y);
+  saveElem->addAttribute(wxT("SashPos"), split->GetSashPosition());
   saveDocData(saveElem);
-  
-  /*
-    size = OptPanel->GetSize();
-    pos = OptPanel->GetPosition();
-    saveElem = new SaveElement(wxT("OptPanel"),wxT(""));
-    saveElem->addAttribute(wxT("Width"), size.GetWidth());
-    saveElem->addAttribute(wxT("Height"), size.GetHeight());
-    saveElem->addAttribute(wxT("Pos_x"), pos.x);
-    saveElem->addAttribute(wxT("Pos_y"), pos.y);
-    saveDocData(saveElem); 
-  */
-
-  /*
-    saveElem = new SaveElement(wxT("Sizer"), wxT(""));
-    saveElem->addAttribute(wxT("Bottom"), BottomSizer->GetOrientation());
-    saveElem->addAttribute(wxT("Top"), TopSizer->GetOrientation());
-    saveElem->addAttribute(wxT("TopLeft"), TopLeftSizer->GetOrientation());
-    saveElem->addAttribute(wxT("TopRight"), TopRightSizer->GetOrientation());
-    saveDocData(saveElem);
-  */
-
 }
 
 void		MainWindow::Load(SaveElementArray data)
@@ -1926,27 +1909,28 @@ void		MainWindow::Load(SaveElementArray data)
 	   isFloating = MediaLibraryPanel->IsFloating();
            if (data[i]->getAttributeInt(wxT("Show")) == 1)
 	     {
-	       cout << "Showing MediaLib" << endl;
-	       ShowMediaLibrary(panelShow);
-	       ItemShowMediaLibrary->Check(true);
-	       cout << "Setting MediaLib SashPos" << endl;
+	       if (!MediaLibraryPanel->IsVisible())
+		 {
+		   ShowMediaLibrary(panelShow);
+		   ItemShowMediaLibrary->Check(true);
+		 }
 	       splitVert->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
 	     }
 	   else
 	     {
-	       cout << "Hiding MediaLib" << endl;
-	       ShowMediaLibrary(panelHide);
-	       ItemShowMediaLibrary->Check(false);
+	       if (MediaLibraryPanel->IsVisible())
+		 { 
+		   ShowMediaLibrary(panelHide);
+		   ItemShowMediaLibrary->Check(false);
+		 }
 	     }
 	   if (data[i]->getAttributeInt(wxT("floating")) == 1)
 	     {
 	       if (!isFloating)
 		 {
-		   cout << "Setting floating MediaLib" << endl;
 		   ShowMediaLibrary(panelShowInWindow);
 		   ItemFloatingMediaLibrary->Check(true);
 		 }
-	       cout << "Setting MediaLib position" << endl;
 	       pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
 	       pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
 	       MediaLibraryFrame->SetPosition(pos);
@@ -1957,43 +1941,38 @@ void		MainWindow::Load(SaveElementArray data)
 	     {
 	       if (isFloating)
 		 {
-		   cout << "Setting docked MediaLib" << endl;
 		   ShowMediaLibrary(panelHideFromWindow);
 		   ItemFloatingMediaLibrary->Check(false);
-		   cout << "Setting MediaLib SashPos" << endl;
 		   splitVert->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
 		 }
 	     }
-	   cout << "MediaLib set" << endl;
 	 }
 
-       /*       else if (data[i]->getKey() == wxT("Transport"))
+       else if (data[i]->getKey() == wxT("Transport"))
 	 {
 	   wxCommandEvent evtFloatTrans(wxEVT_COMMAND_MENU_SELECTED, MainWin_FloatTransport);
 	   if (data[i]->getAttributeInt(wxT("Floating")) == 1)
 	     {
 	       if (!WindowMenu->IsChecked(MainWin_FloatTransport))
 		 {
-		   wxPostEvent(MainWin, evtFloatTrans);
 		   WindowMenu->Check(MainWin_FloatTransport, true);
+		   this->ProcessEvent(evtFloatTrans);
 		 }
-	       std::cerr << "[MainWindow] Load() setting floating transport pos" << std::endl;
 	       pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
 	       pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
 	       TransportFrame->SetPosition(pos);
-	       std::cerr << "[MainWindow] Load() setting floating transport size" << std::endl;
 	       TransportFrame->SetSize(data[i]->getAttributeInt(wxT("Width")),
-	       data[i]->getAttributeInt(wxT("Height")));
+				       data[i]->getAttributeInt(wxT("Height")));
 	     }
 	   else
 	     {
 	       if (WindowMenu->IsChecked(MainWin_FloatTransport))
 		 {
-		   wxPostEvent(MainWin, evtFloatTrans);
 		   WindowMenu->Check(MainWin_FloatTransport, false);
+		   this->ProcessEvent(evtFloatTrans);
 		 }
 	     }
-	     }*/
+	 }
 
        else if (data[i]->getKey() == wxT("Sequencer"))
 	 {
@@ -2002,64 +1981,52 @@ void		MainWindow::Load(SaveElementArray data)
 	     {
 	       if (!WindowMenu->IsChecked(MainWin_FloatSequencer))
 		 {
-		   cout << "Setting floating sequenceer" << endl;
-		   cout << "Sending MainWin_FloatSequencer event" << endl;
-		   this->ProcessEvent(evtFloatSeq);
-		   cout << "Event sent" << endl;
 		   WindowMenu->Check(MainWin_FloatSequencer, true);
+		   this->ProcessEvent(evtFloatSeq);
 		 }
-	       cout << "Setting sequencer position" << endl;
-	       /*
 	       pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
 	       pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
-	       SeqPanel->SetPosition(pos);
-	       cout << "Setting sequenceer size" << endl;
+	       SequencerFrame->SetPosition(pos);
 	       SequencerFrame->SetSize(data[i]->getAttributeInt(wxT("Width")),
 				       data[i]->getAttributeInt(wxT("Height")));
-	       cout << "done" << endl;
-	       */
 	     }
 	   else
 	     {
 	       if (WindowMenu->IsChecked(MainWin_FloatSequencer))
 		 {
-		   cout << "Setting docked sequenceer" << endl;
-		   cout << "Sending MainWin_FloatSequencer event" << endl;
-		   this->ProcessEvent(evtFloatSeq);
-		   cout << "Event sent" << endl;
 		   WindowMenu->Check(MainWin_FloatSequencer, false);
+		   this->ProcessEvent(evtFloatSeq);
 		 }
-	       cout << "Setting sequencer SashPos" << endl;
 	       split->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
 	     }
-	   cout << "Sequencer set" << endl;
 	 }
 
-       /*       else if (data[i]->getKey() == wxT("Rack"))
+       else if (data[i]->getKey() == wxT("Rack"))
 	 {
 	   wxCommandEvent evtFloatRack(wxEVT_COMMAND_MENU_SELECTED, MainWin_FloatRacks);
 	   if (data[i]->getAttributeInt(wxT("Floating")) == 1)
 	     {
 	       if (!WindowMenu->IsChecked(MainWin_FloatRacks))
 		 {
-		   wxPostEvent(MainWin, evtFloatRack);
 		   WindowMenu->Check(MainWin_FloatRacks, true);
+		   this->ProcessEvent(evtFloatRack);
 		 }
 	       pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
 	       pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
-	       RackPanel->SetPosition(pos);
-	       RackPanel->SetSize(data[i]->getAttributeInt(wxT("Width")),
-				  data[i]->getAttributeInt(wxT("Height")));
+	       RackFrame->SetPosition(pos);
+	       RackFrame->SetSize(data[i]->getAttributeInt(wxT("Width")),
+				       data[i]->getAttributeInt(wxT("Height")));
 	     }
 	   else
 	     {
-	     if (!WindowMenu->IsChecked(MainWin_FloatRacks))
-	     {
-	       wxPostEvent(MainWin, evtFloatRack);
-	       WindowMenu->Check(MainWin_FloatTransport, false);
-	       }
+	       if (WindowMenu->IsChecked(MainWin_FloatRacks))
+		 {
+		   WindowMenu->Check(MainWin_FloatRacks, false);
+		   this->ProcessEvent(evtFloatRack);
+		 }
+	       split->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
 	     }
-	     }*/
+	 }
      }
 }
 
