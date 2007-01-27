@@ -1036,14 +1036,7 @@ void					MainWindow::CreatePluginFromUniqueId(wxString UniqueId)
   Uniq[3] = UniqueId[3];
   for (it = LoadedPluginsList.begin(); it != LoadedPluginsList.end(); it++)
     if (COMPARE_IDS((*it)->InitInfo.UniqueId,Uniq))
-      {
-// 	if ((*it)->InitInfo.Type == ePlugTypeEffect)
-// 	  {
-	    wxCommandEvent evt(wxEVT_COMMAND_MENU_SELECTED, (*it)->Id);
-	    this->ProcessEvent(evt);
-// 	  }
-
-      }
+      RackPanel->AddToSelectedTrack(StartInfo, *it);
 }
 
 void					MainWindow::OnCreateExternalPlugin(wxCommandEvent &event)

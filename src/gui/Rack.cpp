@@ -151,36 +151,10 @@ void				RackTrack::DumpPlugins()
 
 void				RackTrack::Save()
 {
-  std::list<Plugin *>::iterator	it;
-
-  for (it = Racks.begin(); it != Racks.end(); it++)
-    {
-      SaveElement*			saved = new SaveElement(wxT("RackPlugin"), (int)Racks.size());
-
-      saved->addAttribute(wxT("Name"), (*it)->Name);
-      saved->addAttribute(wxT("PlugName"), (*it)->InitInfo->Name);
-      saved->addAttribute(wxT("UniqueId"), wxString((*it)->InitInfo->UniqueId,*wxConvCurrent));
-      saveDocData(saved);
-    }
 }
-
-extern WiredExternalPluginMgr	*LoadedExternalPlugins;
 
 void				RackTrack::Load(SaveElementArray data)
 {
-  vector<PluginLoader*>::iterator	it;
-  int					i;
-
-  for (i = 0; i < data.GetCount(); i++)
-    if (data[i]->getKey() == wxT("RackPlugin"))
-      {
-	cout << "== Rackplugin" << endl;
-	cout << "Loaded Name: " << data[i]->getAttribute(wxT("Name")).mb_str() << endl;
-	cout << "Loaded PlugName: " << data[i]->getAttribute(wxT("PlugName")).mb_str() << endl;
-      	cout << "Loaded UniqueId: " << data[i]->getAttribute(wxT("UniqueId")).mb_str() << endl;
-
-	MainWin->CreatePluginFromUniqueId(data[i]->getAttribute(wxT("UniqueId")));
-      }
 
 }
 
@@ -909,25 +883,66 @@ void				Rack::SetAudioConfig(long bufferSize, double sampleRate)
 
 void				Rack::Save()
 {
-//   t_ListRackTrack::iterator	it;
-
-//   for (it = RackTracks.begin(); it != RackTracks.end(); it++)
+  // not used right now
   saveDocData(new SaveElement(wxT("RackNumber"), (int)RackTracks.size()));
+
+  // save all racktracks
+  t_ListRackTrack::iterator	itRackTrack;
+  std::list<Plugin *>::iterator	it;
+  int				no;
+
+  no = 0;
+  for (itRackTrack = RackTracks.begin(); itRackTrack != RackTracks.end(); itRackTrack++)
+    {
+      for (it = (*itRackTrack)->Racks.begin(); it != (*itRackTrack)->Racks.end(); it++)
+	{
+	  SaveElement*			saved = new SaveElement(wxT("RackPlugin"), (int)(*itRackTrack)->Racks.size());
+
+	  saved->addAttribute(wxT("Track"), no);
+	  saved->addAttribute(wxT("Name"), (*it)->Name);
+	  saved->addAttribute(wxT("PlugName"), (*it)->InitInfo->Name);
+	  saved->addAttribute(wxT("UniqueId"), wxString((*it)->InitInfo->UniqueId,*wxConvCurrent));
+	  saveDocData(saved);
+	}
+      no++;
+    }
 }
 
 void				Rack::Load(SaveElementArray data)
 {
-  int				i;
+  // load racktracks
+  vector<PluginLoader*>::iterator	it;
+  int					i;
 
   for (i = 0; i < data.GetCount(); i++)
-    if (data[i]->getKey() == wxT("RackNumber"))
+    if (data[i]->getKey() == wxT("RackPlugin"))
       {
-	int			n;
+#ifdef __DEBUG__
+	cout << "== Rackplugin" << endl;
+	cout << "Loaded Track:: " << data[i]->getAttributeInt(wxT("Track")) << endl;
+	cout << "Loaded Name: " << data[i]->getAttribute(wxT("Name")).mb_str() << endl;
+	cout << "Loaded PlugName: " << data[i]->getAttribute(wxT("PlugName")).mb_str() << endl;
+      	cout << "Loaded UniqueId: " << data[i]->getAttribute(wxT("UniqueId")).mb_str() << endl;
+#endif
+	SelectTrackFromNumber(data[i]->getAttributeInt(wxT("Track")));
+	MainWin->CreatePluginFromUniqueId(data[i]->getAttribute(wxT("UniqueId")));
+      }
+}
 
-	for (n = 0; n < data[i]->getValueInt(); n++)
-	  AddTrack();
-      }     
+void				Rack::SelectTrackFromNumber(int no)
+{
+  t_ListRackTrack::iterator	it;
+  int				i;
 
+  for (i = 0, it = RackTracks.begin(); it != RackTracks.end(); it++, i++)
+    {
+      if (i == no)
+	{
+	  selectedTrack = *it;
+	  return;
+	}
+    }
+  selectedTrack = NULL;
 }
 
 // Events loop (Static events)

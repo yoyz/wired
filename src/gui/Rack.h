@@ -114,6 +114,9 @@ class		Rack: public wxScrolledWindow, WiredDocument
   
   // Seems to select a rack
   void			SetSelected(Plugin *p);
+
+  // Select a RackTrack from its number
+  void			SelectTrackFromNumber(int no);
   
   // Kept for compatibility but shouldn't be used anymore
   void			RemoveFromSelectedTrack();
