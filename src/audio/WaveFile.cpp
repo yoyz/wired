@@ -11,6 +11,7 @@ using namespace std;
 
 WaveFile::WaveFile()
 {
+
   InitVars();
 
   // This file must be opened in read/write mode.
@@ -93,6 +94,7 @@ WaveFile::~WaveFile()
 
 void           WaveFile::InitVars()
 {
+  associated_pattern = 1;
   Channel_to_read = 0;
   Data = NULL;
   LoadedInMem = false;

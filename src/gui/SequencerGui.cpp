@@ -744,6 +744,7 @@ void					SequencerGui::DeletePattern(Pattern *p)
 {
   vector<Pattern *>::iterator		i;
 
+  WaveCenter.RemoveWaveFile(((AudioPattern*)(p))->GetWaveFile());
   for (i = SelectedItems.begin(); i != SelectedItems.end(); i++)
     if (*i == p)
       {

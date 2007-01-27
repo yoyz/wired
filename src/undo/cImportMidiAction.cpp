@@ -31,12 +31,13 @@ void cImportWaveAction::Do ()
 
 void cImportWaveAction::AddWaveTrack()
 {
-  WaveFile *w = WaveCenter.AddWaveFile(_WavePath);
+  WaveFile *w_tmp = WaveCenter.AddWaveFile(_WavePath);
+  WaveFile *w;
   long		nb_channel;
 
-  if (w) 
+  if (w_tmp) 
     {
-      for (nb_channel = 0; nb_channel < w->GetNumberOfChannels(); nb_channel++)
+      for (nb_channel = 0; nb_channel < w_tmp->GetNumberOfChannels(); nb_channel++)
 	{ 
 	  _trackCreated = SeqPanel->CreateTrack(_TrackKindFlag);
 	  w = WaveCenter.AddWaveFile(_WavePath);
@@ -46,17 +47,19 @@ void cImportWaveAction::AddWaveTrack()
 	  NotifyActionManager();
 	}
     }
+  WaveCenter.RemoveWaveFile(w_tmp);
 }
 
 void cImportWaveAction::AddWaveToEditor()
 {
-  WaveFile *w = WaveCenter.AddWaveFile(_WavePath);
+  WaveFile *w_tmp = WaveCenter.AddWaveFile(_WavePath);
+  WaveFile *w;
   long	   nb_channel;
 
-  if (w) 
+  if (w_tmp) 
     {
       _trackCreated = SeqPanel->CreateTrack(_TrackKindFlag);
-      for (nb_channel = 0; nb_channel < w->GetNumberOfChannels(); nb_channel++)
+      for (nb_channel = 0; nb_channel < w_tmp->GetNumberOfChannels(); nb_channel++)
 	{
 	  AudioPattern  *pattern = _trackCreated->CreateAudioPattern(w);
 	  pattern->OnDirectEdit();
@@ -65,6 +68,7 @@ void cImportWaveAction::AddWaveToEditor()
 	  NotifyActionManager();
 	}
     }
+  WaveCenter.RemoveWaveFile(w_tmp);
 }
 
 void cImportWaveAction::RemoveWaveTrack(bool selectFromIndex)

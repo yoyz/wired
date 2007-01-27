@@ -39,6 +39,7 @@ AudioPattern::AudioPattern(WiredDocument *parent, double pos, WaveFile *w, long 
 
 AudioPattern::~AudioPattern()
 {
+  Wave->DelAssociatedPattern();
   OptPanel->DeleteTools(this);
   if (InputChan) delete InputChan;
   if (RecordWave) delete RecordWave;
@@ -51,6 +52,7 @@ void					AudioPattern::Init(WaveFile* w, WiredDocument* parent)
        << "; StartWavePos: " << StartWavePos << "; EndWavePos: " << EndWavePos << endl;
 #endif
 
+  wavefile = new WaveFile();
   Name = wxString::Format(wxT("T%d A%d"), TrackIndex + 1, audio_pattern_count++);
   wxSize s = GetSize();
   SetSize(s);
@@ -137,7 +139,8 @@ void					AudioPattern::SetWave(WaveFile *w)
 #endif
   if (w)
     {
-      FileName = w->Filename;
+      *wavefile = *w;
+      FileName = wavefile->Filename;
       wxMutexLocker  m(SeqMutex);
 
       OnBpmChange();
@@ -301,6 +304,7 @@ Pattern					*AudioPattern::CreateCopy(double pos)
   printf(" [ START ] AudioPattern::CreateCopy(%f) on track %d\n", pos, TrackIndex);
 #endif
   p = new AudioPattern(_documentParent, pos, Wave, TrackIndex);
+  Wave->AddAssociatedPattern();
   SeqMutex.Lock();
   p->StartWavePos = StartWavePos;
   p->EndWavePos = EndWavePos;

@@ -297,6 +297,7 @@ void					SequencerView::Drop(int x, int y, wxString file)
   double       				last_pos = 0;
   Track					*track_to_add;
   WaveFile				*wave;
+  WaveFile				*wave_tmp;
   long					nb_channel;
 
   ScreenToClient(&x, &y);
@@ -310,20 +311,20 @@ void					SequencerView::Drop(int x, int y, wxString file)
 	;
       if (Seq->Tracks.size() != 0 && track < Seq->Tracks.size() && (*i)->IsAudioTrack())
 	{
-	  wave = WaveCenter.AddWaveFile(file);
+	  wave_tmp = WaveCenter.AddWaveFile(file);
 	  for (pattern_iterator = (*i)->GetTrackPattern()->Patterns.begin();
 	       pattern_iterator != (*i)->GetTrackPattern()->Patterns.end();
 	       pattern_iterator++)
 	    if (last_pos < (*pattern_iterator)->GetEndPosition())
 	      last_pos = (*pattern_iterator)->GetEndPosition();
-	  for (nb_channel = 0; nb_channel < wave->GetNumberOfChannels() && i != Seq->Tracks.end(); nb_channel++)
+	  for (nb_channel = 0; nb_channel < wave_tmp->GetNumberOfChannels() && i != Seq->Tracks.end(); nb_channel++)
 	    {
 	      wave = WaveCenter.AddWaveFile(file);
 	      wave->SetChannelToRead(nb_channel);
 	      (*i)->CreateAudioPattern(wave, last_pos);
 	      i++;
 	    }
-	  for (;nb_channel < wave->GetNumberOfChannels(); nb_channel++)
+	  for (;nb_channel < wave_tmp->GetNumberOfChannels(); nb_channel++)
 	    {
 	      track_to_add = SeqPanel->CreateTrack(eAudioTrack);
 	      wave = WaveCenter.AddWaveFile(file);
@@ -333,7 +334,7 @@ void					SequencerView::Drop(int x, int y, wxString file)
 	}
       else
 	{
-	  wave = WaveCenter.AddWaveFile(file);
+	  wave_tmp = WaveCenter.AddWaveFile(file);
 	  for (nb_channel = 0; nb_channel < wave->GetNumberOfChannels(); nb_channel++)
 	    {
 	      track_to_add = SeqPanel->CreateTrack(eAudioTrack);
@@ -342,6 +343,7 @@ void					SequencerView::Drop(int x, int y, wxString file)
 	      track_to_add->CreateAudioPattern(wave, 0);
 	    }
 	}
+      WaveCenter.RemoveWaveFile(wave_tmp);
     }
 }
 

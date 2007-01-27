@@ -21,7 +21,7 @@ class					AudioPattern: public Pattern, public WaveDrawer
   Channel*				InputChan;
   long					LastBlock;
   wxString				FileName;
-
+  WaveFile				*wavefile;
  public:
   AudioPattern(WiredDocument *parent, double pos, double endpos, long trackindex);
   AudioPattern(WiredDocument *parent, double pos, WaveFile *w, long trackindex);
@@ -45,7 +45,8 @@ class					AudioPattern: public Pattern, public WaveDrawer
   void					SetDrawColour(wxColour c);
   void					Split(double pos);
   void					OnDirectEdit();
-  Pattern				*CreateCopy(double pos);
+  inline WaveFile*			GetWaveFile(){return Wave;};
+ Pattern				*CreateCopy(double pos);
   
   // WiredDocument implementation
   void					Save();
