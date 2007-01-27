@@ -127,7 +127,7 @@ void					AudioPattern::OnBpmChange()
   printf("\tAudioPattern : MeasurePerSample %f , Frames %d\n", 
 	 Seq->MeasurePerSample, Wave->GetNumberOfFrames());
 #endif
-  Length = Seq->MeasurePerSample * Wave->GetNumberOfFrames();
+  Length = Seq->MeasurePerSample * (EndWavePos - StartWavePos);
   EndPosition = Position + Length;
   Update();
 }
@@ -141,11 +141,11 @@ void					AudioPattern::SetWave(WaveFile *w)
 
   if (w)
     {
-      *wavefile = *w;
+      *Wave = *w;
       FileName = wavefile->Filename;
       wxMutexLocker  m(SeqMutex);
 
-      OnBpmChange();
+       OnBpmChange();
     }
 }
 
@@ -348,6 +348,7 @@ void					AudioPattern::OnLeftUp(wxMouseEvent &e)
 void					AudioPattern::Split(double pos)
 {
   AudioPattern				*p;
+  
 
   if ((Position < pos) && (pos < EndPosition))
     {
@@ -372,7 +373,7 @@ void					AudioPattern::Split(double pos)
       p->Update();
       EndWavePos = p->StartWavePos;
       Length = (EndPosition = pos) - Position;
-
+      p->SetWave(Wave);
       SetDrawing();
       Update();
       SeqMutex.Unlock();
