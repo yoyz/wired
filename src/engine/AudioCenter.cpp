@@ -69,8 +69,7 @@ void		AudioCenter::RemoveWaveFile(WaveFile *file)
   if (save != NULL && (*save)->GetAssociatedPattern() == 1)
        WaveFiles.erase(save);
   if (cpt == 1 && (*save)->GetAssociatedPattern() == 1)
-     wxRemoveFile(file->Filename);
-  	 
+      wxRemoveFile(file->Filename);
 }
 
 void AudioCenter::Clear()

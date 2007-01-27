@@ -351,6 +351,7 @@ void					AudioPattern::Split(double pos)
 
   if ((Position < pos) && (pos < EndPosition))
     {
+      Wave->AddAssociatedPattern();
 #ifdef __DEBUG__
       cout << " >>> HERE OLD:\n\t Position = " << Position << "\n\t Length = " << Length << "\n\t EndPosition = " << EndPosition << endl;
       cout << "new pos: " << pos << endl;
