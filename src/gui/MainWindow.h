@@ -70,8 +70,11 @@ class					MainWindow: public wxFrame, public WiredDocument
   void					OnCreateRackClick(wxCommandEvent &event);
   void					OnCreateEffectClick(wxCommandEvent &event);
   void					OnFloatTransport(wxCommandEvent &event);
+  wxFrame				*FloatTransport();
   void					OnFloatSequencer(wxCommandEvent &event);
+  wxFrame				*FloatSequencer();
   void					OnFloatRack(wxCommandEvent &event);
+  wxFrame				*FloatRack();
   void					OnFloatMediaLibrary(wxCommandEvent &event);
 
   void					OnSwitchRackOptViewEvent(wxCommandEvent &event);
@@ -115,7 +118,11 @@ class					MainWindow: public wxFrame, public WiredDocument
   void					SwitchRackOptView();
   void					SwitchSeqOptView();  
   void					AddUpdatePlugin(Plugin *p);
-
+  
+  void					SwitchDockedFloat(bool isCurrentlyFloating, int mustBeFloating,
+							  wxCommandEvent evt, wxPoint pos, wxSize size,
+							  int checkBox, wxFrame *frame, 
+							  wxFrame *(MainWindow::*floatfunc)());
   void					Save();
   void					Load(SaveElementArray data);
 

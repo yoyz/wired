@@ -1119,7 +1119,11 @@ void					MainWindow::OnAddTrackMidi(wxCommandEvent &event)
 
 void					MainWindow::OnFloatTransport(wxCommandEvent &event)
 {
-  cout << "float trans" << endl;
+  FloatTransport();
+}
+
+wxFrame					*MainWindow::FloatTransport()
+{
   if (WindowMenu->IsChecked(MainWin_FloatTransport))
     {
       TransportPanel->Hide();
@@ -1143,11 +1147,16 @@ void					MainWindow::OnFloatTransport(wxCommandEvent &event)
       delete TransportFrame;
       TransportFrame = 0x0;
     }
+  return (TransportFrame);
 }
 
 void					MainWindow::OnFloatSequencer(wxCommandEvent &event)
 {
-  cout << "float seq" << endl;
+  FloatSequencer();
+}
+
+wxFrame					*MainWindow::FloatSequencer()
+{
   if (WindowMenu->IsChecked(MainWin_FloatSequencer))
     {
       if (SeqModeView)
@@ -1187,11 +1196,16 @@ void					MainWindow::OnFloatSequencer(wxCommandEvent &event)
       delete SequencerFrame;
       SequencerFrame = 0x0;
     }
+  return (SequencerFrame);
 }
 
 void					MainWindow::OnFloatRack(wxCommandEvent &event)
 {
-  cout << "float rack" << endl;
+  FloatRack();
+}
+
+wxFrame					*MainWindow::FloatRack()
+{
   if (WindowMenu->IsChecked(MainWin_FloatRacks))
     {
       if (RackModeView)
@@ -1231,6 +1245,7 @@ void					MainWindow::OnFloatRack(wxCommandEvent &event)
       delete RackFrame;
       RackFrame = 0x0;
     }
+  return (RackFrame);
 }
 
 void					MainWindow::ShowMediaLibrary(panelState show)
@@ -1871,6 +1886,32 @@ void		MainWindow::Save()
   saveDocData(saveElem);
 }
 
+typedef wxFrame *(MainWindow::*floatfunc)(void);
+
+void		MainWindow::SwitchDockedFloat(bool isCurrentlyFloating, int mustBeFloating,
+					      wxCommandEvent evt, wxPoint pos, wxSize size,
+					      int checkBox, wxFrame *frame, floatfunc function)
+{
+  if (mustBeFloating)
+    {
+      if (!isCurrentlyFloating)
+	{
+	  WindowMenu->Check(checkBox, true);
+	  frame = (*this.*function)();
+	}
+      frame->SetPosition(pos);
+      frame->SetSize(size);
+    }
+  else
+    {
+      if (isCurrentlyFloating)
+	{
+	  WindowMenu->Check(checkBox, false);
+	  this->ProcessEvent(evt);
+	}
+    }
+}
+
 void		MainWindow::Load(SaveElementArray data)
 {
    int			i;
@@ -1951,81 +1992,35 @@ void		MainWindow::Load(SaveElementArray data)
        else if (data[i]->getKey() == wxT("Transport"))
 	 {
 	   wxCommandEvent evtFloatTrans(wxEVT_COMMAND_MENU_SELECTED, MainWin_FloatTransport);
-	   if (data[i]->getAttributeInt(wxT("Floating")) == 1)
-	     {
-	       if (!WindowMenu->IsChecked(MainWin_FloatTransport))
-		 {
-		   WindowMenu->Check(MainWin_FloatTransport, true);
-		   this->ProcessEvent(evtFloatTrans);
-		 }
-	       pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	       pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
-	       TransportFrame->SetPosition(pos);
-	       TransportFrame->SetSize(data[i]->getAttributeInt(wxT("Width")),
-				       data[i]->getAttributeInt(wxT("Height")));
-	     }
-	   else
-	     {
-	       if (WindowMenu->IsChecked(MainWin_FloatTransport))
-		 {
-		   WindowMenu->Check(MainWin_FloatTransport, false);
-		   this->ProcessEvent(evtFloatTrans);
-		 }
-	     }
+	   SwitchDockedFloat(WindowMenu->IsChecked(MainWin_FloatTransport), data[i]->getAttributeInt(wxT("Floating")),
+			     evtFloatTrans, 
+			     wxPoint(data[i]->getAttributeInt(wxT("Pos_x")), data[i]->getAttributeInt(wxT("Pos_y"))),
+			     wxSize(data[i]->getAttributeInt(wxT("Width")), data[i]->getAttributeInt(wxT("Height"))),
+			     MainWin_FloatTransport, (wxFrame *) TransportFrame, &MainWindow::FloatTransport);
 	 }
 
        else if (data[i]->getKey() == wxT("Sequencer"))
 	 {
 	   wxCommandEvent evtFloatSeq(wxEVT_COMMAND_MENU_SELECTED, MainWin_FloatSequencer);
-	   if (data[i]->getAttributeInt(wxT("Floating")) == 1)
-	     {
-	       if (!WindowMenu->IsChecked(MainWin_FloatSequencer))
-		 {
-		   WindowMenu->Check(MainWin_FloatSequencer, true);
-		   this->ProcessEvent(evtFloatSeq);
-		 }
-	       pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	       pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
-	       SequencerFrame->SetPosition(pos);
-	       SequencerFrame->SetSize(data[i]->getAttributeInt(wxT("Width")),
-				       data[i]->getAttributeInt(wxT("Height")));
-	     }
-	   else
-	     {
-	       if (WindowMenu->IsChecked(MainWin_FloatSequencer))
-		 {
-		   WindowMenu->Check(MainWin_FloatSequencer, false);
-		   this->ProcessEvent(evtFloatSeq);
-		 }
-	       split->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
-	     }
+	   SwitchDockedFloat(WindowMenu->IsChecked(MainWin_FloatSequencer), data[i]->getAttributeInt(wxT("Floating")),
+                             evtFloatSeq,
+                             wxPoint(data[i]->getAttributeInt(wxT("Pos_x")), data[i]->getAttributeInt(wxT("Pos_y"))),
+                             wxSize(data[i]->getAttributeInt(wxT("Width")), data[i]->getAttributeInt(wxT("Height"))),
+                             MainWin_FloatSequencer, (wxFrame *) SequencerFrame, &MainWindow::FloatSequencer);
+	   if (!data[i]->getAttributeInt(wxT("Floating")) == 1)
+	     split->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
 	 }
 
        else if (data[i]->getKey() == wxT("Rack"))
 	 {
 	   wxCommandEvent evtFloatRack(wxEVT_COMMAND_MENU_SELECTED, MainWin_FloatRacks);
-	   if (data[i]->getAttributeInt(wxT("Floating")) == 1)
-	     {
-	       if (!WindowMenu->IsChecked(MainWin_FloatRacks))
-		 {
-		   WindowMenu->Check(MainWin_FloatRacks, true);
-		   this->ProcessEvent(evtFloatRack);
-		 }
-	       pos.x = data[i]->getAttributeInt(wxT("Pos_x"));
-	       pos.y = data[i]->getAttributeInt(wxT("Pos_y"));
-	       RackFrame->SetPosition(pos);
-	       RackFrame->SetSize(data[i]->getAttributeInt(wxT("Width")),
-				       data[i]->getAttributeInt(wxT("Height")));
-	     }
-	   else
-	     {
-	       if (WindowMenu->IsChecked(MainWin_FloatRacks))
-		 {
-		   WindowMenu->Check(MainWin_FloatRacks, false);
-		   this->ProcessEvent(evtFloatRack);
-		 }
-	       split->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
-	     }
+	   SwitchDockedFloat(WindowMenu->IsChecked(MainWin_FloatRacks), data[i]->getAttributeInt(wxT("Floating")),
+                             evtFloatRack,
+                             wxPoint(data[i]->getAttributeInt(wxT("Pos_x")), data[i]->getAttributeInt(wxT("Pos_y"))),
+                             wxSize(data[i]->getAttributeInt(wxT("Width")), data[i]->getAttributeInt(wxT("Height"))),
+                             MainWin_FloatRacks, (wxFrame *) RackFrame, &MainWindow::FloatRack);
+	   if (!data[i]->getAttributeInt(wxT("Floating")) == 1)
+	     split->SetSashPosition(data[i]->getAttributeInt(wxT("SashPos")));
 	 }
      }
 }
