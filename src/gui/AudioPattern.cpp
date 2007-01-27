@@ -137,6 +137,8 @@ void					AudioPattern::SetWave(WaveFile *w)
 #ifdef __DEBUG__
   cout << "WaveDrawer::StartWavePos = " << WaveDrawer::StartWavePos<< " WaveDrawer::EndWavePos = " << WaveDrawer::EndWavePos << endl;
 #endif
+  WaveDrawer::SetWave(w, GetSize(), StartWavePos, EndWavePos);
+
   if (w)
     {
       *wavefile = *w;
@@ -145,7 +147,6 @@ void					AudioPattern::SetWave(WaveFile *w)
 
       OnBpmChange();
     }
-  WaveDrawer::SetWave(w, GetSize(), StartWavePos, EndWavePos);
 }
 
 void					AudioPattern::SetDrawing()
