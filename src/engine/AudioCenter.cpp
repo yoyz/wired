@@ -59,14 +59,14 @@ void		AudioCenter::RemoveWaveFile(WaveFile *file)
   int				cpt;
   list<WaveFile *>::iterator	save;
 
-  for (cpt = 0, save = NULL, i = WaveFiles.begin(); i != WaveFiles.end(); i++)
+  for (cpt = 0, save = WaveFiles.end(), i = WaveFiles.begin(); i != WaveFiles.end(); i++)
       if ((*i)->Filename == file->Filename)
 	{
 	  cpt++;
 	  if ((*i) == file)
 	    save = i;
 	}
-  if (save != NULL && (*save)->GetAssociatedPattern() == 1)
+  if (save != WaveFiles.end() && (*save)->GetAssociatedPattern() == 1)
        WaveFiles.erase(save);
   if (cpt == 1 && (*save)->GetAssociatedPattern() == 1)
       wxRemoveFile(file->Filename);
