@@ -67,27 +67,33 @@ void		WiredDocument::saveDocData(SaveElement *data, wxString file)
 void		WiredDocument::clearDocData()
 {
   SaveElementsHashMap::iterator	dataSaveIt;
-
-//   for (dataSaveIt = _dataSave.begin();
-//        dataSaveIt != _dataSave.end();
-//        dataSaveIt++)
-//     if(dataSaveIt->second)
-//       rmDocDataFile(dataSaveIt->first);
-//   std::cerr << "clearDocData -> GetName : " << this->_name.mb_str() << std::endl;
-
+  
+  while(!_dataSave.empty())
+    {
+      dataSaveIt = _dataSave.begin();
+      if(dataSaveIt->second)
+	rmDocDataFile(dataSaveIt->first);
+    }
+ 
+  //to be sure...
   _dataSave.clear();
 }
 
 void		WiredDocument::rmDocDataFile(wxString file)
 {
-//   int	i;
-  
-//   if(_dataSave.find(file) != _dataSave.end())
-//     for (i = 0; i < _dataSave[file]->GetCount(); i++)
-//       if(_dataSave[file]->Item(i) != NULL)
-// 	delete(_dataSave[file]->Item(i));
+   int	i;
+   
+   if(_dataSave.find(file) != _dataSave.end())
+     while(!_dataSave[file]->IsEmpty())
+       {
+	 if(_dataSave[file]->Item(0))
+	   delete (_dataSave[file]->Item(0));
+	 
+	 _dataSave[file]->RemoveAt(0);
+       }
+   
+   _dataSave.erase(file);
 
-//   _dataSave.erase(file);
 }
 
 SaveElementsHashMap	WiredDocument::getDocData()
