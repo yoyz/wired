@@ -115,6 +115,8 @@ void					WaveDrawer::SetDrawing(wxSize s)
 
   if (Wave)
     channel_to_read = Wave->GetChannelToRead();
+  else
+    channel_to_read = 1;
   if (UseSettings && WiredSettings->dbWaveRender)
     {
       if (Wave) // Wave on hdd
