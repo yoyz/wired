@@ -468,8 +468,10 @@ void				Rack::HandleMouseEvent(Plugin *plug, wxMouseEvent *event)
   if(event->RightDown())
     {
       SetSelected(plug);
+#ifdef DEBUG_1561088
       wxPoint p(event->GetPosition().x + plug->GetPosition().x, event->GetPosition().y + plug->GetPosition().y);
       PopupMenu(menu, p.x, p.y);
+#endif
     }
   else if(event->LeftUp() && WasDragging)
     {

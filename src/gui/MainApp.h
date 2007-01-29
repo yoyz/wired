@@ -15,6 +15,8 @@
 
 WX_DEFINE_ARRAY_PTR(wxThread *, wxArrayThread);
 
+#define DEBUG_1561088 1
+
 class MainWindow;
 
 class MainApp : public wxApp
