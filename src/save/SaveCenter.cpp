@@ -2,17 +2,22 @@
 // Under the GNU General Public License Version 2, June 1991
 
 #include "SaveCenter.h"
+#include <wx/dir.h>
 
 SaveCenter		*saveCenter = NULL;
 
 SaveCenter::SaveCenter()
   : WiredDocument(wxT("savecenter"), NULL, true)
 {
+  setSaved(false);
 }
 
 SaveCenter::~SaveCenter()
 {
-  //Nothing to do yet in here...
+  if(!getSaved())
+    CleanProject();
+  
+  std::cerr << "SaveCenter destroyed" << std::endl;
 }
 
 //Implemetation of WiredDocument
@@ -31,6 +36,12 @@ void	SaveCenter::CleanTree()
   WiredDocumentArray		toProcess;
   WiredDocumentArray		toMergeInToProcess;
   int				toProcessIt = 0;
+
+  //delete the old project if it has not been saved.
+  if(!getSaved())
+    CleanProject();
+
+  setSaved(false);
 
   //Initialization of the WiredDocuments to be processed.
   toProcess = this->getChildren();
@@ -62,7 +73,6 @@ void	SaveCenter::SaveProject()
   DumpWiredDocumentTree();
   std::cout << "==/WiredDocument tree dump==" << std::endl;
   
-
   if(!_projectPath.DirExists())
     _projectPath.Mkdir();
     
@@ -74,6 +84,9 @@ void	SaveCenter::SaveProject()
 
   xmlFile->EndDocumentWriter();
   delete xmlFile;
+
+  //the current project is now a saved one
+  setSaved();
 }
 
 void	SaveCenter::SaveFile(WiredDocument *doc, wxString file, wxString path)
@@ -398,7 +411,7 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
 	}
       else if(nodeType == XML_READER_TYPE_END_ELEMENT)
 	{
-	  history.RemoveAt(history.GetCount() - 1);
+	  history.Remove(history.Last());
 	}
     }
   return ret;
@@ -512,6 +525,9 @@ void	SaveCenter::LoadProject()
   //check technical documentation for more informations.
   
   RedistributeHash(dataLoaded);
+
+  //the current project is now a saved one
+  setSaved();
 }
 
 int		SortDataLoaded(loadedDocument *doc1, loadedDocument *doc2)
@@ -690,4 +706,34 @@ bool		SaveCenter::IsProject(wxFileName path)
     return true;
   else
     return false;
+}
+
+bool		SaveCenter::getSaved()
+{
+  return _saved;
+}
+
+void		SaveCenter::setSaved(bool saved)
+{
+  _saved = saved;
+}
+
+void		SaveCenter::CleanProject()
+{
+  wxString	audioPath;
+  wxArrayString	files;
+
+  audioPath = getAudioDir();
+
+  //empty the directory
+  //We can assume the audio directory doesn't have any subdirectory
+  //If one wants to remove subdirectories, he should remove them before
+  //removing the top one.
+  wxDir::GetAllFiles(audioPath, &files);
+  for(int i = 0; i < files.GetCount(); i++)
+    wxRemoveFile(files[i]);      
+
+  wxRmDir(audioPath);
+
+  //add there the deletion of the other folders auto generated.
 }

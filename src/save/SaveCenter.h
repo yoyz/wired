@@ -183,6 +183,17 @@ class SaveCenter : public WiredDocument
    */
   wxFileName	getPathFromRelativeTag(wxString tag);
 
+  /** Returns true if the project has been saved at least once, else false */
+  bool		getSaved();
+
+  /** Sets the saved state of the session. */
+  void		setSaved(bool saved = true);
+
+  /** Removes the files in the project folder.
+   * Should be used only if the project hasn't been saved.
+   */
+  void		CleanProject();
+
  private:
 
   /** Checks if the path is the path to a valid project.
@@ -222,6 +233,10 @@ class SaveCenter : public WiredDocument
    * the suppression of WiredSessionXml.
    */ 
   wxFileName		_audioDir;
+
+  /** Stores if the project has been saved at least once. */
+  bool			_saved;
+
 };
 
 extern SaveCenter*	saveCenter;
