@@ -31,10 +31,11 @@ MixerGui::MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size, Wir
   ImgLockDown = new wxImage(wxString(WiredSettings->DataDir + wxString(MIXERLOCKDOWN)).c_str(), wxBITMAP_TYPE_PNG );
   ImgHpUp = new wxImage(wxString(WiredSettings->DataDir + wxString(MIXERHPUP)).c_str(), wxBITMAP_TYPE_PNG );
   ImgHpDown = new wxImage(wxString(WiredSettings->DataDir + wxString(MIXERHPDOWN)).c_str(), wxBITMAP_TYPE_PNG );
-  /*
-    Adding Master Channel directly
-   */
+
+  //Adding Master Channel directly
   Channel *c = new Channel(true, true, this);
+
+  std::cerr << "MixerGui::MixerGui : " << c << endl;
   AddMasterChannel(c);
   // evenement refresh master volume
   Connect(ID_MIXER_REFRESH, TYPE_MIXER_REFRESH, (wxObjectEventFunction)&MixerGui::OnMasterChange);
@@ -73,7 +74,7 @@ void MixerGui::AddMasterChannel(Channel *channel)
 					       ImgFaderFg, this, -1,
 					       wxPoint(0, 0),
 					       wxSize(CHANNELGUI_WIDTH,
-						      CHANNELGUI_HEIGHT), (WiredDocument *)this);
+						      CHANNELGUI_HEIGHT), this);
 
   SetVirtualSize(CHANNELGUI_WIDTH, CHANNELGUI_HEIGHT);
   ChannelGuiVector.push_back(gui);
@@ -86,6 +87,7 @@ ChannelGui* MixerGui::AddChannel(Channel *channel, const wxString& label)
 {
   int x = /* CHANNELGUI_WIDTH +*/
     ChannelGuiVector.size() * CHANNELGUI_WIDTH;
+
   ChannelGui *gui = new ChannelGui(channel, ImgFaderBg, ImgFaderFg,
 				   this, -1, wxPoint(x, 0),
 				   wxSize(CHANNELGUI_WIDTH,
@@ -162,3 +164,51 @@ void MixerGui::SetLabelByChan(Channel *channel, const wxString& label)
   cg->SetOpt(tr);
   }
 */
+
+void	MixerGui::Load(SaveElementArray data)
+{
+  int dataCompt;
+
+  std::cerr << "MixerGui::Load" << std::endl;
+  for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
+    {
+      std::cerr << "MixerGui->key = " << data[dataCompt]->getKey().mb_str() << std::endl;
+      std::cerr << "MixerGui->value = " << data[dataCompt]->getValue().mb_str() << std::endl;
+
+
+      if (data[dataCompt]->getKey() == wxT("masterLeft"))
+	{
+	  MasterLeft = data[dataCompt]->getValueFloat();
+	  //vuMasterLeft = ->VumLeft;
+	}
+      else if (data[dataCompt]->getKey() == wxT("masterRight"))
+	{
+	  MasterRight = data[dataCompt]->getValueFloat();
+	  //vuMasterRight = gui->VumRight;
+	}
+
+    }
+
+
+}
+
+
+void	MixerGui::Save()
+{
+  SaveElement	*savedElem;
+
+  std::cerr << "MixerGui::Save" << std::endl;
+
+  //MasterLeft
+  std::cerr << "MasterLeft: " << MasterLeft << std::endl;
+  savedElem = new SaveElement(wxT("masterLeft"), MasterLeft);
+  saveDocData(savedElem);
+
+  //MasterRight
+  std::cerr << "MasterRight: " << MasterRight << std::endl;
+  savedElem = new SaveElement(wxT("masterRight"), MasterRight);
+  saveDocData(savedElem);
+
+
+  //ChannelGuiVector
+}

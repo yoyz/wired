@@ -281,7 +281,7 @@ void				ChannelGui::Load(SaveElementArray data)
 {
   int		dataCompt;
 
-  std::cerr << "ChannelGui::Load" << std::endl;
+  std::cerr << "ChannelGui::Load : " << this << std::endl;
   for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
     {
       std::cerr << "ChannelGui->key = " << data[dataCompt]->getKey().mb_str() << std::endl;
@@ -297,29 +297,103 @@ void				ChannelGui::Load(SaveElementArray data)
 	}
       else if (data[dataCompt]->getKey() == wxT("volumeLeft"))
 	{
-	  //VolumeLeft = data[dataCompt]->getValue();
 	  FaderLeft->SetValue((int)(data[dataCompt]->getValueFloat() * 100));
+	  //	  VolumeLeft->SetLabel(data[dataCompt]->getValueFloat());
 	}
       else if (data[dataCompt]->getKey() == wxT("volumeRight"))
 	{
-	  //VolumeRight = data[dataCompt]->getValue();
 	  FaderRight->SetValue((int)(data[dataCompt]->getValueFloat() * 100));
+	  //	  VolumeRight->SetLabel(data[dataCompt]->getValueFloat());
 	}
-      else if (data[dataCompt]->getKey() == wxT("muteLeft"))
+      else if (data[dataCompt]->getKey() == wxT("muteLeftButton"))
 	{
 	  if (!data[dataCompt]->getValueInt())
 	    SetMuteLeftButton(false);
 	  else
 	    SetMuteLeftButton(true);
 	}
-      else if (data[dataCompt]->getKey() == wxT("muteRight"))
+      else if (data[dataCompt]->getKey() == wxT("muteRightButton"))
 	{
 	  if (!data[dataCompt]->getValueInt())
 	    SetMuteRightButton(false);
 	  else
 	    SetMuteRightButton(true);
 	}
+      else if (data[dataCompt]->getKey() == wxT("lockButton"))
+	{
+	  if (!data[dataCompt]->getValueInt()) {
+	    Lock = false;
+	    SetLockButton(false);
+	  }
+	  else {
+	    Lock = true;
+	    SetLockButton(true);
+	  }
+	}
+      else if (data[dataCompt]->getKey() == wxT("label"))
+	{
+	  Label->SetLabel(data[dataCompt]->getValue());
+	}
+
     }
+}
+
+void 	ChannelGui::Save()
+{
+  SaveElement	*savedElem;
+
+  std::cerr << "ChannelGui::Save" << std::endl;
+
+  //Stereo
+  std::cerr << "Stereo: " << Stereo << std::endl;
+  if (Stereo)
+    savedElem = new SaveElement(wxT("stereo"), wxT("1"));
+  else
+    savedElem = new SaveElement(wxT("stereo"), wxT("0"));
+  saveDocData(savedElem);
+
+  //VolumeLeft
+  std::cerr << "VolumeLeft: " << FaderLeft->GetValue() << std::endl;
+  savedElem = new SaveElement(wxT("volumeLeft"), FaderLeft->GetValue() / 100);
+  //FaderLeft->SetValue((int)(data[dataCompt]->getValueFloat() * 100));
+  //  savedElem = new SaveElement(wxT("volumeLeft"), VolumeLeft->GetLabel());
+  saveDocData(savedElem);
+
+  //VolumeRight
+  std::cerr << "VolumeRight: " << FaderRight->GetValue() << std::endl;
+  savedElem = new SaveElement(wxT("volumeRight"), FaderRight->GetValue() / 100);
+  // savedElem = new SaveElement(wxT("volumeRight"), VolumeRight->GetLabel());
+  saveDocData(savedElem);
+
+  //MuteLeft
+  std::cerr << "MuteLeft: " << MuteLeftButton->GetOn() << std::endl;
+  if (MuteLeftButton->GetOn())
+    savedElem = new SaveElement(wxT("muteLeftButton"), wxT("1"));
+  else
+    savedElem = new SaveElement(wxT("muteLeftButton"), wxT("0"));
+  saveDocData(savedElem);
+
+  //MuteRight
+  std::cerr << "MuteRight: " << MuteRightButton->GetOn() << std::endl;
+  if (MuteRightButton->GetOn())
+    savedElem = new SaveElement(wxT("muteRightButton"), wxT("1"));
+  else
+    savedElem = new SaveElement(wxT("muteRightButton"), wxT("0"));
+  saveDocData(savedElem);
+
+  //Lock
+  std::cerr << "Lock: " << LockButton->GetOn() << std::endl;
+  if (LockButton->GetOn())
+    savedElem = new SaveElement(wxT("lockButton"), wxT("1"));
+  else
+    savedElem = new SaveElement(wxT("lockButton"), wxT("0"));
+  saveDocData(savedElem);
+
+  //Label
+  std::cerr << "Label: " << Label->GetLabel() << std::endl;
+  savedElem = new SaveElement(wxT("label"), Label->GetLabel());
+  saveDocData(savedElem);
+
 }
 
 
@@ -327,7 +401,7 @@ MasterChannelGui::MasterChannelGui(Channel* channel, wxImage* img_bg,
 				   wxImage* img_fg, wxWindow* parent,
 				   wxWindowID id, const wxPoint& pos,
 				   const wxSize& size, WiredDocument* parentDoc)
-  : ChannelGui(channel, img_bg, img_fg, parent, id, pos, size, _("MASTER"), (WiredDocument *)this)
+  : ChannelGui(channel, img_bg, img_fg, parent, id, pos, size, _("MASTER"), parentDoc)
 {
   //  Label = new wxStaticText(this, -1, "MASTER", wxPoint(20, 0));
 }

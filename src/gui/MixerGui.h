@@ -109,12 +109,12 @@ class						MixerGui : public wxScrolledWindow, public WiredDocument
   /**
    * WiredDocument implementation
    */
-  void						Load(SaveElementArray data) { return ;};
+  void						Load(SaveElementArray data);
 
   /**
    * WiredDocument implementation
    */
-  void						Save() { return; };
+  void						Save();
 
 
  protected:

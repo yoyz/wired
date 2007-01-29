@@ -52,7 +52,7 @@ class					ChannelGui : public wxPanel, public WiredDocument
   /**
    * WiredDocument implementation
    */
-  void		Save() { return; };
+  void					Save();
 
 
   SeqTrack				*ConnectedSeqTrack;
@@ -80,8 +80,8 @@ class					ChannelGui : public wxPanel, public WiredDocument
   DownButton				*MuteRightButton;
   DownButton				*LockButton;
   wxStaticText				*Label;
-  wxStaticText				*VolumeLeft;
-  wxStaticText				*VolumeRight;
+  //  wxStaticText				*VolumeLeft;
+  //  wxStaticText				*VolumeRight;
 
   //to delete
   wxImage				*hp_up;
