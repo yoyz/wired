@@ -6,7 +6,6 @@
 #include <wx/file.h>
 #include <wx/treectrl.h>
 #include <wx/defs.h>
-#include "MediaLibrary.h"
 #include "MLTree.h"
 #include "MLTreeInfos.h"
 #include "MainWindow.h"
@@ -27,7 +26,7 @@
 #include "delete.xpm"
 #include <SaveCenter.h>
 
-extern MediaLibrary	*MediaLibraryPanel;
+
 extern SaveCenter	*saveCenter;
 WiredSessionXml		*CurrXmlSession = NULL;
 
@@ -61,28 +60,16 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
   s_nodeInfo		infos;
   wxTreeItemId		itemTemp;
 
-  infos = SetStructInfos(infos, _("Sounds"), wxT(""), wxT(""));
-  itemTemp = AppendItem(root, _("Sound Files"));
+  infos = SetStructInfos(infos, _("Local"), wxT(""), wxT(""));
+  itemTemp = AppendItem(root, _("Local Files"));
   SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos;
 
   s_nodeInfo	infos1;
-  infos1 = SetStructInfos(infos1, _("MIDI"), wxT(""), wxT(""));
-  itemTemp = AppendItem(root, _("MIDI Files"));
+  infos1 = SetStructInfos(infos1, _("Project"), wxT(""), wxT(""));
+  itemTemp = AppendItem(root, _("Project Files"));
   SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos1;
-
-  s_nodeInfo	infos2;
-  infos2 = SetStructInfos(infos2, _("Videos"), wxT(""), wxT(""));
-  itemTemp = AppendItem(root, _("Videos Files"));
-  SetItemImage(itemTemp, 0);
-  nodes[itemTemp] = infos2;
-
-  s_nodeInfo	infos3;
-  infos3 = SetStructInfos(infos3, _("Effects"), wxT(""), wxT(""));
-  itemTemp = AppendItem(root, _("Effects Files"));
-  SetItemImage(itemTemp, 0);
-  nodes[itemTemp] = infos3;
 
   Expand(root);
   LoadKnownExtensions();
@@ -423,6 +410,30 @@ wxTreeItemId			MLTree::AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_no
   return itemToAdd;
 }
 
+wxTreeItemId			MLTree::AddFileInProject(wxString FileToAdd, bool expand)
+{
+  wxTreeItemId			itemToAdd;
+  wxTreeItemId                  ParentNode;
+  wxFileName	File(FileToAdd);
+  wxFile *FileInfos = new wxFile(FileToAdd);
+  wxString length_str;	
+  int fileInfosLength = FileInfos->Length();
+  
+  length_str << fileInfosLength;
+
+  s_nodeInfo		infos;
+  
+  infos = SetStructInfos(infos, FileToAdd, File.GetExt(), length_str);
+  ParentNode = GetTreeItemIdFromLabel(_("Project"));
+  itemToAdd = AppendItem(ParentNode, FileToAdd.AfterLast('/'));
+  if (expand == true)
+    Expand(ParentNode);
+  SetItemImage(itemToAdd, 3);
+  nodes[itemToAdd] = infos;
+
+  return itemToAdd;
+}
+
 // Return an item Id from a label node
 wxTreeItemId			MLTree::GetTreeItemIdFromLabel(wxString label)
 {
@@ -578,7 +589,7 @@ void				MLTree::OnAdd(wxString FileToAdd)
 		if (selection.IsOk() == true && selection != GetRootItem())
 		  this->AddFile(selection, FileToAdd.Mid(slashPos + 1), infos, true);
 		else
-		  this->AddFile(GetTreeItemIdFromLabel(_("Sounds")), FileToAdd.Mid(slashPos + 1), infos, true);
+		  this->AddFile(GetTreeItemIdFromLabel(_("Local")), FileToAdd.Mid(slashPos + 1), infos, true);
 	      }
 	  DisplayNodes();
 	}

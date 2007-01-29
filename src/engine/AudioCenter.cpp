@@ -4,7 +4,8 @@
 #include "AudioCenter.h"
 #include <wx/wx.h>
 #include "SaveCenter.h"
-//x#include "<wx/filefn.h>"
+#include "MLTree.h"
+//#include "<wx/filefn.h>"
 
 extern SaveCenter *saveCenter;
 
@@ -37,6 +38,7 @@ WaveFile *AudioCenter::AddWaveFile(wxString filename)
 	  }
 	}
       wxCopyFile(filename, to, true);
+      MediaLibraryPanel->MLTreeView->AddFileInProject(filename, true);
       w = new WaveFile(to, false, WaveFile::rwrite);
       WaveFiles.push_back(w);
     }

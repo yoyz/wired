@@ -9,10 +9,13 @@
 #include <wx/treectrl.h>
 #include <wx/imaglist.h>
 #include "WiredDocument.h"
+#include "MediaLibrary.h"
 
 using std::string;
 using std::vector;
 using std::map;
+
+extern MediaLibrary	*MediaLibraryPanel;
 
 #define EXT_FILE		wxT("wired_exts.conf")
 #define SAVE_TREE_FILE		wxT("MediaLibrary/MLTree")
@@ -43,6 +46,7 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
  * Main constructor for class MLTree
 */
   MLTree(wxWindow *dad, wxPoint p, wxSize s, long style);
+  wxTreeItemId			AddFileInProject(wxString FileToAdd, bool expand);
 /**
  * Main destructor for class MLTree
 */
@@ -186,6 +190,7 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
  * \param toLevel, an int which represent the level of expansion
  * \return void
 */
+
   void				ExpandAll(wxTreeCtrl *Tree, const wxTreeItemId& id, bool shouldExpand, int toLevel);
 
 /**
