@@ -72,7 +72,6 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
   SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos1;
 
-  Expand(root);
   LoadKnownExtensions();
   //temp
   // DisplayNodes();
