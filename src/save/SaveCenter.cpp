@@ -733,7 +733,7 @@ void		SaveCenter::CleanProject()
   for(int i = 0; i < files.GetCount(); i++)
     wxRemoveFile(files[i]);      
 
-  wxRmDir(audioPath);
+  wxRmDir(audioPath.mb_str());
 
   //add there the deletion of the other folders auto generated.
 }
