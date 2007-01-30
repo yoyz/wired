@@ -37,8 +37,6 @@ class MainApp : public wxApp
   void				OnUnhandledException();
   void				ShowWelcome();
 
-  //Shows a wxDirDialog to select a project folder
-  void				OpenWizard();
 };
 
 DECLARE_APP(MainApp)

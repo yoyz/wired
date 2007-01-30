@@ -135,6 +135,9 @@ class					MainWindow: public wxFrame, public WiredDocument
   /* Plugin creation */
   void					CreatePluginFromUniqueId(wxString UniqueId);
 
+  /* Shows a wxDirDialog to select a project folder */
+  void					OpenWizard();
+
  protected:
   friend class				MediaLibrary;
 

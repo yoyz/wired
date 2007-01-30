@@ -110,24 +110,9 @@ bool				MainApp::OnInit()
       exit(-1);
     }
 
-  OpenWizard();
+  MainWin->OpenWizard();
 
   return (true);
-}
-
-void		MainApp::OpenWizard()
-{
-  wxFileName	path;
-
-  wxDirDialog	dirDialog(NULL, _("Select a project folder"), wxGetCwd());
-
-  while(dirDialog.ShowModal() != wxID_OK)
-    MainWin->AlertDialog(_("Warning"),
-			 _("You have to select a project folder."));
- 
-  path.AssignDir(dirDialog.GetPath());
-
-  saveCenter->setProjectPath(path);
 }
 
 void	MainApp::ShowWelcome()

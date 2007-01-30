@@ -664,6 +664,9 @@ bool					MainWindow::NewSession()
   SeqPanel->DeleteAllTracks();
   RackPanel->DeleteAllRacks();
   OptPanel->DeleteTools();
+
+  OpenWizard();
+
   return (true);
 }
 
@@ -2051,6 +2054,20 @@ void		MainWindow::OnSaveML(wxCommandEvent &WXUNUSED(event))
     }
 }
 
+void		MainWindow::OpenWizard()
+{
+  wxFileName	path;
+
+  wxDirDialog	dirDialog(NULL, _("Select a project folder"), wxGetCwd());
+
+  while(dirDialog.ShowModal() != wxID_OK)
+    AlertDialog(_("Warning"),
+			 _("You have to select a project folder."));
+ 
+  path.AssignDir(dirDialog.GetPath());
+
+  saveCenter->setProjectPath(path);
+}
 
 BEGIN_DECLARE_EVENT_TYPES()
   DECLARE_EVENT_TYPE(wxSetCursorPos, 313131)
