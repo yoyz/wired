@@ -31,6 +31,7 @@ extern SaveCenter	*saveCenter;
 WiredSessionXml		*CurrXmlSession = NULL;
 
 //quite strange to have the s_nodeInfo as a return value and a parameter....
+//even stranger because the parameter is not a pointer... conception mistake ?
 s_nodeInfo		SetStructInfos(s_nodeInfo infos, wxString label, wxString extension, wxString length)
 {
   infos.label = label;
@@ -102,11 +103,17 @@ void		MLTree::SaveTreeSC(wxTreeItemId parent, SaveElement *parentElem)
   wxTreeItemId		item = GetFirstChild(parent, cookie);
   wxTreeItemId		item_last = GetLastChild(parent);
   SaveElement		*currSaveElem = NULL;
+  wxString		text;
+  wxFileName		path;
+
 
   while (item.IsOk())
     {
-      wxString text = GetItemText(item);
+      text = GetItemText(item);
       infos = GetTreeItemStructFromId(item);
+
+      path.Assign(infos.label);
+      path.MakeRelativeTo(saveCenter->getAudioDir());
 
       currSaveElem = new SaveElement();
       parentElem->addChildren(currSaveElem);
@@ -129,7 +136,7 @@ void		MLTree::SaveTreeSC(wxTreeItemId parent, SaveElement *parentElem)
 	    {
 	      currSaveElem->setKey(wxT("file"));
 	      currSaveElem->addAttribute(wxT("name"), text);
-	      currSaveElem->addAttribute(wxT("infos_label"), infos.label);
+	      currSaveElem->addAttribute(wxT("infos_label"), path.GetFullPath());
 	      currSaveElem->addAttribute(wxT("infos_length"), infos.length);
 	      currSaveElem->addAttribute(wxT("infos_ext"), infos.extension);
 	    }
@@ -197,6 +204,7 @@ void				MLTree::LoadItem(wxTreeItemId parent,
   s_nodeInfo		infos;
   bool			expand;
   wxTreeItemId		next;
+  wxFileName		path;
 
   saveElemChildren = parentData->getChildren();
 
@@ -223,8 +231,10 @@ void				MLTree::LoadItem(wxTreeItemId parent,
 	}
       else if(currSaveElem->getKey() == wxT("file"))
 	{
+	  path = currSaveElem->getAttribute(wxT("infos_label"));
+	  path.MakeAbsolute(saveCenter->getAudioDir());
 	  infos = SetStructInfos(infos,
-				 currSaveElem->getAttribute(wxT("infos_label")),
+				 path.GetFullPath(),
 				 currSaveElem->getAttribute(wxT("infos_ext")),
 				 currSaveElem->getAttribute(wxT("infos_length")));
 	  AddFile(parent, currSaveElem->getAttribute(wxT("name")), infos, false);
