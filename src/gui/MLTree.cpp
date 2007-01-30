@@ -60,14 +60,14 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
   s_nodeInfo		infos;
   wxTreeItemId		itemTemp;
 
-  infos = SetStructInfos(infos, _("Local"), wxT(""), wxT(""));
-  itemTemp = AppendItem(root, _("Local Files"));
+  infos = SetStructInfos(infos, LOCAL_NODE, wxT(""), wxT(""));
+  itemTemp = AppendItem(root, LOCAL_NODE_NAME);
   SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos;
 
   s_nodeInfo	infos1;
-  infos1 = SetStructInfos(infos1, _("Project"), wxT(""), wxT(""));
-  itemTemp = AppendItem(root, _("Project Files"));
+  infos1 = SetStructInfos(infos1, PROJECT_NODE, wxT(""), wxT(""));
+  itemTemp = AppendItem(root, PROJECT_NODE_NAME);
   SetItemImage(itemTemp, 0);
   nodes[itemTemp] = infos1;
 
@@ -589,7 +589,7 @@ void				MLTree::OnAdd(wxString FileToAdd)
 		if (selection.IsOk() == true && selection != GetRootItem())
 		  this->AddFile(selection, FileToAdd.Mid(slashPos + 1), infos, true);
 		else
-		  this->AddFile(GetTreeItemIdFromLabel(_("Local")), FileToAdd.Mid(slashPos + 1), infos, true);
+		  this->AddFile(GetTreeItemIdFromLabel(LOCAL_NODE), FileToAdd.Mid(slashPos + 1), infos, true);
 	      }
 	  DisplayNodes();
 	}

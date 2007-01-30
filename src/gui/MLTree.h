@@ -19,7 +19,10 @@ extern MediaLibrary	*MediaLibraryPanel;
 
 #define EXT_FILE		wxT("wired_exts.conf")
 #define SAVE_TREE_FILE		wxT("MediaLibrary/MLTree")
-
+#define PROJECT_NODE            _("Project")
+#define LOCAL_NODE		_("Local")
+#define PROJECT_NODE_NAME       _("Project Files")
+#define LOCAL_NODE_NAME		_("Local Files")
 /**
  * The size of ML icon (square)
  */

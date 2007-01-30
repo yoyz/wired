@@ -70,7 +70,7 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
 
   MLTreeView = new MLTree(this, wxPoint(10, 50),
 			  wxSize(195, GetSize().y - 160),
-			  wxTR_DEFAULT_STYLE | wxTR_EDIT_LABELS | wxTR_MULTIPLE);
+			  wxTR_DEFAULT_STYLE | wxTR_EDIT_LABELS | wxTR_MULTIPLE | wxTR_HIDE_ROOT);
   MLTreeView->SetTreeExpanded();
 
   TopToolbar = new wxToolBar(this, -1, wxPoint(-1, -1), wxSize(1000, 46), wxTB_3DBUTTONS);
