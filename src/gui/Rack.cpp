@@ -208,15 +208,18 @@ void				Rack::InitContextMenu()
   menu->Append(ID_MENU_ADD, _("Add"), submenu);
   submenu->Append(ID_INSTR_MENU, _("&Instruments"), instr_menu);
   submenu->Append(ID_EFFECTS_MENU, _("&Effects"), effects_menu);
+#if DEBUG_1561088
   menu->Append(ID_MENU_CUT, _("Cut"));
   menu->Append(ID_MENU_COPY, _("Copy"));
   menu->Append(ID_MENU_PASTE, _("Paste"), false);
+  menu->Enable(ID_MENU_PASTE, false);
+#endif
   menu->AppendSeparator();
   menu->Append(ID_MENU_DELETE, _("Delete"));
-  menu->Enable(ID_MENU_PASTE, false);
 
   AddPlugToMenu();
 
+#if DEBUG_1561088
   Connect(ID_MENU_CUT, wxEVT_COMMAND_MENU_SELECTED,
 	  (wxObjectEventFunction)(wxEventFunction)
 	  (wxCommandEventFunction)&Rack::OnCutClick);
@@ -226,6 +229,7 @@ void				Rack::InitContextMenu()
   Connect(ID_MENU_PASTE, wxEVT_COMMAND_MENU_SELECTED,
 	  (wxObjectEventFunction)(wxEventFunction)
 	  (wxCommandEventFunction)&Rack::OnPasteClick);
+#endif
   Connect(ID_MENU_DELETE, wxEVT_COMMAND_MENU_SELECTED,
 	  (wxObjectEventFunction)(wxEventFunction)
 	  (wxCommandEventFunction)&Rack::OnDeleteClick);
@@ -468,10 +472,8 @@ void				Rack::HandleMouseEvent(Plugin *plug, wxMouseEvent *event)
   if(event->RightDown())
     {
       SetSelected(plug);
-#ifdef DEBUG_1561088
       wxPoint p(event->GetPosition().x + plug->GetPosition().x, event->GetPosition().y + plug->GetPosition().y);
       PopupMenu(menu, p.x, p.y);
-#endif
     }
   else if(event->LeftUp() && WasDragging)
     {
