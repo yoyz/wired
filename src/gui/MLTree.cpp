@@ -392,6 +392,14 @@ wxTreeItemId			MLTree::AddFile(wxTreeItemId ParentNode, wxString FileToAdd, s_no
 
   if (!ParentNode.IsOk())
     ParentNode = root;
+ map<wxTreeItemId, s_nodeInfo>::iterator it;
+ for (it = nodes.begin(); it != nodes.end(); it++)
+    {
+      if ((*it).second.label == infos.label && GetItemParent((*it).first) == ParentNode)
+	{
+	  return itemToAdd;
+	  }
+    }
   itemToAdd = AppendItem(ParentNode, FileToAdd);
   if (expand == true)
     Expand(ParentNode);
@@ -415,7 +423,17 @@ wxTreeItemId			MLTree::AddFileInProject(wxString FileToAdd, bool expand)
   s_nodeInfo		infos;
   
   infos = SetStructInfos(infos, FileToAdd, File.GetExt(), length_str);
-  ParentNode = GetTreeItemIdFromLabel(_("Project"));
+  map<wxTreeItemId, s_nodeInfo>::iterator it;
+
+
+  ParentNode = GetTreeItemIdFromLabel(PROJECT_NODE);
+  for (it = nodes.begin(); it != nodes.end(); it++)
+    {
+      if ((*it).second.label == infos.label && GetItemParent((*it).first) == ParentNode)
+	{
+	  return itemToAdd;
+	  }
+    }
   itemToAdd = AppendItem(ParentNode, FileToAdd.AfterLast('/'));
   if (expand == true)
     Expand(ParentNode);
@@ -424,7 +442,23 @@ wxTreeItemId			MLTree::AddFileInProject(wxString FileToAdd, bool expand)
 
   return itemToAdd;
 }
+wxTreeItemId			MLTree::DelFileInProject(wxString FileToAdd, bool expand)
+{
+ map<wxTreeItemId, s_nodeInfo>::iterator it;
+ wxTreeItemId                  ParentNode;
 
+ ParentNode = GetTreeItemIdFromLabel(PROJECT_NODE);
+ for (it = nodes.begin(); it != nodes.end(); it++)
+   {
+     if ((*it).second.label.AfterLast('/') == FileToAdd.AfterLast('/') && GetItemParent((*it).first) == ParentNode)
+       {
+	 nodes.erase((*it).first);
+	  DeleteChildren((*it).first);
+	  Delete((*it).first);
+       }
+    }
+  DisplayNodes();
+}
 // Return an item Id from a label node
 wxTreeItemId			MLTree::GetTreeItemIdFromLabel(wxString label)
 {
@@ -809,6 +843,25 @@ void				MLTree::EndDrag(wxTreeEvent &event)
 
   item = event.GetItem();
   item_begin = item;
+
+  map<wxTreeItemId, s_nodeInfo>::iterator it;
+  s_nodeInfo		infos;
+
+  for (it = nodes.begin(); it != nodes.end(); it++)
+    {
+      if ((*it).first == item_to_drag)
+	{
+	  infos = (*it).second;
+	  break;
+	}
+    } 
+  for (it = nodes.begin(); it != nodes.end(); it++)
+    {
+      if ((*it).second.label == infos.label && GetItemParent((*it).first) == item)
+	{
+	  return;
+	}
+    }
   if (item.IsOk() && item != item_to_drag && item != GetRootItem() && GetItemParent(item) != item_to_drag && !GetTreeItemStructFromId(item).extension.Cmp(wxT("")))
     {
       DragAndDrop(item);

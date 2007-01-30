@@ -50,6 +50,7 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
 */
   MLTree(wxWindow *dad, wxPoint p, wxSize s, long style);
   wxTreeItemId			AddFileInProject(wxString FileToAdd, bool expand);
+  wxTreeItemId			DelFileInProject(wxString FileToAdd, bool expand);
 /**
  * Main destructor for class MLTree
 */
