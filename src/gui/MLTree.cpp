@@ -153,11 +153,11 @@ void				MLTree::Save()
 {
   SaveElement	*rootTreeSaveElem = new SaveElement();
 
-  rootTreeSaveElem->setKey(wxT("root"));
+  rootTreeSaveElem->setKey(PROJECT_NODE);
 
-  SaveTreeSC(GetRootItem(), rootTreeSaveElem);
+  SaveTreeSC(GetTreeItemIdFromLabel(PROJECT_NODE), rootTreeSaveElem);
 
-  saveDocData(rootTreeSaveElem, wxT("MediaLibrary/MLTree"));
+  saveDocData(rootTreeSaveElem, SAVE_TREE_FILE);
 }
 
 void				MLTree::LoadPatch(wxString filename)
@@ -174,20 +174,17 @@ void				MLTree::LoadPatch(wxString filename)
   patchName = filename.AfterLast('/');
   patchName = patchName.BeforeLast('.');
 
-  root = AddRoot(patchName);
-  SetItemBold(root);
-
   treeData = AskData(filename);
   if(treeData.GetCount() > 0)
     {
       rootSaveElem = treeData.Item(0);
-      while(rootSaveElem->getKey() != wxT("root") && rootSaveElem->hasChildren())
+      while(rootSaveElem->getKey() != PROJECT_NODE && rootSaveElem->hasChildren())
 	rootSaveElem = rootSaveElem->getChildren().Item(0);
 
-      if(rootSaveElem->getKey() == wxT("root"))
-	LoadItem(GetRootItem(), rootSaveElem);
+      if(rootSaveElem->getKey() == PROJECT_NODE)
+	LoadItem(GetTreeItemIdFromLabel(PROJECT_NODE), rootSaveElem);
     }
-  Expand(root);
+  //  Expand(root);
 
 }
 
@@ -251,11 +248,6 @@ void				MLTree::Load(SaveElementArray data)
   wxString		treeFile;
   SaveElement		*rootSaveElem;
 
-  DeleteAllItems();
-
-  root = AddRoot(saveCenter->getProjectName());
-  SetItemBold(root);
-
   ref = data.Item(0);
   treeFile = ref->getValue();
 
@@ -263,13 +255,12 @@ void				MLTree::Load(SaveElementArray data)
   if(treeData.GetCount() > 0)
     {
       rootSaveElem = treeData.Item(0);
-      while(rootSaveElem->getKey() != wxT("root") && rootSaveElem->hasChildren())
+      while(rootSaveElem->getKey() != PROJECT_NODE && rootSaveElem->hasChildren())
 	rootSaveElem = rootSaveElem->getChildren().Item(0);
 
-      if(rootSaveElem->getKey() == wxT("root"))
-	LoadItem(GetRootItem(), rootSaveElem);
+      if(rootSaveElem->getKey() == PROJECT_NODE)
+	LoadItem(GetTreeItemIdFromLabel(PROJECT_NODE), rootSaveElem);
     }
-  Expand(root);
 }
 
 void				MLTree::AddIcon(wxImageList *images, wxIcon icon)
