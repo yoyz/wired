@@ -335,13 +335,13 @@ void					SequencerView::Drop(int x, int y, wxString file)
       else
 	{
 	  wave_tmp = WaveCenter.AddWaveFile(file);
-	  for (nb_channel = 0; nb_channel < wave->GetNumberOfChannels(); nb_channel++)
-	    {
-	      track_to_add = SeqPanel->CreateTrack(eAudioTrack);
-	      wave = WaveCenter.AddWaveFile(file);
-	      wave->SetChannelToRead(nb_channel);
-	      track_to_add->CreateAudioPattern(wave, 0);
-	    }
+	  for (nb_channel = 0; nb_channel < wave_tmp->GetNumberOfChannels(); nb_channel++)
+	  {
+	    track_to_add = SeqPanel->CreateTrack(eAudioTrack);
+	    wave = WaveCenter.AddWaveFile(file);
+	    wave->SetChannelToRead(nb_channel);
+	    track_to_add->CreateAudioPattern(wave, 0);
+	  }
 	}
       WaveCenter.RemoveWaveFile(wave_tmp);
     }
