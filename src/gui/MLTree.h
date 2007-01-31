@@ -23,6 +23,7 @@ extern MediaLibrary	*MediaLibraryPanel;
 #define LOCAL_NODE		_("Local")
 #define PROJECT_NODE_NAME       _("Project Files")
 #define LOCAL_NODE_NAME		_("Local Files")
+#define NEW_DIRECTORY_NAME	_("New Directory")
 /**
  * The size of ML icon (square)
  */
@@ -227,6 +228,14 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
 */
   void				OnAdd(wxString FileToAdd);
 
+
+/**
+ * The OnAddDirectory function is called by launching the Add Directory action
+ *
+*/
+  void				ImportDir();
+  void				OnAddDirectory(wxString DirToAdd);
+
 /**
  * The OnRemove function remove the selected nodes
  * \return void
@@ -238,7 +247,7 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
  * create a new directory node.
  * \return void
 */
-  void				OnCreateDir();
+  wxTreeItemId			OnCreateDir(wxString = NEW_DIRECTORY_NAME);
 
 /**
  * The OnInsert function is called when inserting the selected item into a
@@ -369,7 +378,8 @@ enum
   ML_ID_MENU_INFOS,
   ML_ID_MENU_CREATEDIR,
   ML_ID_INSTR_MENU,
-  ML_ID_EFFECTS_MENU
+  ML_ID_EFFECTS_MENU,
+  ML_ID_MENU_ADDDIR
 };
 
 enum

@@ -25,6 +25,7 @@
 #include "folder-open.xpm"
 #include "delete.xpm"
 #include <SaveCenter.h>
+#include "MLTraverser.h"
 
 
 extern SaveCenter	*saveCenter;
@@ -88,6 +89,8 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
 	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::OnPreview);
   Connect(ML_ID_MENU_INFOS, wxEVT_COMMAND_MENU_SELECTED,
 	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::DisplayInfos);
+  Connect(ML_ID_MENU_ADDDIR, wxEVT_COMMAND_MENU_SELECTED,
+	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::ImportDir);
 }
 
 MLTree::~MLTree()
@@ -339,7 +342,7 @@ bool				MLTree::IsTreeCollapsed()
 }
 
 // When creating a directory
-void				MLTree::OnCreateDir()
+wxTreeItemId			MLTree::OnCreateDir(wxString dirName)
 {
   //  cout << "[MEDIALIBRARY] OmCreateDir" << endl;
 
@@ -350,12 +353,13 @@ void				MLTree::OnCreateDir()
 
   itemParent = GetSelection();
 
-  infos = SetStructInfos(infos, _("New Directory"), wxT(""), wxT(""));
-  itemAdded = AppendItem(itemParent, _("New Directory"));
+  infos = SetStructInfos(infos, dirName, wxT(""), wxT(""));
+  itemAdded = AppendItem(itemParent, dirName);
   SetItemImage(itemAdded, 0);
   nodes[itemAdded] = infos;
   Expand(itemParent);
   EditLabel(itemAdded);
+  return (itemAdded);
 }
 
 // When inserting a file
@@ -599,35 +603,82 @@ s_nodeInfo			MLTree::GetTreeItemStructFromId(wxTreeItemId ItemToFind)
 void				MLTree::OnAdd(wxString FileToAdd)
 {
   if (!FileToAdd.empty())
+  {
+    wxFileName	File(FileToAdd);
+
+    if (File.FileExists() == true)
     {
-      wxFileName	File(FileToAdd);
+      //	  cout << "[MEDIALIBRARY] File added : " << FileToAdd <<  " Extension is : " << File.GetExt() << endl;
+      wxFile *FileInfos = new wxFile(FileToAdd);
+      wxString length_str;
+      int fileInfosLength = FileInfos->Length();
+      length_str << fileInfosLength;
 
-      if (File.FileExists() == true)
+      for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
+	if (iter->Contains(File.GetExt().Lower()) == true)
 	{
-	  //	  cout << "[MEDIALIBRARY] File added : " << FileToAdd <<  " Extension is : " << File.GetExt() << endl;
-	  wxFile *FileInfos = new wxFile(FileToAdd);
-	  wxString length_str;
-	  int fileInfosLength = FileInfos->Length();
-	  length_str << fileInfosLength;
+	  s_nodeInfo		infos;
+	  int			slashPos;
+	  wxTreeItemId		selection;
 
-	  for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
-	    if (iter->Contains(File.GetExt().Lower()) == true)
-	      {
-		s_nodeInfo		infos;
-		int			slashPos;
-		wxTreeItemId		selection;
-
-		infos = SetStructInfos(infos, FileToAdd, File.GetExt(), length_str);
-		slashPos = FileToAdd.Find('/', true);
-		selection = GetSelection();
-		if (selection.IsOk() == true && selection != GetRootItem())
-		  this->AddFile(selection, FileToAdd.Mid(slashPos + 1), infos, true);
-		else
-		  this->AddFile(GetTreeItemIdFromLabel(LOCAL_NODE), FileToAdd.Mid(slashPos + 1), infos, true);
-	      }
-	  DisplayNodes();
+	  infos = SetStructInfos(infos, FileToAdd, File.GetExt(), length_str);
+	  slashPos = FileToAdd.Find('/', true);
+	  selection = GetSelection();
+	  if (selection.IsOk() == true && selection != GetRootItem())
+	    this->AddFile(selection, FileToAdd.Mid(slashPos + 1), infos, true);
+	  else
+	    this->AddFile(GetTreeItemIdFromLabel(LOCAL_NODE), FileToAdd.Mid(slashPos + 1), infos, true);
 	}
+      DisplayNodes();
     }
+  }
+}
+
+void				MLTree::ImportDir()
+{
+  wxDirDialog		dlg(this, _("Import directory"), wxGetCwd());
+  int			res;
+
+  if (dlg.ShowModal() == wxID_OK)
+    {
+      wxString 	seldir = dlg.GetPath();
+
+      this->OnAddDirectory(seldir);
+    }
+}
+
+void				MLTree::OnAddDirectory(wxString DirToAdd)
+{
+  cout << DirToAdd.mb_str() << endl;
+  //DirToAdd.Append("/");
+  if (!DirToAdd.empty())
+  {
+    wxFileName	File(DirToAdd);
+
+    if (File.DirExists())
+    {
+      wxArrayString		files;
+      wxDirTraverserSimple	traverser(files);
+      wxDir			Dir(DirToAdd);
+
+      files.Empty();
+      Dir.Traverse(traverser);	
+      if (!files.IsEmpty())
+      {
+	size_t			nbFiles = files.GetCount();
+	wxString		f;
+	int			i;
+
+	cout << "nbFiles = " << nbFiles << endl;
+	for (i = (int)(nbFiles) - 1; i >= 0 ; i--)
+	{
+	  cout << "nbFiles = " << nbFiles << " i = " << i << endl;
+	  f = files.Item(i);
+	  OnAdd(f);
+	}
+      }
+    }
+  }
 }
 
 // Return selection label
@@ -740,6 +791,7 @@ void				MLTree::OnRightClick(wxMouseEvent& event)
   else
     {
       myMenu->Append(ML_ID_MENU_CREATEDIR, _("New Directory"), _("New Directory"));
+      myMenu->Append(ML_ID_MENU_ADDDIR, _("Import Directory"), _("Import Directory"));
     }
   myMenu->Append(ML_ID_MENU_DELETE, _("Delete"), _("Delete"));
   PopupMenu(myMenu);

@@ -31,6 +31,8 @@ libgui_a_SOURCES = 			\
 		MainWindow.h		\
 		MediaLibrary.cpp	\
 		MediaLibrary.h		\
+		MLTraverser.cpp		\
+		MLTraverser.h		\
 		MLTree.cpp		\
 		MLTree.h		\
 		MLTreeInfos.cpp		\
