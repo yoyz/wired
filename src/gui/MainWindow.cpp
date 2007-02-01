@@ -611,6 +611,10 @@ void					MainWindow::OnClose(wxCloseEvent &event)
   if (LoadedExternalPlugins)
     delete LoadedExternalPlugins;
 
+  cout << "[MAINWIN] Closing Media Library" << endl;
+  if(MediaLibraryPanel)
+    delete MediaLibraryPanel;
+
   cout << "[MAINWIN] Unloading session manager..." << endl;
   delete saveCenter;
 

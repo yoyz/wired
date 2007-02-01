@@ -16,7 +16,6 @@ SaveCenter::~SaveCenter()
 {
   if(!getSaved())
     CleanProject();
-  
   std::cerr << "SaveCenter destroyed" << std::endl;
 }
 
@@ -68,10 +67,6 @@ void	SaveCenter::SaveProject()
 {
   wxString	fileName;
   WiredXml	*xmlFile = new WiredXml();
-
-  std::cout << "==WiredDocument tree dump==" << std::endl;
-  DumpWiredDocumentTree();
-  std::cout << "==/WiredDocument tree dump==" << std::endl;
   
   if(!_projectPath.DirExists())
     _projectPath.Mkdir();
@@ -91,11 +86,16 @@ void	SaveCenter::SaveProject()
 
 void	SaveCenter::SaveFile(WiredDocument *doc, wxString file, wxString path)
 {
-  doc->SaveMe();
-
+  wxFileName	normalizedPath;
+  
   if (path == wxT(""))
     path = file;
-
+  else
+    {
+      normalizedPath.Assign(path);
+      normalizedPath.Normalize();
+      path = normalizedPath.GetFullPath();
+    }
   if (doc->getDocFile(file) == NULL)
     std::cerr << "[SaveCenter] trying to save a key not found..." << std::endl;
 
@@ -359,23 +359,9 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
   SaveElement		*currSaveElem;
 
 
-  //Filename management
-  if(!filename.StartsWith(wxT("/")))
-    {
-      absoluteFilename.Assign(getProjectPath());
-      relativeFilename.Assign(filename);
-      
-      dirs = relativeFilename.GetDirs();
-      
-      for(int i = 0; i < dirs.GetCount(); i++)
-	absoluteFilename.AppendDir(dirs.Item(i));
-      
-      absoluteFilename.SetName(relativeFilename.GetName());
-      absoluteFilename.SetExt(relativeFilename.GetExt());
-    }
-  else
-    absoluteFilename.Assign(filename);
-
+  absoluteFilename.Assign(filename);
+  absoluteFilename.Normalize(wxPATH_NORM_ALL, getProjectPath().GetFullPath());
+  
   xmlFile->OpenDocument(absoluteFilename.GetFullPath());
 
   rootTag = absoluteFilename.GetName();

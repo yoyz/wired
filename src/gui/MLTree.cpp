@@ -91,14 +91,16 @@ MLTree::MLTree(wxWindow *MediaLibraryPanel, wxPoint p, wxSize s, long style)
 	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::DisplayInfos);
   Connect(ML_ID_MENU_ADDDIR, wxEVT_COMMAND_MENU_SELECTED,
 	  (wxObjectEventFunction)(wxEventFunction)(wxCommandEventFunction)&MLTree::ImportDir);
+
+  LoadLocalTree();
 }
 
 MLTree::~MLTree()
 {
-
+  SaveLocalTree();
 }
 
-void		MLTree::SaveTreeSC(wxTreeItemId parent, SaveElement *parentElem)
+void		MLTree::SaveTreeSC(wxTreeItemId parent, SaveElement *parentElem, bool relativePath)
 {
   wxTreeItemIdValue	cookie;
   s_nodeInfo		infos;
@@ -115,8 +117,9 @@ void		MLTree::SaveTreeSC(wxTreeItemId parent, SaveElement *parentElem)
       infos = GetTreeItemStructFromId(item);
 
       path.Assign(infos.label);
-      path.MakeRelativeTo(saveCenter->getAudioDir());
-
+      if(relativePath)
+	path.MakeRelativeTo(saveCenter->getAudioDir());
+      
       currSaveElem = new SaveElement();
       parentElem->addChildren(currSaveElem);
 
@@ -130,7 +133,7 @@ void		MLTree::SaveTreeSC(wxTreeItemId parent, SaveElement *parentElem)
 	    currSaveElem->addAttribute(wxT("is_expanded"), wxT("false"));
 
 	  //call recursively on our children
-	  SaveTreeSC(item, currSaveElem);
+	  SaveTreeSC(item, currSaveElem, relativePath);
 	}
       else // no children
 	{
@@ -151,6 +154,7 @@ void		MLTree::SaveTreeSC(wxTreeItemId parent, SaveElement *parentElem)
 	}
       item = GetNextChild(parent, cookie);
     }
+  
 }
 
 void				MLTree::OnSave(wxString filename)
@@ -164,9 +168,48 @@ void				MLTree::Save()
 
   rootTreeSaveElem->setKey(PROJECT_NODE);
 
-  SaveTreeSC(GetTreeItemIdFromLabel(PROJECT_NODE), rootTreeSaveElem);
+  SaveTreeSC(GetTreeItemIdFromLabel(PROJECT_NODE), rootTreeSaveElem, true);
 
   saveDocData(rootTreeSaveElem, SAVE_TREE_FILE);
+}
+
+void				MLTree::SaveLocalTree()
+{
+  SaveElement	*rootTreeSaveElem = new SaveElement();
+
+  rootTreeSaveElem->setKey(LOCAL_NODE);
+
+  SaveTreeSC(GetTreeItemIdFromLabel(LOCAL_NODE), rootTreeSaveElem, false);
+
+  saveDocData(rootTreeSaveElem, LOCAL_TREE_FILE);
+
+  SavePatch(LOCAL_TREE_FILE, LOCAL_TREE_PATH);
+}
+
+void				MLTree::LoadLocalTree()
+{
+  //Another awful copy paste... we have to do something soon
+
+  SaveElementArray	treeData;
+  SaveElement		*rootSaveElem;
+  wxTreeItemId		localNode;
+
+  localNode = GetTreeItemIdFromLabel(LOCAL_NODE);
+
+  DeleteChildren(localNode);
+
+  treeData = AskData(LOCAL_TREE_PATH);
+
+  if(treeData.GetCount() > 0)
+    {
+      rootSaveElem = treeData.Item(0);
+      while(rootSaveElem->getKey() != LOCAL_NODE && rootSaveElem->hasChildren())
+	rootSaveElem = rootSaveElem->getChildren().Item(0);
+
+      if(rootSaveElem->getKey() == LOCAL_NODE)
+	LoadItem(localNode, rootSaveElem);
+    }
+
 }
 
 void				MLTree::LoadPatch(wxString filename)
@@ -174,14 +217,13 @@ void				MLTree::LoadPatch(wxString filename)
   //Adapted Copy Paste of Load, didn't want to bother trying to make things clean...
   std::cerr << "[MLTree] Load" << std::endl;
 
-  wxString		patchName;
   SaveElementArray	treeData;
   SaveElement		*rootSaveElem;
+  wxTreeItemId		projectNode;
 
-  DeleteAllItems();
+  projectNode = GetTreeItemIdFromLabel(PROJECT_NODE);
 
-  patchName = filename.AfterLast('/');
-  patchName = patchName.BeforeLast('.');
+  DeleteChildren(projectNode);
 
   treeData = AskData(filename);
   if(treeData.GetCount() > 0)
@@ -191,9 +233,8 @@ void				MLTree::LoadPatch(wxString filename)
 	rootSaveElem = rootSaveElem->getChildren().Item(0);
 
       if(rootSaveElem->getKey() == PROJECT_NODE)
-	LoadItem(GetTreeItemIdFromLabel(PROJECT_NODE), rootSaveElem);
+	LoadItem(projectNode, rootSaveElem);
     }
-  //  Expand(root);
 
 }
 
@@ -234,13 +275,13 @@ void				MLTree::LoadItem(wxTreeItemId parent,
       else if(currSaveElem->getKey() == wxT("file"))
 	{
 	  path = currSaveElem->getAttribute(wxT("infos_label"));
-	  path.MakeAbsolute(saveCenter->getAudioDir());
+	  if(path.IsRelative())
+	     path.MakeAbsolute(saveCenter->getAudioDir());
 	  infos = SetStructInfos(infos,
 				 path.GetFullPath(),
 				 currSaveElem->getAttribute(wxT("infos_ext")),
 				 currSaveElem->getAttribute(wxT("infos_length")));
 	  AddFile(parent, currSaveElem->getAttribute(wxT("name")), infos, false);
-	  SetItemImage(next, 3);
 	}
       if(parentData->getAttribute(wxT("is_expanded")) == wxT("true"))
 	 Expand(parent);
@@ -967,6 +1008,7 @@ void				MLTree::OnSuppr(wxKeyEvent &event)
       cout << "removing" << endl;
     }
 }
+
 
 BEGIN_EVENT_TABLE(MLTree, wxTreeCtrl)
   EVT_RIGHT_UP(MLTree::OnRightClick)

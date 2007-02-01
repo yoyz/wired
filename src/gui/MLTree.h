@@ -19,6 +19,8 @@ extern MediaLibrary	*MediaLibraryPanel;
 
 #define EXT_FILE		wxT("wired_exts.conf")
 #define SAVE_TREE_FILE		wxT("MediaLibrary/MLTree")
+#define LOCAL_TREE_FILE		wxT("LocalTree")
+#define LOCAL_TREE_PATH		wxT("~/.wired/LocalTree.xml")
 #define PROJECT_NODE            _("Project")
 #define LOCAL_NODE		_("Local")
 #define PROJECT_NODE_NAME       _("Project Files")
@@ -125,11 +127,21 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
   */
   void			Save();
 
-  void			SaveTreeSC(wxTreeItemId parent, SaveElement *parentData);
+  void			SaveTreeSC(wxTreeItemId parent, SaveElement *parentData, bool relativePath);
 
   void			Load(SaveElementArray data);
   
   void			LoadItem(wxTreeItemId parent, SaveElement *parentData);
+
+  /**
+   * Used to save the local tree when closing wired.
+   */
+  void			SaveLocalTree();
+
+  /**
+   * Used to load the local tree when starting wired.
+   */
+  void			LoadLocalTree();
 
 /**
  * The function IsTreeCollapsed is used to know if the nodes are expanded or

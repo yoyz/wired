@@ -112,7 +112,20 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
 
 MediaLibrary::~MediaLibrary()
 {
+  if(TopToolbar)
+    delete TopToolbar;
 
+  if(MLTreeView)
+    delete MLTreeView;
+
+  if(BottomToolbar)
+    delete BottomToolbar;
+
+  if(SortSelect)
+    delete SortSelect;
+
+  if(FiltersToolbar)
+    delete FiltersToolbar;
 }
 
 void				MediaLibrary::SetFileConverter(FileConversion *Fileconv)
