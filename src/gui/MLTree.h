@@ -65,7 +65,6 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
 
  protected:
   friend class			MediaLibrary;
-  // friend class			WiredSessionXml;
   friend class			MLTreeInfos;
 
 /**

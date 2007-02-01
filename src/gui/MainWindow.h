@@ -35,14 +35,11 @@ using namespace std;
 
 typedef	struct s_PlugStartInfo		PlugStartInfo;
 class					PluginLoader;
-class					WiredSession;
-class					WiredSessionXml;
 class					MainWindow;
 
 extern MainWindow		*MainWin;
 extern vector<PluginLoader *>	LoadedPluginsList;
 extern PlugStartInfo		StartInfo;
-extern WiredSession		*CurrentSession;
 extern wxMutex		        AudioMutex;
 extern wxCondition*	        SeqStopped;
 
@@ -66,7 +63,6 @@ class					MainWindow: public wxFrame, public WiredDocument
   void					OnAddTrackAudio(wxCommandEvent &event);
   void					OnAddTrackMidi(wxCommandEvent &event);
   void					OnDeleteTrack(wxCommandEvent &event);
-  void					OnChangeAudioDir(wxCommandEvent &event);
   void					OnCreateRackClick(wxCommandEvent &event);
   void					OnCreateEffectClick(wxCommandEvent &event);
   void					OnFloatTransport(wxCommandEvent &event);
@@ -268,7 +264,6 @@ enum
   MainWin_AddTrackAudio,
   MainWin_AddTrackMidi,
   MainWin_DeleteTrack,
-  MainWin_ChangeAudioDir,
   MainWin_Copy,
   MainWin_Cut,
   MainWin_Paste,

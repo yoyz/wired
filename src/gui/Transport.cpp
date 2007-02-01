@@ -6,7 +6,6 @@
 #include "Sequencer.h"
 #include "SequencerGui.h"
 #include "Colour.h"
-//#include "WiredSession.h"
 #include "HelpPanel.h"
 #include "DownButton.h"
 #include "HoldButton.h"
@@ -14,8 +13,6 @@
 #include "VUMCtrl.h"
 #include "../engine/Settings.h"
 #include "../engine/AudioEngine.h"
-
-//extern WiredSession				*CurrentSession;
 
 Transport::Transport(wxWindow *parent, const wxPoint &pos, const wxSize &size, long style, WiredDocument *docParent)
   : wxPanel(parent, -1, pos, size, style), WiredDocument(wxT("Transport"), docParent)

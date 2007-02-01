@@ -56,8 +56,6 @@ AudioCenter		WaveCenter;
 Transport		*TransportPanel = NULL;
 PlugStartInfo		StartInfo;
 vector<PluginLoader *>	LoadedPluginsList;
-WiredSession		*CurrentSession = NULL;
-WiredSessionXml		*CurrentXmlSession = NULL;
 //SaveCenter		*saveCenter;
 WiredExternalPluginMgr	*LoadedExternalPlugins = NULL;
 MediaLibrary		*MediaLibraryPanel = NULL;
@@ -155,8 +153,6 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   SequencerMenu->Append(MainWin_AddTrackAudio, _("&Add Audio Track"));
   SequencerMenu->Append(MainWin_AddTrackMidi, _("Add &MIDI Track"));
   SequencerMenu->Append(MainWin_DeleteTrack, _("&Delete Track"));
-  SequencerMenu->AppendSeparator();
-  SequencerMenu->Append(MainWin_ChangeAudioDir, _("&Change Audio directory..."));
 
   RacksMenu->Append(MainWin_DeleteRack, _("D&elete Rack"));
 
@@ -1547,17 +1543,6 @@ void					MainWindow::OnDeleteTrack(wxCommandEvent &event)
   //cActionManager::Global().AddImportWaveAction(selfile, true, false);
 }
 
-void					MainWindow::OnChangeAudioDir(wxCommandEvent &event)
-{
-  assert(CurrentXmlSession);
-
-  wxDirDialog dir(this, _("Choose the Audio file directory"),
-		  saveCenter->getAudioDir().empty() == true ?
-		  wxFileName::GetCwd() : saveCenter->getAudioDir());
-  if (dir.ShowModal() == wxID_OK)
-    saveCenter->setAudioDir(dir.GetPath());
-}
-
 void					MainWindow::OnUndo(wxCommandEvent &event)
 {
   wxMenuItemList					listItems;
@@ -2121,7 +2106,6 @@ BEGIN_DECLARE_EVENT_TYPES()
   EVT_MENU(MainWin_AddTrackAudio, MainWindow::OnAddTrackAudio)
   EVT_MENU(MainWin_AddTrackMidi, MainWindow::OnAddTrackMidi)
   EVT_MENU(MainWin_DeleteTrack, MainWindow::OnDeleteTrack)
-  EVT_MENU(MainWin_ChangeAudioDir, MainWindow::OnChangeAudioDir)
   EVT_MENU(MainWin_FloatTransport, MainWindow::OnFloatTransport)
   EVT_MENU(MainWin_FloatSequencer, MainWindow::OnFloatSequencer)
   EVT_MENU(MainWin_FloatRacks, MainWindow::OnFloatRack)

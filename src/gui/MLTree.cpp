@@ -30,7 +30,6 @@
 
 
 extern SaveCenter	*saveCenter;
-WiredSessionXml		*CurrXmlSession = NULL;
 
 //quite strange to have the s_nodeInfo as a return value and a parameter....
 //even stranger because the parameter is not a pointer... conception mistake ?
