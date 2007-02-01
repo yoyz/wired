@@ -1799,20 +1799,22 @@ void					MainWindow::OnIdle(wxIdleEvent &WXUNUSED(event))
   wxLogNull NoLog;
   if (SeqTimer)
     {
-      wxString			LeftSpace(_("Left space on drive : ")), LeftMemory(_("Free memory : "));
+      wxString			LeftSpace(_("Left space on drive : "));
       wxLongLong		Total, Free;
 
-      wxLongLong Size = wxGetFreeMemory();
-      if (Size > 0)
-	LeftMemory += Size.ToString();
-      else
-	LeftMemory += _("Unknown");
-
+/*    Does not work everywhere : kernel version problem
+ *    wxString			LeftMemory(_("Free memory : "));
+ *    wxLongLong Size = wxGetFreeMemory();
+ *    if (Size > 0)
+ *      LeftMemory += Size.ToString();
+ *    else
+ *      LeftMemory += _("Unknown");
+*/
       wxGetDiskSpace(saveCenter->getAudioDir(), &Total, &Free);
 
       LeftSpace += FileLoader::FormatSize((off_t) Free.GetValue()) + wxT("/") + FileLoader::FormatSize((off_t)Total.GetValue());
       SetStatusText(LeftSpace, 0);
-      SetStatusText(LeftMemory, 1);
+      //SetStatusText(LeftMemory, 1);
     }
 #endif
 }
