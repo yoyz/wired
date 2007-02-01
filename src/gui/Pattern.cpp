@@ -41,7 +41,7 @@ Pattern::Pattern(WiredDocument *parent, wxString name, double pos, double endpos
   // add itself in track's array
   wxMutexLocker		locker(SeqMutex);
 
-  if (Seq->Tracks[trackindex])
+  if (trackindex > 0 && trackindex < Seq->Tracks.size() && Seq->Tracks[trackindex])
     Seq->Tracks[trackindex]->AddPattern(this);
   else
     cerr << "[Pattern] oooops, bad track index!" << endl;
@@ -52,7 +52,7 @@ Pattern::~Pattern()
   // remove itself in track's array
   wxMutexLocker		locker(SeqMutex);
 
-  if (Seq->Tracks[TrackIndex])
+  if (TrackIndex > 0 && TrackIndex < Seq->Tracks.size() && Seq->Tracks[TrackIndex])
     Seq->Tracks[TrackIndex]->DelPattern(this);
 }
 
