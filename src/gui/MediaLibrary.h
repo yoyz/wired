@@ -7,6 +7,7 @@
 #include <wx/wx.h>
 #include "MainWindow.h"
 #include "FileConversion.h"
+#include "debug.h"
 
 class					MainWindow;
 class					DownButton;
@@ -41,8 +42,10 @@ class					MLTree;
 #define ML_BACKGROUND			wxColour(142, 142, 169)
 #define ML_FOREGROUND			wxColour(142, 142, 155)
 #define NB_SORTSELECT_CHOICES		(4)
-#define DEFAULT_SORTSELECT_VALUE	wxT("Sort by...")
 
+#ifndef DEBUG_1647295
+ #define DEFAULT_SORTSELECT_VALUE	wxT("Sort by...")
+#endif
 
 /**
  * The MediaLibrary class is the main class for the media library feature
@@ -114,8 +117,9 @@ class				MediaLibrary : public wxPanel
  * wxComboBox designed to hold the rolling menu offering sorting
  * possibilities
 */
+#ifndef DEBUG_1647295
   wxComboBox			*SortSelect;
-
+#endif
 /**
  * FileConversion for converting files to the used samplerate before using
  * them in the Sequencer
@@ -208,7 +212,9 @@ class				MediaLibrary : public wxPanel
  * handling
  * \return void
 */
+#ifndef DEBUG_1647295
   void				OnSortToggle(wxCommandEvent &WXUNUSED(event));
+#endif
 
 /**
  * The OnFilterAudio function is called by launching the Filter Audio action
@@ -330,7 +336,9 @@ class				MediaLibrary : public wxPanel
  * Struct s_combo_choice containing the list of possible choices in the 
  * select button dedicated to the filetypes sorting.
 */
+#ifndef DEBUG_1647295
 extern const struct s_combo_choice	SortSelectChoices[NB_SORTSELECT_CHOICES + 1];
+#endif
 
 /**
  * The enum table
@@ -343,7 +351,9 @@ enum
    MediaLibrary_Insert,
    MediaLibrary_Start_Preview,
    MediaLibrary_Stop_Preview,
+#ifndef DEBUG_1647295
    MediaLibrary_SortSelect,
+#endif
    MediaLibrary_FilterAudio,
    MediaLibrary_FilterMIDI,
    MediaLibrary_FilterVideo,
