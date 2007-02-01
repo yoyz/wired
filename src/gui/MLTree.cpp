@@ -26,6 +26,7 @@
 #include "delete.xpm"
 #include <SaveCenter.h>
 #include "MLTraverser.h"
+#include <vector>
 
 
 extern SaveCenter	*saveCenter;
@@ -383,9 +384,9 @@ bool				MLTree::IsTreeCollapsed()
 }
 
 // When creating a directory
-wxTreeItemId			MLTree::OnCreateDir(wxString dirName)
+void			MLTree::OnCreateDir()
 {
-  //  cout << "[MEDIALIBRARY] OmCreateDir" << endl;
+  //cout << "[MEDIALIBRARY] OmCreateDir" << endl;
 
   s_nodeInfo		infos;
   wxTreeItemId		itemParent;
@@ -394,12 +395,40 @@ wxTreeItemId			MLTree::OnCreateDir(wxString dirName)
 
   itemParent = GetSelection();
 
-  infos = SetStructInfos(infos, dirName, wxT(""), wxT(""));
-  itemAdded = AppendItem(itemParent, dirName);
+  infos = SetStructInfos(infos, _("New Directory"), wxT(""), wxT(""));
+  itemAdded = AppendItem(itemParent, _("New Directory"));
   SetItemImage(itemAdded, 0);
   nodes[itemAdded] = infos;
   Expand(itemParent);
   EditLabel(itemAdded);
+}
+
+wxTreeItemId			MLTree::OnCreateDirName(wxString dirName, wxTreeItemId itemParent)
+{
+  //cout << "[MEDIALIBRARY] OmCreateDir" << endl;
+
+  s_nodeInfo		infos;
+  //wxTreeItemId		itemParent;
+  wxTreeItemId		itemAdded;
+  wxTreeItemId		itemSearch;
+  wxTreeItemIdValue	cookie;
+
+
+  //itemParent = GetSelection();
+
+  infos = SetStructInfos(infos, dirName, wxT(""), wxT(""));
+  itemSearch = GetFirstChild(itemParent, cookie);
+  while (itemSearch.IsOk())
+  {
+    if (GetItemText(itemSearch).Cmp(dirName) == 0)
+      return (itemSearch);
+    itemSearch = GetNextChild(itemParent, cookie);
+  }
+  itemAdded = AppendItem(itemParent, dirName);
+  SetItemImage(itemAdded, 0);
+  nodes[itemAdded] = infos;
+  Expand(itemParent);
+  //EditLabel(itemAdded);
   return (itemAdded);
 }
 
@@ -670,6 +699,44 @@ void				MLTree::OnAdd(wxString FileToAdd)
 	  else
 	    this->AddFile(GetTreeItemIdFromLabel(LOCAL_NODE), FileToAdd.Mid(slashPos + 1), infos, true);
 	}
+      // we need to delete FileInfos so that the file doesn't stay open
+      delete FileInfos;
+      DisplayNodes();
+    }
+  }
+}
+
+void				MLTree::OnAddOnNode(wxString FileToAdd, wxTreeItemId selection)
+{
+  if (!FileToAdd.empty())
+  {
+    wxFileName	File(FileToAdd);
+
+    if (File.FileExists() == true)
+    {
+      //	  cout << "[MEDIALIBRARY] File added : " << FileToAdd <<  " Extension is : " << File.GetExt() << endl;
+      wxFile *FileInfos = new wxFile(FileToAdd);
+      wxString length_str;
+      int fileInfosLength = FileInfos->Length();
+      length_str << fileInfosLength;
+
+      for (vector<wxString>::iterator iter = Exts.begin(); iter != Exts.end(); iter++)
+	if (iter->Contains(File.GetExt().Lower()) == true)
+	{
+	  s_nodeInfo		infos;
+	  int			slashPos;
+	  //wxTreeItemId		selection;
+
+	  infos = SetStructInfos(infos, FileToAdd, File.GetExt(), length_str);
+	  slashPos = FileToAdd.Find('/', true);
+	  //selection = GetSelection();
+	  if (selection.IsOk() == true && selection != GetRootItem())
+	    this->AddFile(selection, FileToAdd.Mid(slashPos + 1), infos, true);
+	  else
+	    this->AddFile(GetTreeItemIdFromLabel(LOCAL_NODE), FileToAdd.Mid(slashPos + 1), infos, true);
+	}
+      // we need to delete FileInfos so that the file doesn't stay open
+      delete FileInfos;
       DisplayNodes();
     }
   }
@@ -687,10 +754,18 @@ void				MLTree::ImportDir()
       this->OnAddDirectory(seldir);
     }
 }
+wxTreeItemId	MLTree::getOrCreateNodeFromFName(wxString f, wxTreeItemId myRoot)
+{
+  if (f.BeforeFirst('/').Cmp(wxT("")) != 0)
+  {
+    myRoot = OnCreateDirName(f.BeforeFirst('/'), myRoot);
+    return (getOrCreateNodeFromFName(f.AfterFirst('/'), myRoot));
+  }
+  return (myRoot);
+}
 
 void				MLTree::OnAddDirectory(wxString DirToAdd)
 {
-  cout << DirToAdd.mb_str() << endl;
   //DirToAdd.Append("/");
   if (!DirToAdd.empty())
   {
@@ -709,13 +784,20 @@ void				MLTree::OnAddDirectory(wxString DirToAdd)
 	size_t			nbFiles = files.GetCount();
 	wxString		f;
 	int			i;
+	wxTreeItemId	selection;
+	wxTreeItemId	myRoot;
+	wxTreeItemId	node;
 
-	cout << "nbFiles = " << nbFiles << endl;
+	selection = GetSelection();
+	myRoot = OnCreateDirName(DirToAdd.AfterLast('/'), selection);
+	//myNodes.push_back(myRoot);
 	for (i = (int)(nbFiles) - 1; i >= 0 ; i--)
 	{
-	  cout << "nbFiles = " << nbFiles << " i = " << i << endl;
 	  f = files.Item(i);
-	  OnAdd(f);
+	  wxFileName	t(f);
+	  t.MakeRelativeTo(DirToAdd);
+	  node = getOrCreateNodeFromFName(t.GetPath(), myRoot);
+	  OnAddOnNode(f, node);
 	}
       }
     }

@@ -25,7 +25,7 @@ extern MediaLibrary	*MediaLibraryPanel;
 #define LOCAL_NODE		_("Local")
 #define PROJECT_NODE_NAME       _("Project Files")
 #define LOCAL_NODE_NAME		_("Local Files")
-#define NEW_DIRECTORY_NAME	_("New Directory")
+//#define NEW_DIRECTORY_NAME	_("New Directory")
 /**
  * The size of ML icon (square)
  */
@@ -239,6 +239,7 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
  * \return void
 */
   void				OnAdd(wxString FileToAdd);
+  void				OnAddOnNode(wxString FileToAdd, wxTreeItemId selection);
 
 
 /**
@@ -257,9 +258,11 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
 /**
  * The OnCreateDir function is called when creating a new directory. It 
  * create a new directory node.
- * \return void
+ * \return directory added
 */
-  wxTreeItemId			OnCreateDir(wxString = NEW_DIRECTORY_NAME);
+  void				OnCreateDir();
+  wxTreeItemId			OnCreateDirName(wxString, wxTreeItemId);
+  wxTreeItemId			getOrCreateNodeFromFName(wxString, wxTreeItemId);
 
 /**
  * The OnInsert function is called when inserting the selected item into a
