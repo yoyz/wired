@@ -658,20 +658,17 @@ bool					MainWindow::NewSession()
 
   saveCenter->CleanTree();
 
-  // do some clean up
-  wxMutexLocker	locker(SeqMutex);
-  WaveCenter.Clear();
-  UpdatePlugins.clear();
-  Seq->PatternsToRefresh.clear();
-  Seq->PatternsToResize.clear();
-  Seq->TracksToRefresh.clear();
-  SeqPanel->DeleteAllTracks();
-  RackPanel->DeleteAllTracks();
-  OptPanel->DeleteTools();
-
   OpenWizard();
 
   return (true);
+}
+
+void					MainWindow::CleanChildren()
+{
+  UpdatePlugins.clear();
+
+  // AudioCenter
+  WaveCenter.Clear();
 }
 
 void					MainWindow::OnOpen(wxCommandEvent &event)

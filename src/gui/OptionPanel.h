@@ -116,6 +116,7 @@ class OptionPanel : public wxPanel, public WiredDocument
  //WiredDocument implementation
   void				Save();
   void				Load(SaveElementArray data);
+  void				CleanChildren();
 
  private:
   //Setters

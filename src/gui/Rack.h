@@ -78,6 +78,7 @@ class		Rack: public wxScrolledWindow, WiredDocument
   // WiredDocument implementation
   void			Save();
   void			Load(SaveElementArray data);
+  void			CleanChildren();
 
   Plugin*		AddNewRack(PlugStartInfo &startinfo, PluginLoader *p);
   void			AddLoadedRack(Plugin *p);

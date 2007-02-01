@@ -177,25 +177,16 @@ Rack::Rack(wxWindow* parent, wxWindowID id, const wxPoint& pos,
 {
   SetScrollRate(10, 10);
   SetVirtualSize(760, 180);
-  selectedPlugin = 0x0;
-  selectedTrack = 0x0;
-  is_cut = false;
   InitContextMenu();
   copy_plug = NULL;
   filePath.Printf(wxT("/tmp/.tmpccp"));
+
+  CleanChildren();
 }
 
 Rack::~Rack()
 {
-  t_ListRackTrack::iterator i;
-
-  for (i = RackTracks.begin(); i != RackTracks.end(); i++)
-    delete *i;
-
-  t_ListRackTrack		RackTracks;
-
-  RackTrack*			selectedTrack;
-  Plugin*				selectedPlugin;
+  CleanChildren();
 
   if (tmpFile.IsOpened())
     {
@@ -204,8 +195,17 @@ Rack::~Rack()
 	cout << "[Rack] deleting error" << endl;
     }
 
-  if (copy_plug) delete copy_plug;
+  if (copy_plug)
+    delete copy_plug;
   cout << "[Rack] End destructor" << endl;
+}
+
+void				Rack::CleanChildren()
+{
+  DeleteAllTracks();
+  selectedTrack = NULL;
+  selectedPlugin = NULL;
+  is_cut = false;
 }
 
 void				Rack::InitContextMenu()

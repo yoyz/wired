@@ -125,6 +125,7 @@ class					MainWindow: public wxFrame, public WiredDocument
 							  wxFrame *(MainWindow::*floatfunc)());
   void					Save();
   void					Load(SaveElementArray data);
+  void					CleanChildren();
 
   /* init func */
   int					Init();

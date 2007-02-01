@@ -194,6 +194,11 @@ SequencerGui::SequencerGui(wxWindow *parent, const wxPoint &pos, const wxSize &s
 
 SequencerGui::~SequencerGui()
 {
+  CleanChildren();
+}
+
+void					SequencerGui::CleanChildren()
+{
   DeleteAllTracks();
 }
 

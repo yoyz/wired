@@ -139,7 +139,13 @@ OptionPanel::OptionPanel(wxWindow *parent, const wxPoint &pos, const wxSize &siz
 
 OptionPanel::~OptionPanel()
 {
+  CleanChildren();
   // don't have to delete windows attached to another
+}
+
+void				OptionPanel::CleanChildren()
+{
+  DeleteTools();
 }
 
 void				OptionPanel::AddAudioTool(AudioPattern *p)

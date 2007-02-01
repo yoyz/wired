@@ -274,6 +274,7 @@ class				SequencerGui: public wxPanel, public WiredDocument
   // WiredDocument things
   void				Save();
   void				Load(SaveElementArray data);
+  void				CleanChildren();
 
   double			CurrentPos;
 

@@ -1093,12 +1093,17 @@ void			Sequencer::Save()
 
 }
 
-void			Sequencer::CleanChildren()
+void				Sequencer::CleanChildren()
 {
   vector<Track *>::iterator	it;
   Track				*toDelete = NULL;
 
   std::cout << "Sequencer::CleanChildren started" << std::endl;
+
+  PatternsToRefresh.clear();
+  PatternsToResize.clear();
+  TracksToRefresh.clear();
+
   std::cout << "Tracks.size() = " << Tracks.size() << std::endl;
 
   while(!Tracks.empty())
