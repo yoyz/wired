@@ -258,10 +258,23 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
 /**
  * The OnCreateDir function is called when creating a new directory. It 
  * create a new directory node.
- * \return directory added
+ * \return void
 */
   void				OnCreateDir();
+
+/**
+ * The OnCreateDirName function is called when importing a directory.
+ * The parent node must be given
+ * \return the wxTreeItemId added
+*/
   wxTreeItemId			OnCreateDirName(wxString, wxTreeItemId);
+
+/**
+ * getOrCreateNodeFromFName is a recursive function called by OnCreateDirName
+ * to get "aware" of subDirectories in the ML
+ * it takes a relative path and a parent wxTreeItemId as arguments
+ * \return the wxTreeItemId found or created
+*/
   wxTreeItemId			getOrCreateNodeFromFName(wxString, wxTreeItemId);
 
 /**
