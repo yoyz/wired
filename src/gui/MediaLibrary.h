@@ -30,14 +30,16 @@ class					MLTree;
 #define MEDIALIBRARY_COLLAPSEUP_IMG	wxT("ihm/toolbar/collapse_up.png")
 #define MEDIALIBRARY_COLLAPSEDO_IMG	wxT("ihm/toolbar/collapse_up.png")
 
-#define MEDIALIBRARY_FILEAUDIOUP_IMG	wxT("ihm/toolbar/file_audio_up.png")
-#define MEDIALIBRARY_FILEAUDIODO_IMG	wxT("ihm/toolbar/file_audio_up.png")
-#define MEDIALIBRARY_FILEVIDEOUP_IMG	wxT("ihm/toolbar/file_mov_up.png")
-#define MEDIALIBRARY_FILEVIDEODO_IMG	wxT("ihm/toolbar/file_mov_up.png")
-#define MEDIALIBRARY_FILEMIDIUP_IMG	wxT("ihm/toolbar/file_midi_up.png")
-#define MEDIALIBRARY_FILEMIDIDO_IMG	wxT("ihm/toolbar/file_midi_up.png")
-#define MEDIALIBRARY_FILEFXUP_IMG	wxT("ihm/toolbar/file_fx_up.png")
-#define MEDIALIBRARY_FILEFXDO_IMG	wxT("ihm/toolbar/file_fx_up.png")
+#ifndef DEBUG_DISABLE_FILTERS
+ #define MEDIALIBRARY_FILEAUDIOUP_IMG	wxT("ihm/toolbar/file_audio_up.png")
+ #define MEDIALIBRARY_FILEAUDIODO_IMG	wxT("ihm/toolbar/file_audio_up.png")
+ #define MEDIALIBRARY_FILEVIDEOUP_IMG	wxT("ihm/toolbar/file_mov_up.png")
+ #define MEDIALIBRARY_FILEVIDEODO_IMG	wxT("ihm/toolbar/file_mov_up.png")
+ #define MEDIALIBRARY_FILEMIDIUP_IMG	wxT("ihm/toolbar/file_midi_up.png")
+ #define MEDIALIBRARY_FILEMIDIDO_IMG	wxT("ihm/toolbar/file_midi_up.png")
+ #define MEDIALIBRARY_FILEFXUP_IMG	wxT("ihm/toolbar/file_fx_up.png")
+ #define MEDIALIBRARY_FILEFXDO_IMG	wxT("ihm/toolbar/file_fx_up.png")
+#endif
 
 #define ML_BACKGROUND			wxColour(142, 142, 169)
 #define ML_FOREGROUND			wxColour(142, 142, 155)
@@ -106,7 +108,9 @@ class				MediaLibrary : public wxPanel
  * wxToolBar containing the butons dedicated to the filters of the filetypes
  * This wxToolBar is located under the BottomToolbar
 */
+#ifndef DEBUG_DISABLE_FILTERS
   wxToolBar			*FiltersToolbar;
+#endif
 
 /**
  * wxBoxSizer containing all the previously defined wxToolBar
@@ -224,7 +228,9 @@ class				MediaLibrary : public wxPanel
  * handling
  * \return void
 */
+#ifndef DEBUG_DISABLE_FILTERS
   void				OnFilterAudio(wxCommandEvent &WXUNUSED(event));
+#endif
 
 /**
  * The OnFilterMIDI function is called by launching the Filter MIDI action
@@ -234,7 +240,9 @@ class				MediaLibrary : public wxPanel
  * handling
  * \return void
 */
+#ifndef DEBUG_DISABLE_FILTERS
   void				OnFilterMIDI(wxCommandEvent &WXUNUSED(event));
+#endif
 
 /**
  * The OnFilterVideo function is called by launching the Filter Video action
@@ -244,7 +252,9 @@ class				MediaLibrary : public wxPanel
  * handling
  * \return void
 */
+#ifndef DEBUG_DISABLE_FILTERS
   void				OnFilterVideo(wxCommandEvent &WXUNUSED(event));
+#endif
 
 /**
  * The OnFilterEffects function is called by launching the Filter Effects 
@@ -254,7 +264,9 @@ class				MediaLibrary : public wxPanel
  * handling
  * \return void
 */
+#ifndef DEBUG_DISABLE_FILTERS
   void				OnFilterEffects(wxCommandEvent &WXUNUSED(event));
+#endif
 
 /**
  * The OnRightClick function is called by using the mouse right click on a
@@ -354,10 +366,12 @@ enum
 #ifndef DEBUG_1647295
    MediaLibrary_SortSelect,
 #endif
+#ifndef DEBUG_DISABLE_FILTERS
    MediaLibrary_FilterAudio,
    MediaLibrary_FilterMIDI,
    MediaLibrary_FilterVideo,
    MediaLibrary_FilterEffects
+#endif
 };
 
 
