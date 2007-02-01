@@ -15,7 +15,7 @@
 #include	"../mixer/Mixer.h"
 #include	"../redist/Plugin.h"
 #include	"../plugins/PluginLoader.h"
-
+#include	"debug.h"
 int		RackCount = 0;
 
 /********************   Class RackTrack   ********************/
@@ -208,7 +208,7 @@ void				Rack::InitContextMenu()
   menu->Append(ID_MENU_ADD, _("Add"), submenu);
   submenu->Append(ID_INSTR_MENU, _("&Instruments"), instr_menu);
   submenu->Append(ID_EFFECTS_MENU, _("&Effects"), effects_menu);
-#if DEBUG_1561088
+#ifndef DEBUG_1561088
   menu->Append(ID_MENU_CUT, _("Cut"));
   menu->Append(ID_MENU_COPY, _("Copy"));
   menu->Append(ID_MENU_PASTE, _("Paste"), false);
@@ -219,7 +219,7 @@ void				Rack::InitContextMenu()
 
   AddPlugToMenu();
 
-#if DEBUG_1561088
+#ifndef DEBUG_1561088
   Connect(ID_MENU_CUT, wxEVT_COMMAND_MENU_SELECTED,
 	  (wxObjectEventFunction)(wxEventFunction)
 	  (wxCommandEventFunction)&Rack::OnCutClick);
