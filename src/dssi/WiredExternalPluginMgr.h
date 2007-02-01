@@ -40,8 +40,11 @@ public:
 	list<wxString>		GetSortedPluginsList(const wxString& Separator = wxT("#"));
 	void			SetMenuItemId(int ModuleId, int MenuItemId);
 	int			GetPluginType(int PluginId);
-	WiredDSSIGui		*CreatePlugin(int MenuItemId, PlugStartInfo &info);
-	WiredDSSIGui		*CreatePlugin(unsigned long UniqueId);
+	WiredDSSIGui		*CreatePluginFromMenu(int MenuItemId, PlugStartInfo &info);
+	WiredDSSIGui		*CreatePluginFromUniqueId(unsigned long UniqueId);
+	WiredDSSIGui		*CreatePluginFromIdPlugin(unsigned long IdPlugin, PlugStartInfo &info);
+	WiredDSSIGui*		CreatePlugin(unsigned long IdPlugin, PlugStartInfo& info);
+
 	void			DestroyPlugin(WiredDSSIGui *Plug);
 	void			SetStartInfo(PlugStartInfo &Info);
 	

@@ -29,12 +29,6 @@ typedef struct s_PlugStartInfo			PlugStartInfo;
 typedef	std::list<RackTrack *>			t_ListRackTrack;
 typedef	std::list<Plugin *>::const_iterator	t_ListPluginIterator;
 
-typedef struct	s_RackTrackPlugin
-{
-  RackTrack*	rackTrack;
-  Plugin*	plugin;
-} t_RackTrackPlugin;
-
 class		RackTrack : public WiredDocument
 {
  public:
@@ -45,8 +39,8 @@ class		RackTrack : public WiredDocument
   void				Save();
   void				Load(SaveElementArray data);
 
-  Plugin*			AddRack(PlugStartInfo &startinfo, PluginLoader *p, 
-					Plugin *connect_to = 0x0);
+  void				AddRack(Plugin* plug);
+  Plugin*			CreateRack(PlugStartInfo &startinfo, PluginLoader *p);
   void				DeleteRack(Plugin *plug);
   int				GetYPos();
   void				RemoveRack();
@@ -83,23 +77,10 @@ class		Rack: public wxScrolledWindow, WiredDocument
   void			Save();
   void			Load(SaveElementArray data);
 
-  // Kept for compatibility but shouldn't be used anymore
-  Plugin*		AddTrack(PlugStartInfo &startinfo, PluginLoader *p);
-  void			AddTrack(Plugin *p);
-  RackTrack*		AddTrack();
+  Plugin*		AddNewRack(PlugStartInfo &startinfo, PluginLoader *p);
+  void			AddLoadedRack(Plugin *p);
   Plugin*		AddToSelectedTrack(PlugStartInfo &startinfo,
 					   PluginLoader *p);
-  
-  // Should be used instead of AddTrack
-  // Adds a rack and a channel (channel == Mixer object in Mixer window)
-  t_RackTrackPlugin*	AddRackAndChannel(PlugStartInfo &startinfo,
-					  PluginLoader *p);
-  
-  // Should be used instead of AddToSelectedTrack
-  // Adds a rack and a channel (== Mixer object in Mixer window) 
-  // and selects the rack
-  Plugin*		AddSelectedRackAndChannel(PlugStartInfo &startinfo,
-						  PluginLoader *p);
   
   void			DeleteRack(Plugin *plug);
   void			DeleteAllRacks();
@@ -151,7 +132,7 @@ class		Rack: public wxScrolledWindow, WiredDocument
   // Draws the selection rectangle
 
   void			SetAudioConfig(long bufferSize, double samplingRate);
-	  
+
   t_ListRackTrack	RackTracks;
 
   RackTrack*		selectedTrack;
@@ -175,8 +156,6 @@ class		Rack: public wxScrolledWindow, WiredDocument
   wxString		filePath;
   bool			WasDragging;
 	
-  // Not used ...
-  virtual void		OnPaint(wxPaintEvent &event);
   // Event : Help handling
   void			OnHelp(wxMouseEvent &event);
   // Event : Click on rack : Sets unselect rack and plugin
@@ -199,6 +178,9 @@ class		Rack: public wxScrolledWindow, WiredDocument
   void			UpdateUnitXSize();
   
  private:
+
+  // Create a empty track and a channel
+  RackTrack*		CreateRackTrack();
   
   // Removes a rack and a channel
   void			RemoveRackAndChannel(t_ListRackTrack::const_iterator

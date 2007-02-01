@@ -947,7 +947,8 @@ void					MainWindow::LoadExternalPlugins()
   list<wxString>::iterator		IterPluginsList;
   int							PluginInfo;
   int							PluginId;
-  wxString						PluginName, Sep(wxT("#"));
+  wxString						PluginName;
+  wxString						Sep(wxT("#"));
 
   CreateDSSIInstrMenu = NULL;
   CreateLADSPAInstrMenu = NULL;
@@ -959,16 +960,13 @@ void					MainWindow::LoadExternalPlugins()
 
   for (IterPluginsList = PluginsList.begin(); IterPluginsList != PluginsList.end(); IterPluginsList++)
     {
-      if ((*IterPluginsList).find_last_of(Sep.c_str()) > 0)
+      if ((*IterPluginsList).find_last_of(Sep) > 0)
   	{
 	  PluginName = (*IterPluginsList).substr(0, (*IterPluginsList).find_last_of(Sep));
-	  PluginId = atoi(wxString((*IterPluginsList).substr((*IterPluginsList).find_last_of(Sep) + 1).c_str(), *wxConvCurrent).mb_str(*wxConvCurrent));
+	  wxString((*IterPluginsList).substr((*IterPluginsList).find_last_of(Sep) + 1)).ToLong((long*)&PluginId);
   	}
-      //  	PluginInfo = LoadedExternalPlugins->GetPluginType(IterPluginsList->first);
+      cout << "plugin : " << PluginName << " id : " << PluginId << endl;
       PluginInfo = LoadedExternalPlugins->GetPluginType(PluginId);
-
-      //  	LoadedExternalPlugins->SetMenuItemId(IterPluginsList->first,
-      //  		AddPluginMenuItem(PluginInfo, PluginInfo & TYPE_PLUGINS_EFFECT, IterPluginsList->second));
       LoadedExternalPlugins->SetMenuItemId(PluginId,
 					   AddPluginMenuItem(PluginInfo, PluginInfo & TYPE_PLUGINS_EFFECT, PluginName));
     }
@@ -1032,28 +1030,57 @@ int						MainWindow::AddPluginMenuItem(int Type, bool IsEffect, const wxString& 
   return Id;
 }
 
-void					MainWindow::CreatePluginFromUniqueId(wxString UniqueId)
+void					MainWindow::CreatePluginFromUniqueId(wxString UniqueId,
+									     wxString name)
 {
   char					Uniq[4];
   vector<PluginLoader *>::iterator	it;
 
+  // load a rack from a known UniqueId
   Uniq[0] = UniqueId[0];
   Uniq[1] = UniqueId[1];
   Uniq[2] = UniqueId[2];
   Uniq[3] = UniqueId[3];
   for (it = LoadedPluginsList.begin(); it != LoadedPluginsList.end(); it++)
     if (COMPARE_IDS((*it)->InitInfo.UniqueId,Uniq))
-      RackPanel->AddToSelectedTrack(StartInfo, *it);
+      {
+	RackPanel->AddToSelectedTrack(StartInfo, *it);
+	return;
+      }
+
+  // if it's a bad UniqueId, we search from its name
+  // basically it will be an external plugin
+  list<wxString>::iterator		IterPluginsList;
+  list<wxString>			PluginsList;
+  wxString				Sep(wxT("#"));
+  wxString				PluginName;
+  int					PluginId;
+
+  PluginsList = LoadedExternalPlugins->GetSortedPluginsList(Sep);
+  for (IterPluginsList = PluginsList.begin(); IterPluginsList != PluginsList.end(); IterPluginsList++)
+    {
+      if ((*IterPluginsList).find_last_of(Sep) > 0)
+  	{
+	  PluginName = (*IterPluginsList).substr(0, (*IterPluginsList).find_last_of(Sep));
+	  if (PluginName == name)
+	    {
+	      wxString((*IterPluginsList).substr((*IterPluginsList).find_last_of(Sep) + 1)).ToLong((long*)&PluginId);
+	      cout << "id : " << PluginId << endl;
+	      RackPanel->AddToSelectedTrack(StartInfo, new PluginLoader(LoadedExternalPlugins, StartInfo, PluginId));
+	      return;
+	    }
+	}
+    }
 }
 
 void					MainWindow::OnCreateExternalPlugin(wxCommandEvent &event)
 {
   if (LoadedExternalPlugins)
     {
+      cout << "[MAINWIN] Creating rack for plugin id :" << event.GetId() << endl;
       PluginLoader 	*NewPlugin = new PluginLoader(LoadedExternalPlugins, event.GetId(), StartInfo);
 
       LoadedPluginsList.push_back(NewPlugin);
-      cout << "[MAINWIN] Creating rack for plugin: " << NewPlugin->InitInfo.Name.mb_str() << endl;
       cActionManager::Global().AddEffectAction(&StartInfo, NewPlugin, true);
     }
 }

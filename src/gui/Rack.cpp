@@ -45,7 +45,7 @@ void				RackTrack::RemoveChannel()
   Mix->RemoveChannel(Output);
 }
 
-Plugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, Plugin *connect_to)
+Plugin*				RackTrack::CreateRack(PlugStartInfo &startinfo, PluginLoader *p)
 {
   int xx, yy, xpos, ypos;
   static int num = 31000;
@@ -58,6 +58,10 @@ Plugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, Plugin 
   startinfo.Pos = wxPoint(xx, yy);
   startinfo.Size = wxSize(p->InitInfo.UnitsX * UNIT_W, p->InitInfo.UnitsY * UNIT_H);
   plug = p->CreateRack(startinfo);
+
+  if (!plug)
+    return (NULL);
+
   if (p->InitInfo.UnitsX > Units)
     Units = p->InitInfo.UnitsX;
 
@@ -74,9 +78,7 @@ Plugin*				RackTrack::AddRack(PlugStartInfo &startinfo, PluginLoader *p, Plugin 
   wxChar str[128];
   wxSnprintf(str, 128, wxT("%d"), ++RackCount);
   plug->Name = plug->DefaultName() + wxT(" ") + str;
-  SeqMutex.Lock();
-  Racks.push_back(plug);
-  SeqMutex.Unlock();
+  AddRack(plug);
   Parent->ResizeTracks();
   Parent->SetScrolling();
   return (plug);
@@ -86,6 +88,14 @@ void				RackTrack::SetSelected(Plugin *plugin)
 {
   SelectedPlugin = plugin;
 }
+
+void				RackTrack::AddRack(Plugin* plug)
+{
+  wxMutexLocker			locker(SeqMutex);
+
+  Racks.push_back(plug);
+}
+
 void				RackTrack::RemoveRack()
 {
   Racks.remove(SelectedPlugin);
@@ -94,7 +104,6 @@ void				RackTrack::RemoveRack()
   SeqPanel->RemoveReferenceTo(SelectedPlugin);
 
   Parent->ResizeTracks();
-  Parent->SetScrolling();
 }
 
 void				RackTrack::DeleteAllRacks()
@@ -190,8 +199,8 @@ Rack::~Rack()
   if (tmpFile.IsOpened())
     {
       tmpFile.Close();
-      if(wxRemoveFile(filePath) == false)
-	cout << "error supression\n" <<endl;
+      if (wxRemoveFile(filePath) == false)
+	cout << "[Rack] deleting error" << endl;
     }
 
   if (copy_plug) delete copy_plug;
@@ -235,36 +244,6 @@ void				Rack::InitContextMenu()
 	  (wxCommandEventFunction)&Rack::OnDeleteClick);
 }
 
-t_RackTrackPlugin*	Rack::AddRackAndChannel(PlugStartInfo &startinfo, PluginLoader *p)
-{
-  t_RackTrackPlugin	*result;
-  RackTrack			*t;
-  Plugin				*tmp;
-
-  result = new t_RackTrackPlugin();
-  t = new RackTrack(this, RackTracks.size());
-  tmp = t->AddRack(startinfo, p);
-  SeqMutex.Lock();
-  RackTracks.push_back(t);
-  SeqMutex.Unlock();
-  result->rackTrack = t;
-  result->plugin = tmp;
-  ResizeTracks();
-  SetScrolling();
-  //	SeqPanel->RefreshConnectMenu();
-  return (result);
-}
-
-Plugin*				Rack::AddSelectedRackAndChannel(PlugStartInfo &startinfo, PluginLoader *p)
-{
-  t_RackTrackPlugin*	rackTrackPlugin;
-
-  rackTrackPlugin = AddRackAndChannel(startinfo, p);
-  selectedTrack = rackTrackPlugin->rackTrack;
-  selectedPlugin = rackTrackPlugin->plugin;
-  delete rackTrackPlugin;
-}
-
 bool				Rack::RemoveTrack(int index)
 {
   t_ListRackTrack::const_iterator		iter;
@@ -296,7 +275,6 @@ void				Rack::RemoveRackAndChannel(t_ListRackTrack::const_iterator iter)
   (*iter)->RemoveChannel();
   RackTracks.remove(*iter);
   ResizeTracks();
-  SetScrolling();
   SeqMutex.Unlock();
 }
 
@@ -354,7 +332,6 @@ void				Rack::DeleteAllRacks()
     }
   RackTracks.clear();
   ResizeTracks();
-  SetScrolling();
 
   selectedTrack = NULL;
   selectedPlugin = NULL;
@@ -385,7 +362,6 @@ void				Rack::DeleteRack(Plugin *plug)
 	    }
 	  selectedPlugin = 0x0;
 	  ResizeTracks();
-	  SetScrolling();
 	  SeqPanel->RemoveReferenceTo(plug);
 	  return;
 	}
@@ -482,7 +458,7 @@ void				Rack::HandleMouseEvent(Plugin *plug, wxMouseEvent *event)
       if(plug->IsAudio() && !DndGetDest(k, l, new_x, new_y, plug))
 	{
 	  DeleteRack(plug);
-	  AddTrack(plug);
+	  AddLoadedRack(plug);
 	}
       ResizeTracks();
       WasDragging = false;
@@ -721,6 +697,7 @@ inline void			Rack::ResizeTracks()
 	}
       xx += (*i)->Units;
     }
+  SetScrolling();
 }
 
 RackTrack*			Rack::GetRackTrack(Plugin *plug)
@@ -785,27 +762,11 @@ void				Rack::Dump()
 
 // Don't know if this methodes should be used
 
-RackTrack* 			Rack::AddTrack()
-{
-  RackTrack *t;
-
-  SeqMutex.Lock();
-  t = new RackTrack(this, RackTracks.size());
-  RackTracks.push_back(t);
-  SeqMutex.Unlock();
-  return (t);
-}
-
-void				Rack::OnPaint(wxPaintEvent &event)
-{
-
-}
-
 void				Rack::RemoveFromSelectedTrack()
 {
   if (selectedTrack)
     {
-      // ??? RemoveRack is enougth ??? What about RemoveChannel ??? And RackTracks.pop ???
+      // ??? RemoveRack is enough ??? What about RemoveChannel ??? And RackTracks.pop ???
       SeqMutex.Lock();
       selectedTrack->RemoveRack();
       SeqMutex.Unlock();
@@ -828,46 +789,41 @@ void 				Rack::RemoveTrack()
 Plugin*				Rack::AddToSelectedTrack(PlugStartInfo &startinfo, PluginLoader *p)
 {
   Plugin *tmp;
+
   if (selectedTrack)
-    {
-      tmp = selectedTrack->AddRack(startinfo, p, selectedTrack->Racks.back());
-    }
+    tmp = selectedTrack->CreateRack(startinfo, p);
   else
-    tmp = AddTrack(startinfo, p);
+    tmp = AddNewRack(startinfo, p);
   return tmp;
 }
 
-void 				Rack::AddTrack(Plugin *p)
+void 				Rack::AddLoadedRack(Plugin *plug)
 {
-  RackTrack *t;
+  RackTrack			*track;
 
-  t = new RackTrack(this, RackTracks.size());
-
-  t->Units = p->InitInfo->UnitsX;
-
-  SeqMutex.Lock();
-
-  t->Racks.insert(t->Racks.begin(),p);
-
-  RackTracks.push_back(t);
-
-  SeqMutex.Unlock();
-
-  SetScrolling();
+  track = CreateRackTrack();
+  track->Units = plug->InitInfo->UnitsX;
+  track->AddRack(plug);
+  ResizeTracks();
 }
 
-Plugin*				Rack::AddTrack(PlugStartInfo &startinfo, PluginLoader *p)
+RackTrack*			Rack::CreateRackTrack()
 {
-  RackTrack *t;
-  Plugin *tmp;
+  wxMutexLocker			locked(SeqMutex);
+  RackTrack*			rackTrack;
 
-  t = new RackTrack(this, RackTracks.size());
-  tmp = t->AddRack(startinfo, p);
-  SeqMutex.Lock();
-  RackTracks.push_back(t);
-  SeqMutex.Unlock();
-  SetScrolling();
-  return tmp;
+  rackTrack = new RackTrack(this, RackTracks.size());
+  RackTracks.push_back(rackTrack);
+  return (rackTrack);
+}
+
+Plugin*				Rack::AddNewRack(PlugStartInfo &startinfo, PluginLoader *p)
+{
+  Plugin *loaded;
+
+  loaded = CreateRackTrack()->CreateRack(startinfo, p);
+  ResizeTracks();
+  return loaded;
 }
 
 void				Rack::SetAudioConfig(long bufferSize, double sampleRate)
@@ -888,7 +844,7 @@ void				Rack::SetAudioConfig(long bufferSize, double sampleRate)
 void				Rack::Save()
 {
   // not used right now
-  saveDocData(new SaveElement(wxT("RackNumber"), (int)RackTracks.size()));
+  saveDocData(new SaveElement(wxT("RackTrackNumber"), (int)RackTracks.size()));
 
   // save all racktracks
   t_ListRackTrack::iterator	itRackTrack;
@@ -919,6 +875,10 @@ void				Rack::Load(SaveElementArray data)
   int					i;
 
   for (i = 0; i < data.GetCount(); i++)
+    if (data[i]->getKey() == wxT("RackTrackNumber"))
+      for (; i > 0; i--)
+	CreateRackTrack();
+  for (i = 0; i < data.GetCount(); i++)
     if (data[i]->getKey() == wxT("RackPlugin"))
       {
 #ifdef __DEBUG__
@@ -929,7 +889,8 @@ void				Rack::Load(SaveElementArray data)
       	cout << "Loaded UniqueId: " << data[i]->getAttribute(wxT("UniqueId")).mb_str() << endl;
 #endif
 	SelectTrackFromNumber(data[i]->getAttributeInt(wxT("Track")));
-	MainWin->CreatePluginFromUniqueId(data[i]->getAttribute(wxT("UniqueId")));
+	MainWin->CreatePluginFromUniqueId(data[i]->getAttribute(wxT("UniqueId")),
+					  data[i]->getAttribute(wxT("PlugName")));
       }
 }
 
@@ -951,7 +912,6 @@ void				Rack::SelectTrackFromNumber(int no)
 
 // Events loop (Static events)
 BEGIN_EVENT_TABLE(Rack, wxScrolledWindow)
-  //  EVT_PAINT(Rack::OnPaint)
   EVT_ENTER_WINDOW(Rack::OnHelp)
 //  EVT_LEFT_DOWN(Rack::OnClick)
 //  EVT_RIGHT_DOWN(Rack::OnClick)

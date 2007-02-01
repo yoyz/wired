@@ -133,7 +133,8 @@ class					MainWindow: public wxFrame, public WiredDocument
   int					InitAudio(bool restart = false);
 
   /* Plugin creation */
-  void					CreatePluginFromUniqueId(wxString UniqueId);
+  void					CreatePluginFromUniqueId(wxString UniqueId,
+								 wxString name);
 
   /* Shows a wxDirDialog to select a project folder */
   void					OpenWizard();

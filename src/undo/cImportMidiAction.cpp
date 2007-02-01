@@ -327,9 +327,9 @@ void cCreateEffectAction::AddRackEffect ()
     {
     	if (mRackIndex < 0)
 			mRackIndex = RackPanel->RackTracks.size();
-    	//RackPanel->AddToSelectedTrack(*mStartInfo, mPluginLoader);
-    	RackPanel->AddRackAndChannel(*mStartInfo, mPluginLoader);
-	    NotifyActionManager();
+
+	if (RackPanel->AddNewRack(*mStartInfo, mPluginLoader))
+	  NotifyActionManager();
     }
 }
 
@@ -386,7 +386,7 @@ void cCreateRackAction::Do ()
 {
   if (mPluginLoader)
   {
-	RackPanel->AddTrack(*mStartInfo, mPluginLoader);
+	RackPanel->AddNewRack(*mStartInfo, mPluginLoader);
 	NotifyActionManager();
   }
 }
