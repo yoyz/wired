@@ -375,7 +375,7 @@ int			MainWindow::InitAudio(bool restart)
 
       Audio->GetDeviceSettings();
       if (restart == true)
-	Mix->InitOutputBuffers();
+	Mix->InitBuffers();
       Audio->OpenStream();
       if (Audio->StartStream())
 	Audio->IsOk = true;

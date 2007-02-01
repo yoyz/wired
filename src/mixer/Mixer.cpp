@@ -22,16 +22,20 @@ Mixer::Mixer(WiredDocument* docParent) : WiredDocument(wxT("Mixer"), docParent)
   MuteL = false;
   MuteR = false;
 
-  OutputLeft = new float[Audio->SamplesPerBuffer];
-  OutputRight = new float[Audio->SamplesPerBuffer];
-  Input = new float*[PREBUF_NUM];
-  for (int i = 0; i < PREBUF_NUM; i++)
-    Input[i] = new float[Audio->SamplesPerBuffer];
+  OutputLeft = NULL;
+  OutputRight = NULL;
+  Input = NULL;
 
+  InitBuffers();
   cout << "[MIXER] Mixer initialized" << endl;
 }
 
 Mixer::~Mixer()
+{
+  DeleteBuffers();
+}
+
+void				Mixer::DeleteBuffers()
 {
   list<Channel*>::iterator	c;
 
@@ -49,9 +53,15 @@ Mixer::~Mixer()
   InChannels.clear();
 
   if (OutputLeft)
-	  delete[] OutputLeft;
+    {
+      delete[] OutputLeft;
+      OutputLeft = NULL;
+    }
   if (OutputRight)
-	  delete[] OutputRight;
+    {
+      delete[] OutputRight;
+      OutputRight = NULL;
+    }
 
   if (Input)
     {
@@ -61,6 +71,7 @@ Mixer::~Mixer()
 	    delete [] Input[i];
 	}
       delete [] Input;
+      Input = NULL;
     }
 }
 
@@ -150,32 +161,25 @@ bool				Mixer::RemoveChannel(Channel *chan)
   return false;
 }
 
-bool				Mixer::InitOutputBuffers(void)
+bool				Mixer::InitBuffers(void)
 {
-  if (OutputLeft)
-    delete[] OutputLeft;
-  if (OutputRight)
-    delete[] OutputRight;
-  OutputLeft = NULL;
-  OutputRight = NULL;
+  DeleteBuffers();
+
   try
     {
       OutputLeft = new float[Audio->SamplesPerBuffer];
       OutputRight = new float[Audio->SamplesPerBuffer];
+      if (!Input)
+	Input = new float*[PREBUF_NUM];
+      for (int i = 0; i < PREBUF_NUM; i++)
+	Input[i] = new float[Audio->SamplesPerBuffer];
     }
   catch (std::bad_alloc)
     {
-      if (OutputLeft)
-	delete [] OutputLeft;
+      DeleteBuffers();
       cout << "[MIXER] insufficient memory"<< endl;
       return false;
     }
-  for (list<Channel*>::iterator c = OutChannels.begin();
-       c != OutChannels.end(); c++)
-    (*c)->ClearAllBuffers();
-  for (list<Channel*>::iterator c = InChannels.begin();
-       c != InChannels.end(); c++)
-    (*c)->ClearAllBuffers();
   return true;
 }
 
@@ -476,24 +480,5 @@ void			Mixer::CleanChildren()
 {
   cerr << "Mixer::CleanChildren" << endl;
 
-  list<Channel*>::iterator	c;
-
-  for (c = InChannels.begin(); c != InChannels.end(); c++)
-    {
-      if (*c)
-	delete *c;
-    }
-  for (c = OutChannels.begin(); c != OutChannels.end(); c++)
-    {
-      if (*c)
-	delete *c;
-    }
-  OutChannels.clear();
-  InChannels.clear();
-
-
-  if (Input)
-    for (int i = 0; i < PREBUF_NUM; i++)
-      if (Input[i])
-	delete [] Input[i];
+  InitBuffers();
 }

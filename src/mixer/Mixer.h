@@ -27,7 +27,8 @@ class Mixer : public WiredDocument
   Channel*		AddChannel(bool input, bool stereo, bool visible = true);
 
   bool			RemoveChannel(Channel*);
-  bool			InitOutputBuffers(void);
+  bool			InitBuffers(void);
+  void			DeleteBuffers(void);
 
  /* mixes the first buffer
     of each output channels
