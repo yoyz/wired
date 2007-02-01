@@ -36,6 +36,7 @@ RackTrack::RackTrack(Rack *parent, int index)
 
 RackTrack::~RackTrack()
 {
+  DeleteAllRacks();
   RemoveChannel();
 }
 
@@ -96,7 +97,7 @@ void				RackTrack::AddRack(Plugin* plug)
   Racks.push_back(plug);
 }
 
-void				RackTrack::RemoveRack()
+void				RackTrack::RemoveSelectedRack()
 {
   Racks.remove(SelectedPlugin);
 
@@ -244,44 +245,46 @@ void				Rack::InitContextMenu()
 	  (wxCommandEventFunction)&Rack::OnDeleteClick);
 }
 
-bool				Rack::RemoveTrack(int index)
-{
-  t_ListRackTrack::const_iterator		iter;
-  int									cptRacks;
-
-  if (index > (RackTracks.size() - 1) || index < 0) return false;					//TODO: Exception handling
-  for (iter = RackTracks.begin(), cptRacks = 0; cptRacks < index; iter++, cptRacks++) ;
-  RemoveRackAndChannel(iter);
-  return true;
-}
-
-bool				Rack::RemoveTrack(const RackTrack* rackTrack)
+bool				Rack::RemoveRackTrack(const RackTrack* rackTrack)
 {
   t_ListRackTrack::const_iterator	iter;
-  unsigned int					cpt;
 
-  for (iter = RackTracks.begin(), cpt = 0; (*iter) != rackTrack && iter != RackTracks.end(); iter++, cpt++) ;
-  if (iter == RackTracks.end())
-    return false;										//TODO Exception handling
-  RemoveRackAndChannel(iter);
+  for (iter = RackTracks.begin(); iter != RackTracks.end(); iter++)
+    if ((*iter) != rackTrack)
+      {
+	wxMutexLocker		locked(SeqMutex);
+
+	delete (*iter);
+	RackTracks.remove(*iter);
+	ResizeTracks();
+	return true;
+      }
+  return false;
+}
+
+bool				Rack::RemoveRackTrack(int index)
+{
+  t_ListRackTrack::const_iterator		iter;
+  int						cptRacks;
+
+  if (index > (RackTracks.size() - 1) || index < 0)
+    return false;
+  for (iter = RackTracks.begin(), cptRacks = 0; cptRacks < index; iter++, cptRacks++)
+    ;
+  RemoveRackTrack(*iter);
   return true;
 }
 
-void				Rack::RemoveRackAndChannel(t_ListRackTrack::const_iterator iter)
+void 				Rack::RemoveLastRackTrack()
 {
-  //wxMutexLocker lock(SeqMutex);
-  SeqMutex.Lock();
-  (*iter)->RemoveRack();
-  (*iter)->RemoveChannel();
-  RackTracks.remove(*iter);
-  ResizeTracks();
-  SeqMutex.Unlock();
+  if (RackTracks.size() > 0)
+    RemoveRackTrack(RackTracks.size() - 1);
 }
 
-bool				Rack::RemoveSelectedRackAndChannel()
+bool				Rack::RemoveSelectedRackTrack()
 {
   if (selectedTrack)
-    if (RemoveTrack(selectedTrack) == true)
+    if (RemoveRackTrack(selectedTrack) == true)
       {
 	selectedTrack = 0;
 	selectedPlugin = 0;
@@ -319,18 +322,13 @@ int					Rack::GetXPos(int index)
   return (u * (UNIT_W + UNIT_S));
 }
 
-void				Rack::DeleteAllRacks()
+void				Rack::DeleteAllTracks()
 {
   t_ListRackTrack::iterator i;
-  list<Plugin *>::iterator j;
-
 
   for (i = RackTracks.begin(); i != RackTracks.end(); i++)
-    {
-      (*i)->DeleteAllRacks();
-      delete *i;
-    }
-  RackTracks.clear();
+    delete *i;
+
   ResizeTracks();
 
   selectedTrack = NULL;
@@ -565,18 +563,18 @@ inline void			Rack::OnDeleteClick()
 {
   vector<PluginLoader *>::iterator	k;
   int					RackIndex;
+
   if (selectedPlugin)
     {
       for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
 	if (COMPARE_IDS((*k)->InitInfo.UniqueId, selectedPlugin->InitInfo->UniqueId))
 	  {
 	    cout << "[MAINWIN] Destroying plugin: " << selectedPlugin->Name.mb_str() << endl;
-	    selectedTrack->RemoveRack();
+	    selectedTrack->RemoveSelectedRack();
 
 	    RackIndex =  selectedTrack->NbRacks();
 	    if (RackIndex < 1)
-	      RackPanel->RemoveTrack(selectedTrack->Index);
-	    //cActionManager::Global().AddEffectAction(&StartInfo, *k, false);
+	      RackPanel->RemoveRackTrack(selectedTrack->Index);
 	    return;
 	  }
     }
@@ -758,32 +756,6 @@ void				Rack::Dump()
   cout << "  height : " << m_height << endl;
   cout << "  width : " << m_width << endl;
   cout << "End dumping Rack" << endl;
-}
-
-// Don't know if this methodes should be used
-
-void				Rack::RemoveFromSelectedTrack()
-{
-  if (selectedTrack)
-    {
-      // ??? RemoveRack is enough ??? What about RemoveChannel ??? And RackTracks.pop ???
-      SeqMutex.Lock();
-      selectedTrack->RemoveRack();
-      SeqMutex.Unlock();
-    }
-  else
-    RemoveTrack();
-}
-
-void 				Rack::RemoveTrack()
-{
-  SeqMutex.Lock();
-  RackTrack* rackTrack = RackTracks.back();
-  rackTrack->RemoveRack();
-  rackTrack->RemoveChannel();
-  RackTracks.pop_back();
-  SeqMutex.Unlock();
-  SetScrolling();
 }
 
 Plugin*				Rack::AddToSelectedTrack(PlugStartInfo &startinfo, PluginLoader *p)

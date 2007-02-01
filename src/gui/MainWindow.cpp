@@ -666,7 +666,7 @@ bool					MainWindow::NewSession()
   Seq->PatternsToResize.clear();
   Seq->TracksToRefresh.clear();
   SeqPanel->DeleteAllTracks();
-  RackPanel->DeleteAllRacks();
+  RackPanel->DeleteAllTracks();
   OptPanel->DeleteTools();
 
   OpenWizard();
@@ -965,7 +965,6 @@ void					MainWindow::LoadExternalPlugins()
 	  PluginName = (*IterPluginsList).substr(0, (*IterPluginsList).find_last_of(Sep));
 	  wxString((*IterPluginsList).substr((*IterPluginsList).find_last_of(Sep) + 1)).ToLong((long*)&PluginId);
   	}
-      cout << "plugin : " << PluginName << " id : " << PluginId << endl;
       PluginInfo = LoadedExternalPlugins->GetPluginType(PluginId);
       LoadedExternalPlugins->SetMenuItemId(PluginId,
 					   AddPluginMenuItem(PluginInfo, PluginInfo & TYPE_PLUGINS_EFFECT, PluginName));

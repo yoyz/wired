@@ -346,9 +346,11 @@ const wxString		cCreateEffectAction::getHistoryLabel()
 void cCreateEffectAction::RemoveRackEffect ()
 { 
 	if (mRackIndex < 0)
-		RackPanel->RemoveSelectedRackAndChannel();
+	  RackPanel->RemoveSelectedRackTrack();
 	else
-		RackPanel->RemoveTrack(mRackIndex);				// TODO: Should be identified by StartInfo and PluginLoader
+	  RackPanel->RemoveRackTrack(mRackIndex);
+	// TODO: Should be identified by StartInfo and PluginLoader
+	// TODO bis : must delete this undo engine...
 	NotifyActionManager();
 }
 
@@ -398,7 +400,7 @@ void cCreateRackAction::Redo ()
 
 void cCreateRackAction::Undo ()
 { 
-  RackPanel->RemoveTrack();
+  RackPanel->RemoveLastRackTrack();
 }
 
 cCreateRackAction			cCreateRackAction::operator=(const cCreateRackAction& right)

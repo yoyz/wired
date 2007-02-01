@@ -31,6 +31,10 @@ typedef	std::list<Plugin *>::const_iterator	t_ListPluginIterator;
 
 class		RackTrack : public WiredDocument
 {
+ private:
+  void				RemoveChannel();
+  void				DeleteAllRacks();
+
  public:
   RackTrack(Rack *parent, int index);
   ~RackTrack();
@@ -43,9 +47,7 @@ class		RackTrack : public WiredDocument
   Plugin*			CreateRack(PlugStartInfo &startinfo, PluginLoader *p);
   void				DeleteRack(Plugin *plug);
   int				GetYPos();
-  void				RemoveRack();
-  void				RemoveChannel();
-  void				DeleteAllRacks();
+  void				RemoveSelectedRack();
   void				SetSelected(Plugin *plugin);
   int				NbRacks(){return Racks.size();};
   RackTrack			operator=(const RackTrack& right);
@@ -83,7 +85,7 @@ class		Rack: public wxScrolledWindow, WiredDocument
 					   PluginLoader *p);
   
   void			DeleteRack(Plugin *plug);
-  void			DeleteAllRacks();
+  void			DeleteAllTracks();
   RackTrack*		GetRackTrack(Plugin *plug);
   int			GetXPos(int index);
   
@@ -98,22 +100,18 @@ class		Rack: public wxScrolledWindow, WiredDocument
 
   // Select a RackTrack from its number
   void			SelectTrackFromNumber(int no);
-  
-  // Kept for compatibility but shouldn't be used anymore
-  void			RemoveFromSelectedTrack();
-  // Should be used instead of RemoveFromSelectedTrack
-  bool			RemoveSelectedRackAndChannel();
 
-  // Removes the selected rack and the attached channel
-  // Kept for compatibility but shouldn't be used anymore
-  void			RemoveTrack();
-  // Should be used instead of RemoveTrack
-  bool			RemoveTrack(int index);
+  // Should be used instead of RemoveFromSelectedTrack
+  bool			RemoveSelectedRackTrack();
+
+  // Removes the last rack track
+  void			RemoveLastRackTrack();
+
+  // Removes a rack from its index
+  bool			RemoveRackTrack(int index);
  
-  // Removes a rack and a channel from index
-  // RemoveRack() ? Not RemoveAllRackTracks() ?
-  // Should be used instead of RemoveTrack
-  bool			RemoveTrack(const RackTrack* rackTrack);
+  // Removes a rack from its ptr
+  bool			RemoveRackTrack(const RackTrack* rackTrack);
 
   // Debug - Shows member variables
   void			Dump();
