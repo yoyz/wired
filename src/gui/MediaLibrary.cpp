@@ -260,6 +260,8 @@ void				MediaLibrary::OnSize(wxSizeEvent &event)
   //we assume that each toolbar has a size of 50px (toolbar + margins + ...)
   Layout();
   MLTreeView->Fit();
+  MLTreeView->SetSize(this->GetSize().x, this->GetSize().y - 100);
+
 #ifndef DEBUG_DISABLE_FILTERS
   BottomToolbar->Move(0, this->GetSize().y - 100);
   FiltersToolbar->Move(0, this->GetSize().y - 50);
