@@ -2,7 +2,7 @@ LDFLAGS = $(shell wx-config --libs) -L../../fileloader -lfileloader
 
 CPPFLAGS = $(shell wx-config --cflags) -I../../xml -I../../save	   \
 	-I../../libs/WiredAkai/include -I../../gui -I../../plugins \
-	-I../../fileloader -I/opt/gnome/include -I../../audio      \
+	-I../../fileloader -I../../audio      \
 	-I../../redist -I../../engine -I../../mixer -I../../midi   \
 	-I../../midi/portmidi/pm_common				   \
 	-I../../midi/portmidi/porttime -I../../editmidi		   \
