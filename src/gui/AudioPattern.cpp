@@ -448,10 +448,11 @@ void					AudioPattern::SetSize(wxSize s)
 
 void				AudioPattern::Save()
 {
+  wxFileName			file(FileName);
 
-
- saveDocData(new SaveElement(wxT("FileName"), FileName));
- Pattern::Save();
+  file.MakeRelativeTo(saveCenter->getAudioDir());
+  saveDocData(new SaveElement(wxT("FileName"), file.GetFullPath()));
+  Pattern::Save();
 }
 
 void				AudioPattern::Load(SaveElementArray data)
@@ -462,7 +463,10 @@ void				AudioPattern::Load(SaveElementArray data)
     {
       if (data[i]->getKey() == wxT("FileName"))
 	{
-	  FileName = data[i]->getValue();
+	  wxFileName		file(data[i]->getValue());
+
+	  file.MakeAbsolute(saveCenter->getAudioDir());
+	  FileName = file.GetFullPath();
 	  WaveFile*		newWave = new WaveFile(FileName, false);
 
 	  Init(newWave, _documentParent);

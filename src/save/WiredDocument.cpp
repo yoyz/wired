@@ -40,6 +40,17 @@ void		WiredDocument::Unregister(WiredDocument *child)
   _children.Remove(child);
 }
 
+void		WiredDocument::ChangeParent(WiredDocument *newdad)
+{
+  if (_parent)
+    _parent->Unregister(this);
+  if (newdad)
+    {
+      _parent = newdad;
+      newdad->Register(this);
+    }
+}
+
 WiredDocumentArray	WiredDocument::getChildren()
 {
   return _children;

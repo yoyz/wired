@@ -80,6 +80,8 @@ class WiredDocument
    * \param child The child to remove.
    */
   void				Unregister(WiredDocument *child);
+
+  void				ChangeParent(WiredDocument *newdad);
   
   /** Returns the data stored in _dataSave.
    * \return The data stored in _dataSave.

@@ -204,7 +204,6 @@ void					Pattern::OnMotion(wxMouseEvent &e)
   long					y;
   long					max;
   double				z;
-  int					trackfrom;
   int					trackto;
   double				mes;
   

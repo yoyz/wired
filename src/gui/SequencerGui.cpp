@@ -477,6 +477,7 @@ void					SequencerGui::MovePattern(Pattern *p,
     {
       Seq->Tracks[newTrackIndex]->AddPattern(p);
       Seq->Tracks[oldTrackIndex]->DelPattern(p);
+      p->ChangeParent(Seq->Tracks[newTrackIndex]);
     }
 }
 
