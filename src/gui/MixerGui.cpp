@@ -191,18 +191,13 @@ void	MixerGui::Save()
 {
   SaveElement	*savedElem;
 
-  std::cerr << "MixerGui::Save" << std::endl;
-
   //MasterLeft
-  std::cerr << "MasterLeft: " << MasterLeft << std::endl;
   savedElem = new SaveElement(wxT("masterLeft"), MasterLeft);
   saveDocData(savedElem);
 
   //MasterRight
-  std::cerr << "MasterRight: " << MasterRight << std::endl;
   savedElem = new SaveElement(wxT("masterRight"), MasterRight);
   saveDocData(savedElem);
-
 
   //ChannelGuiVector
 }
