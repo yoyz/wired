@@ -132,6 +132,13 @@ class SaveCenter : public WiredDocument
   void			DumpWiredDocumentSubTree(WiredDocument *currentNode,
 						 int depth);
 
+  /** Checks if the path is the path to a valid project.
+   * A path is a valid project path if it contains a wired.xml file.
+   * TODO : Add deeper checks.
+   * \param path The path to the folder to check.
+   */
+  bool			IsProject(wxFileName path);
+
  private:
    /** Writes an element in the xmlfile.
     * \param elem the element to write.
@@ -195,13 +202,6 @@ class SaveCenter : public WiredDocument
   void		CleanProject();
 
  private:
-
-  /** Checks if the path is the path to a valid project.
-   * A path is a valid project path if it contains a wired.xml file.
-   * TODO : Add deeper checks.
-   * \param path The path to the folder to check.
-   */
-  bool			IsProject(wxFileName path);
 
   /** Dumps a SaveElementArrayHashMap.
    * As this structure is quite complicated, this function is mainly used for debug.

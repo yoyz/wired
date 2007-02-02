@@ -1831,8 +1831,6 @@ void		MainWindow::OnKey(wxKeyEvent& event)
 
 void		MainWindow::Save()
 {
-  std::cerr << "[save] MainWindow::Save()" << std::endl;
- 
   SaveElement	*saveElem;
   wxSize	size;
   wxPoint	pos;
@@ -2090,6 +2088,9 @@ void		MainWindow::OpenWizard()
   path.AssignDir(dirDialog.GetPath());
 
   saveCenter->setProjectPath(path);
+
+  if (saveCenter->IsProject(path))
+     saveCenter->LoadProject();
 }
 
 BEGIN_DECLARE_EVENT_TYPES()

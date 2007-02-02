@@ -324,10 +324,6 @@ void		SaveCenter::setProjectPath(wxFileName projectPath)
 
   if(!_audioDir.DirExists())
     _audioDir.Mkdir();
-
-  if(IsProject(_projectPath))
-     LoadProject();
-
 }
 
 wxString	SaveCenter::getProjectName()
