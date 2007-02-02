@@ -76,7 +76,9 @@ class				MediaLibrary : public wxPanel
   MLTree			*MLTreeView;
 
  protected:
-
+  
+  wxWindow                     *Parent;
+  void                          Converts(wxString Path);
 /**
  *Boolean used to know if the wav file is preview
 */

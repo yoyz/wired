@@ -20,6 +20,8 @@ using namespace std;
 #include "audio.xpm"
 #include "delete.xpm"
 #include "FileStat.h"
+#include "Sequencer.h"
+#include "FileConversion.h"
 
 #define F_WIDTH		640
 #define F_HEIGHT	520
@@ -1202,6 +1204,7 @@ void FileLoader::StopPlaying()
   wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, FileLoader_Stop);  
   event.SetEventObject(this);
   wxPostEvent(GetParent(), event);
+  
 }
 
 void FileLoader::StartPlaying()
@@ -1215,6 +1218,7 @@ void FileLoader::StartPlaying()
   wxCommandEvent event(wxEVT_COMMAND_BUTTON_CLICKED, FileLoader_Start);  
   event.SetEventObject(this);
   wxPostEvent(GetParent(), event);
+ 
 }
 
 void FileLoader::OnAddToFavorites(wxCommandEvent &e)

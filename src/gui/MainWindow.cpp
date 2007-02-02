@@ -1746,8 +1746,11 @@ void					MainWindow::AddUpdatePlugin(Plugin *p)
 void					MainWindow::OnFileLoaderStart(wxCommandEvent &event)
 {
   FileLoader				*f = (FileLoader *)event.GetEventObject();
+  wxString                              selfile;
 
-  Seq->PlayFile(f->GetSelectedFile(), f->IsAkai());
+  selfile = f->GetSelectedFile();
+  FileConverter->ConvertSamplerateNoGraph(selfile);
+  Seq->PlayFile(saveCenter->getAudioDir() + selfile.AfterLast('/'), f->IsAkai());
 }
 
 void					MainWindow::OnFileLoaderStop(wxCommandEvent &event)

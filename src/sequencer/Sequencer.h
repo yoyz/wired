@@ -14,7 +14,6 @@
 #include <vector>
 #include <list>
 #include <iostream>
-
 #include "WiredDocument.h"
 
 typedef struct s_SeqCreateEvent		SeqCreateEvent;
@@ -209,7 +208,7 @@ class Sequencer : public wxThread, public WiredDocument
   std::list<MidiPattern *>		PatternsToRefresh;
   /** List of tracks to refresh.*/
   std::list<Track *>			TracksToRefresh;
-
+  WiredSampleRate                       *GetSampleRateConverter(){return SampleRateConverter;};
  protected:
 
   void					SetCurrentPos();
@@ -251,11 +250,10 @@ class Sequencer : public wxThread, public WiredDocument
   long					PlayWavePos;
   /** PlayWave output channel.*/
   Channel				*PlayWaveChannel;
-  
   WiredSampleRate			*SampleRateConverter;
+ 
 };
 
 static wxMutex				SeqMutex(wxMUTEX_RECURSIVE);
 extern Sequencer			*Seq;
-
 #endif

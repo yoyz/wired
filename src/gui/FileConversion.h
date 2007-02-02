@@ -45,6 +45,7 @@ public:
 	bool				ConvertFromCodec(wxString& FileName);
 	void				ConvertToCodec(wxString& FileName);
 	bool				ConvertSamplerate(wxString& FileName);
+	bool				ConvertSamplerateNoGraph(wxString& FileName);
 
 	// import a wav file
 	void				ImportWaveFile(wxString& FileName);
@@ -60,6 +61,7 @@ private:
 	void				CopyToWorkingDir(wxString& FileName);
 	void				ImportWavePattern(wxString& FileName);
 	bool				ConvertSamplerate(wxString& FileName, bool &HasChangedPath);
+	bool				ConvertSamplerateNoGraph(wxString& FileName, bool &HasChangedPath);
 	int				GetSndFFormat(PcmType Type);
 	bool				Decode(wxString& FileName);
 	void				EnqueueAction(FileConversionTypeAction ActionType, wxString &SrcFile, wxString &DstFile);

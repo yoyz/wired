@@ -245,11 +245,34 @@ bool				FileConversion::ConvertSamplerate(wxString &FileName)
 //	FileConversionMutex.Unlock();
 }
 
+bool				FileConversion::ConvertSamplerateNoGraph(wxString &FileName)
+{
+	bool HasChangedPath;
+	return ConvertSamplerateNoGraph(FileName, HasChangedPath);
+//	EnqueueAction(AConvertSampleRate, FileName, wxString(wxT("")));
+//	FileConversionMutex.Unlock();
+}
+bool				FileConversion::ConvertSamplerateNoGraph(wxString &FileName, bool &HasChangedPath)
+{
+	int					HasConvertedFile;
+
+	HasConvertedFile = _SampleRateConverter.OpenFileNoGraph(FileName, _Parent);
+	if (HasConvertedFile == wxID_CANCEL)
+		return false;
+	else if (HasConvertedFile == wxID_NO)
+		return true;
+	else if (HasConvertedFile == wxID_YES)
+	{
+		HasChangedPath = true;
+		return true;
+	}
+	return true;
+}
 bool				FileConversion::ConvertSamplerate(wxString &FileName, bool &HasChangedPath)
 {
 	int					HasConvertedFile;
 
-    HasConvertedFile = _SampleRateConverter.OpenFile(FileName, _Parent);
+	HasConvertedFile = _SampleRateConverter.OpenFile(FileName, _Parent);
 	if (HasConvertedFile == wxID_CANCEL)
 		return false;
 	else if (HasConvertedFile == wxID_NO)

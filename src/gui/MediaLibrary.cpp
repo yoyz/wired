@@ -66,6 +66,7 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
   wxString	sortselect_choices[NB_SORTSELECT_CHOICES];
   long		c;
 
+  Parent = parent;
   preview = false;
   this->SetInvisible();
   this->SetDocked();
@@ -341,6 +342,31 @@ void				MediaLibrary::OnFilterEffects(wxCommandEvent &WXUNUSED(event))
 }
 #endif
 
+void                            MediaLibrary::Converts(wxString Path)
+{
+  FileConverter->ConvertSamplerateNoGraph(Path);
+
+  /*SNDFILE				*Result;
+  SF_INFO				Info;
+  int					Res = wxID_NO;
+  bool				SameSampleRate, SameFormat;
+  
+  Info.format = 0;
+  if ((Result = sf_open(Path.mb_str(*wxConvCurrent), SFM_READ, &Info)) != NULL)
+    {      cerr << "test1" << endl;
+      SameFormat = Seq->GetSampleRateConverter()->IsSameFormat(Info.format, Seq->GetSampleRateConverter()->Get_Apllication_Setting().Format);
+      cerr << "test2" << endl;
+      SameSampleRate = (int)Info.samplerate == (int)Seq->GetSampleRateConverter()->Get_Apllication_Setting().SampleRate ? true : false;
+      cerr << "test3" << endl;
+      if (!SameFormat || !SameSampleRate)
+	{
+	  cerr << "test4" << endl;
+	  Seq->GetSampleRateConverter()->Convert(&Info, Path, Result);
+	}
+      sf_close(Result);
+      }*/
+}
+
 void				MediaLibrary::OnPreview(wxCommandEvent &WXUNUSED(event))
 {
   wxString			selfile;
@@ -353,10 +379,12 @@ void				MediaLibrary::OnPreview(wxCommandEvent &WXUNUSED(event))
 
   if (preview == false)
     {
+
       preview = true;
       BottomToolbar->EnableTool(5, false);
       BottomToolbar->EnableTool(6, true);
-      Seq->PlayFile(selfile, false);
+      Converts(selfile);
+      Seq->PlayFile(saveCenter->getAudioDir() + selfile.AfterLast('/'), false);
     }
   else
     {
