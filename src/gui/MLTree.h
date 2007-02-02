@@ -54,6 +54,8 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
   MLTree(wxWindow *dad, wxPoint p, wxSize s, long style);
   wxTreeItemId			AddFileInProject(wxString FileToAdd, bool expand);
   wxTreeItemId			DelFileInProject(wxString FileToAdd, bool expand);
+  wxPoint                       GetPos(){return Pos;};
+  wxString                      GetFile(){return Selfile;};
 /**
  * Main destructor for class MLTree
 */
@@ -64,6 +66,8 @@ class				MLTree : public wxTreeCtrl, public WiredDocument
   void			OnSave(wxString filename);
 
  protected:
+  wxPoint                       Pos;
+  wxString     	                Selfile;
   friend class			MediaLibrary;
   friend class			MLTreeInfos;
 

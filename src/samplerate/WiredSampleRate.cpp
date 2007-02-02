@@ -2,8 +2,10 @@
 // Under the GNU General Public License Version 2, June 1991
 
 #include "WiredSampleRate.h"
+#include "SaveCenter.h"
 
 static wxMutex				SampleRateMutex;
+extern SaveCenter *saveCenter;
 
 WiredSampleRate::WiredSampleRate()
 {
@@ -160,7 +162,7 @@ bool					WiredSampleRate::Convert(SF_INFO *SrcInfo, wxString& SrcFile, SNDFILE *
 
 	if (SrcFile.find(wxT("/")) != SrcFile.npos)
 	{
-		DestFileName = _ApplicationSettings.WorkingDirectory + SrcFile.substr(SrcFile.find_last_of(wxT("/")));
+		DestFileName = saveCenter->getAudioDir() + SrcFile.AfterLast('/');
 		Info.samplerate = _ApplicationSettings.SampleRate;
 		Info.channels = SrcInfo->channels;
 		Info.format = SrcInfo->format;

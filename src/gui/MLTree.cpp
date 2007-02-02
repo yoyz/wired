@@ -1056,22 +1056,25 @@ void				MLTree::OnLeftClick(wxMouseEvent &event)
 {
   int		x;
   int		y;
-  wxString     	selfile;
   s_nodeInfo   	infos;
+
 
   infos = GetTreeItemStructFromId(item_to_drag);
   if (infos.label != wxT(""))
     {
       if (infos.extension.Cmp(wxT("")))
 	{
-	  selfile = infos.label;
+	  Selfile = infos.label;
 	  x = event.GetPosition().x;
 	  y = event.GetPosition().y;
 	  ClientToScreen(&x, &y);
-	  SeqPanel->Drop(x, y, selfile);
+	  wxCommandEvent event( EVT_DROP, ID_EVT_DROP );
+	  Pos.x = x;
+	  Pos.y = y;
+	  wxPostEvent(SeqPanel->GetEventHandler(), event);
 	}
     }
-  event.Skip();
+    event.Skip();
 }
 
 void				MLTree::OnSuppr(wxKeyEvent &event)

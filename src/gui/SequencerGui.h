@@ -24,8 +24,12 @@
 #include "AudioPattern.h"
 #include "MidiPattern.h"
 #include "AccelCenter.h"
-
+#include "MLTree.h"
 #include "SequencerView.h"
+
+BEGIN_DECLARE_EVENT_TYPES()
+  DECLARE_EVENT_TYPE(EVT_DROP, -1)
+END_DECLARE_EVENT_TYPES()
 
 #define ID_SEQ_SETPOS			(101010)
 #define ID_SEQ_RESIZE			(101011)
@@ -84,6 +88,7 @@ enum
     ID_TOOL_SPLIT_SEQUENCER,
     ID_TOOL_MERGE_SEQUENCER,
     ID_TOOL_PAINT_SEQUENCER,
+    ID_EVENT_DROP,
   };
 
 #define NB_COMBO_CHOICES		(9)
@@ -121,7 +126,8 @@ enum
     ID_SEQ_MAGNET,
     ID_SEQ_COMBO_MAGNET,
     ID_SEQ_COLOR,
-    ID_SEQ_COLORBOX
+    ID_SEQ_COLORBOX,
+    ID_EVT_DROP
   };
 
 class				Ruler;
@@ -268,7 +274,7 @@ class				SequencerGui: public wxPanel, public WiredDocument
   void				OnMagnetismChange(wxCommandEvent &event);
   void				OnColorButtonClick(wxCommandEvent &event);
   void				OnColoredBoxClick(wxCommandEvent &event);
-  void				Drop(int x, int y, wxString file);
+  void				Drop(wxCommandEvent &event);
   //bool				Floating;
   void				HideAllPatterns(wxMouseEvent &e);
   // WiredDocument things

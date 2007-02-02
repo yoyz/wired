@@ -9,7 +9,9 @@
 #include "HelpPanel.h"
 #include "Sequencer.h"
 #include "AudioCenter.h"
+#include "FileConversion.h"
 
+extern FileConversion		*FileConverter;
 SequencerView::SequencerView(SequencerGui *parent, const wxPoint &pos,
 			     const wxSize &size)
   : wxWindow(parent, -1, pos, size, wxSUNKEN_BORDER),
@@ -312,6 +314,7 @@ void					SequencerView::Drop(int x, int y, wxString file)
       if (Seq->Tracks.size() != 0 && track < Seq->Tracks.size() && (*i)->IsAudioTrack())
 	{
 	  wave_tmp = WaveCenter.AddWaveFile(file);
+	  FileConverter->ImportFile(file);
 	  for (pattern_iterator = (*i)->GetTrackPattern()->Patterns.begin();
 	       pattern_iterator != (*i)->GetTrackPattern()->Patterns.end();
 	       pattern_iterator++)
@@ -335,6 +338,7 @@ void					SequencerView::Drop(int x, int y, wxString file)
       else
 	{
 	  wave_tmp = WaveCenter.AddWaveFile(file);
+	  FileConverter->ImportFile(file);
 	  for (nb_channel = 0; nb_channel < wave_tmp->GetNumberOfChannels(); nb_channel++)
 	  {
 	    track_to_add = SeqPanel->CreateTrack(eAudioTrack);

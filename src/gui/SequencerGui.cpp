@@ -28,6 +28,7 @@
 #include "../engine/Settings.h"
 #include "../audio/WriteWaveFile.h"
 
+DEFINE_EVENT_TYPE(EVT_DROP)
 const struct s_combo_choice		ComboChoices[NB_COMBO_CHOICES + 1] =
 {
   { _("Bar")	,	1	},
@@ -1021,16 +1022,17 @@ void					SequencerGui::SetEndPos(double pos)
 {
   EndCursor->SetPos(pos);
 }
-void					SequencerGui::Drop(int x, int y, wxString file)
+
+void					SequencerGui::Drop(wxCommandEvent &event)
 {
+  wxPoint   pos;
+  wxString file;
 
-  SeqView->Drop(x, y, file);
+  cerr << "teste" << endl;
+  file = MediaLibraryPanel->MLTreeView->GetFile();
+  pos = MediaLibraryPanel->MLTreeView->GetPos();
+  SeqView->Drop(pos.x, pos.y, file);
 
-}
-
-void					SequencerGui::HideAllPatterns(wxMouseEvent &e)
-{
-  SeqPanel->SelectItem(0x0, e.ShiftDown());
 }
 
 // WiredDocument implementation
@@ -1095,4 +1097,5 @@ BEGIN_EVENT_TABLE(SequencerGui, wxPanel)
   EVT_COMBOBOX(ID_SEQ_COMBO_MAGNET, SequencerGui::OnMagnetismChange)
   EVT_SIZE(SequencerGui::OnSize)
   EVT_MOUSEWHEEL(SequencerGui::OnWheelMove)
+  EVT_COMMAND(ID_EVT_DROP, EVT_DROP, SequencerGui::Drop)
 END_EVENT_TABLE()

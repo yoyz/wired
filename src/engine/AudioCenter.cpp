@@ -37,7 +37,8 @@ WaveFile *AudioCenter::AddWaveFile(wxString filename)
 	    return (w);
 	  }
 	}
-      wxCopyFile(filename, to, true);
+      if (!wxFileExists(to))
+	wxCopyFile(filename, to, false);
       MediaLibraryPanel->MLTreeView->AddFileInProject(to, true);
       w = new WaveFile(to, false, WaveFile::rwrite);
       WaveFiles.push_back(w);
