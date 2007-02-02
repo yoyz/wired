@@ -302,6 +302,7 @@ void					SequencerView::Drop(int x, int y, wxString file)
   WaveFile				*wave_tmp;
   long					nb_channel;
 
+  std::cerr << "trut trut" << std::endl;
   ScreenToClient(&x, &y);
   if (x >= 0 && y >= 0)
     {
@@ -314,14 +315,15 @@ void					SequencerView::Drop(int x, int y, wxString file)
       if (Seq->Tracks.size() != 0 && track < Seq->Tracks.size() && (*i)->IsAudioTrack())
 	{
 	  wave_tmp = WaveCenter.AddWaveFile(file);
-	  FileConverter->ImportFile(file);
 	  for (pattern_iterator = (*i)->GetTrackPattern()->Patterns.begin();
 	       pattern_iterator != (*i)->GetTrackPattern()->Patterns.end();
 	       pattern_iterator++)
 	    if (last_pos < (*pattern_iterator)->GetEndPosition())
 	      last_pos = (*pattern_iterator)->GetEndPosition();
+	  std::cerr << "wave_tmp->GetNumberOfChannels()" << wave_tmp->GetNumberOfChannels() << std::endl;
 	  for (nb_channel = 0; nb_channel < wave_tmp->GetNumberOfChannels() && i != Seq->Tracks.end(); nb_channel++)
 	    {
+	      std::cerr << "nb_channel = " << nb_channel << std::endl;
 	      wave = WaveCenter.AddWaveFile(file);
 	      wave->SetChannelToRead(nb_channel);
 	      (*i)->CreateAudioPattern(wave, last_pos);
@@ -329,6 +331,7 @@ void					SequencerView::Drop(int x, int y, wxString file)
 	    }
 	  for (;nb_channel < wave_tmp->GetNumberOfChannels(); nb_channel++)
 	    {
+	      std::cerr << "nb_channel = " << nb_channel << std::endl;
 	      track_to_add = SeqPanel->CreateTrack(eAudioTrack);
 	      wave = WaveCenter.AddWaveFile(file);
 	      wave->SetChannelToRead(nb_channel);
@@ -338,13 +341,12 @@ void					SequencerView::Drop(int x, int y, wxString file)
       else
 	{
 	  wave_tmp = WaveCenter.AddWaveFile(file);
-	  FileConverter->ImportFile(file);
 	  for (nb_channel = 0; nb_channel < wave_tmp->GetNumberOfChannels(); nb_channel++)
 	  {
-	    track_to_add = SeqPanel->CreateTrack(eAudioTrack);
+ 	    track_to_add = SeqPanel->CreateTrack(eAudioTrack);
 	    wave = WaveCenter.AddWaveFile(file);
 	    wave->SetChannelToRead(nb_channel);
-	    track_to_add->CreateAudioPattern(wave, 0);
+ 	    track_to_add->CreateAudioPattern(wave, 0);
 	  }
 	}
       WaveCenter.RemoveWaveFile(wave_tmp);
