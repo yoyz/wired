@@ -397,7 +397,8 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
 	}
       else if(nodeType == XML_READER_TYPE_END_ELEMENT)
 	{
-	  history.Remove(history.Last());
+	  if(history.GetCount() > 0)
+	    history.Remove(history.Last());
 	}
     }
   return ret;
