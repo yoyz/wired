@@ -32,7 +32,7 @@ ChannelGui::ChannelGui(Channel* channel, wxImage* img_bg, wxImage* img_fg,
   Chan = channel;
   ImgFaderBg = img_bg;
   ImgFaderFg = img_fg;
-  if (Chan->Stereo)
+  if (Chan && Chan->Stereo)
     {
       FaderLeft  = new FaderCtrl(this, FaderLeftId, ImgFaderBg, ImgFaderFg, 0,
 				 127, &Chan->VolumeLeft, true, wxPoint(17, 10), wxDefaultSize,

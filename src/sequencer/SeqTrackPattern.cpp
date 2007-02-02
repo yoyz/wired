@@ -11,11 +11,17 @@ SeqTrackPattern::SeqTrackPattern()
 
 SeqTrackPattern::~SeqTrackPattern()
 {
-  std::vector<Pattern *>		vectorCopy;
-  std::vector<Pattern *>::iterator	it;
+  int				size;
+  vector<Pattern*>::iterator	it;
+  vector<Pattern*>::iterator	next;
 
-  // we must copy vector, because DeletePattern will delete some iterators
-  vectorCopy = Patterns;
-  for (it = vectorCopy.begin(); it != vectorCopy.end(); it++)
-    SeqPanel->DeletePattern(*it);
+  size = 0;
+  it = Patterns.begin();
+  while (it != Patterns.end() && size < Patterns.size())
+    {
+      next = it + 1;
+      SeqPanel->DeletePattern(*it);
+      it = next;
+      size++;
+    }
 }

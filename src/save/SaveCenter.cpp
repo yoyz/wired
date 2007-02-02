@@ -49,7 +49,7 @@ void	SaveCenter::CleanTree()
     {
       std::cout << "toProcessIt = " << toProcessIt << std::endl;
       std::cout << "toProcess.GetCount() = " << toProcess.GetCount() << std::endl;
-      std::cout << "toProcess[toProcessIt]->GetName() = " << toProcess[toProcessIt]->getName() << std::endl;
+      std::cout << "toProcess[toProcessIt]->GetName() = " << toProcess[toProcessIt]->getName().mb_str() << std::endl;
       
       //Clean the WiredDocument
       toProcess[toProcessIt]->CleanChildren();

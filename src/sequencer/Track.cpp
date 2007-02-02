@@ -162,10 +162,13 @@ void						Track::DelPattern(Pattern *p)
   wxMutexLocker				locker(SeqMutex);
   vector<Pattern *>::iterator		iter;
 
-  for (iter = TrackPattern->Patterns.begin(); *iter != p; iter++)
-    ;
-  if (iter != TrackPattern->Patterns.end())
-    TrackPattern->Patterns.erase(iter);
+  for (iter = TrackPattern->Patterns.begin();
+       iter != TrackPattern->Patterns.end(); iter++)
+    if (*iter == p)
+      {
+	TrackPattern->Patterns.erase(iter);
+	break;
+      }
 #ifdef __DEBUG__
   printf("Track::DelPattern(%d) -- OVER (PATTERN)\n", p);
 #endif

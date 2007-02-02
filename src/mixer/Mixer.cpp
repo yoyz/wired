@@ -37,6 +37,7 @@ Mixer::~Mixer()
 
 void				Mixer::DeleteBuffers()
 {
+  wxMutexLocker			locker(MixMutex);
   list<Channel*>::iterator	c;
 
   for (c = InChannels.begin(); c != InChannels.end(); c++)
@@ -413,7 +414,8 @@ void				Mixer::MixInput(void)
 
 void			Mixer::Save()
 {
-  SaveElement	*savedElem;
+  wxMutexLocker		locker(MixMutex);
+  SaveElement		*savedElem;
 
   std::cerr << "Mixer::Save" << std::endl;
 
@@ -447,7 +449,8 @@ void			Mixer::Save()
 
 void			Mixer::Load(SaveElementArray data)
 {
-  int		dataCompt;
+  wxMutexLocker		locker(MixMutex);
+  int			dataCompt;
 
   std::cerr << "Mixer::Load" << std::endl;
   for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
@@ -478,7 +481,5 @@ void			Mixer::Load(SaveElementArray data)
 
 void			Mixer::CleanChildren()
 {
-  cerr << "Mixer::CleanChildren" << endl;
 
-  InitBuffers();
 }
