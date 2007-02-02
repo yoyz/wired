@@ -232,7 +232,7 @@ class				SequencerGui: public wxPanel, public WiredDocument
   void				SetBeginLoopPos(double pos);
   void				SetEndLoopPos(double pos);
   void				SetEndPos(double pos);
-/*   void				RefreshConnectMenu(); */
+  void				RefreshConnectMenu();
   void				RemoveReferenceTo(Plugin *plug);
   void				DeleteSelectedTrack();
   void				DeleteAllTracks();

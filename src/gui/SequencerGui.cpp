@@ -576,12 +576,34 @@ void					SequencerGui::RemoveReferenceTo(Plugin *plug)
     (*i)->GetTrackOpt()->RemoveReferenceTo(plug);
 }
 
-void					SequencerGui::DeleteAllTracks()
+void					SequencerGui::RefreshConnectMenu()
 {
+  wxMutexLocker				locker(SeqMutex);
   vector<Track *>::iterator		i;
 
   for (i = Seq->Tracks.begin(); i != Seq->Tracks.end(); i++)
     (*i)->GetTrackOpt()->RebuildConnectList();
+}
+
+void					SequencerGui::DeleteAllTracks()
+{
+  wxMutexLocker				locker(SeqMutex);
+  vector<Track *>::iterator		i;
+  vector<Track *>::iterator		next;
+
+  i = Seq->Tracks.begin();
+  while (i != Seq->Tracks.end())
+    {
+      next = i + 1;
+      delete (*i);
+      i = next;
+    }
+
+  // should be unnecessary
+  Seq->Tracks.clear();
+
+  UpdateTracks();
+  SetScrolling();
 }
 
 void					SequencerGui::DeleteSelectedTrack()
@@ -750,6 +772,8 @@ void					SequencerGui::DeletePattern(Pattern *p)
 {
   vector<Pattern *>::iterator		i;
 
+  if (!p)
+    return;
   WaveCenter.RemoveWaveFile(((AudioPattern*)(p))->GetWaveFile());
   for (i = SelectedItems.begin(); i != SelectedItems.end(); i++)
     if (*i == p)
