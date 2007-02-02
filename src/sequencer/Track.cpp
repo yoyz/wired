@@ -139,7 +139,11 @@ AudioPattern					*Track::CreateAudioPattern(WaveFile *w, double pos)
 #ifdef __DEBUG__
   printf("Track::CreateAudioPattern(%d, %f) -- START (AUDIO) Index=%d\n", w, pos, Index);
 #endif
-  newPattern = new AudioPattern(this, pos, w, Index);
+
+  if (w)
+    newPattern = new AudioPattern(this, pos, w, Index);
+  else
+    newPattern = new AudioPattern(this, pos, 0.0f, Index);
   newPattern->SetDrawColour(PatternColours[ColourIndex]);
 
   SeqMutex.Lock();
@@ -255,10 +259,12 @@ void						Track::Load(SaveElementArray data)
   int						i;
 
   for (i = 0; i < data.GetCount(); i++)
+    if (data[i]->getKey() == wxT("Index"))
+      Index = data[i]->getValueInt();
+
+  for (i = 0; i < data.GetCount(); i++)
     {
-      if (data[i]->getKey() == wxT("Index"))
-	Index = data[i]->getValueInt();
-      else if (data[i]->getKey() == wxT("ColourIndex"))
+      if (data[i]->getKey() == wxT("ColourIndex"))
 	ColourIndex = data[i]->getValueInt();
       else if (data[i]->getKey() == wxT("PatternsSize"))
 	{
@@ -269,7 +275,7 @@ void						Track::Load(SaveElementArray data)
 	  for (n = 0; n < nbPattern; n++)
 	    {
 	      if (GetType() == eAudioTrack)
-		new AudioPattern(this, 0.f, 0.f, Index);
+		CreateAudioPattern(NULL, 0.f);
 	      else if (GetType() == eMidiTrack)
 		new MidiPattern(this, 0.f, 0.f, Index);
 	    }
