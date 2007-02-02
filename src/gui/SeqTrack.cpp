@@ -518,7 +518,8 @@ void					SeqTrack::Save()
   saveDocData(new SaveElement(wxT("Record"), Record));
   saveDocData(new SaveElement(wxT("Mute"), Mute));
   saveDocData(new SaveElement(wxT("Selected"), Selected));
-  saveDocData(new SaveElement(wxT("PluginsNameConnected"), Connected->Name));
+  if(Connected)
+    saveDocData(new SaveElement(wxT("PluginsNameConnected"), Connected->Name));
 }
 
 void					SeqTrack::Load(SaveElementArray data)
@@ -537,7 +538,7 @@ void					SeqTrack::Load(SaveElementArray data)
 	    SelectTrack();
 	}
       else if (data[i]->getKey() == wxT("PluginsNameConnected"))
-	ConnectTo(RackPanel->FindPlugin(data[i]->getValue()));
+ 	ConnectTo(RackPanel->FindPlugin(data[i]->getValue()));
     }
 }
 
