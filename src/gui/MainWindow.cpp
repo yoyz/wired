@@ -1750,7 +1750,10 @@ void					MainWindow::OnFileLoaderStart(wxCommandEvent &event)
 
   selfile = f->GetSelectedFile();
   FileConverter->ConvertSamplerateNoGraph(selfile);
-  Seq->PlayFile(saveCenter->getAudioDir() + selfile.AfterLast('/'), f->IsAkai());
+  if (wxFileExists(saveCenter->getAudioDir() + selfile.AfterLast('/')))
+    Seq->PlayFile(saveCenter->getAudioDir() + selfile.AfterLast('/'), f->IsAkai());
+  else
+     Seq->PlayFile(selfile, f->IsAkai());
 }
 
 void					MainWindow::OnFileLoaderStop(wxCommandEvent &event)

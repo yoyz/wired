@@ -383,8 +383,11 @@ void				MediaLibrary::OnPreview(wxCommandEvent &WXUNUSED(event))
       preview = true;
       BottomToolbar->EnableTool(5, false);
       BottomToolbar->EnableTool(6, true);
-      Converts(selfile);
-      Seq->PlayFile(saveCenter->getAudioDir() + selfile.AfterLast('/'), false);
+      FileConverter->ConvertSamplerateNoGraph(selfile);
+      if (wxFileExists(saveCenter->getAudioDir() + selfile.AfterLast('/')))
+	Seq->PlayFile(saveCenter->getAudioDir() + selfile.AfterLast('/'), false);
+      else
+	Seq->PlayFile(selfile, false);
     }
   else
     {
