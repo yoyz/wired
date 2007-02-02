@@ -46,6 +46,7 @@
 #include "Colour.h"
 #include "HelpPanel.h"
 #include "SaveCenter.h"
+#include "debug.h"
 
 extern SaveCenter *saveCenter;
 
