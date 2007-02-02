@@ -87,9 +87,15 @@ class		Rack: public wxScrolledWindow, WiredDocument
   
   void			DeleteRack(Plugin *plug);
   void			DeleteAllTracks();
-  RackTrack*		GetRackTrack(Plugin *plug);
-  int			GetXPos(int index);
   
+  // Find a plugin from its name
+  Plugin*		FindPlugin(wxString name);
+
+  // Get RackTrack from a plugin
+  RackTrack*		GetRackTrack(Plugin *plug);
+
+  int			GetXPos(int index);
+
   // Applies scrolling on all racks
   void			SetScrolling();
   

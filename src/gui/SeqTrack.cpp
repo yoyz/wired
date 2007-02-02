@@ -518,6 +518,7 @@ void					SeqTrack::Save()
   saveDocData(new SaveElement(wxT("Record"), Record));
   saveDocData(new SaveElement(wxT("Mute"), Mute));
   saveDocData(new SaveElement(wxT("Selected"), Selected));
+  saveDocData(new SaveElement(wxT("PluginsNameConnected"), Connected->Name));
 }
 
 void					SeqTrack::Load(SaveElementArray data)
@@ -527,14 +528,16 @@ void					SeqTrack::Load(SaveElementArray data)
   for (i = 0; i < data.GetCount(); i++)
     {
       if (data[i]->getKey() == wxT("TrackName")) SetName(data[i]->getValue());
-      if (data[i]->getKey() == wxT("VuValue")) SetVuValue(data[i]->getValueInt());
-      if (data[i]->getKey() == wxT("Record")) SetRecording(data[i]->getValueInt());
-      if (data[i]->getKey() == wxT("Mute")) SetMute(data[i]->getValueInt());
-      if (data[i]->getKey() == wxT("Selected"))
+      else if (data[i]->getKey() == wxT("VuValue")) SetVuValue(data[i]->getValueInt());
+      else if (data[i]->getKey() == wxT("Record")) SetRecording(data[i]->getValueInt());
+      else if (data[i]->getKey() == wxT("Mute")) SetMute(data[i]->getValueInt());
+      else if (data[i]->getKey() == wxT("Selected"))
 	{
 	  if (data[i]->getValueInt() == true)
 	    SelectTrack();
 	}
+      else if (data[i]->getKey() == wxT("PluginsNameConnected"))
+	ConnectTo(RackPanel->FindPlugin(data[i]->getValue()));
     }
 }
 

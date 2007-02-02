@@ -712,6 +712,20 @@ RackTrack*			Rack::GetRackTrack(Plugin *plug)
   return (0x0);
 }
 
+Plugin*				Rack::FindPlugin(wxString name)
+{
+  t_ListRackTrack::iterator i;
+  list<Plugin *>::iterator j;
+
+  for (i = RackTracks.begin(); i != RackTracks.end(); i++)
+    {
+      for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
+	if ((*j)->Name == name)
+	  return (*j);
+    }
+  return (NULL);
+}
+
 void				Rack::OnPluginParamChange(wxMouseEvent &event)
 {
 	//cActionManager::Global().AddChangeParamsEffectAction(0, true);
@@ -794,6 +808,7 @@ Plugin*				Rack::AddNewRack(PlugStartInfo &startinfo, PluginLoader *p)
   Plugin *loaded;
 
   loaded = CreateRackTrack()->CreateRack(startinfo, p);
+  SeqPanel->RefreshConnectMenu();
   ResizeTracks();
   return loaded;
 }
