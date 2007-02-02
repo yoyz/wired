@@ -893,7 +893,7 @@ void					MainWindow::LoadPlugins()
 
   if (!PluginsConfFile.Open(WiredSettings->PlugConfFile))
     {
-      cerr << "Could not load " << WiredSettings->PlugConfFile.mb_str() << endl;
+      cerr << "[MAINWIN] Could not load " << WiredSettings->PlugConfFile.mb_str() << endl;
       return;
     }
   PluginMenuIndexCount = PLUG_MENU_INDEX_START;
@@ -924,12 +924,15 @@ void					MainWindow::LoadPlugins()
 		}
 	      else
 		cout << "[MAINWIN] Plugin type unknown" << endl;
+#ifdef __DEBUG__
 	      cout << "[MAINWIN] Plugin " << p->InitInfo.Name.mb_str() << " is working" << endl;
+#endif
 	    }
 	  else
 	    delete p;
 	}
     }
+  cout << "[MAINWIN] Loaded " << LoadedPluginsList.size() << " internal plugins" << endl;
 }
 
 void					MainWindow::LoadExternalPlugins()
@@ -962,6 +965,7 @@ void					MainWindow::LoadExternalPlugins()
       LoadedExternalPlugins->SetMenuItemId(PluginId,
 					   AddPluginMenuItem(PluginInfo, PluginInfo & TYPE_PLUGINS_EFFECT, PluginName));
     }
+  cout << "[MAINWIN] Loaded " << PluginsList.size() << " external plugins" << endl;
 }
 
 int						MainWindow::AddPluginMenuItem(int Type, bool IsEffect, const wxString& MenuName)

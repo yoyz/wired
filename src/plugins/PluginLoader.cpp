@@ -53,7 +53,9 @@ PluginLoader::PluginLoader(wxString filename) :
   if (handle.IsLoaded())
     {
       // check all mandatory symbols
+#ifdef __DEBUG__
       cout << "[PLUGLOADER] Loading symbol init..." << endl;
+#endif
 
       init = (init_t) handle.GetSymbol(PLUG_INIT);
       if (!init) 

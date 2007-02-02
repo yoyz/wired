@@ -65,7 +65,9 @@ bool			WiredDSSIPlugin::Load(const wxString& FileName, int& FirstIndex)
 			
 	  for (pos = 0, PluginInfo = 0; (CurrentDescriptor = _DSSIDescriptorFunction(pos)); pos++, PluginInfo = 0)
 	    {
+#ifdef __DEBUG__
 	      cout << "[DSSIPLUG] Adding DSSI Plugin {" << CurrentDescriptor->LADSPA_Plugin->Name << "}" << endl;
+#endif
 	      _DSSIDescriptors[FirstIndex] = CurrentDescriptor;
 	      PluginInfo |= TYPE_PLUGINS_DSSI;
 				
@@ -89,7 +91,9 @@ bool			WiredDSSIPlugin::Load(const wxString& FileName, int& FirstIndex)
 			
 	  for (pos = 0, PluginInfo = 0; (CurrentDescriptor = _LADSPADescriptorFunction(pos)); pos++, PluginInfo = 0)
 	    {				
+#ifdef __DEBUG__
 	      cout << "[DSSIPLUG] Adding LADSPA Plugin {" << CurrentDescriptor->Name << "}" << endl;
+#endif
 	      _LADSPADescriptors[FirstIndex] = CurrentDescriptor;
 	      PluginInfo |= TYPE_PLUGINS_LADSPA;
 	      for (PortPos = 0; PortPos < CurrentDescriptor->PortCount; PortPos++)
