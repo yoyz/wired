@@ -85,7 +85,8 @@ class		Rack: public wxScrolledWindow, WiredDocument
   Plugin*		AddToSelectedTrack(PlugStartInfo &startinfo,
 					   PluginLoader *p);
   
-  void			DeleteRack(Plugin *plug);
+  void			DeleteRack(Plugin *plug, bool eraseit = true);
+  void			DeleteSelectedRack();
   void			DeleteAllTracks();
   
   // Find a plugin from its name

@@ -335,7 +335,7 @@ void				Rack::DeleteAllTracks()
   selectedPlugin = NULL;
 }
 
-void				Rack::DeleteRack(Plugin *plug)
+void				Rack::DeleteRack(Plugin *plug, bool eraseit)
 {
   t_ListRackTrack::iterator i;
   list<Plugin *>::iterator j, k;
@@ -346,6 +346,11 @@ void				Rack::DeleteRack(Plugin *plug)
 	{
 	  OptPanel->ClosePlug(plug);
 	  (*i)->Racks.erase(j);
+	  if (eraseit)
+	    {
+	      plug->Hide();
+	      delete plug;
+	    }
 	  (*i)->Units = 0;
 	  for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
 	    {
@@ -455,7 +460,7 @@ void				Rack::HandleMouseEvent(Plugin *plug, wxMouseEvent *event)
       new_y = (event->GetPosition().y + plug->GetPosition().y);
       if(plug->IsAudio() && !DndGetDest(k, l, new_x, new_y, plug))
 	{
-	  DeleteRack(plug);
+	  DeleteRack(plug, false);
 	  AddLoadedRack(plug);
 	}
       ResizeTracks();
@@ -519,7 +524,7 @@ bool				Rack::DndGetDest(t_ListRackTrack::iterator &k,  list<Plugin *>::iterator
 	    {
 	      if((*l) == plug)
 		return true;
-	      DeleteRack(plug);
+	      DeleteRack(plug, false);
 	      l++;
 	      DndInsert(k, l, plug);
 	      UpdateUnitXSize();
@@ -559,25 +564,15 @@ void				Rack::UpdateUnitXSize()
     }
 }
 
+void				Rack::DeleteSelectedRack()
+{
+  if (selectedPlugin)
+    DeleteRack(selectedPlugin);
+}
+
 inline void			Rack::OnDeleteClick()
 {
-  vector<PluginLoader *>::iterator	k;
-  int					RackIndex;
-
-  if (selectedPlugin)
-    {
-      for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
-	if (COMPARE_IDS((*k)->InitInfo.UniqueId, selectedPlugin->InitInfo->UniqueId))
-	  {
-	    cout << "[MAINWIN] Destroying plugin: " << selectedPlugin->Name.mb_str() << endl;
-	    selectedTrack->RemoveSelectedRack();
-
-	    RackIndex =  selectedTrack->NbRacks();
-	    if (RackIndex < 1)
-	      RackPanel->RemoveRackTrack(selectedTrack->Index);
-	    return;
-	  }
-    }
+  DeleteSelectedRack();
 }
 
 inline void			Rack::OnCutClick()

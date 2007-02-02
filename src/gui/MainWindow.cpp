@@ -1123,18 +1123,7 @@ void					MainWindow::OnCreateEffectClick(wxCommandEvent &event)
 
 void					MainWindow::OnDeleteRack(wxCommandEvent &event)
 {
-  vector<PluginLoader *>::iterator	k;
-
-  if (RackPanel->selectedPlugin)
-    {
-      for (k = LoadedPluginsList.begin(); k != LoadedPluginsList.end(); k++)
-	if (COMPARE_IDS((*k)->InitInfo.UniqueId, RackPanel->selectedPlugin->InitInfo->UniqueId))
-	  {
-	    cActionManager::Global().AddEffectAction(&StartInfo, *k, false);
-	    CreateUndoRedoMenus(EditMenu);
-	    return;
-	  }
-    }
+  RackPanel->DeleteSelectedRack();
 }
 
 void					MainWindow::OnAddTrackAudio(wxCommandEvent &event)
