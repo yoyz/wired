@@ -281,12 +281,15 @@ void				ChannelGui::Load(SaveElementArray data)
 {
   int		dataCompt;
 
+#ifdef __DEBUG__
   std::cerr << "ChannelGui::Load : " << this << std::endl;
+#endif
   for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
     {
+#ifdef __DEBUG__
       std::cerr << "ChannelGui->key = " << data[dataCompt]->getKey().mb_str() << std::endl;
       std::cerr << "ChannelGui->value = " << data[dataCompt]->getValue().mb_str() << std::endl;
-
+#endif
 
       if (data[dataCompt]->getKey() == wxT("stereo"))
 	{
@@ -342,10 +345,6 @@ void 	ChannelGui::Save()
 {
   SaveElement	*savedElem;
 
-  std::cerr << "ChannelGui::Save" << std::endl;
-
-  //Stereo
-  std::cerr << "Stereo: " << Stereo << std::endl;
   if (Stereo)
     savedElem = new SaveElement(wxT("stereo"), wxT("1"));
   else
@@ -353,20 +352,17 @@ void 	ChannelGui::Save()
   saveDocData(savedElem);
 
   //VolumeLeft
-  std::cerr << "VolumeLeft: " << FaderLeft->GetValue() << std::endl;
   savedElem = new SaveElement(wxT("volumeLeft"), FaderLeft->GetValue() / 100);
   //FaderLeft->SetValue((int)(data[dataCompt]->getValueFloat() * 100));
   //  savedElem = new SaveElement(wxT("volumeLeft"), VolumeLeft->GetLabel());
   saveDocData(savedElem);
 
   //VolumeRight
-  std::cerr << "VolumeRight: " << FaderRight->GetValue() << std::endl;
   savedElem = new SaveElement(wxT("volumeRight"), FaderRight->GetValue() / 100);
   // savedElem = new SaveElement(wxT("volumeRight"), VolumeRight->GetLabel());
   saveDocData(savedElem);
 
   //MuteLeft
-  std::cerr << "MuteLeft: " << MuteLeftButton->GetOn() << std::endl;
   if (MuteLeftButton->GetOn())
     savedElem = new SaveElement(wxT("muteLeftButton"), wxT("1"));
   else
@@ -374,7 +370,6 @@ void 	ChannelGui::Save()
   saveDocData(savedElem);
 
   //MuteRight
-  std::cerr << "MuteRight: " << MuteRightButton->GetOn() << std::endl;
   if (MuteRightButton->GetOn())
     savedElem = new SaveElement(wxT("muteRightButton"), wxT("1"));
   else
@@ -382,7 +377,6 @@ void 	ChannelGui::Save()
   saveDocData(savedElem);
 
   //Lock
-  std::cerr << "Lock: " << LockButton->GetOn() << std::endl;
   if (LockButton->GetOn())
     savedElem = new SaveElement(wxT("lockButton"), wxT("1"));
   else
@@ -390,7 +384,6 @@ void 	ChannelGui::Save()
   saveDocData(savedElem);
 
   //Label
-  std::cerr << "Label: " << Label->GetLabel() << std::endl;
   savedElem = new SaveElement(wxT("label"), Label->GetLabel());
   saveDocData(savedElem);
 

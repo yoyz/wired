@@ -467,7 +467,6 @@ void				Transport::Load(SaveElementArray data)
 {
   wxMutexLocker			m(SeqMutex);
 
-  cerr << "bpm : " << Seq->BPM << endl;
   SetBpm(Seq->BPM);
   SetSigNumerator(Seq->SigNumerator);
   SetSigDenominator(Seq->SigDenominator);

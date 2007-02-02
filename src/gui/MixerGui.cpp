@@ -35,7 +35,6 @@ MixerGui::MixerGui(wxWindow *parent, const wxPoint &pos, const wxSize &size, Wir
   //Adding Master Channel directly
   Channel *c = new Channel(true, true, this);
 
-  std::cerr << "MixerGui::MixerGui : " << c << endl;
   AddMasterChannel(c);
   // evenement refresh master volume
   Connect(ID_MIXER_REFRESH, TYPE_MIXER_REFRESH, (wxObjectEventFunction)&MixerGui::OnMasterChange);
@@ -169,13 +168,8 @@ void	MixerGui::Load(SaveElementArray data)
 {
   int dataCompt;
 
-  std::cerr << "MixerGui::Load" << std::endl;
   for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
     {
-      std::cerr << "MixerGui->key = " << data[dataCompt]->getKey().mb_str() << std::endl;
-      std::cerr << "MixerGui->value = " << data[dataCompt]->getValue().mb_str() << std::endl;
-
-
       if (data[dataCompt]->getKey() == wxT("masterLeft"))
 	{
 	  MasterLeft = data[dataCompt]->getValueFloat();

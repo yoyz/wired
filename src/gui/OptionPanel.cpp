@@ -392,8 +392,6 @@ void				OptionPanel::ClosePlug(Plugin *p)
 
 void				OptionPanel::Save()
 {
-  std::cerr << "[OptionPanel] Save()" << std::endl;
-
   //Title
   saveDocData(new SaveElement(wxT("title"), this->Title->GetLabel()));
 
@@ -417,12 +415,8 @@ void				OptionPanel::Load(SaveElementArray data)
 {
   int		dataCompt;
 
-  std::cerr << "[OptionPanel Load()" << std::endl;
   for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
     {
-      std::cerr << "[OptionPanel] key = " << data[dataCompt]->getKey() << std::endl;
-      std::cerr << "[OptionPanel] value = " << data[dataCompt]->getValue() << std::endl;
-
       if (data[dataCompt]->getKey() == wxT("title"))
 	{
 	  this->SetTitle(data[dataCompt]->getValue());

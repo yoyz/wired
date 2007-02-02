@@ -47,10 +47,12 @@ void	SaveCenter::CleanTree()
 
   while(toProcessIt != toProcess.GetCount())
     {
+#ifdef __DEBUG__
       std::cout << "toProcessIt = " << toProcessIt << std::endl;
       std::cout << "toProcess.GetCount() = " << toProcess.GetCount() << std::endl;
       std::cout << "toProcess[toProcessIt]->GetName() = " << toProcess[toProcessIt]->getName().mb_str() << std::endl;
-      
+#endif
+
       //Clean the WiredDocument
       toProcess[toProcessIt]->CleanChildren();
       //Retrieve its remaining children 
@@ -505,8 +507,6 @@ void	SaveCenter::LoadProject()
 	}
     }
   
-  std::cout << "[SaveCenter] File read" << std::endl;
-
    //redistribute the elements loaded
   //In a separated method for readability and for logic
   //check technical documentation for more informations.
@@ -587,15 +587,18 @@ void		SaveCenter::RedistributeHash(LoadedDocumentArray dataLoaded)
 
       if (toProcess[currentName])
 	{
+#ifdef __DEBUG__
 	  std::cout << "[SaveCenter] currentName = " << currentName.mb_str() << std::endl;
+#endif
 	  //Take the first element with the same name of toProcess
 	  currentDoc = toProcess[currentName]->Item(0);
 
 	  //load the WiredDocument with data from the dataLoaded
 	  currentDoc->Load(currentLoadedDoc->data);
 
+#ifdef __DEBUG__
 	  std::cout << "[SaveCenter] loaded" << std::endl;
-
+#endif
 
 	  //Retrieve its children
 	  children = currentDoc->getChildren();

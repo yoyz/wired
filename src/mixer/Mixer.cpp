@@ -417,20 +417,15 @@ void			Mixer::Save()
   wxMutexLocker		locker(MixMutex);
   SaveElement		*savedElem;
 
-  std::cerr << "Mixer::Save" << std::endl;
-
   //VolumeLeft
-  std::cerr << "VolumeLeft: " << this->VolumeLeft << std::endl;
   savedElem = new SaveElement(wxT("volumeLeft"), this->VolumeLeft);
   saveDocData(savedElem);
 
   //VolumeRight
-  std::cerr << "VolumeRight: " << this->VolumeRight << std::endl;
   savedElem = new SaveElement(wxT("volumeRight"), this->VolumeRight);
   saveDocData(savedElem);
 
   //MuteL
-  std::cerr << "MuteL: " << this->MuteL << std::endl;
   if (this->MuteL)
     savedElem = new SaveElement(wxT("muteL"), 1);
   else
@@ -438,7 +433,6 @@ void			Mixer::Save()
   saveDocData(savedElem);
 
   //MuteR
-  std::cerr << "MuteR: " << this->MuteR << std::endl;
   if (this->MuteR)
     savedElem = new SaveElement(wxT("muteR"), 1);
   else
@@ -452,12 +446,8 @@ void			Mixer::Load(SaveElementArray data)
   wxMutexLocker		locker(MixMutex);
   int			dataCompt;
 
-  std::cerr << "Mixer::Load" << std::endl;
   for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
     {
-      std::cerr << "[Mixer] key = " << data[dataCompt]->getKey().mb_str() << std::endl;
-      std::cerr << "[Mixer] value = " << data[dataCompt]->getValue().mb_str() << std::endl;
-
       if (data[dataCompt]->getKey() == wxT("volumeLeft"))
 	this->VolumeLeft = data[dataCompt]->getValueFloat();
       else if (data[dataCompt]->getKey() == wxT("volumeRight"))

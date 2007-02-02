@@ -1946,7 +1946,6 @@ void		MainWindow::Load(SaveElementArray data)
    wxPoint		pos;
    bool			isFloating;
 
-   std::cerr << "[MainWindow] Load()" << std::endl;
    for (i = 0; i < data.GetCount(); i++)
      {
        if (data[i]->getKey() == wxT("MainWindow"))

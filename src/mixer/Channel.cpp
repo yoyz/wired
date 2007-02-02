@@ -285,10 +285,7 @@ void			Channel::Save()
 {
   SaveElement	*savedElem;
 
-  std::cerr << "Channel::Save: " << Label.mb_str() << std::endl;
-
   //Stereo
-  std::cerr << "Stereo: " << this->Stereo << std::endl;
   if (this->Stereo)
     savedElem = new SaveElement(wxT("stereo"), 1);
   else
@@ -296,12 +293,10 @@ void			Channel::Save()
   saveDocData(savedElem);
 
   //VolumeLeft
-  std::cerr << "VolumeLeft: " << this->VolumeLeft << std::endl;
   savedElem = new SaveElement(wxT("volumeLeft"), this->VolumeLeft);
   saveDocData(savedElem);
 
   //VolumeRight
-  std::cerr << "VolumeRight: " << this->VolumeRight << std::endl;
   savedElem = new SaveElement(wxT("volumeRight"), this->VolumeRight);
   saveDocData(savedElem);
 
@@ -320,37 +315,30 @@ void			Channel::Save()
   saveDocData(savedElem);
 
   //InputNum
-  std::cerr << "InputNum: " << this->InputNum << std::endl;
   savedElem = new SaveElement(wxT("inputNum"), (int)this->InputNum);
   saveDocData(savedElem);
 
   //Label
-  std::cerr << "Label: " << this->Label.mb_str() << std::endl;
   savedElem = new SaveElement(wxT("label"), this->Label);
   saveDocData(savedElem);
 
   //Visible
-  std::cerr << "Visible: " << this->Visible << std::endl;
   savedElem = new SaveElement(wxT("visible"), this->Visible);
   saveDocData(savedElem);
 
   //Lrms
-  std::cerr << "Lrms: " << this->Lrms << std::endl;
   savedElem = new SaveElement(wxT("lrms"), this->Lrms);
   saveDocData(savedElem);
 
   //Rrms
-  std::cerr << "Rrms: " << this->Rrms << std::endl;
   savedElem = new SaveElement(wxT("rrms"), this->Rrms);
   saveDocData(savedElem);
 
   //CurBuf
-  std::cerr << "CurBuf: " << this->CurBuf << std::endl;
   savedElem = new SaveElement(wxT("curBuf"), this->CurBuf);
   saveDocData(savedElem);
 
   //Filled
-  std::cerr << "Filled: " << this->Filled << std::endl;
   if (this->Filled)
     savedElem = new SaveElement(wxT("filled"), 1);
   else
@@ -362,12 +350,8 @@ void			Channel::Load(SaveElementArray data)
 {
   int		dataCompt;
 
-  std::cerr << "Channel::Load: " << Label.mb_str() << std::endl;
   for (dataCompt = 0; dataCompt < data.GetCount(); dataCompt++)
     {
-      std::cerr << "[Channel] key = " << data[dataCompt]->getKey().mb_str() << std::endl;
-      std::cerr << "[Channel] value = " << data[dataCompt]->getValue().mb_str() << std::endl;
-
       if (data[dataCompt]->getKey() == wxT("stereo"))
 	{
 	  if (!data[dataCompt]->getValueInt())
