@@ -1028,7 +1028,6 @@ void					SequencerGui::Drop(wxCommandEvent &event)
   wxPoint   pos;
   wxString file;
 
-  cerr << "teste" << endl;
   file = MediaLibraryPanel->MLTreeView->GetFile();
   pos = MediaLibraryPanel->MLTreeView->GetPos();
   SeqView->Drop(pos.x, pos.y, file);
