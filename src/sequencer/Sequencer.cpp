@@ -1037,6 +1037,7 @@ void                    Sequencer::OnExit()
 
 void			Sequencer::Load(SaveElementArray data)
 {
+  wxMutexLocker		locker(SeqMutex);
   int			i;
   int			n;
   int			nbTracks;
@@ -1071,6 +1072,7 @@ void			Sequencer::Load(SaveElementArray data)
 
 void			Sequencer::Save()
 {
+  wxMutexLocker		locker(SeqMutex);
   int			i;
 
   // save tracks
@@ -1097,6 +1099,7 @@ void				Sequencer::CleanChildren()
 {
   vector<Track *>::iterator	it;
   Track				*toDelete = NULL;
+  wxMutexLocker			locker(SeqMutex);
 
   std::cout << "Sequencer::CleanChildren started" << std::endl;
 
@@ -1104,14 +1107,5 @@ void				Sequencer::CleanChildren()
   PatternsToResize.clear();
   TracksToRefresh.clear();
 
-  std::cout << "Tracks.size() = " << Tracks.size() << std::endl;
-
-  while(!Tracks.empty())
-    {
-      std::cout << "a" << std::endl;
-      delete (*Tracks.begin());
-    }
-
   std::cout << endl << "Sequencer::CleanChildren finished" << std::endl;
-
 }
