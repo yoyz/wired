@@ -43,6 +43,7 @@
 #include "MediaLibrary.h"
 #include "MLTree.h"
 #include "SaveCenter.h"
+#include "debug.h"
 
 //Isn't it bullshit to declare things here ?
 
@@ -124,20 +125,28 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   CreateEffectMenu = new wxMenu;
   HelpMenu = new wxMenu;
   WindowMenu = new wxMenu;
-  MediaLibraryMenu = new wxMenu;
 
+#ifndef DEBUG_DISABLE_CLEAN_MENUS
   FileMenu->Append(MainWin_New, _("&New\tCtrl-N"));
   FileMenu->Append(MainWin_Open, _("&Open...\tCtrl-O"));
-  FileMenu->Append(MainWin_Save, _("&Save\tCtrl-S"));
-  FileMenu->Append(MainWin_SaveAs, _("Save &as...\tF12"));
   FileMenu->AppendSeparator();
+#endif
   FileMenu->Append(MainWin_ImportWave, _("&Import Wave file..."));
   FileMenu->Append(MainWin_ImportMIDI, _("Import &MIDI file..."));
   FileMenu->Append(MainWin_ImportAKAI, _("Import A&KAI sample..."));
   FileMenu->AppendSeparator();
+  FileMenu->Append(MainWin_Save, _("&Save\tCtrl-S"));
+  FileMenu->Append(MainWin_SaveAs, _("Save &as...\tF12"));
+  FileMenu->AppendSeparator();
   FileMenu->Append(MainWin_ExportWave, _("E&xport Wave file..."));
   FileMenu->Append(MainWin_ExportMIDI, _("Ex&port MIDI file..."));
   FileMenu->AppendSeparator();
+#ifndef FEATURE_DISABLE_SAVE_ML
+  FileMenu->AppendSeparator();
+  FileMenu->Append(MainWin_SaveML, _("Save Media Library"));
+  FileMenu->Append(MainWin_LoadML, _("Load Media Library"));
+  FileMenu->AppendSeparator();
+#endif
   FileMenu->Append(MainWin_Quit, _("&Quit\tCtrl-Q"));
   
   //EditMenu->AppendSeparator();
@@ -159,18 +168,13 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   HelpMenu->Append(MainWin_IntHelp, _("&Show Integrated Help"));
   HelpMenu->Append(MainWin_About, _("&About..."));
 
-  MediaLibraryMenu->Append(MainWin_MediaLibraryBeta, _("This feature is currently in alpha stage"))->Enable(false);
-  MediaLibraryMenu->Append(MainWin_SaveML, _("Save Media Library"));
-  MediaLibraryMenu->Append(MainWin_LoadML, _("Load Media Library"));
-  MediaLibraryMenu->AppendSeparator();
-  ItemShowMediaLibrary = MediaLibraryMenu->AppendCheckItem(MainWin_MediaLibraryShow, _("&Show/Hide\tCtrl-M"));
-  ItemFloatingMediaLibrary = MediaLibraryMenu->AppendCheckItem(MainWin_FloatMediaLibrary, _("&Floating"));
-
   WindowMenu->Append(MainWin_SwitchRack, _("Switch &Rack/Optional view\tTAB"));
   WindowMenu->Append(MainWin_SwitchSeq, _("Switch &Sequencer/Optional view\tCtrl+TAB"));
   WindowMenu->AppendSeparator();
-  ItemFloatingTrans = WindowMenu->AppendCheckItem(MainWin_FloatTransport, _("Floating &Transport"));
+  ItemShowMediaLibrary = WindowMenu->AppendCheckItem(MainWin_MediaLibraryShow, _("Show/&Hide MediaLibrary\tCtrl-M"));
   WindowMenu->AppendSeparator();
+  ItemFloatingMediaLibrary = WindowMenu->AppendCheckItem(MainWin_FloatMediaLibrary, _("Floating &MediaLibrary"));
+  ItemFloatingTrans = WindowMenu->AppendCheckItem(MainWin_FloatTransport, _("Floating &Transport"));
   ItemFloatingSeq = WindowMenu->AppendCheckItem(MainWin_FloatSequencer,_("Floating S&equencer"));
   ItemFloatingRacks = WindowMenu->AppendCheckItem(MainWin_FloatRacks, _("Floating R&acks"));
   //   ItemFloatingOptView = WindowMenu->AppendCheckItem(MainWin_FloatView, _("Floating Optional View"));
@@ -188,7 +192,6 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   MenuBar->Append(CreateEffectMenu, _("Effec&ts"));
   // Video menu is empty... and not finished
   //  MenuBar->Append(VideoMenu, _("&Video"));
-  MenuBar->Append(MediaLibraryMenu, _("&MediaLibrary"));
   MenuBar->Append(WindowMenu, _("&Window"));
   MenuBar->Append(HelpMenu, _("&Help"));
 
@@ -231,7 +234,7 @@ MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &
   MediaLibraryPanel->SetBackgroundColour(*wxWHITE);
 
   // media lib start hidden until its state is stable
-  ShowMediaLibrary(panelHide);
+  ShowMediaLibrary(panelHideFromWindow);
   RackPanel->Show();
   SeqPanel->Show();
   OptPanel->Show();
@@ -1338,7 +1341,7 @@ void					MainWindow::OnFloatMediaLibrary(wxCommandEvent &event)
   //  if (MediaLibraryMenu->IsChecked(MainWin_FloatMediaLibrary))
   if (!MediaLibraryPanel->IsFloating())
     {
-      if (!MediaLibraryMenu->IsChecked(MainWin_MediaLibraryShow))
+      if (!WindowMenu->IsChecked(MainWin_MediaLibraryShow))
 	ItemShowMediaLibrary->Check(true);
       ShowMediaLibrary(panelShowInWindow);
     }
@@ -2110,8 +2113,10 @@ BEGIN_DECLARE_EVENT_TYPES()
   EVT_MENU(MainWin_FloatRacks, MainWindow::OnFloatRack)
   EVT_MENU(MainWin_FloatMediaLibrary, MainWindow::OnFloatMediaLibrary)
   EVT_MENU(MainWin_MediaLibraryShow, MainWindow::MediaLibraryShow)
+#ifndef FEATURE_DISABLE_SAVE_ML
   EVT_MENU(MainWin_SaveML, MainWindow::OnSaveML)
   EVT_MENU(MainWin_LoadML, MainWindow::OnLoadML)
+#endif
   EVT_MENU(MainWin_Undo, MainWindow::OnUndo) 
   EVT_MENU(MainWin_Redo, MainWindow::OnRedo)
   //EVT_MENU(MainWin_History, MainWindow::OnHistory)
