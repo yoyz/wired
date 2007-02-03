@@ -1066,7 +1066,6 @@ void					SequencerGui::Save()
 {
   saveDocData(new SaveElement(wxT("HoriZoomFactor"), HoriZoomFactor));
   saveDocData(new SaveElement(wxT("VertZoomFactor"), VertZoomFactor));
-  saveDocData(new SaveElement(wxT("Tool"), Tool));
   saveDocData(new SaveElement(wxT("CurrentXScrollPos"), CurrentXScrollPos));
   saveDocData(new SaveElement(wxT("CurrentYScrollPos"), CurrentYScrollPos));
   saveDocData(new SaveElement(wxT("FirstMeasure"), FirstMeasure));
@@ -1090,7 +1089,6 @@ void					SequencerGui::Load(SaveElementArray data)
     {
       if (data[i]->getKey() == wxT("HoriZoomFactor"))		HoriZoomFactor = data[i]->getValueFloat();
       else if (data[i]->getKey() == wxT("VertZoomFactor"))	VertZoomFactor = data[i]->getValueFloat();
-      else if (data[i]->getKey() == wxT("Tool"))		Tool = data[i]->getValueInt();
       else if (data[i]->getKey() == wxT("CurrentXScrollPos"))	CurrentXScrollPos = data[i]->getValueDouble();
       else if (data[i]->getKey() == wxT("CurrentYScrollPos"))	CurrentYScrollPos = data[i]->getValueDouble();
       else if (data[i]->getKey() == wxT("FirstMeasure"))	FirstMeasure = data[i]->getValueDouble();
