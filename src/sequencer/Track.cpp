@@ -260,7 +260,16 @@ void						Track::Load(SaveElementArray data)
 
   for (i = 0; i < data.GetCount(); i++)
     if (data[i]->getKey() == wxT("Index"))
-      Index = data[i]->getValueInt();
+      {
+	long		height = SeqPanel->GetSeqHeaderHeight();
+	wxPoint		pos;
+	int		index = data[i]->getValueInt();
+
+
+	UpdateIndex(index);
+	GetTrackOpt()->SetPosition(wxPoint(0, ((SeqPanel->GetView()->GetTotalHeight() / height) * index)
+					   - SeqPanel->GetCurrentYScrollPos()));
+      }
 
   for (i = 0; i < data.GetCount(); i++)
     {
@@ -281,4 +290,5 @@ void						Track::Load(SaveElementArray data)
 	    }
 	}
     }
+  SeqPanel->UpdateTracks();
 }

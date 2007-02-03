@@ -216,6 +216,11 @@ class				SequencerGui: public wxPanel, public WiredDocument
   Track				*CreateTrack(trackType type = eAudioTrack);
   void				DeleteTrack(Track* track);
 
+  // accessors
+  inline SequencerView*		GetView() { return (SeqView); };
+  int				GetCurrentYScrollPos();
+  int				GetSeqHeaderHeight();
+
   void				UnselectTracks();
   void				SelectTrack(long trackindex);
   void				MovePattern(Pattern *p, long oldTrackIndex, long newTrackIndex);
@@ -246,6 +251,8 @@ class				SequencerGui: public wxPanel, public WiredDocument
   void				PasteItems();
   void				ShowPopup(wxPoint pos);
   void				ChangeMouseCursor(wxCursor c);
+
+  // wx events
   void				OnScroll(wxScrollEvent &event);
   void				OnWheelMove(wxMouseEvent &e);
   void				OnVertSliderUpdate(wxCommandEvent &event);
@@ -284,8 +291,8 @@ class				SequencerGui: public wxPanel, public WiredDocument
 
   double			CurrentPos;
 
- protected:
   void				UpdateTracks();
+ protected:
   void				SwapTracksPos(Track *t1, Track *t2);
   void				UpdateTrackList(std::vector<Track *> *track_list);
   void				UpdateMeasures();

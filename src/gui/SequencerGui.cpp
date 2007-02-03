@@ -203,13 +203,26 @@ void					SequencerGui::CleanChildren()
   DeleteAllTracks();
 }
 
+int					SequencerGui::GetSeqHeaderHeight()
+{
+  return ((int)floor(TRACK_HEIGHT * VertZoomFactor));
+}
+
+int					SequencerGui::GetCurrentYScrollPos()
+{
+  return ((int)floor(CurrentYScrollPos));
+}
+
 Track					*SequencerGui::CreateTrack(trackType type)
 {
   // create a new track
+  long		height = (long) floor(TRACK_HEIGHT * VertZoomFactor);
   Track*	newTrack;
-  wxPoint	pos(0, SeqView->GetTotalHeight() -
-		    (long) floor(CurrentYScrollPos));
-  wxSize	size(TRACK_WIDTH, (long) floor(TRACK_HEIGHT * VertZoomFactor));
+  wxPoint	pos;
+  wxSize	size(TRACK_WIDTH, height);
+
+  // default insertion (insert to the end)
+  pos = wxPoint(0, SeqView->GetTotalHeight() - (long) floor(CurrentYScrollPos));
 
   newTrack = new Track((WiredDocument*)Seq, type, pos, size, TrackView);
 
