@@ -410,12 +410,13 @@ enum
   ML_ID_MENU_CREATEDIR,
   ML_ID_INSTR_MENU,
   ML_ID_EFFECTS_MENU,
-  ML_ID_MENU_ADDDIR
+  ML_ID_MENU_ADDDIR,
+  ML_ID_LAST
 };
 
 enum
 {
-   MLTree_RightClick = ML_ID_EFFECTS_MENU + 1,
+   MLTree_RightClick = ML_ID_LAST + 1,
    MLTree_Menu,
    MLTree_Selected
 };
