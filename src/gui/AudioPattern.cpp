@@ -459,7 +459,7 @@ void				AudioPattern::Save()
 void				AudioPattern::Load(SaveElementArray data)
 {
   int				i;
-
+  WaveFile*		newWave;
   for (i = 0; i < data.GetCount(); i++)
     {
       if (data[i]->getKey() == wxT("FileName"))
@@ -468,8 +468,7 @@ void				AudioPattern::Load(SaveElementArray data)
 
 	  file.MakeAbsolute(saveCenter->getAudioDir());
 	  FileName = file.GetFullPath();
-	  WaveFile*		newWave = new WaveFile(FileName, false);
-
+	  newWave = WaveCenter.AddWaveFile(FileName);
 	  Init(newWave, _documentParent);
 	  Pattern::Load(data);
 	}
