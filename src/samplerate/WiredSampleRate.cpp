@@ -179,9 +179,18 @@ bool					WiredSampleRate::Convert(SF_INFO *SrcInfo, wxString& SrcFile, SNDFILE *
 	SF_INFO				Info;
 	wxString				DestFileName;
 	int					ConversionQuality;
-	wxProgressDialog ProgressBar(_("Converting wave file"), _("Please wait..."),
-						   SrcInfo->frames , NULL, wxPD_SMOOTH | wxPD_ELAPSED_TIME |
-				     wxPD_AUTO_HIDE | wxPD_CAN_ABORT | wxPD_REMAINING_TIME | wxPD_APP_MODAL);
+
+
+
+	wxProgressDialog  *ProgressBar;
+
+	
+	if (isgraph == true)
+	  {
+	    ProgressBar = new wxProgressDialog(_("Converting wave file"), _("Please wait..."),
+					       SrcInfo->frames , NULL, wxPD_SMOOTH | wxPD_ELAPSED_TIME |
+					       wxPD_AUTO_HIDE | wxPD_CAN_ABORT | wxPD_REMAINING_TIME | wxPD_APP_MODAL);
+	  }
 	if (SrcFile.find(wxT("/")) != SrcFile.npos)
 	{
 		DestFileName = saveCenter->getAudioDir() + SrcFile.AfterLast('/');
@@ -212,7 +221,7 @@ bool					WiredSampleRate::Convert(SF_INFO *SrcInfo, wxString& SrcFile, SNDFILE *
 				SRC_STATE*	Converter = src_new(ConversionQuality, SrcInfo->channels, &ConverterError);
 
 				 if (isgraph == true)
-				   ProgressBar.Update(NbLoop, wxT(""), &HasFailed);
+				   ProgressBar->Update(NbLoop, wxT(""), &HasFailed);
 				Buffer = new float[_ApplicationSettings.SamplesPerBuffer * Info.channels];
 				while ((Readen = sf_readf_float(SrcData, Buffer, _ApplicationSettings.SamplesPerBuffer)) > 0)
 				{
@@ -237,7 +246,7 @@ bool					WiredSampleRate::Convert(SF_INFO *SrcInfo, wxString& SrcFile, SNDFILE *
 					}
 					NbLoop += ReallyReaden;
 					if (isgraph == true)
-					  if (HasFailed || ProgressBar.Update(NbLoop) == false)
+					  if (HasFailed || ProgressBar->Update(NbLoop) == false)
 					    {
 					      sf_close(Result);
 					      delete[] Buffer;
