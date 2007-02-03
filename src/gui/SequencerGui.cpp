@@ -643,8 +643,10 @@ void					SequencerGui::SelectItem(Pattern *p, bool shift)
     else
       {
 	p->SetSelected(false);
-	for (i = SelectedItems.begin(); (i != SelectedItems.end()) && (*i != p); i++);
-	SelectedItems.erase(i);
+	for (i = SelectedItems.begin(); (i != SelectedItems.end()) && (*i != p); i++)
+	  ;
+	if(i != SelectedItems.end())
+	  SelectedItems.erase(i);
       }
 }
 

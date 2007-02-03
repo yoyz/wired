@@ -248,6 +248,9 @@ class					Pattern : public wxWindow, public WiredDocument
    * \return returns a double,the end of position.
    */
   double							GetEndPos();
+
+
+  void								Dump();
 //  virtual Pattern			operator=(const Pattern& right) = 0;
 };
 

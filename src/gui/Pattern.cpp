@@ -45,6 +45,7 @@ Pattern::Pattern(WiredDocument *parent, wxString name, double pos, double endpos
     Seq->Tracks[trackindex]->AddPattern(this);
   else
     cerr << "[Pattern] oooops, bad track index!" << endl;
+
 }
 
 Pattern::~Pattern()
@@ -258,6 +259,7 @@ void					Pattern::OnMotion(wxMouseEvent &e)
 	}
       SeqMutex.Unlock();
     }
+
 //   else
 //     if (SeqPanel->Tool == ID_TOOL_SPLIT_SEQUENCER)
 //       SeqPanel->RulerPanel->MoveXMark(e.GetPosition().x + GetXPos(Position));
@@ -298,6 +300,7 @@ void				Pattern::Save()
   SaveElement*			saved;
 
   saveDocData(new SaveElement(wxT("Name"), Name));
+  saveDocData(new SaveElement(wxT("TrackIndex"), (int)TrackIndex));
   saveDocData(new SaveElement(wxT("Position"), Position));
   saveDocData(new SaveElement(wxT("EndPosition"), EndPosition));
   saveDocData(new SaveElement(wxT("Length"), Length));
@@ -329,6 +332,8 @@ void				Pattern::Load(SaveElementArray data)
     {
       if (data[i]->getKey() == wxT("Name"))
 	Name = data[i]->getValue();
+      else if (data[i]->getKey() == wxT("TrackIndex"))
+        TrackIndex = data[i]->getValueInt();
       else if (data[i]->getKey() == wxT("Position"))
         pos = data[i]->getValueDouble();
       else if (data[i]->getKey() == wxT("EndPosition"))
@@ -355,4 +360,21 @@ void				Pattern::Load(SaveElementArray data)
   // modify update internal vars like m_pos, m_size, ...
   Modify(pos, endpos, TrackIndex, length);
   Update();
+}
+
+void			Pattern::Dump()
+{
+  std::cerr << "PatternDump()" << std::endl;
+  std::cerr << "Position = " << Position << std::endl;
+  std::cerr << "EndPosition = " << EndPosition << std::endl;
+  std::cerr << "Length = " << Length << std::endl;
+  std::cerr << "TrackIndex = " << TrackIndex << std::endl;
+  std::cerr << "StateMask = " << StateMask << std::endl;
+  std::cerr << "m_pos.x = " << m_pos.x << std::endl;
+  std::cerr << "m_pos.y = " << m_pos.y << std::endl;
+  std::cerr << "m_size.GetWidth() = " << m_size.GetWidth() << std::endl;
+  std::cerr << "m_size.GetHeighy() = " << m_size.GetHeight() << std::endl;
+  std::cerr << "m_click.x = " << m_click.x << std::endl;
+  std::cerr << "m_click.y = " << m_click.y << std::endl;
+  std::cerr << "Name.mb_str() = " << Name.mb_str() << std::endl;
 }
