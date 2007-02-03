@@ -198,11 +198,10 @@ bool					WiredSampleRate::Convert(SF_INFO *SrcInfo, wxString& SrcFile, SNDFILE *
 		Info.channels = SrcInfo->channels;
 		Info.format = SrcInfo->format;
 		Info.format |= GetFileFormat(_ApplicationSettings.Format);
+
+		// if the last previewed file is the same
 		if (isgraph == false && wxFileExists(DestFileName))
-		  {
-		     cerr << "deja preview" << DestFileName.mb_str() << endl;
-			  return false;
-		  }
+		  return false;
 		if ((Result = sf_open(DestFileName.mb_str(*wxConvCurrent), SFM_WRITE, &Info)))
 		{
 		  if (isgraph == true)

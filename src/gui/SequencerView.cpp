@@ -302,7 +302,6 @@ void					SequencerView::Drop(int x, int y, wxString file)
   WaveFile				*wave_tmp;
   long					nb_channel;
 
-  std::cerr << "trut trut" << std::endl;
   ScreenToClient(&x, &y);
   if (x >= 0 && y >= 0)
     {
