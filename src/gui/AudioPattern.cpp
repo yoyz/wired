@@ -307,6 +307,7 @@ Pattern					*AudioPattern::CreateCopy(double pos)
   p = new AudioPattern(_documentParent, pos, Wave, TrackIndex);
   Wave->AddAssociatedPattern();
   SeqMutex.Lock();
+  p->FileName = Wave->Filename;
   p->StartWavePos = StartWavePos;
   p->EndWavePos = EndWavePos;
   p->EndPosition = pos +  Length;
@@ -364,8 +365,9 @@ void					AudioPattern::Split(double pos)
       SeqMutex.Lock();
       p->StartWavePos = StartWavePos + (long) floor((pos - Position) * Seq->SamplesPerMeasure);
       p->EndWavePos = p->StartWavePos + (long) floor(p->Length * Seq->SamplesPerMeasure);
-
+      
       p->SetWave(Wave);
+      p->FileName = FileName;
       p->SetDrawColour(WaveDrawer::PenColor);
       p->SetCursor(GetCursor());
       if (IsSelected())
@@ -373,7 +375,6 @@ void					AudioPattern::Split(double pos)
       p->Update();
       EndWavePos = p->StartWavePos;
       Length = (EndPosition = pos) - Position;
-      p->SetWave(Wave);
       SetDrawing();
       Update();
       SeqMutex.Unlock();
