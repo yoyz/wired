@@ -964,7 +964,7 @@ void					MainWindow::LoadExternalPlugins()
   	{
 	  PluginName = (*IterPluginsList).substr(0, (*IterPluginsList).find_last_of(Sep));
 	  wxString((*IterPluginsList).substr((*IterPluginsList).find_last_of(Sep) + 1)).ToLong(&LongPluginId);
-	  PluginId = (long)PluginId;
+	  PluginId = (int)LongPluginId;
   	}
       PluginInfo = LoadedExternalPlugins->GetPluginType(PluginId);
       LoadedExternalPlugins->SetMenuItemId(PluginId,
