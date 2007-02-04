@@ -946,6 +946,7 @@ void					MainWindow::LoadExternalPlugins()
   list<wxString>::iterator		IterPluginsList;
   int							PluginInfo;
   int							PluginId;
+  long							LongPluginId;
   wxString						PluginName;
   wxString						Sep(wxT("#"));
 
@@ -962,7 +963,8 @@ void					MainWindow::LoadExternalPlugins()
       if ((*IterPluginsList).find_last_of(Sep) > 0)
   	{
 	  PluginName = (*IterPluginsList).substr(0, (*IterPluginsList).find_last_of(Sep));
-	  wxString((*IterPluginsList).substr((*IterPluginsList).find_last_of(Sep) + 1)).ToLong((long*)&PluginId);
+	  wxString((*IterPluginsList).substr((*IterPluginsList).find_last_of(Sep) + 1)).ToLong(&LongPluginId);
+	  PluginId = (long)PluginId;
   	}
       PluginInfo = LoadedExternalPlugins->GetPluginType(PluginId);
       LoadedExternalPlugins->SetMenuItemId(PluginId,
