@@ -1,0 +1,210 @@
+
+WIRED 0.4 (rev 13xx)
+------------------------------------------------------------------------
+
+- Added --enable-portmidi flag allowing the use of an external portmidi library
+- Added a script to auto-update translations
+- Added -avoid-version to LDFLAGS (lighter plug-ins : it doesn't create symlink)
+- Added the possibility to launch Wired without any audio device
+- Added samplerate management when importing from ML
+- Remade project Save/Load from scratch using the new SaveCenter
+	(Save now includes : windows size and position, sequencer, racks
+	 mixer, transport, MediaLib, plug-ins patches, current tool)
+- From new Save/Load results new project handling 
+	(a project is now a directory containing project files,
+	 batch files and samples)
+- Improved wave and samplerate management with the new WaveCenter
+- Improved right click management on racks to prevent crashes (bug #1561088)
+- Use of wxUSE_ON_FATAL_EXCEPTION macro (more flexible according to wx builds)
+- Updated sources for wxWidgets 2.8 support
+- Updated zh_TW translation
+- Updated synth plugin to unicode
+- Changed some icons due to right issues
+- Removed compilation and use of non-working plugins.
+- Removed MediaLibrary filters toolbar (useless, no code behind)
+- Removed minor non-working stuff (ML sorting, ...)
+- Fixed a bug when importing wave files with an upper case extention in the ML
+- Fixed a bug causing Wired to crash when splash.png was not present
+- Fixed a bug causing Wired to crash when deleting a rack using the rack menu
+- Fixed a bug causing Wired to crash when stopping the recording of a wave
+- Fixed a preview related bug
+- Fixed minor issues with samplerate and settings window
+- Fixed some typos in output messages
+- Fixed some BPM related bugs
+- HUGE code cleaning and optimisation
+- Minor code portability
+
+	
+WIRED 0.4 alpha (rev 1218)
+------------------------------------------------------------------------
+- Added save and load function for Media Library, Drum31 and WiredSampler
+- Improved connection management between effect and instrument
+- Improved Rack connection
+- Fixed autoscroll when you add wiredsampler to the rack view
+- Fixed a bug when removing a rack
+- Fixed preview in media library
+- Improved copy/paste of multiple patterns
+- Added wired directories for lib, include, sysconf and data directories
+- Real name of the Midi device displayed in the header of the track
+- Fixed use of PortMidi API
+- Removed forgotten debug messages
+- Added an icon when an effect can be assign to a track
+- Made some clean up in the menu and keyboard shortcuts
+- Fixed a bug in Wave Drawer
+- Fixed stereo and prepared multichannel
+- Added drag and drop between Medialibrary and Sequencer
+- Added drag and drop features in Sequencer
+
+	
+WIRED 0.3.1 (rev 1008)
+------------------------------------------------------------------------
+
+- Added tooltip in Sequencer
+- Added some visual improvements in the settings window
+- Misc Media Library improvements
+- Removed forgotten debug messages
+- Fixed locale management
+- Changed about box
+- Changed some error messages to more explicit ones
+- Changed outdated first launch message by a more generic one
+- Changed structure of the conf file
+- Limited number of simultaneous pop-ups
+- Default Device selection is working (based on PortAudio choices)
+- Fixed multichannel bugs
+- Fixed a bug that freezed Wired if no Output Channels were set in the
+  conf file and that prevented to update conf file (bug #1563624)
+- Partially reactivated codec management (vorbis,mpeg,flac :
+  add --enable-codecs to configure script)
+- Put relative path (prefix) instead of /usr
+- Added an "enable plugins" flag to the configure script. This allow
+  users to compile Wired with or without plugins
+- Added configure options : --enable-portaudio to use Wired built-in
+  portaudio snapshot (default), and options --with-jack,
+  --without-oss, etc..
+- Apdated portaudio sources
+- Added some icons
+- Added CHANGELOG file
+- Updated chinese translation
+- Added Italian language (thanks to MaxG)
+- Updated INSTALL, BUGS and README files
+- Fixing and cleaning (as everytime)
+
+
+WIRED 0.3 (rev 958)
+------------------------------------------------------------------------
+
+- Added the Media Library
+- Added new languages (french, chinese)
+- New installation script (autogen.sh). It executes local, libtoolize,
+  autoconf and automake
+- Imported a recent snapshot of PortaudioV19 into Wired
+- Jack support (portaudio implicit) but not active due to problems
+- Changed splashscreen, added tiny icon
+- Set help panel as default option panel (instead of mixer)
+- Session saving now works
+- Fixed some typos (they're still a lot)
+- Wired now exits with an error dialog if no soundcard is detected
+- Updated wired.conf structure
+- Minor changes in non-unicode output
+- Welcome popup is called only if wired.conf doesn't exist (Wired is
+  launched for the first time)
+- Added audio system selection (oss, alsa, jack)
+- Apply button really saves settings now
+- Added the possibility to load wired_*.conf from current directory
+- Adde the possibility to put plugins into different directory with
+  PREFIX (from configure)
+- Addded gettext support for autogen.sh
+- Moved m4 directory to the config directory and fixed bug with
+  mkinstalldirs
+- Removed deprecated files
+- Fixed ompilation errors
+- Splashscreen is now hidden once main window is loaded
+- HUGE debugging
+- HUGE code cleaning
+- Code portability
+- Optimisation
+
+
+WIRED 0.2.2 (rev 826)
+------------------------------------------------------------------------
+
+- Made unicode modifications (some c_str() are removed)
+- Changed splashscreen
+- Did some cleaning in instruction files, and changed licence of files
+  It's now excplicitly under GPL v2.1
+- Setting Window displays all loaded parameters : fixes bug #1483792
+- Deleted useless files (Makefile.in.in is used)
+- Unicode fixing
+- Move all version informations in new file version.h.
+- Method declaration modified to fit with gcc 4.1
+- Fixed floating windows and window switching, it works altogether now
+- Fixed delete threads problem
+- Fixed bug 1483865 : WiredSampler double clic doesn't work
+- Fixed bug 1483831 : timeline has not correct height
+- Fixed bug 1482968 : can't see entire wavefile diagram
+- Fixed bug 1483873 : Magnetism ComboBox
+- Fixed bug 1483799 : optional view listing has optional floating view
+- Fixed bug 1472875 : bookmarks don't work after reload
+- Fixed bug 1468815 : deletion of a rack when it's loaded in a track
+- Other bug fixing
+- Code cleaning
+
+
+WIRED 0.2.1
+------------------------------------------------------------------------
+
+- Rack view and sequencer can't be floating windows at the same time
+  any more
+- Removed rack view minimum height
+- Misc visual improvements
+- Fixed working directory saving
+- Fixed configuration saving
+- Fixed bug 1470348 : no preview in file dialog
+- Fixed bug 1466901 : file dialog of loopsampler doesn't look for wav files
+- Fixed bug 1469115 : sequencer doesn't show tracks
+- Fixed bug 1469432 : closing optional view of LoopSampler crashes app
+- Other bug fixing
+- Code cleaning
+
+
+WIRED 0.2 (rev 767)
+------------------------------------------------------------------------
+
+- Unicode support
+- OSS support
+- Added a timeout on quit
+- New Settings window look
+- Changed faders' default value in the loopsampler and the native effect plugins
+- Moved format thing to something much more elegant
+- Removed some ugly code
+- Changed default sound settings values
+- Translation updated
+- Favorites and MRUs are working
+- Added new conditions to compile
+- Added some messages
+- Fixed Fader control
+- Page up and page down now move the fader with a step of 1/10th the range
+  of values.
+- Added missing buttons
+- New Thread management
+- Cleaned i18n
+- Changed metronom and loop design
+- Added test on import
+- Conversion on saving file does work (at least ....)
+- Removed annoying warning messages
+- Some changes on file loading
+- A LOT OF bug fixing
+- A LOT OF code cleaning
+- A LOT OF optimisation
+- portability optimisations
+
+	
+WIRED 0.11
+------------------------------------------------------------------------
+
+- Corrections in volume controls
+- Master channel control is back
+- Significant fader modifications
+- Added a log Frame
+- Some work on future features (WiredVideo)
+- Bug fixing and code cleaning

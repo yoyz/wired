@@ -1,0 +1,44 @@
+This document is based on the user experience of Wired as reported in the user 
+forum. Wired is really relying on its users' feedback to evolve. Don't hesitate 
+to come and visit us at http://wired.sf.net/
+
+
+==INTRODUCTION==
+If you find any bug or if you have any difficulties using Wired, please follow 
+the foolowing steps.
+1- Go to the "KNOWN BUGS" section of this document and check if yours is present.
+   Instructions will be given there
+2- Visit the user forum (http://wired.sourceforge.net) and search for a 
+   post concerning your problem, it may already be discussed.
+3- If nobody has already talked about it, please start a new thread in the 
+   appropriate forum, you'll be answered soon.
+
+
+==COMMON USAGE PROBLEMS==
+1- "Could not open audio device ..."
+
+First, you should check you audio settings... ;-)
+To do so, in the menu 'Edit', choose 'Settings...'. Then go to the Audio section.
+In the Output subsection, choose a sound card, make sure two outputs are checked.
+Then go back to the main audio section and select a samplerate and a latency. 
+The '4096 Samples/buffer' is known to be unstable on some configurations. 
+Please, try to avoid it.
+
+If it still doesn't work, or if you can't find any soundcard in the list, it may 
+be because you are using ALSA and another software is already using your 
+soundcard. Close every audio applications and try to relaunch wired.
+
+You can try to use fuser to check if a command is using your audio devices.
+$ fuser -v /dev/dsp
+should make it in most cases, but you can replace /dev/dsp with the appropriate 
+device, depending on your configuration. 
+
+You should also ty to delete you wired.conf (~/.wired/wired.conf) file since it
+may be outdated. Then close all audio application and try to launch Wired again
+and configure you sound card. A new configuration file will be created
+automatically.
+
+
+==KNOWN BUGS==
+Please come and check our bug tracker at :
+http://sourceforge.net/tracker/?group_id=120022&atid=685647

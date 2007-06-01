@@ -1,0 +1,30 @@
+LDFLAGS = $(shell wx-config --libs) -L../../fileloader -lfileloader
+
+CPPFLAGS = $(shell wx-config --cflags) -I../../xml -I../../save -I../../gui   \
+	-I../../plugins -I../../fileloader -I../../audio \
+	-I../../redist -I../../engine -I../../mixer -I../../midi	      \
+	-I../../midi/portmidi/pm_common -I../../midi/portmidi/porttime	      \
+	-I../../editmidi -I../../undo -I../../libs/WiredWidgets/src
+
+if PORTAUDIO
+CPPFLAGS += -I../../portaudio/include
+endif
+
+
+pkglib_LTLIBRARIES = libWiredBeatBox.la
+
+libWiredBeatBox_la_LDFLAGS = -avoid-version
+libWiredBeatBox_la_SOURCES =				\
+			../../redist/Polyphony.cpp	\
+			BeatBox.cpp			\
+			BeatButton.cpp			\
+			BeatBoxChannel.cpp		\
+			BeatBoxView.cpp			\
+			BeatNote.cpp			\
+			../../redist/Plugin.cpp		\
+			../../gui/WaveView.cpp          \
+			../../gui/WaveDrawer.cpp        \
+			../../engine/Settings.cpp	\
+			../../audio/WaveFile.cpp	
+
+libWiredBeatBox_la_LIBADD = $(DEPS_LIBS) ../../save/libsave.la
