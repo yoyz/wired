@@ -16,6 +16,8 @@
 
 extern Rack *RackPanel;
 
+using namespace std;
+
 long HostCallback(Plugin *plug, long param, void *value)
 {
     switch (param)

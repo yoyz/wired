@@ -58,6 +58,7 @@ Plugin*				RackTrack::CreateRack(PlugStartInfo &startinfo, PluginLoader *p)
   Parent->CalcScrolledPosition(xpos, ypos, &xx, &yy);
   startinfo.Pos = wxPoint(xx, yy);
   startinfo.Size = wxSize(p->InitInfo.UnitsX * UNIT_W, p->InitInfo.UnitsY * UNIT_H);
+  startinfo.saveCenter = saveCenter;
   plug = p->CreateRack(startinfo);
 
   if (!plug)
@@ -888,11 +889,17 @@ void				Rack::Load(SaveElementArray data)
   vector<PluginLoader*>::iterator	it;
   int					i;
 
+  cout << "Rack::Load()" <<endl; // toto
   for (i = 0; i < data.GetCount(); i++)
     if (data[i]->getKey() == wxT("RackTrackNumber"))
       for (; i > 0; i--)
+      {
+	cout << "rack i == " << i << endl; // toto
 	CreateRackTrack();
+      }
+  cout << "data.GetCount() == " << data.GetCount() << endl; // toto
   for (i = 0; i < data.GetCount(); i++)
+  {
     if (data[i]->getKey() == wxT("RackPlugin"))
       {
 #ifdef __DEBUG__
@@ -906,6 +913,7 @@ void				Rack::Load(SaveElementArray data)
 	MainWin->CreatePluginFromUniqueId(data[i]->getAttribute(wxT("UniqueId")),
 					  data[i]->getAttribute(wxT("PlugName")));
       }
+  }
 }
 
 void				Rack::SelectTrackFromNumber(int no)

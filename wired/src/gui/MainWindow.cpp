@@ -655,7 +655,7 @@ void					MainWindow::OnClose(wxCloseEvent &event)
   cout << "[MAINWIN] Closing..." << endl;
   // all gui windows (and this one) are destroyed in MainApp::OnExit
   // but exit prevent wired to segfault... :(
-  exit(1);
+  exit(0);
 }
 
 void					MainWindow::OnQuit(wxCommandEvent &WXUNUSED(event))
@@ -1058,7 +1058,7 @@ void					MainWindow::CreatePluginFromUniqueId(wxString UniqueId,
   list<wxString>			PluginsList;
   wxString				Sep(wxT("#"));
   wxString				PluginName;
-  int					PluginId;
+  long					PluginId;
 
   PluginsList = LoadedExternalPlugins->GetSortedPluginsList(Sep);
   for (IterPluginsList = PluginsList.begin(); IterPluginsList != PluginsList.end(); IterPluginsList++)
@@ -2138,6 +2138,8 @@ void		MainWindow::OpenWizard()
 			 _("You have to select a project folder."));
 
   path.AssignDir(dirDialog.GetPath());
+
+  wxFileName::SetCwd(path.GetFullPath());
 
   saveCenter->setProjectPath(path);
 

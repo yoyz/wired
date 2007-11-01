@@ -4,12 +4,16 @@
 #include <iostream>
 #include "SaveCenter.h"
 #include <wx/dir.h>
+#include "Settings.h"
 
 SaveCenter		*saveCenter = NULL;
+extern	Settings	*WiredSettings;
+using namespace std;
 
 SaveCenter::SaveCenter()
   : WiredDocument(wxT("savecenter"), NULL, true)
 {
+  _id_mark = 0;
   setSaved(false);
 }
 
@@ -29,6 +33,20 @@ void	SaveCenter::Save()
 void	SaveCenter::Load(SaveElementArray dataLoaded)
 {
   //load project specific infos ?
+}
+
+long	SaveCenter::RegisterId(long id)
+{
+  if(this)
+  {
+    if(id > _id_mark)
+      _id_mark = id;
+    else
+      _id_mark++;
+    return (_id_mark);
+  }
+  else
+    return (id);
 }
 
 void	SaveCenter::CleanTree()
@@ -100,7 +118,7 @@ void	SaveCenter::SaveFile(WiredDocument *doc, wxString file, wxString path)
       path = normalizedPath.GetFullPath();
     }
   if (doc->getDocFile(file) == NULL)
-    std::cerr << "[SaveCenter] trying to save a key not found..." << std::endl;
+    std::cerr << "[SaveCenter] trying to save a key not found... (file == '" << file.mb_str() << "')" << std::endl;
 
   WriteFile(path + file, doc->getDocFile(file));
 }
@@ -355,10 +373,25 @@ void		SaveCenter::setProjectName(wxString projectName)
 }
 
 //This method really looks like LoadProject... maybe we could do something...
-SaveElementArray	SaveCenter::LoadFile(wxString filename)
+SaveElementArray	SaveCenter::LoadLocalFile(wxString filename)
+{
+  SaveElementArray	ret;
+  wxString		path;
+  wxFileName		absoluteFilename;
+
+  absoluteFilename.Assign(filename);
+  absoluteFilename.Normalize(wxPATH_NORM_ALL, WiredSettings->HomeDir);
+
+  return LoadFile(absoluteFilename.GetFullPath(), true, absoluteFilename.GetName());
+}
+SaveElementArray	SaveCenter::LoadProjectFile(wxString filename)
+{
+  return LoadFile(filename, false);
+}
+SaveElementArray	SaveCenter::LoadFile(wxString filename, bool fullpath, wxString rootTag)
 {
   WiredXml		*xmlFile = new WiredXml();
-  wxString		rootTag;
+  //wxString		rootTag;
   SaveElementArray	ret;
   SaveElementArray	history;
   wxString		s;
@@ -372,12 +405,21 @@ SaveElementArray	SaveCenter::LoadFile(wxString filename)
   SaveElement		*currSaveElem;
 
 
-  absoluteFilename.Assign(filename);
-  absoluteFilename.Normalize(wxPATH_NORM_ALL, getProjectPath().GetFullPath());
+  if (fullpath)
+  {
+    if(!xmlFile->OpenDocument(filename))
+      cerr << "LoadFile:could not load file:" << absoluteFilename.GetFullPath().mb_str() << ":" << endl;
+  }
+  else
+  {
+    absoluteFilename.Assign(filename);
+    absoluteFilename.Normalize(wxPATH_NORM_ALL, getProjectPath().GetFullPath());
 
-  xmlFile->OpenDocument(absoluteFilename.GetFullPath());
+    if(!xmlFile->OpenDocument(absoluteFilename.GetFullPath()))
+      cerr << "LoadFile:could not load file:" << absoluteFilename.GetFullPath().mb_str() << ":" << endl;
 
-  rootTag = absoluteFilename.GetName();
+    rootTag = absoluteFilename.GetName();
+  }
 
   //data management
   while(xmlFile->Read())
@@ -459,7 +501,6 @@ void	SaveCenter::LoadProject()
       if (nodeType == XML_READER_TYPE_ELEMENT)
 	{
 	  nodeName = xmlFile->GetNodeName();
-
 	  //if it is a WiredDoc
 	  if (nodeName == WIRED_TAG_WIREDDOC)
 	    {
@@ -581,12 +622,13 @@ void		SaveCenter::RedistributeHash(LoadedDocumentArray dataLoaded)
 
   int						i;
 
-  std::cout << "[SaveCenter] RedistributeHash" << std::endl;
+  std::cout << "[SaveCenter] RedistributeHash begin" << std::endl;
 
   //TODO : Make tests about what we are treating and handle cases were it fails.
 
   //init the whole process with the SaveCenter on top
   currentName = getName();
+  std::cout << "currentName == '" << currentName.mb_str() << "'" << std::endl;
   toProcess[currentName] = new WiredDocumentArray();
   toProcess[currentName]->Add(this);
 
@@ -618,7 +660,7 @@ void		SaveCenter::RedistributeHash(LoadedDocumentArray dataLoaded)
 	  for(i = 0; i < children.GetCount(); i++)
 	    {
 	      childName = children[i]->getName();
-	      if(toProcess.find(childName) == toProcess.end())
+	      if(toProcess.find(childName) == toProcess.end() || !toProcess[childName])
 		toProcess[childName] = new WiredDocumentArray();
 	      toProcess[childName]->Add(children[i]);
 	    }
@@ -637,6 +679,7 @@ void		SaveCenter::RedistributeHash(LoadedDocumentArray dataLoaded)
       //Remove the current loadedDocument from the dataLoaded
       dataLoaded.Remove(currentLoadedDoc);
     }
+  std::cout << "[SaveCenter] RedistributeHash finished" << std::endl;
 }
 
 wxString	SaveCenter::GetDefaultProjectName(wxFileName cwd)

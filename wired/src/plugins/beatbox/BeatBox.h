@@ -30,6 +30,8 @@ using namespace std;
 
 #define PLUGIN_NAME		wxT("DRUM-31")
 
+#define BEATBOX_SAVE_PATCH	wxT("beatbox/patch.xml")
+
 #define BEATBOX_BG		wxT("plugins/beatbox/beatbox_bg.png")
 #define BEATBOX_MINI_BG		wxT("plugins/beatbox/drm31.bmp")
 #define BEATBTN_UNCLICKED	wxT("plugins/beatbox/beatbtn_unclicked.png")
@@ -138,6 +140,8 @@ class WiredBeatBox : public Plugin, public WiredDocument
   
   void		Save();
   void		Load(SaveElementArray data);
+  long		SavePatch(int fd);
+  void		Load(int fd, long size);
 
   void		LoadPatch(wxString filename);
   void		LoadChannel(SaveElement *channelData);
@@ -175,6 +179,7 @@ class WiredBeatBox : public Plugin, public WiredDocument
   void		OnSigChoice(wxCommandEvent& event);
   void		OnPositionChoice(wxCommandEvent& event);
   void		OnLoadPatch(wxCommandEvent& event);
+  void		LoadXmlPatch();
   void		OnSavePatch(wxCommandEvent& event);
   void		OnPatternSelectors(wxCommandEvent& event);
   void		OnEditButton(wxCommandEvent& event);
