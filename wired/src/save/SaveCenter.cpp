@@ -471,6 +471,7 @@ void	SaveCenter::LoadProject()
   int			nodeType;
   SaveElement		*currSaveElem = NULL;
   loadedDocument	*currDoc = NULL;
+  long			tmp;
 
   //depth of the last wiredDocument
   int		lastWiredDocDepth;
@@ -510,8 +511,8 @@ void	SaveCenter::LoadProject()
 	      //we init a loadedDocument struct
 	      currDoc = new loadedDocument();
 	      currDoc->name = xmlFile->GetAttribute(wxT("name"));
-	      wxString(xmlFile->GetAttribute(wxT("id"))).ToLong((long *)&currDoc->id);
-
+	      wxString(xmlFile->GetAttribute(wxT("id"))).ToLong(&tmp);
+	      currDoc->id = tmp;
 	      //and add it to the dataLoaded
 	      dataLoaded.Add(currDoc);
 	    }

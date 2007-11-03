@@ -17,6 +17,9 @@
 #include	"PluginLoader.h"
 #include	"debug.h"
 int		RackCount = 0;
+#ifdef __DEBUG__
+Plugin*		gl_lastDeletedPlug = 0;
+#endif
 
 /********************   Class RackTrack   ********************/
 
@@ -373,10 +376,7 @@ void				Rack::DeleteRack(Plugin *plug, bool eraseit)
 	  OptPanel->ClosePlug(plug);
 	  (*i)->Racks.erase(j);
 	  if (eraseit)
-	    {
-	      plug->Hide();
-	      delete plug;
-	    }
+	    plug->Hide();
 	  (*i)->Units = 0;
 	  for (j = (*i)->Racks.begin(); j != (*i)->Racks.end(); j++)
 	    {
@@ -392,8 +392,26 @@ void				Rack::DeleteRack(Plugin *plug, bool eraseit)
 	  selectedPlugin = 0x0;
 	  ResizeTracks();
 	  SeqPanel->RemoveReferenceTo(plug);
+#ifdef __DEBUG__
+	  cout << "[RACK] plugin to be erased = " << plug << endl;
+#endif
+           //toto TODO XXX *will* cause segfault at exit (for ladspa and dssi)
+	   //is it deleted somewhere else ? where is that pointer ??
+	   //and why "awatch gl_lastDeletedPlug" or "awatch (Plugin*)0x......" don't work in gdb ? :(
+	   //am i doing it wrong... ?
+          /*
+	   *if (eraseit)
+	   *{
+	   *  delete plug;
+	   *  plug = 0x0;
+	   *}
+           */
+#ifdef __DEBUG__
+	  gl_lastDeletedPlug = plug;
+#endif
 	  return;
 	}
+  cerr << "[RACK] did not find plugin to delete" << endl;
 }
 
 void				Rack::SetSelected(Plugin *p)

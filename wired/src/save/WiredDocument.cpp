@@ -85,8 +85,10 @@ bool		WiredDocument::saveDocData(SaveElement *data, wxString file)
 {
   SaveElementsHashMap::iterator	it;
 
+#ifdef __DEBUG__
   if(file.Cmp(WIRED_PROJECT_FILE))
       cout << ">>> writing file :'" << file.mb_str() << "'" << endl;
+#endif
   if(!_dataSave.count(file))
     _dataSave[file] = new SaveElementArray();
 

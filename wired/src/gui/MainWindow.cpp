@@ -906,7 +906,7 @@ void					MainWindow::LoadPlugins()
       if ((str.length() > 0) && (str.at(0) != '#'))
 	{
 	  p = new PluginLoader(str);
-	  if (p->IsLoaded())
+	  if (p && p->IsLoaded())
 	    {
 	      LoadedPluginsList.push_back(p);
 

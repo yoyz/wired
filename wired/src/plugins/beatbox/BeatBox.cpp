@@ -2138,7 +2138,7 @@ void	WiredBeatBox::LoadBank(SaveElement *bankData)
   long			b;
   SaveElementArray	patterns;
 
-  bankData->getKey().AfterLast('_').ToLong((long *)&b);
+  bankData->getKey().AfterLast('_').ToLong(&b);
   b = bankData->getAttributeInt(wxT("id"));
 
   patterns = bankData->getChildren();
@@ -2149,7 +2149,8 @@ void	WiredBeatBox::LoadBank(SaveElement *bankData)
 
 void	WiredBeatBox::LoadPattern(SaveElement *patternData, int bank)
 {
-  int			p, channelNum;
+  int			p;
+  long			channelNum;
   SaveElementArray	channels, notes;
   SaveElement		*note;
 
@@ -2167,7 +2168,7 @@ void	WiredBeatBox::LoadPattern(SaveElement *patternData, int bank)
   channels = patternData->getChildren();
   for (int i = 0; i < channels.GetCount(); i++)
     {
-      channels[i]->getKey().AfterLast('_').ToLong((long *)&channelNum);
+      channels[i]->getKey().AfterLast('_').ToLong(&channelNum);
       notes = channels[i]->getChildren();
       for(int j = 0; j < notes.GetCount(); j++)
 	{

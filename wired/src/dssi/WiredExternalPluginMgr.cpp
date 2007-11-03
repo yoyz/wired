@@ -252,6 +252,8 @@ void				WiredExternalPluginMgr::DestroyPlugin(WiredDSSIGui *Plug)
 {
 	list<WiredDSSIGui*>::iterator	Iter;
 	
+	if (!Plug)
+	  return;
 	for (Iter = _LoadedPlugins.begin(); Iter != _LoadedPlugins.end(); Iter++)
 	{
 		if (*Iter == Plug)
