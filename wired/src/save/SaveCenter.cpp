@@ -629,17 +629,16 @@ void		SaveCenter::RedistributeHash(LoadedDocumentArray dataLoaded)
 
   //init the whole process with the SaveCenter on top
   currentName = getName();
-  std::cout << "currentName == '" << currentName.mb_str() << "'" << std::endl;
   toProcess[currentName] = new WiredDocumentArray();
   toProcess[currentName]->Add(this);
 
   while(!toProcess.empty() && !dataLoaded.empty())
-    {
-      //Take the first element of dataLoaded
-      currentLoadedDoc = dataLoaded[0];
-      currentName = currentLoadedDoc->name;
+  {
+	//Take the first element of dataLoaded
+	currentLoadedDoc = dataLoaded[0];
+	currentName = currentLoadedDoc->name;
 
-      if (toProcess[currentName])
+	if (toProcess[currentName])
 	{
 #ifdef __DEBUG__
 	  std::cout << "[SaveCenter] currentName = " << currentName.mb_str() << std::endl;
@@ -659,27 +658,27 @@ void		SaveCenter::RedistributeHash(LoadedDocumentArray dataLoaded)
 
 	  //Add them to the list of WiredDocuments
 	  for(i = 0; i < children.GetCount(); i++)
-	    {
-	      childName = children[i]->getName();
-	      if(toProcess.find(childName) == toProcess.end() || !toProcess[childName])
-		toProcess[childName] = new WiredDocumentArray();
-	      toProcess[childName]->Add(children[i]);
-	    }
+	  {
+		childName = children[i]->getName();
+		if(toProcess.find(childName) == toProcess.end() || !toProcess[childName])
+		  toProcess[childName] = new WiredDocumentArray();
+		toProcess[childName]->Add(children[i]);
+	  }
 
 	  //Remove the current WiredDocument from the list to Process
 	  toProcess[currentName]->Remove(currentDoc);
 
 	  //Clear the hashmap entry if needed
 	  if(toProcess[currentName]->IsEmpty())
-	    {
-	      delete toProcess[currentName];
-	      toProcess.erase(currentName);
-	    }
+	  {
+		delete toProcess[currentName];
+		toProcess.erase(currentName);
+	  }
 	}
 
-      //Remove the current loadedDocument from the dataLoaded
-      dataLoaded.Remove(currentLoadedDoc);
-    }
+	//Remove the current loadedDocument from the dataLoaded
+	dataLoaded.Remove(currentLoadedDoc);
+  }
   std::cout << "[SaveCenter] RedistributeHash finished" << std::endl;
 }
 

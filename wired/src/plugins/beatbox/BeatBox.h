@@ -140,10 +140,11 @@ class WiredBeatBox : public Plugin, public WiredDocument
   
   void		Save();
   void		Load(SaveElementArray data);
-  long		SavePatch(int fd);
   void		Load(int fd, long size);
 
-  void		LoadPatch(wxString filename);
+  void		LoadPatch(wxString filename = BEATBOX_SAVE_PATCH);
+  void		LoadXmlPatch(wxString filename = BEATBOX_SAVE_PATCH);
+  void		SaveXmlPatch(wxString filename = BEATBOX_SAVE_PATCH);
   void		LoadChannel(SaveElement *channelData);
   void		LoadBank(SaveElement *bankData);
   void		LoadPattern(SaveElement *patternData, int bank);
@@ -179,7 +180,6 @@ class WiredBeatBox : public Plugin, public WiredDocument
   void		OnSigChoice(wxCommandEvent& event);
   void		OnPositionChoice(wxCommandEvent& event);
   void		OnLoadPatch(wxCommandEvent& event);
-  void		LoadXmlPatch();
   void		OnSavePatch(wxCommandEvent& event);
   void		OnPatternSelectors(wxCommandEvent& event);
   void		OnEditButton(wxCommandEvent& event);
@@ -226,6 +226,7 @@ class WiredBeatBox : public Plugin, public WiredDocument
   int			MidiSteps[3];
   
  protected:
+  wxString		_customFileName;
   bool			OnLoading;
   wxMutex		PatternMutex;
   wxMutex		MidiMutex;

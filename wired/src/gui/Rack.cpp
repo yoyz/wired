@@ -62,6 +62,7 @@ Plugin*				RackTrack::CreateRack(PlugStartInfo &startinfo, PluginLoader *p)
   startinfo.Pos = wxPoint(xx, yy);
   startinfo.Size = wxSize(p->InitInfo.UnitsX * UNIT_W, p->InitInfo.UnitsY * UNIT_H);
   startinfo.saveCenter = saveCenter;
+  startinfo.parent = this;
   plug = p->CreateRack(startinfo);
 
   if (!plug)
@@ -194,7 +195,6 @@ Rack::Rack(wxWindow* parent, wxWindowID id, const wxPoint& pos,
   InitContextMenu();
   copy_plug = NULL;
   filePath.Printf(wxT("/tmp/.tmpccp"));
-
   CleanChildren();
 }
 
@@ -399,6 +399,7 @@ void				Rack::DeleteRack(Plugin *plug, bool eraseit)
 	   //is it deleted somewhere else ? where is that pointer ??
 	   //and why "awatch gl_lastDeletedPlug" or "awatch (Plugin*)0x......" don't work in gdb ? :(
 	   //am i doing it wrong... ?
+	   //do we really need to delete it btw ?
           /*
 	   *if (eraseit)
 	   *{
@@ -895,6 +896,8 @@ void				Rack::Save()
 	  saved->addAttribute(wxT("Name"), (*it)->Name);
 	  saved->addAttribute(wxT("PlugName"), (*it)->InitInfo->Name);
 	  saved->addAttribute(wxT("UniqueId"), wxString((*it)->InitInfo->UniqueId,*wxConvCurrent));
+	  // toto : on pourrait ecrire qqchose la
+	  // saved->setValue(wxT("beatbox"));
 	  saveDocData(saved);
 	}
       no++;
@@ -907,15 +910,10 @@ void				Rack::Load(SaveElementArray data)
   vector<PluginLoader*>::iterator	it;
   int					i;
 
-  cout << "Rack::Load()" <<endl; // toto
   for (i = 0; i < data.GetCount(); i++)
     if (data[i]->getKey() == wxT("RackTrackNumber"))
       for (; i > 0; i--)
-      {
-	cout << "rack i == " << i << endl; // toto
 	CreateRackTrack();
-      }
-  cout << "data.GetCount() == " << data.GetCount() << endl; // toto
   for (i = 0; i < data.GetCount(); i++)
   {
     if (data[i]->getKey() == wxT("RackPlugin"))

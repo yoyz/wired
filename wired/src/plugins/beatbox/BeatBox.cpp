@@ -61,7 +61,7 @@ END_EVENT_TABLE()
 
 WiredBeatBox::WiredBeatBox(PlugStartInfo &startinfo, PlugInitInfo *initinfo,
 			   WiredDocument *parent) 
-  : Plugin(startinfo, initinfo), WiredDocument(wxT("beatbox"), startinfo.saveCenter)
+  : Plugin(startinfo, initinfo), WiredDocument(wxT("beatbox"), startinfo.parent)
 {
   cout << "[DRM31] Host is " << GetHostProductName().mb_str()
        << " version " << GetHostProductVersion().mb_str() << endl;
@@ -70,6 +70,8 @@ WiredBeatBox::WiredBeatBox(PlugStartInfo &startinfo, PlugInitInfo *initinfo,
   //setId(123);
   if (startinfo.saveCenter)
     saveCenter = startinfo.saveCenter;
+  else
+	cerr << "[BEATBOX] could not get hands on saveCenter..." << endl;
   // registering id to avoid duplicates
   setId(saveCenter->RegisterId());
   OnLoading = false;
@@ -553,10 +555,7 @@ WiredBeatBox::WiredBeatBox(PlugStartInfo &startinfo, PlugInitInfo *initinfo,
   for (int b = 0; b < NUM_PATTERNS; b++)
     PatternsMidiNotes[b] = note++;
   
-  if(wxFileName::FileExists(BEATBOX_SAVE_PATCH))
-  {
-    LoadXmlPatch();
-  }
+  _customFileName = BEATBOX_SAVE_PATCH;
 }
 
 void WiredBeatBox::OnChannelHelp(wxMouseEvent& WXUNUSED(event))
@@ -1714,32 +1713,11 @@ void WiredBeatBox::OnSavePatch(wxCommandEvent& WXUNUSED(e))
   wxString selfile = SaveFileLoader(_("Save Patch"), &exts);
   if (!selfile.empty())
   {
-    int fd = open(selfile.mb_str(*wxConvCurrent),  O_CREAT | O_TRUNC | O_WRONLY, 
-	S_IRUSR | S_IWUSR);
-    if (fd < 0)
-    {
-      cout << "[WIREDBEATBOX] Couldnt open file: "<<selfile << " )" << endl;
-      //close(fd);
-      return;
-    }
-    /*
-       wxProgressDialog *Progress = 
-       new wxProgressDialog("Saving patch file", "Please wait...", 
-       100, this, wxPD_AUTO_HIDE | wxPD_CAN_ABORT
-       | wxPD_REMAINING_TIME);
-       Progress->Update(1);
-       Progress->Update(55);
-       delete Progress;
-       */
-    cout << "saved " << SavePatch(fd) << " byte(s)"<< endl;
-
-    close(fd);
-
-    //toto
-    //cout << "will write '" << selfile.mb_str() << "' and for key '" << "beatbox/patch" << "'" << endl;
-    //SaveElement	*patch = new SaveElement(wxT("beatbox/patch"), selfile);
-    //saveDocData(patch);
-    //delete patch;
+	SaveXmlPatch(selfile);
+	wxFileName wxFN = wxFileName(selfile);
+	wxFN.MakeRelativeTo(saveCenter->getProjectPath().GetFullPath());
+	selfile = wxFN.GetFullPath();
+	_customFileName = selfile;
   }
   else
     cout << "[DRM31] could not open save file" << endl;
@@ -1747,153 +1725,7 @@ void WiredBeatBox::OnSavePatch(wxCommandEvent& WXUNUSED(e))
   //delete dlg;
 }
 
-long WiredBeatBox::SavePatch(int fd)
-{
-  long len, size = 0;
-  int steps, sig_index = 0;
-  int bank, ps, res, m;
-
-  PatternMutex.Lock();
-  OnLoading = true;
-  PatternMutex.Unlock();
-
-  // writing midi params
-  for (m = 0; m < 2; m++)
-    if ((res = write(fd, &(MidiVolume[m]), sizeof(int))) != sizeof (int))
-      return (-1);
-    else
-      size += res;
-  for (m = 0; m < 2; m++)
-    if ((res = write(fd, &(MidiSteps[m]), sizeof(int))) != sizeof (int))
-      return (-1);
-    else
-      size += res;
-  for (int i = 0; i < NB_CHAN; i++)
-  {
-    for (m = 0; m < 2; m++)
-      if ((res = write(fd, &(Channels[i]->MidiVolume[m]), sizeof(int)) )
-	  != sizeof (int))
-      { cout << "[DRM31] SavePatch: write() error" << endl; return (-1); }
-      else
-	size += res;
-    for (m = 0; m < 2; m++)
-      if ((res = write(fd, &(Channels[i]->MidiVel[m]), sizeof(int)))
-	  != sizeof (int))
-      { cout << "[DRM31] SavePatch: write() error" << endl; return (-1); }
-      else
-	size += res;
-    for (m = 0; m < 2; m++)
-      if ((res = write(fd, &(Channels[i]->MidiPitch[m]), sizeof(int))) 
-	  != sizeof (int))
-      { cout << "[DRM31] SavePatch: write() error" << endl; return (-1); }
-      else
-	size += res;
-    for (m = 0; m < 2; m++)
-      if ((res = write(fd, &(Channels[i]->MidiPan[m]), sizeof(int))) 
-	  != sizeof (int))
-      { cout << "[DRM31] SavePatch: write() error" << endl; return (-1); }
-      else
-	size += res;
-    for (m = 0; m < 2; m++)
-      if ((res = write(fd, &(Channels[i]->MidiStart[m]), sizeof(int))) 
-	  != sizeof (int))
-      { cout << "[DRM31] SavePatch: write() error" << endl; return (-1); }
-      else
-	size += res;
-    for (m = 0; m < 2; m++)
-      if ((res = write(fd, &(Channels[i]->MidiEnd[m]), sizeof(int))) 
-	  != sizeof (int))
-      { cout << "[DRM31] SavePatch: write() error" << endl; return (-1); }
-      else
-	size += res;
-
-  }
-
-  //writing steps/signatures params
-  for (bank = 0; bank < 5; bank++)
-    for (ps = 0; ps < 8; ps++)
-    {
-      if ((res = write(fd, &(SigIndex[bank][ps]), sizeof (int))) 
-	  != sizeof (int))
-      { cout << "[DRM31] SavePatch: write() error" << endl; return (-1); }
-      else
-	size += res;
-      if ((res = write(fd, &(Steps[bank][ps]), sizeof (int))) 
-	  != sizeof (int))
-      { cout << "[DRM31] SavePatch: write() error" << endl; return (-1); }
-      else
-	size += res;
-    }
-
-  //master Level
-  if ((res = write(fd, &MLevel, sizeof (float))) 
-      != sizeof (float))
-  { cout << "[DRM31] SavePatch: write() error" << endl; return (-1); }
-  else
-    size += res;
-
-
-  for (int i = 0; i < NB_CHAN; i++)
-  {
-    if (Channels[i]->Wave)
-    {
-      len = Channels[i]->Wave->Filename.size();
-      size += write(fd, &len, sizeof(long));
-      size += write(fd, Channels[i]->Wave->Filename.mb_str(), len * sizeof(char));
-      cout << "[DRM31] writing info for : '" << Channels[i]->Wave->Filename.mb_str() << "'" << endl;
-    }
-    else
-    {
-      len = 0;
-      size += write(fd, &len, sizeof(long));
-    }
-
-    //writing params
-    int p;
-    for (p = 0; p < NB_PARAMS; p++)
-      size += write(fd, &(Channels[i]->Params[p]), sizeof(float));
-    p = (Channels[i]->Muted ? 1 : 0);
-    size += write(fd, &p, sizeof(int));
-    p = (Channels[i]->IsSolo ? 1 : 0);
-    size += write(fd, &p, sizeof(int));
-    p = (Channels[i]->Reversed ? 1 : 0);
-    size += write(fd, &p, sizeof(int));
-    size += write(fd, &(Channels[i]->Voices), sizeof(unsigned int));
-
-    //writing notes
-    for (bank = 0; bank < 5; bank++)
-      for (ps = 0; ps < 8; ps++)
-      {
-	len = Channels[i]->Rythms[bank][ps].size();
-	size += write(fd, &len, sizeof(long));
-	for (list<BeatNote*>::iterator bn = 
-	    Channels[i]->Rythms[bank][ps].begin();
-	    bn != Channels[i]->Rythms[bank][ps].end(); bn++)
-	{
-	  //cout << "note pos: " << (*bn)->Position;
-	  /*
-	     printf("note pos=%f; state=%d\n", 
-	     (*bn)->Position,(*bn)->State);
-	     */
-	  size += write(fd, &((*bn)->State), sizeof(unsigned int));
-	  size += 
-	    write(fd, &((*bn)->Position), sizeof (double));
-	  for (p = 0; p < NB_PARAMS; p++ )
-	    size +=
-	      write(fd, &((*bn)->Params[p]), sizeof (float));
-	  p = (*bn)->Reversed ? 1 : 0;
-	  size += write(fd, &p, sizeof(int));
-	}
-      }
-  }
-  PatternMutex.Lock();
-  OnLoading = false;
-  PatternMutex.Unlock();
-
-  cout << "[DRM31] saved size " << size << endl;
-  return size;
-}
-void WiredBeatBox::LoadXmlPatch()
+void WiredBeatBox::LoadXmlPatch(wxString selfile)
 {
   // originate from the previous OnLoadPatch
   /*
@@ -1902,7 +1734,6 @@ void WiredBeatBox::LoadXmlPatch()
    *
    *wxString selfile = OpenFileLoader(_("Load Patch"), &exts);
    */
-  wxString selfile = BEATBOX_SAVE_PATCH;
   if (!selfile.empty())
     {
       PatternMutex.Lock();
@@ -1953,43 +1784,15 @@ void WiredBeatBox::OnLoadPatch(wxCommandEvent& WXUNUSED(e))
   exts.push_back(_("drm\tDRM-31 patch file (*.drm)"));
 
   wxString selfile = OpenFileLoader(_("Load Patch"), &exts);
+
+  wxFileName wxFN = wxFileName(selfile);
+  wxFN.MakeRelativeTo(saveCenter->getProjectPath().GetFullPath());
+  selfile = wxFN.GetFullPath();
+
   if (!selfile.empty())
   {
-    int fd = open(selfile.mb_str(*wxConvCurrent), O_RDONLY);
-    if (fd < 0)
-    {
-      cout << "[DRM31] OnLoadPatch: Couldnt open( " << selfile << " )" << endl;
-      return;
-    }
-    PatternMutex.Lock();
-    OnLoading = true;
-    PatternMutex.Unlock();
-
-    for (int chan = 0; chan < NB_CHAN; chan++)
-      Channels[chan]->Reset();
-
-    struct stat st;
-    fstat(fd, &st);
-    cout << "[DRM31] load patch: file size: " << st.st_size 
-      << endl;
-
-    wxProgressDialog *Progress = 
-      new wxProgressDialog(_("Loading patch file"), _("Please wait..."), 
-	  100, this, wxPD_AUTO_HIDE | wxPD_CAN_ABORT
-	  | wxPD_REMAINING_TIME);
-    Progress->Update(1);
-    Progress->Update(55);
-
-    Load(fd, st.st_size);
-    Progress->Update(75);
-    Progress->Update(100);
-    close(fd);
-    delete Progress;
-
-    //toto
-    //SaveElement	*patch = new SaveElement(wxT("beatbox/patch"), selfile);
-    //saveDocData(patch);
-    //delete patch;
+	LoadXmlPatch(selfile);
+	_customFileName = selfile;
   }
   else
     cout << "[DRM31] Could not load file" << endl;
@@ -2021,9 +1824,11 @@ void	WiredBeatBox::LoadPatch(wxString filename)
 
   data = AskData(filename);
 
-  std::cerr << "[BeatBox] loading : " << filename.mb_str() << std::endl;
+  cout << "[BEATBOX] LoadPatch(): loading : '" << filename.mb_str() << "'" << std::endl;
+#ifdef __DEBUG__
+  cout << "[BEATBOX] LoadPatch(): data count == " << data.GetCount() << endl;
+#endif
 
-  cout << "data count == " << data.GetCount() << endl;
   for(dataIt = 0; dataIt < data.GetCount(); dataIt++)
   {
     if(data[dataIt]->getKey() == wxT("MidiVolume"))
@@ -2217,79 +2022,97 @@ wxString	WiredBeatBox::IntArrayToString(int *vect)
 
 void	WiredBeatBox::Save()
 {
+  wxString	filename;
+
+  if (_customFileName != wxString(wxT("")))
+  {
+	filename = _customFileName;
+  }
+  else
+	filename = BEATBOX_SAVE_PATCH;
+  if (filename.Right(4) != wxString(wxT(".xml")))
+	filename += wxT(".xml");
+  SaveXmlPatch(filename);
+}
+
+void WiredBeatBox::SaveXmlPatch(wxString filename)
+{
   //The old save function has been taken back and adapted for time effiency.
   //However, it would be a good idea to migrate the infos about the channels
   //in the BeatBoxChannel class and to save them separately.
   //Unfortunately, this involves taking back the whole Drum-31 structure and
   //there is no time to do this.
-  
+
   SaveElement	*saveElem, *bank, *pattern, *channel, *note;
   wxString	s;
+
+  //formating filename to be relative to the project path
+  wxFileName wxFN = wxFileName(filename);
+  wxFN.MakeRelativeTo(saveCenter->getProjectPath().GetFullPath());
+  filename = wxFN.GetFullPath();
 
   //saving midi params
   //MidiVolume
   saveElem = new SaveElement(wxT("MidiVolume"), IntArrayToString(MidiVolume));
-  saveDocData(saveElem, BEATBOX_SAVE_PATCH);
+  saveDocData(saveElem, filename);
 
   //MidiSteps
   saveElem = new SaveElement(wxT("MidiSteps"), IntArrayToString(MidiSteps));
-  saveDocData(saveElem, BEATBOX_SAVE_PATCH);
+  saveDocData(saveElem, filename);
 
   //MasterLevel
   saveElem = new SaveElement(wxT("MasterLevel"), MLevel);
-  saveDocData(saveElem, BEATBOX_SAVE_PATCH);
+  saveDocData(saveElem, filename);
 
   //Channels  
   for(int i = 0; i < NB_CHAN; i++)
-    {
-      saveElem = new SaveElement();
-      saveElem->setKey(wxT("channel"));
-      saveElem->addAttribute(wxT("id"), i);
+  {
+	saveElem = new SaveElement();
+	saveElem->setKey(wxT("channel"));
+	saveElem->addAttribute(wxT("id"), i);
 
-      if(Channels[i]->Wave)
-	saveElem->setValue(Channels[i]->Wave->Filename);
+	if(Channels[i]->Wave)
+	  saveElem->setValue(Channels[i]->Wave->Filename);
 
-      saveElem->addAttribute(wxT("MidiVolume"), 
-			     IntArrayToString(Channels[i]->MidiVolume));
-      saveElem->addAttribute(wxT("MidiVel"), 
-			     IntArrayToString(Channels[i]->MidiVel));
-      saveElem->addAttribute(wxT("MidiPitch"), 
-			     IntArrayToString(Channels[i]->MidiPitch));
-      saveElem->addAttribute(wxT("MidiPan"), 
-			     IntArrayToString(Channels[i]->MidiPan));
-      saveElem->addAttribute(wxT("MidiStart"), 
-			     IntArrayToString(Channels[i]->MidiStart));
-      saveElem->addAttribute(wxT("MidiEnd"), 
-			     IntArrayToString(Channels[i]->MidiEnd));
-      //params
-      for(int j = 0; j < NB_PARAMS; j++)
+	saveElem->addAttribute(wxT("MidiVolume"), 
+		IntArrayToString(Channels[i]->MidiVolume));
+	saveElem->addAttribute(wxT("MidiVel"), 
+		IntArrayToString(Channels[i]->MidiVel));
+	saveElem->addAttribute(wxT("MidiPitch"), 
+		IntArrayToString(Channels[i]->MidiPitch));
+	saveElem->addAttribute(wxT("MidiPan"), 
+		IntArrayToString(Channels[i]->MidiPan));
+	saveElem->addAttribute(wxT("MidiStart"), 
+		IntArrayToString(Channels[i]->MidiStart));
+	saveElem->addAttribute(wxT("MidiEnd"), 
+		IntArrayToString(Channels[i]->MidiEnd));
+	//params
+	for(int j = 0; j < NB_PARAMS; j++)
 	{
 	  s.clear();
 	  s << Channels[i]->Params[j];
 	  saveElem->addAttribute(wxString(wxT("param_")) << j, s);
 	}
 
-      //muted, solo, reverse
-      saveElem->addAttribute(wxT("mute"), Channels[i]->Muted);
-      saveElem->addAttribute(wxT("solo"), Channels[i]->IsSolo);
-      saveElem->addAttribute(wxT("reverse"), Channels[i]->Reversed);
+	//muted, solo, reverse
+	saveElem->addAttribute(wxT("mute"), Channels[i]->Muted);
+	saveElem->addAttribute(wxT("solo"), Channels[i]->IsSolo);
+	saveElem->addAttribute(wxT("reverse"), Channels[i]->Reversed);
 
-      //Voices
-      s.clear();
-      s << Channels[i]->Voices;
-      saveElem->addAttribute(wxT("voices"), s);
-
-
-      saveDocData(saveElem, BEATBOX_SAVE_PATCH);
-    }
+	//Voices
+	s.clear();
+	s << Channels[i]->Voices;
+	saveElem->addAttribute(wxT("voices"), s);
+	saveDocData(saveElem, filename);
+  }
 
   //banks & patterns
   for (int b = 0; b < 5; b++)
-    {
-      bank = new SaveElement();
-      bank->setKey(wxT("bank"));
-      bank->addAttribute(wxT("id"), b);
-      for (int p = 0; p < 8; p++)
+  {
+	bank = new SaveElement();
+	bank->setKey(wxT("bank"));
+	bank->addAttribute(wxT("id"), b);
+	for (int p = 0; p < 8; p++)
 	{
 	  pattern = new SaveElement();
 	  bank->addChildren(pattern);
@@ -2300,14 +2123,14 @@ void	WiredBeatBox::Save()
 
 	  //notes
 	  for(int c = 0; c < NB_CHAN; c++)
-	    {
-	      channel = new SaveElement();
-	      pattern->addChildren(channel);
-	      channel->setKey(wxString(wxT("channel_")) << c);	      
-	      int n = 0;
-	      for(list<BeatNote*>::iterator bn = Channels[c]->Rythms[b][p].begin();
-		  bn != Channels[c]->Rythms[b][p].end();
-		  bn++)
+	  {
+		channel = new SaveElement();
+		pattern->addChildren(channel);
+		channel->setKey(wxString(wxT("channel_")) << c);	      
+		int n = 0;
+		for(list<BeatNote*>::iterator bn = Channels[c]->Rythms[b][p].begin();
+			bn != Channels[c]->Rythms[b][p].end();
+			bn++)
 		{		  
 		  note = new SaveElement();
 		  channel->addChildren(note);
@@ -2320,22 +2143,32 @@ void	WiredBeatBox::Save()
 		  note->addAttribute(wxT("position"), (*bn)->Position);
 		  note->addAttribute(wxT("reversed"), (*bn)->Reversed);
 		  for(int p = 0; p < NB_PARAMS; p++)
-		    note->addAttribute(wxString(wxT("param_")) << p,
-				       (*bn)->Params[p]);
-				     
+			note->addAttribute(wxString(wxT("param_")) << p,
+				(*bn)->Params[p]);
+
 		  n++;
 		}
-	    }
+	  }
 	}
-      saveDocData(bank, BEATBOX_SAVE_PATCH);
-    }
-  
-
+	saveDocData(bank, filename);
+  }
+#ifdef __DEBUG__
+  cout << "[BEATBOX] SaveXmlPatch(): file to write : '" << filename.mb_str() << "'" << endl;
+#endif
+  _customFileName = filename;
 }
 
 void	WiredBeatBox::Load(SaveElementArray data)
 {
-  cout << "youpi je suis appele" << endl;
+  int	i;
+
+  for( i = 0 ; i < data.GetCount() ; i++ )
+	if (data[i]->getKey() == wxT("reference"))
+	  _customFileName = data[i]->getValue();
+  if(wxFileName::FileExists(_customFileName))
+	LoadXmlPatch(_customFileName);
+  else
+	cerr << "[BEATBOX] patch not found : '" << _customFileName.mb_str() << "'" << endl;
 }
 
 void WiredBeatBox::Load(int fd, long size)

@@ -79,6 +79,7 @@ typedef struct  s_PlugStartInfo
   wxPoint	Pos;
   wxSize	Size;
   SaveCenter	*saveCenter;
+  WiredDocument	*parent;
 }		PlugStartInfo;
 
 #define WIRED_MIDI_EVENT	1

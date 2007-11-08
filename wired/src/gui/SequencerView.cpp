@@ -351,6 +351,11 @@ void					SequencerView::Drop(int x, int y, wxString file)
       else
 	{
 	  wave_tmp = WaveCenter.AddWaveFile(file);
+	  if (!wave_tmp)
+	  {
+		cerr << "Problem adding '" << file.mb_str() << "'" << endl;
+		return;
+	  }
 	  for (nb_channel = 0; nb_channel < wave_tmp->GetNumberOfChannels(); nb_channel++)
 	  {
  	    track_to_add = SeqPanel->CreateTrack(eAudioTrack);
