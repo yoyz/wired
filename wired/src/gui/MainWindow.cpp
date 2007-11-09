@@ -2129,7 +2129,6 @@ void MainWindow::OnSaveML(wxCommandEvent &WXUNUSED(event))
 void		MainWindow::OpenWizard()
 {
   LOG;
-  wxFileName	path;
 
   wxDirDialog	dirDialog(NULL, _("Select a project folder"), wxGetCwd());
 
@@ -2137,10 +2136,16 @@ void		MainWindow::OpenWizard()
     AlertDialog(_("Warning"),
 			 _("You have to select a project folder."));
 
-  path.AssignDir(dirDialog.GetPath());
+  WiredStartSession(dirDialog.GetPath());
+}
 
-  wxFileName::SetCwd(path.GetFullPath());
+void		MainWindow::WiredStartSession(wxString sessionDir)
+{
+  wxFileName	path;
 
+  path.AssignDir(sessionDir);
+  path.MakeAbsolute();
+  wxFileName::SetCwd(path.GetPath());
   saveCenter->setProjectPath(path);
 
   if (saveCenter->IsProject(path))

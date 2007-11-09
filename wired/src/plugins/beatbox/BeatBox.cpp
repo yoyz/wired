@@ -72,7 +72,7 @@ WiredBeatBox::WiredBeatBox(PlugStartInfo &startinfo, PlugInitInfo *initinfo,
     saveCenter = startinfo.saveCenter;
   else
 	cerr << "[BEATBOX] could not get hands on saveCenter..." << endl;
-  // registering id to avoid duplicates
+  // registering id to avoid duplicates (see BeatBox.h)
   setId(saveCenter->RegisterId());
   OnLoading = false;
   

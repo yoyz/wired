@@ -118,7 +118,7 @@ public:
 
   /** Increases the id. */
   static void		increaseId() { id++; }
-  void			setId(int newId) { _id = newId; }
+  inline void		setId(int newId) { _id = newId; }
 
  protected:
 

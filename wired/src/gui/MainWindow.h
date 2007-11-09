@@ -20,6 +20,7 @@ using namespace std;
 #include <wx/splitter.h>
 #include <wx/log.h>
 #include <wx/filename.h>
+#include  <wx/cmdline.h>
 
 #include "version.h"
 
@@ -136,6 +137,7 @@ class					MainWindow: public wxFrame, public WiredDocument
   /* Shows a wxDirDialog to select a project folder */
   void					OpenWizard();
 
+  void					WiredStartSession(wxString sessionDir);
   wxString				m_FrameTitle;
  protected:
   friend class				MediaLibrary;
