@@ -20,6 +20,10 @@ using namespace std;
 
 long HostCallback(Plugin *plug, long param, void *value)
 {
+  static wxString	lastSaveDir;
+  static wxString	lastOpenDir;
+  wxFileDialog *dlg = 0x0;
+
     switch (param)
     {
         case wiredSendMouseEvent :
@@ -94,9 +98,21 @@ long HostCallback(Plugin *plug, long param, void *value)
                 wxString result;
             } *w;
             w = (s_wired_l *)value;
-            wxFileDialog dlg(MainWin, w->t);
-            if (dlg.ShowModal() == wxID_OK)
-                w->result = dlg.GetPath();
+
+			cout << "bon" << endl << endl;
+			if (lastOpenDir)
+			  cout << "lastOpenDir == " << lastOpenDir.mb_str() << endl;
+			else
+			  cout << "no lastOpenDir" << endl;
+			if (lastOpenDir && wxFileName::DirExists(lastOpenDir))
+			  dlg = new wxFileDialog(MainWin, w->t, lastOpenDir);
+			else
+			  dlg = new wxFileDialog(MainWin, w->t);
+            if (dlg->ShowModal() == wxID_OK)
+			{
+				w->result = dlg->GetPath();
+				lastOpenDir = dlg->GetDirectory();
+			}
             /*
             FileLoader *dlg = new FileLoader(MainWin, MainWin_FileLoader, w->t, w->ak, false, w->e);
             if (dlg->ShowModal() == wxID_OK)
@@ -114,9 +130,15 @@ long HostCallback(Plugin *plug, long param, void *value)
                 wxString result;
             } *w;
             w = (s_wired_l *)value;
-            wxFileDialog dlg(MainWin, w->t, wxT(""), wxT(""), wxT(""), wxSAVE);
-            if (dlg.ShowModal() == wxID_OK)
-                w->result = dlg.GetPath();
+			if (lastSaveDir && wxFileName::DirExists(lastSaveDir))
+			  dlg = new wxFileDialog(MainWin, w->t, lastSaveDir, wxT(""), wxT(""), wxSAVE);
+			else
+			  dlg = new wxFileDialog(MainWin, w->t, wxT(""), wxT(""), wxT(""), wxSAVE);
+            if (dlg->ShowModal() == wxID_OK)
+			{
+			  w->result = dlg->GetPath();
+			  lastSaveDir = dlg->GetDirectory();
+			}
             /*
             FileLoader *dlg = new FileLoader(MainWin, MainWin_FileLoader, w->t, false, true, w->e);
             if (dlg->ShowModal() == wxID_OK)
@@ -147,5 +169,6 @@ long HostCallback(Plugin *plug, long param, void *value)
         default:
             return (-1);
     }
+	delete dlg;
     return (1);
 }
