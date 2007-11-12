@@ -118,6 +118,7 @@ bool MainApp::OnInit()
     // returning false segfault.. so we exit instead
     exit(-1);
   }
+
   if (wxFileName::DirExists(SessionDir))
     MainWin->WiredStartSession(SessionDir);
   else

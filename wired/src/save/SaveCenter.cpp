@@ -105,6 +105,13 @@ void	SaveCenter::SaveProject()
   setSaved();
 }
 
+void	SaveCenter::SaveOneDocument(WiredDocument *doc, wxString file)
+{
+  WiredXml	*xmlFile = new WiredXml();
+  xmlFile->CreateDocument(file);
+  SaveDocument(doc, xmlFile);
+}
+
 void	SaveCenter::SaveFile(WiredDocument *doc, wxString file, wxString path)
 {
   wxFileName	normalizedPath;

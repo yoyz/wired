@@ -30,15 +30,7 @@ using namespace std;
 
 #define PLUGIN_NAME		wxT("DRUM-31")
 
-// the commented line at the end of this comment does not work, don't know why, can't gets hands on _id from WiredDocument,
-// I keep getting '1', even at instantiation :
-// */
-// _BeatBox_id = saveCenter->RegisterId();
-// ...
-// /*
-// in the constructor...
-// someone ought to teach me a lesson I think (tinoucas)
-//#define BEATBOX_SAVE_PATCH	(wxString(wxT("beatbox/patch_")) << (saveCenter->getId() == 1 ? _BeatBox_id : ...) << wxT(".xml"))
+// a number will be added so that multiple beatbox don't overwritte eachother
 #define BEATBOX_SAVE_PATCH	wxT("beatbox/patch.xml")
 
 #define BEATBOX_BG		wxT("plugins/beatbox/beatbox_bg.png")
@@ -186,6 +178,9 @@ class WiredBeatBox : public Plugin, public WiredDocument
   void		OnLoadKit(wxCommandEvent &event) {}
   void		OnToggleChannel(wxCommandEvent &event);
   void		OnPlay(wxCommandEvent& event);
+  void		TogglePlay();
+  void		DoPlay();
+  void		DoStop();
   void		OnSigChoice(wxCommandEvent& event);
   void		OnPositionChoice(wxCommandEvent& event);
   void		OnLoadPatch(wxCommandEvent& event);

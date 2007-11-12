@@ -38,6 +38,7 @@
 using namespace std;
 
 extern SaveCenter	*saveCenter;
+
 extern const wxEventType EVT_DROP;
 
 void s_nodeInfo::Set(const wxString &label, const wxString &extension, const wxString &length)
@@ -1127,23 +1128,25 @@ void MLTree::EndDrag(wxTreeEvent &event)
 void MLTree::OnLeftClick(wxMouseEvent &event)
 {
   LOG;
-    s_nodeInfo infos = GetTreeItemStructFromId(item_to_drag);
-    if (infos._label != wxT(""))
-    {
-        if (infos._extension.Cmp(wxT("")))
-        {
-            _Selfile = infos._label;
-            int x = event.GetPosition().x;
-            int y = event.GetPosition().y;
-            ClientToScreen(&x, &y);
-            wxCommandEvent event(EVT_DROP, ID_EVT_DROP);
-            _Pos.x = x;
-            _Pos.y = y;
-            wxPostEvent(SeqPanel->GetEventHandler(), event);
-        }
-        SeqPanel->HideAllPatterns(event);
-    }
-    event.Skip();
+  int x, y;
+  s_nodeInfo infos = GetTreeItemStructFromId(item_to_drag);
+
+  if (infos._label != wxT(""))
+  {
+	if (infos._extension.Cmp(wxT("")))
+	{
+	  _Selfile = infos._label;
+	  x = event.GetPosition().x;
+	  y = event.GetPosition().y;
+	  ClientToScreen(&x, &y);
+	  wxCommandEvent event(EVT_DROP, ID_EVT_DROP);
+	  _Pos.x = x;
+	  _Pos.y = y;
+	  wxPostEvent(SeqPanel->GetEventHandler(), event);
+	}
+	SeqPanel->HideAllPatterns(event);
+  }
+  event.Skip();
 }
 
 void				MLTree::OnSuppr(wxKeyEvent &event)

@@ -141,6 +141,11 @@ class SaveCenter : public WiredDocument
    */
   bool			IsProject(wxFileName path);
 
+  /** Saves one WiredDocument
+   * This function can be called from a plugin to force the writing of a patch
+   */
+  void		SaveOneDocument(WiredDocument *doc, wxString file);
+
  private:
    /** Writes an element in the xmlfile.
     * \param elem the element to write.

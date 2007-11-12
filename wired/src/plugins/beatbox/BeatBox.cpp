@@ -16,6 +16,7 @@
 static PlugInitInfo	info;
 extern SaveCenter	*saveCenter;
 extern Settings		*WiredSettings;
+static int			gl_BBId;
 
 inline void CalcPan(float pan, float* panvals)
 {
@@ -71,7 +72,7 @@ WiredBeatBox::WiredBeatBox(PlugStartInfo &startinfo, PlugInitInfo *initinfo,
   if (startinfo.saveCenter)
     saveCenter = startinfo.saveCenter;
   else
-	cerr << "[BEATBOX] could not get hands on saveCenter..." << endl;
+	cerr << "[DRM31] could not get hands on saveCenter..." << endl;
   // registering id to avoid duplicates (see BeatBox.h)
   setId(saveCenter->RegisterId());
   OnLoading = false;
@@ -555,7 +556,20 @@ WiredBeatBox::WiredBeatBox(PlugStartInfo &startinfo, PlugInitInfo *initinfo,
   for (int b = 0; b < NUM_PATTERNS; b++)
     PatternsMidiNotes[b] = note++;
   
-  _customFileName = BEATBOX_SAVE_PATCH;
+  // let's build a _customFileName for autosaving patch :
+  wxString customFN_orig = BEATBOX_SAVE_PATCH;
+  wxString ext;
+
+  gl_BBId++; //beatbox counter
+  _customFileName = customFN_orig.BeforeLast('.');
+  ext = customFN_orig.AfterLast('.');
+  _customFileName << gl_BBId << wxT(".") << ext;
+  while (wxFileName::FileExists(_customFileName))
+  {
+	gl_BBId++;
+	_customFileName = customFN_orig.BeforeLast('.');
+	_customFileName << gl_BBId << wxT(".") << ext;
+  } 
 }
 
 void WiredBeatBox::OnChannelHelp(wxMouseEvent& WXUNUSED(event))
@@ -1718,70 +1732,64 @@ void WiredBeatBox::OnSavePatch(wxCommandEvent& WXUNUSED(e))
 	wxFN.MakeRelativeTo(saveCenter->getProjectPath().GetFullPath());
 	selfile = wxFN.GetFullPath();
 	_customFileName = selfile;
+	cout << "[DRM31] Calling savecenter to write the file" << endl;
+	saveCenter->SaveOneDocument(this, _customFileName);
   }
   else
     cout << "[DRM31] could not open save file" << endl;
   cout << "OnSavePatch(): end" << endl;
-  //delete dlg;
 }
 
 void WiredBeatBox::LoadXmlPatch(wxString selfile)
 {
-  // originate from the previous OnLoadPatch
-  /*
-   *vector<wxString> exts;
-   *exts.push_back(_("xml\tDRM-31 xml patch file (*.xml)"));
-   *
-   *wxString selfile = OpenFileLoader(_("Load Patch"), &exts);
-   */
   if (!selfile.empty())
-    {
-      PatternMutex.Lock();
-      OnLoading = true;
-      PatternMutex.Unlock();
-      
+  {
+	PatternMutex.Lock();
+	OnLoading = true;
+	PatternMutex.Unlock();
 
-      for (int chan = 0; chan < NB_CHAN; chan++)
-	Channels[chan]->Reset();
 
-      wxProgressDialog *Progress = 
-	new wxProgressDialog(_("Loading patch file"), _("Please wait..."), 
-			     100, this, wxPD_AUTO_HIDE | wxPD_CAN_ABORT
-			     | wxPD_REMAINING_TIME);
-      Progress->Update(1);
-      Progress->Update(55);
+	for (int chan = 0; chan < NB_CHAN; chan++)
+	  Channels[chan]->Reset();
 
-      LoadPatch(selfile);
+	wxProgressDialog *Progress = 
+	  new wxProgressDialog(_("Loading patch file"), _("Please wait..."), 
+		  100, this, wxPD_AUTO_HIDE | wxPD_CAN_ABORT
+		  | wxPD_REMAINING_TIME);
+	Progress->Update(1);
+	Progress->Update(55);
 
-      Progress->Update(75);
-      Progress->Update(100);
+	LoadPatch(selfile);
 
-      delete Progress;      
+	Progress->Update(75);
+	Progress->Update(100);
 
-      EditedPattern = 0;
-      SelectedPattern = 0;
-      EditedBank = 0;
-      SelectedBank = 0;
-      
-      SelectedChannel = Channels[0];
-      Channels[0]->Select();
-      ReCalcStepsSigCoef();
-      UpdateSteps(0,0);
-      SetPatternList();
+	delete Progress;      
 
-      PatternMutex.Lock();
-      OnLoading = false;
-      PatternMutex.Unlock();
-    }
+	EditedPattern = 0;
+	SelectedPattern = 0;
+	EditedBank = 0;
+	SelectedBank = 0;
+
+	SelectedChannel = Channels[0];
+	Channels[0]->Select();
+	ReCalcStepsSigCoef();
+	UpdateSteps(0,0);
+	SetPatternList();
+
+	PatternMutex.Lock();
+	OnLoading = false;
+	PatternMutex.Unlock();
+  }
   else
-    cout << "[DRM31] Could not load file" << endl;
-
+	cout << "[DRM31] Could not load file" << endl;
 }
 
 void WiredBeatBox::OnLoadPatch(wxCommandEvent& WXUNUSED(e))
 {
   vector<wxString> exts;
-  exts.push_back(_("drm\tDRM-31 patch file (*.drm)"));
+  //exts.push_back(_("drm\tDRM-31 patch file (*.drm)"));
+  exts.push_back(_("xml\tDRM-31 patch file (*.xml)"));
 
   wxString selfile = OpenFileLoader(_("Load Patch"), &exts);
 
@@ -1808,7 +1816,6 @@ void WiredBeatBox::OnLoadPatch(wxCommandEvent& WXUNUSED(e))
   PatternMutex.Lock();
   OnLoading = false;
   PatternMutex.Unlock();
-
 }
 
 void	WiredBeatBox::LoadPatch(wxString filename)
@@ -1824,48 +1831,61 @@ void	WiredBeatBox::LoadPatch(wxString filename)
 
   data = AskData(filename);
 
-  cout << "[BEATBOX] LoadPatch(): loading : '" << filename.mb_str() << "'" << std::endl;
+  cout << "[DRM31] LoadPatch(): loading : '" << filename.mb_str() << "'" << std::endl;
 #ifdef __DEBUG__
-  cout << "[BEATBOX] LoadPatch(): data count == " << data.GetCount() << endl;
+  cout << "[DRM31] LoadPatch(): data count == " << data.GetCount() << endl;
 #endif
 
   for(dataIt = 0; dataIt < data.GetCount(); dataIt++)
   {
-    if(data[dataIt]->getKey() == wxT("MidiVolume"))
-    {
-      StringToIntArray(data[dataIt]->getValue(), MidiVolume);
-    }
-    else
-    {
-      if(data[dataIt]->getKey() == wxT("MidiSteps"))
-      {
-	StringToIntArray(data[dataIt]->getValue(), MidiSteps);
-      }
-      else
-      {
-	if(data[dataIt]->getKey() == wxT("MasterLevel"))
+	if(data[dataIt]->getKey() == wxT("AutoPlay"))
 	{
-	  MLevel = data[dataIt]->getValueFloat();
-	  std::cerr << "[BeatBox] MLevel = " << MLevel << std::endl;
-	  Pool->SetVolume(MLevel);
-	  MVol->SetValue((int)floor(MLevel*100));
-	}
-	else
-	{
-	  if(data[dataIt]->getKey() == wxT("channel"))
+	  if(data[dataIt]->getValue() == wxT("yes"))
 	  {
-	    LoadChannel(data[dataIt]);
+		cout << "[DRM31] setting AutoPlay" << endl;
+		DoPlay();
 	  }
 	  else
 	  {
-	    if(data[dataIt]->getKey().Matches(wxT("bank")))
-	    {
-	      LoadBank(data[dataIt]);
-	    }
+		cout << "[DRM31] not setting AutoPlay" << endl;
+		DoStop();
 	  }
 	}
-      }
-    }
+	if(data[dataIt]->getKey() == wxT("MidiVolume"))
+	{
+	  StringToIntArray(data[dataIt]->getValue(), MidiVolume);
+	}
+	else
+	{
+	  if(data[dataIt]->getKey() == wxT("MidiSteps"))
+	  {
+		StringToIntArray(data[dataIt]->getValue(), MidiSteps);
+	  }
+	  else
+	  {
+		if(data[dataIt]->getKey() == wxT("MasterLevel"))
+		{
+		  MLevel = data[dataIt]->getValueFloat();
+		  std::cerr << "[DRM31] MLevel = " << MLevel << std::endl;
+		  Pool->SetVolume(MLevel);
+		  MVol->SetValue((int)floor(MLevel*100));
+		}
+		else
+		{
+		  if(data[dataIt]->getKey() == wxT("channel"))
+		  {
+			LoadChannel(data[dataIt]);
+		  }
+		  else
+		  {
+			if(data[dataIt]->getKey().Matches(wxT("bank")))
+			{
+			  LoadBank(data[dataIt]);
+			}
+		  }
+		}
+	  }
+	}
   }
 
   SetVoices();
@@ -1873,7 +1893,7 @@ void	WiredBeatBox::LoadPatch(wxString filename)
   Channels[0]->Select();
   EditedPattern = SelectedPattern = EditedBank = SelectedBank = 0;
   for (int i = 0; i < NUM_PATTERNS; i++)
-    PatternSelectors[i]->SetOff();
+	PatternSelectors[i]->SetOff();
   PatternSelectors[0]->SetOn();
   BankKnob->SetValue(1);
 
@@ -2152,8 +2172,11 @@ void WiredBeatBox::SaveXmlPatch(wxString filename)
 	}
 	saveDocData(bank, filename);
   }
+  // playing state
+  saveElem = new SaveElement(wxT("AutoPlay"), AutoPlay ? wxT("yes") : wxT("no"));
+  saveDocData(saveElem, filename);
 #ifdef __DEBUG__
-  cout << "[BEATBOX] SaveXmlPatch(): file to write : '" << filename.mb_str() << "'" << endl;
+  cout << "[DRM31] SaveXmlPatch(): file to write : '" << filename.mb_str() << "'" << endl;
 #endif
   _customFileName = filename;
 }
@@ -2168,7 +2191,7 @@ void	WiredBeatBox::Load(SaveElementArray data)
   if(wxFileName::FileExists(_customFileName))
 	LoadXmlPatch(_customFileName);
   else
-	cerr << "[BEATBOX] patch not found : '" << _customFileName.mb_str() << "'" << endl;
+	cerr << "[DRM31] patch not found : '" << _customFileName.mb_str() << "'" << endl;
 }
 
 void WiredBeatBox::Load(int fd, long size)
@@ -2483,6 +2506,11 @@ inline void WiredBeatBox::UpdateStepsDeps(unsigned int steps)
 
 void WiredBeatBox::OnPlay(wxCommandEvent& WXUNUSED(e))
 {
+  TogglePlay();
+}
+
+void WiredBeatBox::TogglePlay()
+{
   PatternMutex.Lock();
   AutoPlay = !AutoPlay;
   //PlayNext= true;
@@ -2491,6 +2519,31 @@ void WiredBeatBox::OnPlay(wxCommandEvent& WXUNUSED(e))
   else 
     Playing = false;
   PatternMutex.Unlock();
+}
+
+void WiredBeatBox::DoPlay()
+{
+  PatternMutex.Lock();
+  AutoPlay = true;
+  if (SeqPlaying == true)
+	Playing = true;
+  else 
+	Playing = false;
+  PatternMutex.Unlock();
+  PlayButton->SetOn();
+  if (View)
+	View->Refresh();
+}
+
+void WiredBeatBox::DoStop()
+{
+  PatternMutex.Lock();
+  AutoPlay = false;
+  Playing = false;
+  PatternMutex.Unlock();
+  PlayButton->SetOff();
+  if (View)
+	View->Refresh();
 }
 
 void WiredBeatBox::Play()

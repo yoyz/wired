@@ -21,6 +21,7 @@ int		RackCount = 0;
 Plugin*		gl_lastDeletedPlug = 0;
 #endif
 
+
 /********************   Class RackTrack   ********************/
 
 RackTrack::RackTrack(Rack *parent, int index)
@@ -452,65 +453,66 @@ void				Rack::HandleMouseEvent(Plugin *plug, wxMouseEvent *event)
   int x , y = 0;
   int xx, yy = 0;
 
-  if (event->GetEventType() == wxEVT_MOUSEWHEEL)
-    {
-      int x, y, y1, y2, y3;
 
-      GetVirtualSize(0x0, &y1);
-      GetSize(0x0, &y2);
-      GetViewStart(&x, &y3);
-      if (y1 > y2)
+  if (event->GetEventType() == wxEVT_MOUSEWHEEL)
+  {
+	int x, y, y1, y2, y3;
+
+	GetVirtualSize(0x0, &y1);
+	GetSize(0x0, &y2);
+	GetViewStart(&x, &y3);
+	if (y1 > y2)
 	{
 	  if (event->GetWheelRotation() > 0)
-	    y = -1;
+		y = -1;
 	  else
-	    y = 1;
+		y = 1;
 	  Scroll(x, y3 + y);
 	}
-    }
+  }
   else if (event->Dragging() && event->LeftIsDown())
-    {
-      tmp_x = event->GetPosition().x + plug->GetPosition().x - OldX;
-      tmp_y = event->GetPosition().y + plug->GetPosition().y - OldY;
-      if(tmp_x < 0)
-	tmp_x = 0;
-      if(tmp_y < 0)
-	tmp_y = 0;
-      plug->Move(wxPoint(tmp_x, tmp_y));
-      WasDragging = true;
-    }
+  {
+	tmp_x = event->GetPosition().x + plug->GetPosition().x - OldX;
+	tmp_y = event->GetPosition().y + plug->GetPosition().y - OldY;
+	if(tmp_x < 0)
+	  tmp_x = 0;
+	if(tmp_y < 0)
+	  tmp_y = 0;
+	plug->Move(wxPoint(tmp_x, tmp_y));
+	WasDragging = true;
+  }
 
   if(event->LeftDown())
-    {
-      OldX = event->GetPosition().x;
-      OldY = event->GetPosition().y;
+  {
+	OldX = event->GetPosition().x;
+	OldY = event->GetPosition().y;
 
-      Plugin *oldplug = selectedPlugin;
-      SetSelected(plug);
-      if (oldplug)
-	oldplug->Refresh();
+	Plugin *oldplug = selectedPlugin;
+	SetSelected(plug);
+	if (oldplug)
+	  oldplug->Refresh();
 
-      new_x = (event->GetPosition().x + plug->GetPosition().x);
-      new_y = (event->GetPosition().y + plug->GetPosition().y);
-    }
+	new_x = (event->GetPosition().x + plug->GetPosition().x);
+	new_y = (event->GetPosition().y + plug->GetPosition().y);
+  }
   if(event->RightDown())
-    {
-      SetSelected(plug);
-      wxPoint p(event->GetPosition().x + plug->GetPosition().x, event->GetPosition().y + plug->GetPosition().y);
-      PopupMenu(menu, p.x, p.y);
-    }
+  {
+	SetSelected(plug);
+	wxPoint p(event->GetPosition().x + plug->GetPosition().x, event->GetPosition().y + plug->GetPosition().y);
+	PopupMenu(menu, p.x, p.y);
+  }
   else if(event->LeftUp() && WasDragging)
-    {
-      new_x = (event->GetPosition().x + plug->GetPosition().x);
-      new_y = (event->GetPosition().y + plug->GetPosition().y);
-      if(plug->IsAudio() && !DndGetDest(k, l, new_x, new_y, plug))
+  {
+	new_x = (event->GetPosition().x + plug->GetPosition().x);
+	new_y = (event->GetPosition().y + plug->GetPosition().y);
+	if(plug->IsAudio() && !DndGetDest(k, l, new_x, new_y, plug))
 	{
 	  DeleteRack(plug, false);
 	  AddLoadedRack(plug);
 	}
-      ResizeTracks();
-      WasDragging = false;
-    }
+	ResizeTracks();
+	WasDragging = false;
+  }
 }
 
 void				Rack::AddPlugToMenu()

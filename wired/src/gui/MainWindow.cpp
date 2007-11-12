@@ -51,8 +51,11 @@
 #define LOG
 #endif
 
-//Isn't it bullshit to declare things here ?
+#define WIZ_WIDTH 200
+#define WIZ_HEIGHT 200
+#define WIZ_WIN_SIZE wxSize(WIZ_WIDTH, WIZ_HEIGHT)
 
+//Isn't it bullshit to declare things here ?
 Rack			*RackPanel = NULL;
 SequencerGui		*SeqPanel = NULL;
 Sequencer		*Seq = NULL;
@@ -75,7 +78,7 @@ wxCondition		*SeqStopped = NULL;
 
 MainWindow::MainWindow(const wxString &title, const wxPoint &pos, const wxSize &size, WiredDocument *parent)
   : wxFrame((wxFrame *) NULL, wxID_ANY, title, pos, size,
-	    wxDEFAULT_FRAME_STYLE | wxWS_EX_PROCESS_IDLE | wxMAXIMIZE),
+	    wxDEFAULT_FRAME_STYLE | wxWS_EX_PROCESS_IDLE | wxMAXIMIZE, wxT("wired")),
     WiredDocument(wxT("MainWindow"), parent)
 {
   LOG;
@@ -691,7 +694,7 @@ bool					MainWindow::NewSession()
 
   saveCenter->CleanTree();
 
-  OpenWizard();
+  ChooseSessionDir();
 
   return (true);
 }
@@ -2130,6 +2133,43 @@ void		MainWindow::OpenWizard()
 {
   LOG;
 
+  /*
+   *wxDialog		Dialog(NULL, -1, _("Wired Wizard"),
+   *    wxDefaultPosition, WIZ_WIN_SIZE, wxDEFAULT_DIALOG_STYLE, _("Wizard"));
+   *wxStaticText	DialogText(&Dialog, -1, _("What do you want to do ?"),
+   *    wxPoint(13,10), wxSize(-1, -1), wxALIGN_CENTER);
+   *wxButton		DialogOkButton(&Dialog, wxID_OK, _("Create"),
+   *    wxPoint(10, 110));
+   *wxButton		DialogCancelButton(&Dialog, wxID_CANCEL, _("Open recent"),
+   *    wxPoint(95, 110));
+   *
+   *Dialog.SetReturnCode(wxID_CANCEL);
+   *Dialog.SetReturnCode(wxID_OK);
+   *if (Dialog.ShowModal() == wxID_OK)
+   *{
+   *  cout << "create" << endl;
+   *  ChooseSessionDir();
+   *}
+   *else
+   *{
+   *  cout << "open recent" << endl;
+   *  ...
+   *  WiredStartSession(sessionDir);
+   *}
+   */
+
+  vector<wxFileName>	pathList = WiredSettings->GetRecentDirs();
+
+  for (int pouet = 0; pouet < pathList.size(); pouet++)
+	cout << "Recent" << pouet << " = '" << pathList[pouet].GetFullPath().mb_str() << "'" << endl;
+
+  ChooseSessionDir();
+}
+
+void		MainWindow::ChooseSessionDir()
+{
+  LOG;
+
   wxDirDialog	dirDialog(NULL, _("Select a project folder"), wxGetCwd());
 
   while(dirDialog.ShowModal() != wxID_OK)
@@ -2143,6 +2183,7 @@ void		MainWindow::WiredStartSession(wxString sessionDir)
 {
   wxFileName	path;
 
+  WiredSettings->AddDirToRecent(sessionDir);
   path.AssignDir(sessionDir);
   path.MakeAbsolute();
   wxFileName::SetCwd(path.GetPath());

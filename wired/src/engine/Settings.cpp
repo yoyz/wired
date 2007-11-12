@@ -215,3 +215,67 @@ void Settings::DeleteDeprecatedEntries()
   conf->DeleteEntry(wxT("SampleFormat"));
   conf->DeleteEntry(wxT("SamplesPerBuffer"));
 }
+
+vector<wxFileName>	Settings::GetRecentDirs()
+{
+  vector<wxFileName>	pathList;
+  int					i;
+  wxString				recent, tmpstr;
+  wxFileName			path;
+  wxString				Group = wxT("/Recent");
+
+  if(conf)
+  {
+	conf->SetPath(Group);
+	for (i = 0; i < MAX_RECENT; i++)
+	{
+	  recent.Clear();
+	  recent << wxT("Recent") << i;
+	  conf->Read(recent, &tmpstr, wxT(""));
+	  path.Assign(tmpstr);
+	  if (path.DirExists())
+		pathList.push_back(path);
+	}
+  }
+  else
+	cout << "[SETTINGS] GetRecentDirs() : Can't access conf" << endl;
+  return (pathList);
+}
+
+bool Settings::AddDirToRecent(wxString pathstr)
+{
+  vector<wxFileName>	pathList;
+  wxString				tmpstr, recent;
+  wxFileName			newpath, path;
+  int					i;
+  wxString				Group = wxT("/Recent");
+
+  if(conf)
+  {
+	conf->SetPath(Group);
+	newpath.Assign(pathstr);
+	newpath.MakeAbsolute();
+	cout << "[SETTINGS] Adding '" << newpath.GetFullPath().mb_str() << "' to the recent list" << endl;
+	pathList.push_back(newpath);
+	for (i = 0; i < MAX_RECENT; i++)
+	{
+	  recent.Clear();
+	  recent << wxT("Recent") << i;
+	  conf->Read(recent, &tmpstr, wxT(""));
+	  path.Assign(tmpstr);
+	  // DirExists or IsOk ?
+	  if (path.DirExists())
+		if (newpath != path)
+		  pathList.push_back(path);
+	}
+	conf->DeleteGroup(Group);
+	for (i = 0; i < pathList.size() && i < MAX_RECENT - 1; i++)
+	{
+	  recent.Clear();
+	  recent << wxT("Recent") << i;
+	  conf->Write(recent, pathList[i].GetFullPath());
+	}
+  }
+  else
+	cout << "[SETTINGS] AddDirToRecent() : Can't access conf" << endl;
+}
