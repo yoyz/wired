@@ -18,7 +18,9 @@ using namespace std;
 
 #define WIRED_CONF_VERSION	wxT("1")
 
-#define MAX_RECENT	5
+// TODO: add it in settings window
+// it can be in the conf file (max_recent in /Recent)
+#define MAX_RECENT	20
 
 /**
  * Setting for wired.
@@ -203,6 +205,12 @@ class Settings
    * \return vector<wxFileName> of recent session dirs
    */
   vector<wxFileName>	GetRecentDirs();
+
+  /**
+   * Removes a recent dir from conf file
+   * \return nothing
+   */
+  void					RemoveRecentDir(int idx);
 
  protected:
   wxFileConfig	*conf;

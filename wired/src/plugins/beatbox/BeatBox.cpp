@@ -1728,9 +1728,13 @@ void WiredBeatBox::OnSavePatch(wxCommandEvent& WXUNUSED(e))
   if (!selfile.empty())
   {
 	SaveXmlPatch(selfile);
-	wxFileName wxFN = wxFileName(selfile);
-	wxFN.MakeRelativeTo(saveCenter->getProjectPath().GetFullPath());
-	selfile = wxFN.GetFullPath();
+	//formating filename to be relative to the project path
+	//works really bad when crossing symbolic links :-/
+    /*
+	 *wxFileName wxFN = wxFileName(selfile);
+	 *wxFN.MakeRelativeTo(saveCenter->getProjectPath().GetFullPath());
+	 *selfile = wxFN.GetFullPath();
+     */
 	_customFileName = selfile;
 	cout << "[DRM31] Calling savecenter to write the file" << endl;
 	saveCenter->SaveOneDocument(this, _customFileName);
@@ -2067,9 +2071,12 @@ void WiredBeatBox::SaveXmlPatch(wxString filename)
   wxString	s;
 
   //formating filename to be relative to the project path
-  wxFileName wxFN = wxFileName(filename);
-  wxFN.MakeRelativeTo(saveCenter->getProjectPath().GetFullPath());
-  filename = wxFN.GetFullPath();
+  //works really bad when crossing symbolic links :-/
+  /*
+   *wxFileName wxFN = wxFileName(filename);
+   *wxFN.MakeRelativeTo(saveCenter->getProjectPath().GetFullPath());
+   *filename = wxFN.GetFullPath();
+   */
 
   //saving midi params
   //MidiVolume

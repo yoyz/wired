@@ -138,7 +138,7 @@ class					MainWindow: public wxFrame, public WiredDocument
 								 wxString name);
 
   /* Shows a wxDirDialog to select a project folder */
-  void					ChooseSessionDir();
+  wxString				ChooseSessionDir();
   void					OpenWizard();
 
   void					WiredStartSession(wxString sessionDir);

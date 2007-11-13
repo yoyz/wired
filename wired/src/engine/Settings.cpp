@@ -223,11 +223,19 @@ vector<wxFileName>	Settings::GetRecentDirs()
   wxString				recent, tmpstr;
   wxFileName			path;
   wxString				Group = wxT("/Recent");
+  int					max_recent;
+  long					l;
 
   if(conf)
   {
 	conf->SetPath(Group);
-	for (i = 0; i < MAX_RECENT; i++)
+	conf->Read(wxT("max_recent"), &tmpstr, wxT(""));
+	if (tmpstr != wxT(""))
+	  tmpstr.ToLong(&l);
+	else
+	  l = MAX_RECENT;
+	max_recent = (int)l;
+	for (i = 0; i < max_recent; i++)
 	{
 	  recent.Clear();
 	  recent << wxT("Recent") << i;
@@ -242,6 +250,47 @@ vector<wxFileName>	Settings::GetRecentDirs()
   return (pathList);
 }
 
+void	Settings::RemoveRecentDir(int idx)
+{
+  vector<wxFileName>	pathList;
+  int					i;
+  long					l;
+  wxString				recent, tmpstr;
+  wxFileName			path;
+  wxString				Group = wxT("/Recent");
+  int					max_recent;
+
+  if(conf)
+  {
+	conf->SetPath(Group);
+	conf->Read(wxT("max_recent"), &tmpstr, wxT(""));
+	if (tmpstr != wxT(""))
+	  tmpstr.ToLong(&l);
+	else
+	  l = MAX_RECENT;
+	max_recent = (int)l;
+	for (i = 0; i < max_recent; i++)
+	{
+	  recent.Clear();
+	  recent << wxT("Recent") << i;
+	  conf->Read(recent, &tmpstr, wxT(""));
+	  path.Assign(tmpstr);
+	  if (path.DirExists() && i != idx)
+		pathList.push_back(path);
+	}
+	conf->DeleteGroup(Group);
+	if (pathList.size() > 0)
+	  for (i = 0; i < pathList.size() && i < max_recent; i++)
+	  {
+		recent.Clear();
+		recent << wxT("Recent") << i;
+		conf->Write(recent, pathList[i].GetFullPath());
+	  }
+  }
+  else
+	cout << "[SETTINGS] RemoveRecentDir() : Can't access conf" << endl;
+}
+
 bool Settings::AddDirToRecent(wxString pathstr)
 {
   vector<wxFileName>	pathList;
@@ -249,15 +298,23 @@ bool Settings::AddDirToRecent(wxString pathstr)
   wxFileName			newpath, path;
   int					i;
   wxString				Group = wxT("/Recent");
+  int					max_recent;
+  long					l;
 
   if(conf)
   {
 	conf->SetPath(Group);
+	conf->Read(wxT("max_recent"), &tmpstr, wxT(""));
+	if (tmpstr != wxT(""))
+	  tmpstr.ToLong(&l);
+	else
+	  l = MAX_RECENT;
+	max_recent = (int)l;
 	newpath.Assign(pathstr);
 	newpath.MakeAbsolute();
 	cout << "[SETTINGS] Adding '" << newpath.GetFullPath().mb_str() << "' to the recent list" << endl;
 	pathList.push_back(newpath);
-	for (i = 0; i < MAX_RECENT; i++)
+	for (i = 0; i < max_recent; i++)
 	{
 	  recent.Clear();
 	  recent << wxT("Recent") << i;
@@ -269,7 +326,7 @@ bool Settings::AddDirToRecent(wxString pathstr)
 		  pathList.push_back(path);
 	}
 	conf->DeleteGroup(Group);
-	for (i = 0; i < pathList.size() && i < MAX_RECENT - 1; i++)
+	for (i = 0; i < pathList.size() && i < max_recent; i++)
 	{
 	  recent.Clear();
 	  recent << wxT("Recent") << i;

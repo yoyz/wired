@@ -44,6 +44,7 @@
 #include "MLTree.h"
 #include "SaveCenter.h"
 #include "debug.h"
+#include "Wizard.h"
 
 #ifdef DEBUG_MAINWINDOW
 #define LOG { wxFileName __filename__(__FILE__); cout << __filename__.GetFullName() << " : "  << __LINE__ << " : " << __FUNCTION__  << endl; }
@@ -2133,40 +2134,17 @@ void		MainWindow::OpenWizard()
 {
   LOG;
 
-  /*
-   *wxDialog		Dialog(NULL, -1, _("Wired Wizard"),
-   *    wxDefaultPosition, WIZ_WIN_SIZE, wxDEFAULT_DIALOG_STYLE, _("Wizard"));
-   *wxStaticText	DialogText(&Dialog, -1, _("What do you want to do ?"),
-   *    wxPoint(13,10), wxSize(-1, -1), wxALIGN_CENTER);
-   *wxButton		DialogOkButton(&Dialog, wxID_OK, _("Create"),
-   *    wxPoint(10, 110));
-   *wxButton		DialogCancelButton(&Dialog, wxID_CANCEL, _("Open recent"),
-   *    wxPoint(95, 110));
-   *
-   *Dialog.SetReturnCode(wxID_CANCEL);
-   *Dialog.SetReturnCode(wxID_OK);
-   *if (Dialog.ShowModal() == wxID_OK)
-   *{
-   *  cout << "create" << endl;
-   *  ChooseSessionDir();
-   *}
-   *else
-   *{
-   *  cout << "open recent" << endl;
-   *  ...
-   *  WiredStartSession(sessionDir);
-   *}
-   */
 
-  vector<wxFileName>	pathList = WiredSettings->GetRecentDirs();
+  Wizard	wiz;
 
-  for (int pouet = 0; pouet < pathList.size(); pouet++)
-	cout << "Recent" << pouet << " = '" << pathList[pouet].GetFullPath().mb_str() << "'" << endl;
-
-  ChooseSessionDir();
+  wiz.ShowModal();
+  if (wxFileName::DirExists(wiz.GetDir()))
+	WiredStartSession(wiz.GetDir());
+  else
+	WiredStartSession(ChooseSessionDir());
 }
 
-void		MainWindow::ChooseSessionDir()
+wxString		MainWindow::ChooseSessionDir()
 {
   LOG;
 
@@ -2176,7 +2154,7 @@ void		MainWindow::ChooseSessionDir()
     AlertDialog(_("Warning"),
 			 _("You have to select a project folder."));
 
-  WiredStartSession(dirDialog.GetPath());
+  return (dirDialog.GetPath());
 }
 
 void		MainWindow::WiredStartSession(wxString sessionDir)
