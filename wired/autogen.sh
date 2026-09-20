@@ -16,15 +16,15 @@ rm -rf autom4te*.cache
 rm -f libtool
 # remove gettext stuff
 rm -f ABOUT-NLS
-rm -rf intl
 
 
 ###
 ### configuration part
 ###
 # create the config directory
-mkdir config
-mkdir intl
+mkdir -p config/m4
+# autoheader writes config.h.in into src/include (AC_CONFIG_HEADERS)
+mkdir -p src/include
 
 # execute autotools cmds
 autopoint -f				&& \

@@ -25,6 +25,7 @@ PmError pm_init()
     #ifdef PMNULL
         pm_linuxnull_init();
     #endif
+    return pmNoError;
 }
 
 void pm_term(void)

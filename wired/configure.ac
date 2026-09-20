@@ -1,7 +1,7 @@
 ###############################################################
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
+AC_PREREQ([2.69])
 AC_INIT([Wired], [0.7.0], [wired@bloodshed.net])
 
 LIB_WIREDCODECS_VERSION=1:0:0
@@ -26,20 +26,22 @@ AC_SUBST(LIB_WIREDCODECS_VERSION)
 
 # Auxiliary files.
 AC_CONFIG_AUX_DIR([config])
+AC_CONFIG_MACRO_DIR([config/m4])
 
 # Needed for plugins
-AC_DISABLE_STATIC
-AC_ENABLE_SHARED
-AC_PROG_LIBTOOL
+LT_INIT([disable-static])
 
 # Automake.
-AM_INIT_AUTOMAKE([1.8.2 foreign check-news dist-bzip2 no-dist-gzip])
+AM_INIT_AUTOMAKE([foreign dist-bzip2 no-dist-gzip])
 
 # Look for a gnu compiler
 if test $ac_cv_c_compiler_gnu = yes ; then
 	AC_DEFINE([COMPILER_IS_GCC],1, [Set to 1 if the compile is GNU GCC.])
-	GCC_MAJOR_VERSION=`gcc -dumpversion 2>/dev/null | awk -F. '{print $1}'`
-	GCC_MINOR_VERSION=`gcc -dumpversion 2>/dev/null | awk -F. '{print $2}'`
+	GCC_MAJOR_VERSION=`gcc -dumpfullversion 2>/dev/null | awk -F. '{print $1}'`
+	GCC_MINOR_VERSION=`gcc -dumpfullversion 2>/dev/null | awk -F. '{print $2}'`
+	if test "x$GCC_MAJOR_VERSION" = x; then
+		GCC_MAJOR_VERSION=3
+	fi
 	AC_DEFINE_UNQUOTED([GCC_MAJOR_VERSION],${GCC_MAJOR_VERSION}, [Major version of GCC or 3 otherwise.])
 fi
 
@@ -58,7 +60,6 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-AC_PROG_GCC_TRADITIONAL
 AC_LANG([C++])
 AC_PROG_CXXCPP
 
@@ -119,12 +120,12 @@ fi
 
 # libs used in plugins
 if test x"$enable_plugins" = xyes; then
-   AC_CHECK_LIB([SoundTouch], [soundtouch_ac_test], [SNDTOUC='yes'], AC_MSG_ERROR([Couldn't find lib SoundTouch]))
+   PKG_CHECK_MODULES([SOUNDTOUCH], [soundtouch >= 1.3.1], [SNDTOUC='yes'], AC_MSG_ERROR([Couldn't find lib SoundTouch]))
 fi
 
 # libs used in codecs
 if test x"$enable_codecs" = xyes; then
-   AC_CHECK_LIB([FLAC++], [FLAC__stream_decoder_init_file], [FLAC='yes'], AC_MSG_ERROR([Couldn't find libflac++]))
+   PKG_CHECK_MODULES([FLAC], [flac++], [FLAC='yes'], AC_MSG_ERROR([Couldn't find libflac++]))
    AC_CHECK_LIB([vorbis], [vorbis_info_init], [VORBIS='yes'], AC_MSG_ERROR([Couldn't find libvorbis]))
 fi
 
@@ -134,10 +135,8 @@ if test x"$enable_video" = xyes; then
 fi
 
 #Checking for wxWidgets
-AM_OPTIONS_WXCONFIG
-reqwx=2.6.0
-AM_PATH_WXCONFIG($reqwx, wxWin=1)
-if test "$wxWin" != 1; then
+AC_PATH_PROG([WX_CONFIG], [wx-config], [no])
+if test "$WX_CONFIG" = no; then
 	AC_MSG_ERROR([
                 wxWidgets must be installed on your system
                 but wx-config script couldn't be found.
@@ -145,20 +144,37 @@ if test "$wxWin" != 1; then
 		Please check that wx-config is in path, the directory
 		where wxWidgets libraries are installed (returned by
 		'wx-config --libs' or 'wx-config --static --libs' command)
-		is in LD_LIBRARY_PATH or equivalent variable and
-		wxWidgets version is $reqwx or above.
+		is in LD_LIBRARY_PATH or equivalent variable.
 		])
-else
-	AC_PATH_PROG(WX_CONFIG, wx-config, no)
-	WXWIDGET_VERSION=`wx-config --version`
-	LIBS="$LIBS $(wx-config --libs media,core)"
 fi
 
-if test "$PORTAUDIO_VERSION" != 19; then
+WXWIDGET_VERSION=`$WX_CONFIG --version`
+reqwx=3.0.0
+AC_MSG_CHECKING([for wxWidgets >= $reqwx])
+if printf '%s\n%s\n' "$reqwx" "$WXWIDGET_VERSION" | sort -V | head -1 | grep -qx "$reqwx"; then
+	AC_MSG_RESULT([yes ($WXWIDGET_VERSION)])
+else
+	AC_MSG_RESULT([no ($WXWIDGET_VERSION)])
+	AC_MSG_ERROR([wxWidgets >= $reqwx is required, found $WXWIDGET_VERSION.])
+fi
+
+WX_CPPFLAGS=`$WX_CONFIG --cppflags`
+WX_CXXFLAGS_ONLY=`$WX_CONFIG --cxxflags`
+WX_CFLAGS_ONLY=`$WX_CONFIG --cflags`
+WX_LIBS=`$WX_CONFIG --libs media,core`
+LIBS="$LIBS $($WX_CONFIG --libs media,core)"
+AC_SUBST(WX_CONFIG)
+AC_SUBST(WX_CPPFLAGS)
+AC_SUBST(WX_CXXFLAGS_ONLY)
+AC_SUBST(WX_CFLAGS_ONLY)
+AC_SUBST(WX_LIBS)
+
+PORTAUDIO_MAJOR_VERSION=`echo $PORTAUDIO_VERSION | cut -d. -f1`
+if test "$PORTAUDIO_MAJOR_VERSION" != 19; then
 	AC_MSG_ERROR([
                 Portaudio v19 must be installed on your system.
 		])
-fi   
+fi
 
 CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
 CXXFLAGS="$CXXFLAGS $WX_CXXFLAGS_ONLY"
@@ -286,12 +302,11 @@ AC_MSG_RESULT([$CFGDEBUG])
 
 #Some locale things
 ALL_LINGUAS="fr_FR it_IT zh_TW.Big5"
-AM_GNU_GETTEXT([use-libtool])
-AM_GNU_GETTEXT_VERSION([0.14.4])
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.21])
 
 AC_CONFIG_FILES([Makefile
 		po/Makefile.in
-		intl/Makefile
 		src/Makefile
 		src/save/Makefile
 		src/audio/Makefile

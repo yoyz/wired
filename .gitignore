@@ -1,0 +1,37 @@
+# Wired build system artifacts (generated, never commit)
+wired/aclocal.m4
+wired/configure
+wired/libtool
+wired/config.log
+wired/config.status
+wired/ABOUT-NLS
+wired/autom4te.cache/
+wired/config/
+wired/po/Makefile
+wired/po/Makefile.in
+wired/po/POTFILES
+wired/po/*.po~
+wired/*.in~
+wired/src/include/config.h
+wired/src/include/config.h.in
+wired/src/include/stamp-h1
+wired/src/include/.deps/
+
+# Autotools generated Makefiles
+**/Makefile.in
+**/Makefile
+
+# Build products
+*.o
+*.lo
+*.la
+*.a
+*.so
+*.so.*
+.deps/
+.libs/
+wired/src/wired
+wired/wired
+
+# Editor / misc
+*~

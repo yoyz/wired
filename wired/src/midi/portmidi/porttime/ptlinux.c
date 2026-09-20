@@ -25,14 +25,14 @@ CHANGE LOG
 #include "porttime.h"
 #include "sys/time.h"
 #include "sys/resource.h"
-#include "sys/timeb.h"
+#include "time.h"
 #include "pthread.h"
 
 #define TRUE 1
 #define FALSE 0
 
 static int time_started_flag = FALSE;
-static struct timeb time_offset = {0, 0, 0, 0};
+static struct timespec time_offset = {0, 0};
 static pthread_t pt_thread_pid;
 
 /* note that this is static data -- we only need one copy */
@@ -72,7 +72,7 @@ static void *Pt_CallbackProc(void *p)
 PtError Pt_Start(int resolution, PtCallback *callback, void *userData)
 {
     if (time_started_flag) return ptNoError;
-    ftime(&time_offset); /* need this set before process runs */
+    clock_gettime(CLOCK_MONOTONIC, &time_offset); /* need this set before process runs */
     if (callback) {
         int res;
         pt_callback_parameters *parms = (pt_callback_parameters *) 
@@ -109,10 +109,10 @@ int Pt_Started()
 PtTimestamp Pt_Time()
 {
     long seconds, milliseconds;
-    struct timeb now;
-    ftime(&now);
-    seconds = now.time - time_offset.time;
-    milliseconds = now.millitm - time_offset.millitm;
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC, &now);
+    seconds = now.tv_sec - time_offset.tv_sec;
+    milliseconds = now.tv_nsec / 1000000 - time_offset.tv_nsec / 1000000;
     return seconds * 1000 + milliseconds;
 }
 
