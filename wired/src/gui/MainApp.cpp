@@ -12,6 +12,8 @@
 #include <wx/dirdlg.h>
 #include <wx/filename.h>
 #include <wx/image.h>
+#include <wx/frame.h>
+#include <wx/statbmp.h>
 #include <wx/imagpng.h>
 #include <wx/imaggif.h>
 #include <wx/snglinst.h>
@@ -152,7 +154,7 @@ void		MainApp::ShowWizard()
 // show/hide splash
 void MainApp::ShowSplash(bool show)
 {
-  static wxSplashScreen* splash = NULL;
+  static wxFrame* splash = NULL;
 
   if (nosplash)
     return;
@@ -165,18 +167,22 @@ void MainApp::ShowSplash(bool show)
 	{
 	  if ( ! splash )
 	    {
-	      // we keep time-out very high for low cpu
-	      splash = new wxSplashScreen(bitmap,
-					  wxSPLASH_CENTRE_ON_SCREEN
-					  | wxSPLASH_TIMEOUT,
-					  120000,
-					  NULL,
-					  -1,
-					  wxDefaultPosition,
-					  wxDefaultSize,
-					  wxSIMPLE_BORDER);
+	      // wxSplashScreen is unusable here: it installs a *global* event
+	      // filter (src/generic/splash.cpp FilterEvent) that closes and
+	      // DELETES itself on any key/mouse event anywhere in the app —
+	      // typing/clicking in the Wizard kills it and leaves our static
+	      // pointer dangling (SIGSEGV on the next ShowSplash()). Use a
+	      // plain frame + bitmap that nothing else can destroy.
+	      splash = new wxFrame(NULL, -1, wxEmptyString,
+				   wxDefaultPosition, wxDefaultSize,
+				   wxFRAME_TOOL_WINDOW | wxFRAME_NO_TASKBAR);
+	      new wxStaticBitmap(splash, -1, bitmap);
+	      splash->SetClientSize(bitmap.GetWidth(), bitmap.GetHeight());
+	      splash->CenterOnScreen();
+	      splash->Show();
+	      splash->Update();
 	    }
-	  splash->Update();
+	  splash->Raise();
 	  splash->Refresh();
 	  // alert dialog can use it before frame loading
 	  wxYield();
@@ -195,9 +201,13 @@ void MainApp::ShowSplash(bool show)
     }
   else
     {
-      // Wired crash if loading time of main frame is longer than splash timeout
+      // nothing else can destroy this frame, so the pointer is always valid
       if (splash)
-	splash->Hide();
+	{
+	  splash->Hide();
+	  splash->Destroy();
+	  splash = NULL;
+	}
     }
 }
 

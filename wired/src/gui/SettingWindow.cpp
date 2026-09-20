@@ -94,8 +94,8 @@ SettingWindow::SettingWindow()
   CurrentPanel = GeneralPanel;
 
   // add colomns of the first "line" to the sizer
-  horiSizer->Add(SettingsTree, wxSizerFlags().Proportion(40).Expand().Right().Border());
-  horiSizer->Add(CurrentPanel, wxSizerFlags().Proportion(100).Expand().Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL).Border());
+  horiSizer->Add(SettingsTree, wxSizerFlags().Proportion(40).Expand().Border());
+  horiSizer->Add(CurrentPanel, wxSizerFlags().Proportion(100).Expand().Border());
 
   // create the standardized way to create dialog buttons
   wxStdDialogButtonSizer* buttonSizer = new wxStdDialogButtonSizer();
@@ -108,7 +108,7 @@ SettingWindow::SettingWindow()
 
   // add first and second line to the main sizer
   mainSizer->Add(horiSizer, wxSizerFlags().Proportion(100).Expand().Border());
-  mainSizer->Add(buttonSizer, wxSizerFlags().Align(wxALIGN_RIGHT | wxALIGN_BOTTOM).Border());
+  mainSizer->Add(buttonSizer, wxSizerFlags().Align(wxALIGN_RIGHT).Border());
 
   // resize items and window
   SetSizer(mainSizer);

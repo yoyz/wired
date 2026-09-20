@@ -68,13 +68,13 @@ Wizard::Wizard()
 
   wxBoxSizer*	mainSizer = new wxBoxSizer(wxVERTICAL);
 
-  nameSizer->Add(st_ProjectName, wxSizerFlags().Border().Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL).Proportion(15));
-  nameSizer->Add(tc_ProjectName, wxSizerFlags().Border().Center().Expand().Proportion(70));
-  nameSizer->Add(b_NewProject, wxSizerFlags().Border().Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL).Proportion(15));
+  nameSizer->Add(st_ProjectName, wxSizerFlags().Border().Align(wxALIGN_CENTER_VERTICAL).Proportion(15));
+  nameSizer->Add(tc_ProjectName, wxSizerFlags().Border().Expand().Proportion(70));
+  nameSizer->Add(b_NewProject, wxSizerFlags().Border().Align(wxALIGN_CENTER_VERTICAL).Proportion(15));
 
-  pathSizer->Add(st_NewPath, wxSizerFlags().Border().Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL).Proportion(15));
-  pathSizer->Add(tc_NewPath, wxSizerFlags().Border().Center().Expand().Proportion(70));
-  pathSizer->Add(b_BrowseNew, wxSizerFlags().Border().Align(wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL).Proportion(15));
+  pathSizer->Add(st_NewPath, wxSizerFlags().Border().Align(wxALIGN_CENTER_VERTICAL).Proportion(15));
+  pathSizer->Add(tc_NewPath, wxSizerFlags().Border().Expand().Proportion(70));
+  pathSizer->Add(b_BrowseNew, wxSizerFlags().Border().Align(wxALIGN_CENTER_VERTICAL).Proportion(15));
 
   buttonSizer->Add(b_OK, wxSizerFlags().Border());
   buttonSizer->Add(b_Remove, wxSizerFlags().Border());
@@ -84,9 +84,9 @@ Wizard::Wizard()
   mainSizer->Add(nameSizer);
   mainSizer->Add(pathSizer);
   mainSizer->Add(st_RecentTitle, wxSizerFlags().Border());
-  mainSizer->Add(lc_Recent, wxSizerFlags().Border().Center().Expand().Proportion(100));
-  mainSizer->Add(st_Recent, wxSizerFlags().Border().Center().Expand().Proportion(100));
-  mainSizer->Add(buttonSizer, wxSizerFlags().Border().Bottom());
+  mainSizer->Add(lc_Recent, wxSizerFlags().Border().Expand().Proportion(100));
+  mainSizer->Add(st_Recent, wxSizerFlags().Border().Expand().Proportion(100));
+  mainSizer->Add(buttonSizer, wxSizerFlags().Border());
 
   vector<wxFileName>	pathList = WiredSettings->GetRecentDirs();
   if (pathList.size())
@@ -178,49 +178,42 @@ void	Wizard::OnNewClick(wxCommandEvent &event)
 
 void	Wizard::NewProject()
 {
-  wxMessageDialog	*dlg;
-
   chosenDir.Clear();
   chosenDir << tc_NewPath->GetValue() << wxFileName::GetPathSeparator() \
 	<< tc_ProjectName->GetValue();
 
   wxFileName	dir(chosenDir);
   dir.MakeAbsolute();
-  if (!dir.SetCwd())
-  {
-	if (!dir.DirExists())
+
+  // The directory may not exist yet (this is a *new* project). Check first:
+  // calling SetCwd() on a missing directory makes wx pop a spurious
+  // "Could not set current working directory" error dialog.
+  if (!dir.DirExists())
+    {
+      wxMessageDialog dlg(this, _("Directory does not exist.\nCreate new one ?"),
+	      _("No such directory"), wxYES_NO | wxYES_DEFAULT);
+      if (dlg.ShowModal() != wxID_YES)
+	return;
+
+      if (!wxFileName::Mkdir(dir.GetFullPath(), 0777, wxPATH_MKDIR_FULL))
 	{
-	  dlg = new wxMessageDialog(this, _("Directory does not exist.\nCreate new one ?"),
-		  _("No such directory"), wxYES_NO | wxYES_DEFAULT);
-	  if (dlg->ShowModal() == wxID_YES)
-	  {
-		if (wxFileName::Mkdir(dir.GetFullPath(), 0777, wxPATH_MKDIR_FULL))
-		{
-//		  dir.SetCwd();
-		  EndModal(0);
-		}
-		else
-		{
-		  delete dlg;
-		  dlg = new wxMessageDialog(this, _("Unable to create directory"), _("Sorry"),
-			  wxICON_INFORMATION);
-		  dlg->ShowModal();
-		  delete dlg;
-		}
-	  }
+	  wxMessageDialog err(this, _("Unable to create directory"), _("Sorry"),
+		  wxICON_INFORMATION);
+	  err.ShowModal();
+	  return;
 	}
-	else
-	{
-	  dlg = new wxMessageDialog(this, _("Access denied"), _("Sorry"), wxICON_INFORMATION);
-	  dlg->ShowModal();
-	  delete dlg;
-	}
-  }
+    }
+
+  if (dir.SetCwd())
+    {
+      chosenDir = dir.GetFullPath();
+      EndModal(0);
+    }
   else
-  {
-	chosenDir = dir.GetFullPath();
-	EndModal(0);
-  }
+    {
+      wxMessageDialog err(this, _("Access denied"), _("Sorry"), wxICON_INFORMATION);
+      err.ShowModal();
+    }
 }
 
 void	Wizard::OnTextChange(wxCommandEvent &event)
@@ -337,15 +330,17 @@ void	Wizard::LoadProject()
 
 void	Wizard::OnOkClick(wxCommandEvent &event)
 {
-  //lc_Recent is initialized at null (not to display)
-  //if there is no recent project, let's do as if we are creating a new one
-  if(!lc_Recent)
+  // lc_Recent is always created in the ctor, so the old `!lc_Recent` test
+  // was dead code and OK always demanded a recent-session selection.
+  // If a recent session is selected, load it; otherwise treat the typed
+  // name/path as a new project.
+  if(lc_Recent->GetSelectedItemCount() > 0)
   {
-    NewProject();
+    LoadProject();
   }
   else
   {
-    LoadProject();
+    NewProject();
   }
 
   std::cout << "[WIZARD] ChosenDir : " << chosenDir.mb_str() << std::endl;

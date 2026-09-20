@@ -22,7 +22,12 @@ WiredDocument::WiredDocument(wxString name, WiredDocument *parent, bool noParent
   // registering this id to avoid duplicates
   // if we aren't in a plugin, id == _id
   // but still, this way we keep track of the growing id
-  _id = saveCenter->RegisterId(id);
+  // saveCenter is still NULL while the SaveCenter itself is being
+  // constructed (WiredDocument base ctor), so skip registration then:
+  // modern gcc eliminates the `if(this)` guard inside RegisterId(),
+  // turning that NULL call into a guaranteed segfault.
+  if (saveCenter != NULL)
+    _id = saveCenter->RegisterId(id);
 
   if (!parent && !noParent)
     parent = saveCenter;

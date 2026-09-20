@@ -19,40 +19,58 @@ Settings		*WiredSettings = NULL;
 Settings::Settings()
 {
   wxFileName f;
+  // when the app is not installed, fall back to data/conf sitting next to
+  // the executable (build-tree layout: wired/src/wired -> wired/src/data)
+  wxFileName exeFile(wxStandardPaths::Get().GetExecutablePath());
+  wxString   exeDir = exeFile.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+  wxString   sep    = wxFileName::GetPathSeparator();
 
   SetDefault();
 
 #ifdef _WIN32
   // exemple : C:\\path\\wired_exe_install_dir\\conf
-  ConfDir = wxStandardPaths::Get().GetDataDir() + wxFileName::GetPathSeparator() + wxT("conf\\");
+  ConfDir = wxStandardPaths::Get().GetDataDir() + sep + wxT("conf\\");
   // exemple : C:\\path\\wired_exe_install_dir\\data
-  DataDir = wxStandardPaths::Get().GetDataDir() + wxFileName::GetPathSeparator() + wxT("data\\");
+  DataDir = wxStandardPaths::Get().GetDataDir() + sep + wxT("data\\");
   // exemple : C:\\path\\wired_exe_install_dir\\plugins
-  PlugDir = wxStandardPaths::Get().GetDataDir() + wxFileName::GetPathSeparator() + wxT("plugins\\");
+  PlugDir = wxStandardPaths::Get().GetDataDir() + sep + wxT("plugins\\");
 #else
   // exemple : /usr/etc/wired/
-  ConfDir = wxString(wxT(SYSCONF_DIR)) + wxFileName::GetPathSeparator();
+  ConfDir = wxString(wxT(SYSCONF_DIR)) + sep;
   // exemple : /usr/share/wired/
-  DataDir = wxString(wxT(DATA_DIR)) + wxT("/wired/");
+  DataDir = wxString(wxT(DATA_DIR)) + sep + wxT("wired") + sep;
   // exemple : /usr/lib/
-  PlugDir = wxString(wxT(LIB_DIR)) + wxFileName::GetPathSeparator();
+  PlugDir = wxString(wxT(LIB_DIR)) + sep;
 #endif
   PlugConfFile = ConfDir + PLUG_CONF_FILE;
   f.Assign(PlugConfFile);
   if (!f.FileExists())
     {
-      // if not found let hope it belongs the current directory
-      ConfDir = wxT("./");
+      // not installed: try next to the executable (build-tree layout)
+      ConfDir = exeDir + wxT("conf") + sep;
       PlugConfFile = ConfDir + PLUG_CONF_FILE;
+      f.Assign(PlugConfFile);
+      if (!f.FileExists())
+	{
+	  // if not found let hope it belongs the current directory
+	  ConfDir = wxT("./");
+	  PlugConfFile = ConfDir + PLUG_CONF_FILE;
+	}
     }
 
   f.Assign(DataDir);
 
   if (!f.DirExists())
     {
-      // if not found let hope it belongs the current directory
-      DataDir = wxT("");
+      // not installed: try next to the executable (build-tree layout)
+      DataDir = exeDir + wxT("data") + sep;
       f.Assign(DataDir);
+      if (!f.DirExists())
+	{
+	  // if not found let hope it belongs the current directory
+	  DataDir = wxT("");
+	  f.Assign(DataDir);
+	}
     }
 
   f.AssignDir(f.GetHomeDir() + wxFileName::GetPathSeparator() + wxString(WIRED_DIRECTORY));

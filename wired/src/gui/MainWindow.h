@@ -14,7 +14,10 @@
 #include <wx/splitter.h>
 #include <wx/cmdproc.h>
 
-#define PLUG_MENU_INDEX_START		(50000)
+// wx3 only accepts menu item IDs in [0, 0x7fff) or the wxID_AUTO range;
+// 50000 (wx2-era) trips wxMenuItemBase's assert on every plugin menu item.
+// 1000 is above the MainWin_* enum (~95) and below wxID_LOWEST (4999).
+#define PLUG_MENU_INDEX_START		(1000)
 #define INDEX_MENUITEM_UNDO	        2
 #define INDEX_MENUITEM_REDO		3
 // TODO : this should be created regarding to $PREFIX/etc/wired/wired_exts.conf

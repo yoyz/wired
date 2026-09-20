@@ -174,7 +174,7 @@ MediaLibrary::MediaLibrary(wxWindow *parent, const wxPoint &pos, const wxSize &s
 
   TopSizer = new wxBoxSizer(wxVERTICAL);
   TopSizer->Add(TopToolbar, 0, wxFIXED_MINSIZE | wxALL | wxEXPAND, 0);
-  TopSizer->Add(MLTreeView, 0, wxALIGN_TOP | wxALIGN_BOTTOM | wxALL | wxEXPAND, 0);
+  TopSizer->Add(MLTreeView, 0, wxALL | wxEXPAND, 0);
   TopSizer->Add(BottomToolbar, 0, wxFIXED_MINSIZE | wxALL | wxEXPAND, 0);
 #ifndef DEBUG_DISABLE_FILTERS
   TopSizer->Add(FiltersToolbar, 0, wxALL | wxEXPAND, 0);
