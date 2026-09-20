@@ -12,6 +12,8 @@
 #include <wx/dirdlg.h>
 #include <wx/filename.h>
 #include <wx/image.h>
+#include <wx/imagpng.h>
+#include <wx/imaggif.h>
 #include <wx/snglinst.h>
 #include <wx/debugrpt.h>
 

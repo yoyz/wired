@@ -60,13 +60,13 @@ void	Key::OnLeftDown(wxMouseEvent &event)
       selected = true;
       wxSize s = GetSize();
       wxRect rect(0, 0, s.GetWidth(), s.GetHeight());
-      printf("click on %s\n", (char*)note.c_str());
+      printf("click on %s\n", note.ToUTF8().data());
       printf("MIDINOTE: 0x%02X\n", code);
       Refresh(&rect);
 
       wxMouseEvent evt(wxEVT_LEFT_DOWN);
       evt.SetEventObject(this);
-      GetParent()->ProcessEvent(evt);
+      GetParent()->GetEventHandler()->ProcessEvent(evt);
     }
 }
 
@@ -79,7 +79,7 @@ void	Key::OnLeftUp(wxMouseEvent	&event)
   
   wxMouseEvent evt(wxEVT_LEFT_UP);
   evt.SetEventObject(this);
-  GetParent()->ProcessEvent(evt);
+  GetParent()->GetEventHandler()->ProcessEvent(evt);
 }
 
 /*

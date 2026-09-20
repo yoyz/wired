@@ -29,7 +29,7 @@ WaveFile::WaveFile()
   {
     Error = true;
     cout << "[WAVEFILE] Unable to create temporary file in read/write mode " << endl;
-    throw Error::File(wxString(wxT("")), wxString(sf_strerror(0), wxConvCurrent));
+    throw Error::File(wxString(wxT("")), wxString(sf_strerror(0), *wxConvCurrent));
   }
 }
 

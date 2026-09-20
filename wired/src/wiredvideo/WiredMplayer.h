@@ -61,7 +61,7 @@ private:
 	
     int		SetPlayBool(bool value);
 	int	       	MuteFile();
-	int	       	SendMPlayerMessage(const wxChar* message, unsigned int msgLen);
+	int	       	SendMPlayerMessage(const wxString& message, unsigned int msgLen);
 };
 
 #endif //_WIREDMPLAYER_H_

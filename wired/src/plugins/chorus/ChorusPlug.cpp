@@ -194,7 +194,7 @@ void ChorusPlugin::Load(WiredPluginData& Datas)
 {
   char	*buffer;
   
-  buffer = strdup(Datas.LoadValue(wxString(STR_BASE_LENGHT, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_BASE_LENGHT)));
   if (buffer != NULL)
     {
       BaseLength = atof(buffer);
@@ -203,7 +203,7 @@ void ChorusPlugin::Load(WiredPluginData& Datas)
       chorus2->setBaseLength(BaseLength);
     }
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_MODE_DEPTH, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_MODE_DEPTH)));
   if (buffer != NULL)
     {
       ModDepth = atof(buffer);
@@ -212,7 +212,7 @@ void ChorusPlugin::Load(WiredPluginData& Datas)
       chorus2->setModDepth(ModDepth);
     }
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_FREQUENCY, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_FREQUENCY)));
   if (buffer != NULL)
     {
       Frequency = atof(buffer);
@@ -221,7 +221,7 @@ void ChorusPlugin::Load(WiredPluginData& Datas)
       chorus2->setModFrequency(Frequency);
     }
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_EFFECT_MIX, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_EFFECT_MIX)));
   if (buffer != NULL)
     {
       EffectMix = atof(buffer);
@@ -249,16 +249,16 @@ void ChorusPlugin::Save(WiredPluginData& Datas)
   std::ostringstream 	oss;
 
   oss << BaseLength;
-  Datas.SaveValue(wxString(STR_BASE_LENGHT, *wxConvCurrent), wxString(oss.str().c_str(), *wxConvCurrent));
+  Datas.SaveValue(wxString(STR_BASE_LENGHT), wxString(oss.str().c_str()));
   oss.seekp(ios_base::beg);
   oss << ModDepth;
-  Datas.SaveValue(wxString(STR_MODE_DEPTH, *wxConvCurrent), wxString(oss.str().c_str(), *wxConvCurrent));
+  Datas.SaveValue(wxString(STR_MODE_DEPTH), wxString(oss.str().c_str()));
   oss.seekp(ios_base::beg);
   oss << Frequency;
-  Datas.SaveValue(wxString(STR_FREQUENCY, *wxConvCurrent), wxString(oss.str().c_str(), *wxConvCurrent));
+  Datas.SaveValue(wxString(STR_FREQUENCY), wxString(oss.str().c_str()));
   oss.seekp(ios_base::beg);
   oss << EffectMix;
-  Datas.SaveValue(wxString(STR_EFFECT_MIX, *wxConvCurrent), wxString(oss.str().c_str(), *wxConvCurrent));
+  Datas.SaveValue(wxString(STR_EFFECT_MIX), wxString(oss.str().c_str()));
 }
 
 bool ChorusPlugin::IsAudio()

@@ -259,51 +259,51 @@ void DelayPlugin::Load(WiredPluginData& Datas)
 	
 	DelayMutex.Lock();
 		
-	buffer = strdup(Datas.LoadValue(wxString(STR_DELAY_TIME, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_DELAY_TIME)));
 	if (buffer != NULL)
 		DelayTime = strtof(buffer, NULL);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_FEEDBACK, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_FEEDBACK)));
 	if (buffer != NULL)
 		Feedback = strtof(buffer, NULL);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_DRY_LEVEL, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_DRY_LEVEL)));
 	if (buffer != NULL)
 		DryLevel = strtof(buffer, NULL);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_WET_LEVEL, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_WET_LEVEL)));
 	if (buffer != NULL)
 		WetLevel = strtof(buffer, NULL);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_BYPASS1, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_BYPASS1)));
 	if (buffer != NULL)
 		MidiBypass[0] = atoi(buffer);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_BYPASS2, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_BYPASS2)));
 	if (buffer != NULL)
 		MidiBypass[1] = atoi(buffer);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_TIME1, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_TIME1)));
 	if (buffer != NULL)
 		MidiTime[0] = atoi(buffer);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_TIME2, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_TIME2)));
 	if (buffer != NULL)
 		MidiTime[1] = atoi(buffer);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_FEEDBACK1, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_FEEDBACK1)));
 	if (buffer != NULL)
 		MidiFeedback[0] = atoi(buffer);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_FEEDBACK2, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_FEEDBACK2)));
 	if (buffer != NULL)
 		MidiFeedback[1] = atoi(buffer);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_DRY_WET1, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_DRY_WET1)));
 	if (buffer != NULL)
 		MidiDryWet[0] = atoi(buffer);
 	free(buffer);	
-	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_DRY_WET2, *wxConvCurrent)));
+	buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_DRY_WET2)));
 	if (buffer != NULL)
 		MidiDryWet[1] = atoi(buffer);
 	free(buffer);
@@ -316,40 +316,40 @@ void DelayPlugin::Save(WiredPluginData& Datas)
 	std::ostringstream 	oss;
 
 	oss << DelayTime;
-	Datas.SaveValue(wxString(STR_DELAY_TIME, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_DELAY_TIME), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << Feedback;
-	Datas.SaveValue(wxString(STR_FEEDBACK, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_FEEDBACK), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << DryLevel;
-	Datas.SaveValue(wxString(STR_DRY_LEVEL, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_DRY_LEVEL), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << WetLevel;
-	Datas.SaveValue(wxString(STR_WET_LEVEL, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_WET_LEVEL), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << MidiBypass[0];
-	Datas.SaveValue(wxString(STR_MIDI_BYPASS1, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_MIDI_BYPASS1), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << MidiBypass[1];
-	Datas.SaveValue(wxString(STR_MIDI_BYPASS2, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_MIDI_BYPASS2), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << MidiTime[0];
-	Datas.SaveValue(wxString(STR_MIDI_TIME1, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_MIDI_TIME1), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << MidiTime[1];
-	Datas.SaveValue(wxString(STR_MIDI_TIME2, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_MIDI_TIME2), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << MidiFeedback[0];
-	Datas.SaveValue(wxString(STR_MIDI_FEEDBACK1, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_MIDI_FEEDBACK1), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << MidiFeedback[1];
-	Datas.SaveValue(wxString(STR_MIDI_FEEDBACK2, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_MIDI_FEEDBACK2), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << MidiDryWet[0];
-	Datas.SaveValue(wxString(STR_MIDI_DRY_WET1, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_MIDI_DRY_WET1), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 	oss << MidiDryWet[1];
-	Datas.SaveValue(wxString(STR_MIDI_DRY_WET2, *wxConvCurrent), (char *)oss.str().c_str());
+	Datas.SaveValue(wxString(STR_MIDI_DRY_WET2), (char *)oss.str().c_str());
 	oss.seekp(ios_base::beg);
 }
 

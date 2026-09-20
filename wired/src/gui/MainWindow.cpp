@@ -315,12 +315,6 @@ int			MainWindow::Init()
   wxThreadError		err;
 
   // start midi thread
-  if ((err = MidiEngine->Create()) != wxTHREAD_NO_ERROR)
-    {
-      cout << "[MAINWIN] Create MidiEngine thread failed ! (error:"
-	   << err << ")" << endl;
-      return (-1);
-    }
   if ((err = MidiEngine->Run()) != wxTHREAD_NO_ERROR)
     {
       cout << "[MAINWIN] Run MidiEngine thread failed ! (error:"
@@ -349,12 +343,6 @@ int			MainWindow::Init()
   InitFileConverter();
 
   // start sequencer thread (after InitAudio is a good option)
-  if ((err = Seq->Create()) != wxTHREAD_NO_ERROR)
-    {
-      cout << "[MAINWIN] Create sequencer thread failed ! (error:"
-	   << err << ")" << endl;
-      return (-1);
-    }
   Seq->SetPriority(WXTHREAD_MAX_PRIORITY);
   if ((err = Seq->Run()) != wxTHREAD_NO_ERROR)
     {
@@ -650,8 +638,12 @@ void					MainWindow::OnClose(wxCloseEvent &event)
   const wxArrayThread& threads = wxGetApp().m_threads;
   size_t count = threads.GetCount();
 
+  wxArrayThread snapshot;
   for (size_t i = 0; i < count; i++)
-    threads.Item(i)->Delete();
+    snapshot.Add(threads.Item(i));
+
+  for (size_t i = 0; i < count; i++)
+    snapshot.Item(i)->Delete();
 
   if (count > 0)
     {
@@ -815,7 +807,7 @@ void					MainWindow::OnSaveAs(wxCommandEvent &event)
 void MainWindow::OnImportWave(wxCommandEvent &event)
 {
   LOG;
-  wxFileDialog dlg(this, _("Loading sound file"), wxT(""), wxT(""), WIRED_SUPPORTED_SNDFILES, wxMULTIPLE);
+  wxFileDialog dlg(this, _("Loading sound file"), wxT(""), wxT(""), WIRED_SUPPORTED_SNDFILES, wxFD_MULTIPLE);
   if (dlg.ShowModal() == wxID_OK)
   {
     wxArrayString paths;
@@ -920,7 +912,7 @@ void MainWindow::OnExportWave(wxCommandEvent &event)
     msg.ShowModal();
     return;
   }
-  wxFileDialog dlg(this, _("Exporting sound file"), wxT(""), wxT(""), wxT(""), wxSAVE);
+  wxFileDialog dlg(this, _("Exporting sound file"), wxT(""), wxT(""), wxT(""), wxFD_SAVE);
   if (dlg.ShowModal() == wxID_OK)
   {
     wxString selfile = dlg.GetPath();
@@ -954,7 +946,7 @@ void MainWindow::OnExportWave(wxCommandEvent &event)
 void MainWindow::OnExportMIDI(wxCommandEvent &event)
 {
   LOG;
-  wxFileDialog dlg(this, _("Export MIDI file"), wxT(""), wxT(""), _("Midi file (*.mid)|*.mid"), wxSAVE);
+  wxFileDialog dlg(this, _("Export MIDI file"), wxT(""), wxT(""), _("Midi file (*.mid)|*.mid"), wxFD_SAVE);
   if (dlg.ShowModal() == wxID_OK)
   {
     wxString selfile = dlg.GetPath();
@@ -2209,7 +2201,7 @@ void MainWindow::OnLoadML(wxCommandEvent &WXUNUSED(event))
 void MainWindow::OnSaveML(wxCommandEvent &WXUNUSED(event))
 {
   LOG;
-    wxFileDialog dlg(this, _("Save Media Library"), wxT(""), wxT(""), _("Media Library file (*.xml)|*.xml"), wxSAVE);
+    wxFileDialog dlg(this, _("Save Media Library"), wxT(""), wxT(""), _("Media Library file (*.xml)|*.xml"), wxFD_SAVE);
     if (dlg.ShowModal() == wxID_OK)
         MediaLibraryPanel->MLTreeView->OnSave(dlg.GetPath());
 }

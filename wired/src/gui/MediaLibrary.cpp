@@ -245,7 +245,7 @@ void				MediaLibrary::SetDocked()
 
 void MediaLibrary::OnAdd(wxCommandEvent &WXUNUSED(event))
 {
-    wxFileDialog dlg(this, _("Loading sound file"), wxT(""), wxT(""), WIRED_SUPPORTED_SNDFILES, wxMULTIPLE);
+    wxFileDialog dlg(this, _("Loading sound file"), wxT(""), wxT(""), WIRED_SUPPORTED_SNDFILES, wxFD_MULTIPLE);
     if (dlg.ShowModal() == wxID_OK)
     {
         wxArrayString paths;

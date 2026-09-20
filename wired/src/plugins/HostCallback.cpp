@@ -83,7 +83,8 @@ long HostCallback(Plugin *plug, long param, void *value)
 			  ((wxString *)value)->Append(WIRED_VERSION);
             break;
         case wiredHostVendorName :
-            value = (void *)_("P31");
+			if (value)
+			  ((wxString *)value)->Append(_("P31"));
             break;
         case wiredGetDataDir :
         {
@@ -158,7 +159,7 @@ long HostCallback(Plugin *plug, long param, void *value)
 #endif
 
 
-			if (lastOpenDir && wxFileName::DirExists(lastOpenDir))
+			if (!lastOpenDir.IsEmpty() && wxFileName::DirExists(lastOpenDir))
 			  dlg = new wxFileDialog(MainWin, w->t, lastOpenDir, wxT(""), extensions_chosen);
 			else
 			  dlg = new wxFileDialog(MainWin, w->t, wxT(""), wxT(""), extensions_chosen);
@@ -199,10 +200,10 @@ long HostCallback(Plugin *plug, long param, void *value)
 #ifdef __DEBUG__
 			cout << "HostCallback() : extensions_chosen == " << extensions_chosen.mb_str() << endl;
 #endif
-			if (lastSaveDir && wxFileName::DirExists(lastSaveDir))
-			  dlg = new wxFileDialog(MainWin, w->t, lastSaveDir, wxT(""), extensions_chosen, wxSAVE);
+			if (!lastSaveDir.IsEmpty() && wxFileName::DirExists(lastSaveDir))
+			  dlg = new wxFileDialog(MainWin, w->t, lastSaveDir, wxT(""), extensions_chosen, wxFD_SAVE);
 			else
-			  dlg = new wxFileDialog(MainWin, w->t, wxT(""), wxT(""), extensions_chosen, wxSAVE);
+			  dlg = new wxFileDialog(MainWin, w->t, wxT(""), wxT(""), extensions_chosen, wxFD_SAVE);
             if (dlg->ShowModal() == wxID_OK)
 			{
 			  w->result = dlg->GetPath();

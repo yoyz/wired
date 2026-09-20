@@ -82,12 +82,12 @@ int		WiredMplayer::SeekFile(eSeekMethod seekMethod, double position)
 	//free(buf);
 	if (Playbool == false)
 	  {
-	    SendMPlayerMessage(msg.c_str(), msg.size());
+	    SendMPlayerMessage(msg, msg.size());
 	    SetPlayBool(true);
 	    return PauseFile();
 	  }
 	else
-	  return SendMPlayerMessage(msg.c_str(), msg.size());
+	  return SendMPlayerMessage(msg, msg.size());
 }
 
 bool		WiredMplayer::DisplayVideoFrame(const wxString& videoFilePath)
@@ -148,9 +148,9 @@ int			WiredMplayer::MuteFile()
 	return SendMPlayerMessage(ACTION_MUTE, LEN_ACTION_MUTE);
 }
 
-int			WiredMplayer::SendMPlayerMessage(const wxChar* message, unsigned int msgLen)
+int			WiredMplayer::SendMPlayerMessage(const wxString& message, unsigned int msgLen)
 {
-    if ((write(pfd[1], message, msgLen)) <=  0)
+    if ((write(pfd[1], message.mb_str(), msgLen)) <=  0)
       {
 	cout << "[WIREDMPLAYER] Can't " << message << endl;
 	return 0;

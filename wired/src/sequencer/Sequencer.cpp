@@ -41,7 +41,7 @@ Sequencer::Sequencer(WiredDocument* docParent)
   Init();
   try
     {
-      ClickWave = new WaveFile(WiredSettings->DataDir + wxString(wxT("wired_click.wav"), *wxConvCurrent));
+      ClickWave = new WaveFile(WiredSettings->DataDir + wxString(wxT("wired_click.wav")));
     }
   catch (...)
     {
@@ -965,7 +965,7 @@ void					Sequencer::PlayFile(wxString filename, bool isakai)
 	  filename = filename.substr(filename.find(wxT(":"), 0) + 1, filename.size() - filename.find(wxT(":"), 0));
 	  mFilename = filename.substr(10, filename.size() - 10);
 	  int pos = mFilename.find(wxT("/"), 0);
-	  mPart = mFilename.substr(0, pos).c_str()[0] - 64;
+	  mPart = (int)(mFilename.substr(0, pos).c_str()[0]) - 64;
 	  mFilename = mFilename.substr(pos, mFilename.size() - pos);
 	  int opos = 0;
 	  while ((pos = mFilename.find(wxT("/"), opos)) != wxString::npos)

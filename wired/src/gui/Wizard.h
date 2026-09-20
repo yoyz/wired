@@ -6,11 +6,8 @@
 #include  <vector>
 #include  <wx/filename.h>
 #include  <wx/string.h>
-
-#ifdef _WIN32
 #include  <wx/listbase.h>
 #include  <wx/listctrl.h>
-#endif
 
 class	Wizard : public wxDialog
 {

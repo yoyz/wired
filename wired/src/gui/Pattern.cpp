@@ -265,10 +265,10 @@ void					Pattern::OnMotion(wxMouseEvent &e)
 
 void					Pattern::DrawName(wxPaintDC &dc, const wxSize &s)
 {
-  long					x;
-  long					y;
-  long					w;
-  long					h;
+  wxCoord				x;
+  wxCoord				y;
+  wxCoord				w;
+  wxCoord				h;
 
   dc.SetPen(PenColor);
   dc.SetBrush(CL_PATTERN_NAME_BRUSH);

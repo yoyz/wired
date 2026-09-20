@@ -93,16 +93,16 @@ wxWindow	*WiredDSSIGui::CreateView(wxWindow *rack, wxPoint &pos, wxSize &size)
   if (_GuiControls.size() <= 3)
     {
       tr_bg = 
-	new wxImage(wxString(GetDataDir() + wxString(IMG_DL_SINGLE_BG), *wxConvCurrent), 
+	new wxImage(wxString(GetDataDir() + wxString(IMG_DL_SINGLE_BG)), 
 		    wxBITMAP_TYPE_PNG);
       TpBmp = new wxBitmap(*tr_bg);
       delete tr_bg;
     }
   else
     {
-      wxImage		*beg = new wxImage(wxString(GetDataDir() + wxString(IMG_DL_BEG_BG), *wxConvCurrent));
-      wxImage		*mid = new wxImage(wxString(GetDataDir() + wxString(IMG_DL_MID_BG), *wxConvCurrent));
-      wxImage		*end = new wxImage(wxString(GetDataDir() + wxString(IMG_DL_END_BG), *wxConvCurrent));
+      wxImage		*beg = new wxImage(wxString(GetDataDir() + wxString(IMG_DL_BEG_BG)));
+      wxImage		*mid = new wxImage(wxString(GetDataDir() + wxString(IMG_DL_MID_BG)));
+      wxImage		*end = new wxImage(wxString(GetDataDir() + wxString(IMG_DL_END_BG)));
       wxMemoryDC	dc;
 
       TpBmp = new wxBitmap(width, 100);
@@ -127,16 +127,16 @@ wxWindow	*WiredDSSIGui::CreateView(wxWindow *rack, wxPoint &pos, wxSize &size)
     }
 
   img_fader_bg = 
-    new wxImage(wxString(GetDataDir() + wxString(IMG_DL_FADER_BG), *wxConvCurrent),
+    new wxImage(wxString(GetDataDir() + wxString(IMG_DL_FADER_BG)),
 		wxBITMAP_TYPE_PNG);
   img_fader_fg = 
-    new wxImage(wxString(GetDataDir() + wxString(IMG_DL_FADER_FG), *wxConvCurrent), 
+    new wxImage(wxString(GetDataDir() + wxString(IMG_DL_FADER_FG)), 
 		wxBITMAP_TYPE_PNG);
   img_knob_bg = 
-    new wxImage(wxString(GetDataDir() + wxString(IMG_DL_KNOB_FG), *wxConvCurrent), 
+    new wxImage(wxString(GetDataDir() + wxString(IMG_DL_KNOB_FG)), 
 		wxBITMAP_TYPE_PNG);
   img_knob_fg = 
-    new wxImage(wxString(GetDataDir() + wxString(IMG_DL_KNOB_BG), *wxConvCurrent), 
+    new wxImage(wxString(GetDataDir() + wxString(IMG_DL_KNOB_BG)), 
 		wxBITMAP_TYPE_PNG);
   Faders = (wxWindow**) new void*[_GuiControls.size()];
 
@@ -180,11 +180,11 @@ wxWindow	*WiredDSSIGui::CreateView(wxWindow *rack, wxPoint &pos, wxSize &size)
   
   // bypass
   
-  liquid_off = new wxImage(wxString(GetDataDir() + wxString(IMG_LIQUID_OFF), *wxConvCurrent), wxBITMAP_TYPE_PNG);
-  liquid_on = new wxImage(wxString(GetDataDir() + wxString(IMG_LIQUID_ON), *wxConvCurrent), wxBITMAP_TYPE_PNG);
+  liquid_off = new wxImage(wxString(GetDataDir() + wxString(IMG_LIQUID_OFF)), wxBITMAP_TYPE_PNG);
+  liquid_on = new wxImage(wxString(GetDataDir() + wxString(IMG_LIQUID_ON)), wxBITMAP_TYPE_PNG);
   Liquid = new StaticBitmap(this, -1, wxBitmap(*liquid_on), wxPoint(22, 25));
-  bypass_on = new wxImage(wxString(GetDataDir() + wxString(IMG_BYPASS_ON), *wxConvCurrent), wxBITMAP_TYPE_PNG);
-  bypass_off = new wxImage(wxString(GetDataDir() + wxString(IMG_BYPASS_OFF), *wxConvCurrent), wxBITMAP_TYPE_PNG);
+  bypass_on = new wxImage(wxString(GetDataDir() + wxString(IMG_BYPASS_ON)), wxBITMAP_TYPE_PNG);
+  bypass_off = new wxImage(wxString(GetDataDir() + wxString(IMG_BYPASS_OFF)), wxBITMAP_TYPE_PNG);
   BypassBtn = new DownButton(this, 4242, wxPoint(21, 58), wxSize(bypass_on->GetWidth(), bypass_on->GetHeight()),
 			     bypass_off, bypass_on);
   Connect(4242, wxEVT_RIGHT_DOWN, (wxObjectEventFunction)(wxEventFunction) 
@@ -274,7 +274,7 @@ void		WiredDSSIGui::OnPaint(wxPaintEvent &event)
   else
 	  interspace = 1;
   for (i = 0, iter = _GuiControls.begin(); iter != _GuiControls.end(); iter++, i++)
-    dc.DrawRotatedText(wxString(iter->second.Descriptor.Name, *wxConvCurrent),
+    dc.DrawRotatedText(iter->second.Descriptor.Name,
 		       73 + i * interspace + interspace / 2 - 13 , 80, 90);
 
   // deselect object

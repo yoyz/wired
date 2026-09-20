@@ -51,7 +51,7 @@ SettingWindow::SettingWindow()
   SettingsTree = new wxTreeCtrl(this, CATEGORY_ID, wxDefaultPosition, wxDefaultSize,
 				wxSUNKEN_BORDER | wxTR_NO_LINES |
 				wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_HIDE_ROOT |
-				wxTR_FULL_ROW_HIGHLIGHT | wxTR_EXTENDED);
+				wxTR_FULL_ROW_HIGHLIGHT);
 
   wxImageList   *imagelist = new wxImageList(MENUICON_SIZE, MENUICON_SIZE, true);
 

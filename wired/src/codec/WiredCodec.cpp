@@ -227,7 +227,7 @@ void WiredCodec::WLoadLib()
   list<wxString>::const_iterator	iter;
   
   for (iter = _WiredSo.begin(); iter != _WiredSo.end(); iter++)
-    WLibLoader(_WiredPath + wxString(wxT("/"), *wxConvCurrent) + *iter);
+    WLibLoader(_WiredPath + wxString(wxT("/")) + *iter);
 }
 
 void	WiredCodec::FeelExtension(list<t_LibInfo> Info)

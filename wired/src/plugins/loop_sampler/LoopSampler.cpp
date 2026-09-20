@@ -1024,9 +1024,10 @@ long LoopSampler::Save(int fd)
 
   if (Wave)
     {
-      len = Wave->Filename.size();
+      wxCharBuffer buf = Wave->Filename.mb_str();
+      len = buf.length();
       size = write(fd, &len, sizeof (len));
-      size += write(fd, Wave->Filename.c_str(), len);
+      size += write(fd, buf.data(), len);
     }
   else
     {

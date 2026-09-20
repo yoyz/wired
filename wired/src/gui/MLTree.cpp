@@ -383,7 +383,7 @@ void				MLTree::LoadTree(WiredSessionXml *XmlSession)
 
 void				MLTree::SaveML()
 {
-  CurrXmlSession = new WiredSessionXml(wxString(wxT(""), *wxConvCurrent));
+CurrXmlSession = new WiredSessionXml(wxString(wxT("")));
   CurrXmlSession->InitSaveML();
   SaveTree(CurrXmlSession, GetRootItem());
   CurrXmlSession->EndSaveML();
@@ -391,7 +391,7 @@ void				MLTree::SaveML()
 
 void				MLTree::LoadML()
 {
-  CurrXmlSession = new WiredSessionXml(wxString(wxT(""), *wxConvCurrent));
+CurrXmlSession = new WiredSessionXml(wxString(wxT("")));
   //CurrXmlSession->InitLoadML(STR_XMLFILE_ML);
   LoadTree(CurrXmlSession);
   //  CurrXmlSession->EndSaveML();
@@ -537,7 +537,7 @@ void MLTree::DisplayInfos()
   _mouse_pos.y += 50;
   _mouse_pos.x += 30;
   // BAD Why a new (infos will be lost, delete impossible)
-  MLTreeInfos *infos = new MLTreeInfos(MediaLibraryPanel, wxPoint(2, _mouse_pos.y), wxSize(197, 100), wxCAPTION | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxTHICK_FRAME, info);
+  MLTreeInfos *infos = new MLTreeInfos(MediaLibraryPanel, wxPoint(2, _mouse_pos.y), wxSize(197, 100), wxCAPTION | wxMINIMIZE_BOX | wxMAXIMIZE_BOX | wxRESIZE_BORDER, info);
 }
 
 // When adding a file

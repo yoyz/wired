@@ -27,14 +27,15 @@ endif
 DEPS_LIBS = libs/WiredWidgets/src/.libs/libWiredWidgets.so \
 	    libs/WiredAkai/src/.libs/libWiredAkai.so
 
-wired_LDFLAGS = $(shell wx-config --libs) \
-		$(shell pkg-config portaudio-2.0 --libs) \
-		$(shell xml2-config --libs) \
-		@SAMPLERATE_LIBS@ \
-		-lsndfile \
-		-Lfileloader -lfileloader \
-		-rpath ${libdir}/wired \
-		$(DEPS_LIBS)
+WIRED_SYSTEM_LIBS = $(shell wx-config --libs) \
+	$(shell pkg-config portaudio-2.0 --libs) \
+	$(shell xml2-config --libs) \
+	@SAMPLERATE_LIBS@ \
+	-lsndfile
+
+LIBS += $(WIRED_SYSTEM_LIBS) $(DEPS_LIBS)
+
+wired_LDFLAGS = -rpath ${libdir}/wired -Wl,--no-as-needed
 
 wired_CPPFLAGS = $(shell wx-config --cflags) \
 		 $(shell xml2-config --cflags) \
@@ -43,15 +44,11 @@ wired_CPPFLAGS = $(shell wx-config --cflags) \
 		-Iaudio -Iengine -Imixer -Iundo \
 		-Imidi -Ieditmidi
 
-
-if PORTMIDI
-wired_CPPFLAGS += -Imidi/portmidi/pm_common -Imidi/portmidi/porttime
-wired_LDFLAGS += -lasound -Lmidi/portmidi
-else
-wired_LDFLAGS += -lportmidi -lporttime
-endif
-
 bin_PROGRAMS = wired
+
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(wired_LDFLAGS) $(LDFLAGS) -o $@
+wired_LINK = $(CXXLINK)
 
 wired_SOURCES =
 
@@ -78,7 +75,11 @@ wired_LDADD +=\
 endif
 
 if PORTMIDI
+wired_CPPFLAGS += -Imidi/portmidi/pm_common -Imidi/portmidi/porttime
 wired_LDADD +=\
 	midi/portmidi/libportmidi.a		\
-	midi/portmidi/porttime/libporttime.a	
+	midi/portmidi/porttime/libporttime.a	\
+	-lasound -Lmidi/portmidi
+else
+wired_LDADD += -lportmidi -lporttime
 endif

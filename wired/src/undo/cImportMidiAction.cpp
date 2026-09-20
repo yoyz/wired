@@ -169,7 +169,7 @@ cImportAkaiAction::cImportAkaiAction (wxString& path, trackType kind)
   path = path.substr(path.find(wxT(":"), 0) + 1, path.size() - path.find(wxT(":"), 0));
   mPath = path.substr(10, path.size() - 10);
   int pos = mPath.find(wxT("/"), 0);
-  mPart = mPath.substr(0, pos).c_str()[0] - 64;
+  mPart = (int)(mPath.substr(0, pos).c_str()[0]) - 64;
   mPath = mPath.substr(pos, mPath.size() - pos);
   int opos = 0;
   while ((pos = mPath.find(wxT("/"), opos)) != wxString::npos)

@@ -58,9 +58,9 @@ private:
 
 static const wxCmdLineEntryDesc g_cmdLineDesc [] =
 {
-  { wxCMD_LINE_SWITCH, wxT("h"), wxT("help"), wxT(""),
+  { wxCMD_LINE_SWITCH, "h", "help", "",
     wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-  { wxCMD_LINE_PARAM, wxT(""), wxT(""), wxT(""),
+  { wxCMD_LINE_PARAM, "", "", "",
     wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
   { wxCMD_LINE_NONE }
 };

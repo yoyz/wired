@@ -9,7 +9,7 @@
 
 RulerMidi::RulerMidi(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 		     const wxSize &size, EditMidi *editmidi) :
-  wxPanel(parent, id, pos, size, wxTHICK_FRAME)
+  wxPanel(parent, id, pos, size, wxRESIZE_BORDER)
 {
   em = editmidi;
   ZoomX = 1;

@@ -189,7 +189,7 @@ bool				FileConversion::Decode(wxString &FileName)
 
 		RelativeFileName = FileNameLocal.substr(FileNameLocal.find_last_of(wxT("/")));
 		RelativeFileName.SetExt(wxT("wav"));
-		DestFileName = _WorkingDir + wxString(wxT("/"), *wxConvCurrent) + RelativeFileName.GetFullName();
+		DestFileName = _WorkingDir + wxString(wxT("/")) + RelativeFileName.GetFullName();
 		Data.pcm = new float[_BufferSize];
 		memset(Data.pcm, 0, _BufferSize);
 		while ((Readen = _CodecConverter.Decode(FileNameLocal, &Data, _BufferSize)) > 0)

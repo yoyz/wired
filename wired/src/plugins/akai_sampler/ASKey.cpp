@@ -62,7 +62,7 @@ void	ASKey::OnLeftDown(wxMouseEvent &event)
 
 		wxMouseEvent evt(wxEVT_LEFT_DOWN);
 		evt.SetEventObject(this);
-		GetParent()->ProcessEvent(evt);
+		GetParent()->GetEventHandler()->ProcessEvent(evt);
 	}
 }
 
@@ -75,5 +75,5 @@ void	ASKey::OnLeftUp(wxMouseEvent	&event)
 
 	wxMouseEvent evt(wxEVT_LEFT_UP);
 	evt.SetEventObject(this);
-	GetParent()->ProcessEvent(evt);
+	GetParent()->GetEventHandler()->ProcessEvent(evt);
 }

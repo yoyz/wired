@@ -60,7 +60,7 @@ END_EVENT_TABLE()
   bmp = new wxBitmap(wxString(GetDataDir() + wxString(IMG_SP_BMP)), wxBITMAP_TYPE_BMP);  
 
   PlugPanel = new ASPlugPanel(this, wxPoint(149, 8), wxSize(642, 120),//GetSize().GetWidth() - 150, GetSize().GetHeight() - ASCLAVIER_HEIGHT - 5), 
-            wxTHICK_FRAME , this);
+            wxRESIZE_BORDER , this);
 
   Samples = new ASSampleList(this, _("Samples"));
 

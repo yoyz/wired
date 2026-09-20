@@ -26,11 +26,11 @@ bool		WiredVideo::OpenFile()
 
   fileFormat = wxString(VIDEO_FILE_FILTER) + wxT("|All Files (*.*)|*.*");
   dlg = new wxFileDialog(MainWin,
-			 wxString(wxT("[WIREDVIDEO] Loading video file"), *wxConvCurrent),
+			 wxString(wxT("[WIREDVIDEO] Loading video file")),
 			 filePath,
-			 wxString(wxT(""), *wxConvCurrent),
+			 wxString(wxT("")),
 			 fileFormat,
-			 wxOPEN);
+			 wxFD_OPEN);
 
   if (dlg->ShowModal() == wxID_OK)
     {

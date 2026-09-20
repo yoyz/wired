@@ -229,9 +229,9 @@ void		FaderCtrl::OnKeyDown(wxKeyEvent& event)
     step = -Coeff;
   else if (event.GetKeyCode() == WXK_DOWN)
     step = Coeff;
-  else if (event.GetKeyCode() == WXK_NEXT)
+  else if (event.GetKeyCode() == WXK_PAGEDOWN)
     step = -Ord / 10;
-  else if (event.GetKeyCode() == WXK_PRIOR)
+  else if (event.GetKeyCode() == WXK_PAGEUP)
     step = Ord / 10;
   if (step)
     {

@@ -32,7 +32,7 @@ FilterPlugin::FilterPlugin(PlugStartInfo &startinfo, PlugInitInfo *initinfo)
   wxImage *tr_bg = 
     new wxImage(GetDataDir() + wxString(IMG_FL_BG), 
 		wxBITMAP_TYPE_PNG);
-  TpBmp = new wxBitmap(tr_bg);
+  TpBmp = new wxBitmap(*tr_bg);
   delete tr_bg;
   bmp = new wxBitmap(GetDataDir() + wxString(IMG_FL_BMP), 
 		     wxBITMAP_TYPE_BMP); 
@@ -40,7 +40,7 @@ FilterPlugin::FilterPlugin(PlugStartInfo &startinfo, PlugInitInfo *initinfo)
 			  wxBITMAP_TYPE_PNG);
   liquid_off = new wxImage(GetDataDir() + wxString(IMG_LIQUID_OFF), 
 			   wxBITMAP_TYPE_PNG);
-  Liquid = new StaticBitmap(this, -1, wxBitmap(liquid_on), wxPoint(22, 25));
+  Liquid = new StaticBitmap(this, -1, wxBitmap(*liquid_on), wxPoint(22, 25));
 
   bypass_on = new wxImage(GetDataDir() + wxString(IMG_BYPASS_ON),
 			  wxBITMAP_TYPE_PNG);
@@ -260,43 +260,43 @@ void	 	FilterPlugin::Load(WiredPluginData& Datas)
   
   Mutex.Lock();
   
-  buffer = strdup(Datas.LoadValue(wxString(STR_FILTER, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_FILTER)));
   if (buffer != NULL)
     filter = atoi(buffer);
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_CUTOFF, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_CUTOFF)));
   if (buffer != NULL)
     Cutoff = strtof(buffer, NULL);
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_RESONANCE, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_RESONANCE)));
   if (buffer != NULL)
     Res = strtof(buffer, NULL);
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_BYPASS, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_BYPASS)));
   if (buffer != NULL)
     Bypass = atoi(buffer);
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_BYPASS1, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_BYPASS1)));
   if (buffer != NULL)
     MidiBypass[0] = atoi(buffer);
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_BYPASS2, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_BYPASS2)));
   if (buffer != NULL)
     MidiBypass[1] = atoi(buffer);
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_CUTOFF1, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_CUTOFF1)));
   if (buffer != NULL)
     MidiCutoff[0] = atoi(buffer);
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_CUTOFF2, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_CUTOFF2)));
   if (buffer != NULL)
 	  MidiCutoff[1] = atoi(buffer);
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_RESONANCE1, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_RESONANCE1)));
   if (buffer != NULL)
     MidiRes[0] = atoi(buffer);
   free(buffer);
-  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_RESONANCE2, *wxConvCurrent)));
+  buffer = strdup(Datas.LoadValue(wxString(STR_MIDI_RESONANCE2)));
   if (buffer != NULL)
     MidiRes[1] = atoi(buffer);
   free(buffer);
@@ -559,12 +559,12 @@ void FilterPlugin::Update()
       if (Bypass)
 	{
 	  BypassBtn->SetOn();
-	  Liquid->SetBitmap(wxBitmap(liquid_off));
+	  Liquid->SetBitmap(wxBitmap(*liquid_off));
 	}
       else
 	{
 	  BypassBtn->SetOff();
-	  Liquid->SetBitmap(wxBitmap(liquid_on));
+	  Liquid->SetBitmap(wxBitmap(*liquid_on));
 	}
       UpdateBypass = false;
     }
@@ -751,9 +751,9 @@ void FilterPlugin::OnBypass(wxCommandEvent &e)
 
   Bypass = BypassBtn->GetOn();
   if (Bypass)
-    Liquid->SetBitmap(wxBitmap(liquid_off));
+    Liquid->SetBitmap(wxBitmap(*liquid_off));
   else
-    Liquid->SetBitmap(wxBitmap(liquid_on));	      
+    Liquid->SetBitmap(wxBitmap(*liquid_on));	      
 
   Mutex.Unlock();
 }

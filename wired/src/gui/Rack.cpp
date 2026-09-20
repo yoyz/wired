@@ -79,7 +79,7 @@ void				Rack::InitContextMenu()
 #ifndef DEBUG_1561088
   menu->Append(ID_MENU_CUT, _("Cut"));
   menu->Append(ID_MENU_COPY, _("Copy"));
-  menu->Append(ID_MENU_PASTE, _("Paste"), false);
+  menu->Append(ID_MENU_PASTE, _("Paste"));
   menu->Enable(ID_MENU_PASTE, false);
 #endif
   menu->AppendSeparator();

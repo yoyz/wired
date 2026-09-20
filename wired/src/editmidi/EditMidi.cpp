@@ -26,9 +26,9 @@ EditMidi::EditMidi(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wx
 
   detached = false;
   // fenetre du haut
-  top = new wxWindow(splitter, -1, wxPoint(0, 0), wxSize(size.GetWidth(), size.GetHeight() - SBS - BOTTOM_HEIGHT), wxTHICK_FRAME);
+  top = new wxWindow(splitter, -1, wxPoint(0, 0), wxSize(size.GetWidth(), size.GetHeight() - SBS - BOTTOM_HEIGHT), wxRESIZE_BORDER);
   // fenetre du bas
-  bottom = new wxWindow(splitter, -1, wxPoint(0, 0), wxSize(size.GetWidth(), BOTTOM_HEIGHT), wxTHICK_FRAME);
+  bottom = new wxWindow(splitter, -1, wxPoint(0, 0), wxSize(size.GetWidth(), BOTTOM_HEIGHT), wxRESIZE_BORDER);
 
   // coupe la fenetre en 2 dans le sens horizontal
   splitter->SplitHorizontally(top, bottom, size.GetHeight() - SBS);
@@ -42,7 +42,7 @@ EditMidi::EditMidi(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wx
 
   // fenetre en bas à droite (midiattr)
   swbd = new wxScrolledWindow(bottom, -1, wxPoint(CLAVIER_WIDTH, 0),
-			      wxSize(size.GetWidth() - SBS - CLAVIER_WIDTH, BOTTOM_HEIGHT), wxTHICK_FRAME);
+			      wxSize(size.GetWidth() - SBS - CLAVIER_WIDTH, BOTTOM_HEIGHT), wxRESIZE_BORDER);
   swbd->SetScrollRate(SBPASH, SBPASV);
 
   // MidiAttr
@@ -65,7 +65,7 @@ EditMidi::EditMidi(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wx
   swg = new wxScrolledWindow(top, -1, wxPoint(0, MIDI_RULER_HEIGHT),
 			     wxSize(CLAVIER_WIDTH,
 				    size.GetHeight() - SBS - MIDI_RULER_HEIGHT),
-			     wxTHICK_FRAME);
+			     wxRESIZE_BORDER);
   swg->SetScrollRate(SBPASH, SBPASV);
 
   // clavier
@@ -76,7 +76,7 @@ EditMidi::EditMidi(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wx
   // fenetre en haut à droite (midipart)
   swd = new wxScrolledWindow(top, -1, wxPoint(CLAVIER_WIDTH, MIDI_RULER_HEIGHT),
 			     wxSize(size.GetWidth() - CLAVIER_WIDTH - SBS,
-				    size.GetHeight() - SBS - MIDI_RULER_HEIGHT), wxTHICK_FRAME);
+				    size.GetHeight() - SBS - MIDI_RULER_HEIGHT), wxRESIZE_BORDER);
   swd->SetScrollRate(SBPASH, SBPASV);
 
   // fenetre tt en haut (ruler midi)
